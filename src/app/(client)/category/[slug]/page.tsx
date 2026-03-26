@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import type { Category } from "@/types/category.types";
 import { 
   BookOpen, 
   Headphones, 
@@ -49,30 +50,6 @@ import { categoryService } from "@/services/category.service";
 import { bookService } from "@/services/book.service";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-hot-toast";
-
-interface Category {
-  _id: string;
-  name: {
-    uz: string;
-    ru: string;
-    en?: string;
-  };
-  slug: string;
-  description?: {
-    uz?: string;
-    ru?: string;
-    en?: string;
-  };
-  image?: string;
-  icon?: string;
-  bookCount?: number;
-  subCategories?: Array<{
-    _id: string;
-    name: { uz: string; ru: string; en: string };
-    slug: string;
-    bookCount?: number;
-  }>;
-}
 
 interface Product {
   _id: string;
@@ -457,7 +434,7 @@ export default function CategoryDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {category.subCategories.map((sub) => (
                   <Link
-                    key={sub._id}
+                    key={sub._id ?? sub.slug}
                     href={`/category/${category.slug}/${sub.slug}`}
                     className="px-4 py-2 bg-gray-100 dark:bg-slate-700 rounded-full text-sm text-gray-600 dark:text-gray-400 hover:bg-[#005CB9] hover:text-white transition-colors"
                   >

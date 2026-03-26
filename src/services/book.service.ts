@@ -1,8 +1,26 @@
 // services/book.service.ts
 import { api } from './api';
-import { Book } from '@/types';
+import { Book, Product } from '@/types';
 
 export const bookService = {
+  async getProducts(params?: any): Promise<{ products: Product[]; pagination: { page: number; limit: number; total: number; pages: number } }> {
+    try {
+      const response = await api.get('/products', { params });
+      return (
+        response.data.data || {
+          products: [],
+          pagination: { page: 1, limit: params?.limit || 10, total: 0, pages: 1 }
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return {
+        products: [],
+        pagination: { page: 1, limit: params?.limit || 10, total: 0, pages: 1 }
+      };
+    }
+  },
+
   // Barcha kitoblarni olish
   async getAllBooks(params?: any): Promise<{ books: Book[]; total: number }> {
     try {

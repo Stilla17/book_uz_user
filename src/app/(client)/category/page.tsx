@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import type { Category } from "@/types/category.types";
 import { 
   BookOpen, 
   Headphones, 
@@ -50,39 +51,10 @@ import {
 import { categoryService } from "@/services/category.service";
 import { toast } from "react-hot-toast";
 
-interface ICategory {
-  _id: string;
-  name: {
-    uz: string;
-    ru: string;
-    en?: string;
-  };
-  slug: string;
-  icon?: string;
-  image?: string;
-  description?: {
-    uz?: string;
-    ru?: string;
-    en?: string;
-  };
-  bookCount?: number;
-  isActive: boolean;
-  isFeatured?: boolean;
-  order?: number;
-  parentId?: string | null;
-  createdAt?: string;
-  subCategories?: Array<{
-    _id: string;
-    name: { uz: string; ru: string; en: string };
-    slug: string;
-    bookCount?: number;
-  }>;
-}
-
 export default function CategoriesPage() {
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [filteredCategories, setFilteredCategories] = useState<ICategory[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact">("grid");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -151,7 +123,7 @@ export default function CategoriesPage() {
     }
   };
 
-  const getCategoryIcon = (category: ICategory) => {
+  const getCategoryIcon = (category: Category) => {
     if (category.icon) {
       return category.icon;
     }
@@ -176,7 +148,6 @@ export default function CategoriesPage() {
       darslik: "📚",
       darsliklar: "📚",
       sarguzasht: "🗺️",
-      detektiv: "🔍",
       klassika: "📖",
       falsafa: "🤔",
       diniy: "🕋",
@@ -596,12 +567,12 @@ export default function CategoriesPage() {
                           {/* Subcategories Preview */}
                           {category.subCategories && category.subCategories.length > 0 && (
                             <div className="mb-3 flex flex-wrap gap-1">
-                              {category.subCategories.slice(0, 3).map((sub) => (
-                                <span
-                                  key={sub._id}
-                                  className="text-xs px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-full"
-                                >
-                                  {sub.name.uz}
+                                {category.subCategories.slice(0, 3).map((sub) => (
+                                  <span
+                                    key={sub._id ?? sub.slug}
+                                    className="text-xs px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-full"
+                                  >
+                                    {sub.name.uz}
                                 </span>
                               ))}
                               {category.subCategories.length > 3 && (
@@ -704,7 +675,7 @@ export default function CategoriesPage() {
                               <div className="mt-2 flex flex-wrap gap-1">
                                 {category.subCategories.slice(0, 5).map((sub) => (
                                   <span
-                                    key={sub._id}
+                                    key={sub._id ?? sub.slug}
                                     className="text-xs px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-full"
                                   >
                                     {sub.name.uz}
@@ -851,3 +822,4 @@ export default function CategoriesPage() {
     </div>
   );
 }
+
