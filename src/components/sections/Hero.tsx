@@ -111,7 +111,7 @@ export const Hero = () => {
                 }}
                 loop={true}
                 onSlideChange={handleSlideChange}
-                className='hero-swiper h-[400px] w-full sm:h-[500px] lg:h-[600px]'>
+                className='hero-swiper h-100 w-full sm:h-[500px] lg:h-[600px]'>
                 {banners.map((banner) => (
                     <SwiperSlide key={banner._id}>
                         <div className='relative h-full w-full'>
