@@ -1,22 +1,23 @@
 import React from 'react';
-import { Gift, Star, TrendingUp, Percent, Award, Download } from 'lucide-react';
-import { ICategory, NavItem } from '@/types/nav.types';
 
-// Mock kategoriyalar (10 ta - admin qo'shmagan bo'lsa)
-// export const mockCategories: ICategory[] = [
-//     { _id: '1', name: { uz: 'Detektiv', ru: 'Детективы' }, slug: 'detektiv', icon: '🔍', count: 1240 },
-//     { _id: '2', name: { uz: 'Fantastika', ru: 'Фантастика' }, slug: 'fantastika', icon: '🚀', count: 892 },
-//     { _id: '3', name: { uz: 'Fentezi', ru: 'Фэнтези' }, slug: 'fentezi', icon: '🧙', count: 756 },
-//     { _id: '4', name: { uz: 'Roman', ru: 'Романы' }, slug: 'roman', icon: '💕', count: 1450 },
-//     { _id: '5', name: { uz: 'Psixologiya', ru: 'Психология' }, slug: 'psixologiya', icon: '🧠', count: 856 },
-//     { _id: '6', name: { uz: 'Tarix', ru: 'История' }, slug: 'tarix', icon: '📜', count: 623 },
-//     { _id: '7', name: { uz: 'Biznes', ru: 'Бизнес' }, slug: 'biznes', icon: '💼', count: 432 },
-//     { _id: '8', name: { uz: 'Bolalar', ru: 'Детские' }, slug: 'bolalar', icon: '🧸', count: 289 },
-//     { _id: '9', name: { uz: 'Ilmiy', ru: 'Научные' }, slug: 'ilmiy', icon: '🔬', count: 567 },
-//     { _id: '10', name: { uz: "She'riyat", ru: 'Поэзия' }, slug: 'she-riyat', icon: '📝', count: 345 },
-// ];
+import { NavItem } from '@/types/nav.types';
 
-
+import {
+    Award,
+    CreditCard,
+    Download,
+    FileText,
+    Gift,
+    Headphones,
+    HelpCircle,
+    Info,
+    Mail,
+    Percent,
+    Shield,
+    Star,
+    TrendingUp,
+    Truck
+} from 'lucide-react';
 
 // Bottom Navigation - to'liq jonlantirilgan (8 ta)
 export const bottomNav: NavItem[] = [
@@ -24,51 +25,93 @@ export const bottomNav: NavItem[] = [
         label: 'Promokod',
         href: '/promo',
         icon: <Gift size={14} />,
-        description: 'Chegirmalar va aksiyalar',
-        color: 'text-purple-500',
+        description: 'Chegirmalar va aksiyalar'
     },
     {
         label: 'Yangi',
         href: '/catalog?sort=-createdAt',
         icon: <Star size={14} />,
-        description: 'Yangi kitoblar',
-        color: 'text-blue-500',
+        description: 'Yangi kitoblar'
     },
     {
         label: 'Mashhur',
         href: '/catalog?sort=-ratingAvg',
         icon: <TrendingUp size={14} />,
-        description: "Eng ko'p o'qilgan",
-        color: 'text-red-500',
+        description: "Eng ko'p o'qilgan"
     },
     {
         label: 'Chegirma',
         href: '/catalog?isDiscount=true',
         icon: <Percent size={14} />,
-        description: 'Chegirmadagi kitoblar',
-        color: 'text-green-500',
+        description: 'Chegirmadagi kitoblar'
     },
     {
         label: 'Top 100',
         href: '/catalog?isTop=true',
         icon: <Award size={14} />,
-        description: 'Eng yaxshi kitoblar',
-        color: 'text-yellow-500',
+        description: 'Eng yaxshi kitoblar'
     },
     {
         label: "Sovg'a",
         href: '/gift-cards',
         icon: <Gift size={14} />,
-        description: "Sovg'a kartalari",
-        color: 'text-pink-500',
+        description: "Sovg'a kartalari"
     },
     {
         label: 'Bepul',
         href: '/catalog?price=0',
         icon: <Download size={14} />,
-        description: 'Bepul kitoblar',
-        color: 'text-teal-500',
-    },
+        description: 'Bepul kitoblar'
+    }
 ];
 
-
+export const serviceMenuItems = [
+    {
+        icon: <Info size={16} />,
+        label: 'serviceItems.about.label',
+        href: '/about',
+        description: 'serviceItems.about.description'
+    },
+    {
+        icon: <Truck size={16} />,
+        label: 'serviceItems.delivery.label',
+        href: '/delivery',
+        description: 'serviceItems.delivery.description'
+    },
+    {
+        icon: <CreditCard size={16} />,
+        label: 'serviceItems.payment.label',
+        href: '/payment',
+        description: 'serviceItems.payment.description'
+    },
+    {
+        icon: <Shield size={16} />,
+        label: 'serviceItems.guarantee.label',
+        href: '/guarantee',
+        description: 'serviceItems.guarantee.description'
+    },
+    {
+        icon: <Headphones size={16} />,
+        label: 'serviceItems.contact.label',
+        href: '/contact',
+        description: 'serviceItems.contact.description'
+    },
+    {
+        icon: <HelpCircle size={16} />,
+        label: 'serviceItems.faq.label',
+        href: '/faq',
+        description: 'serviceItems.faq.description'
+    },
+    {
+        icon: <FileText size={16} />,
+        label: 'serviceItems.terms.label',
+        href: '/terms',
+        description: 'serviceItems.terms.description'
+    },
+    {
+        icon: <Mail size={16} />,
+        label: 'serviceItems.news.label',
+        href: '/news',
+        description: 'serviceItems.news.description'
+    }
+];

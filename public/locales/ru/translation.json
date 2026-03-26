@@ -1,0 +1,47 @@
+{
+    "catalog": "Все жанры",
+    "allView": "Все книги",
+    "services": "Услуги",
+    "servicesAll": "Все услуги",
+    "darkMode": "Темный режим",
+    "lightMode": "Светлый режим",
+    "serviceItems": {
+        "about": {
+            "label": "О нас",
+            "description": "О нашей компании"
+        },
+        "delivery": {
+            "label": "Доставка",
+            "description": "Условия доставки"
+        },
+        "payment": {
+            "label": "Способы оплаты",
+            "description": "Как оплатить"
+        },
+        "guarantee": {
+            "label": "Гарантия",
+            "description": "Гарантия на товар"
+        },
+        "contact": {
+            "label": "Контакты",
+            "description": "Свяжитесь с нами"
+        },
+        "faq": {
+            "label": "FAQ",
+            "description": "Часто задаваемые вопросы"
+        },
+        "terms": {
+            "label": "Условия использования",
+            "description": "Правила сайта"
+        },
+        "news": {
+            "label": "Новости",
+            "description": "Последние новости"
+        }
+    },
+    "searchPlaceholder": "Книга, автор или жанр...",
+    "search": "Поиск",
+    "cart": "Корзина",
+    "profile": "Профиль",
+    "myBooks": "Мои книги"
+}

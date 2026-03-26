@@ -63,7 +63,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         primaryForeground: isDark ? '#ffffff' : '#ffffff',
         secondary: isDark ? '#334155' : '#f1f5f9',
         secondaryForeground: isDark ? '#f8fafc' : '#0f172a',
-        muted: isDark ? '#334155' : '#f1f5f9',
+        muted: isDark ? '#475266' : '#f1f5f9',
         mutedForeground: isDark ? '#94a3b8' : '#64748b',
         accent: isDark ? '#1e293b' : '#f8fafc',
         accentForeground: isDark ? '#f8fafc' : '#0f172a',

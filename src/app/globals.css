@@ -1,13 +1,13 @@
 /* app/globals.css */
 @import 'tailwindcss';
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
     --font-domaine: var(--font-domaine); /* Faqat DomaineText */
-    
+
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
@@ -119,68 +119,94 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  
-  /* Global UI font: Open Sans. DomaineText reserved for headings/content where needed. */
-  html, body {
-    @apply bg-background text-foreground;
+    * {
+        @apply border-border;
+    }
 
-    font-family: var(--font-rubik), var(--font-domaine);
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+    /* Global UI font: Open Sans. DomaineText reserved for headings/content where needed. */
+    html,
+    body {
+        @apply bg-background text-foreground;
 
-  /* DomaineText for headings and strong text */
-  h1, h2, h3, h4, h5, h6, strong, b {
-    font-family: var(--font-domaine), Georgia, serif;
-  }
-  
-  /* Og'irliklar */
-  h1, h2, h3, h4, h5, h6, strong, b, .font-bold {
-    font-weight: 700;
-  }
-  
-  .font-light {
-    font-weight: 300;
-  }
-  
-  .font-medium {
-    font-weight: 500;
-  }
-  
-  .font-black {
-    font-weight: 900;
-  }
-  
-  em, i, .italic {
-    font-style: italic;
-  }
+        font-family: var(--font-rubik), var(--font-domaine);
+        transition:
+            background-color 0.3s ease,
+            color 0.3s ease;
+    }
+
+    /* DomaineText for headings and strong text */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong,
+    b {
+        font-family: var(--font-domaine), Georgia, serif;
+    }
+
+    /* Og'irliklar */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong,
+    b,
+    .font-bold {
+        font-weight: 700;
+    }
+
+    .font-light {
+        font-weight: 300;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+    .font-black {
+        font-weight: 900;
+    }
+
+    em,
+    i,
+    .italic {
+        font-style: italic;
+    }
 }
 
 /* Qolgan stillar */
 [data-state='open'].DropdownMenuContent {
-  animation: slideDown 0.3s ease-out;
+    animation: slideDown 0.3s ease-out;
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .no-scrollbar::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 .no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
-:root{
-  --brand-blue: #00a0e3;
-  --brand-orange: #FF8A00;
+:root {
+    --brand-blue: #00a0e3;
+    --brand-orange: #ff8a00;
 }
-.dark{
-  --brand-blue: #00a0e3;
-  --brand-orange: #ffb14d;
+.dark {
+    --brand-blue: #00a0e3;
+    --brand-orange: #ffb14d;
 }

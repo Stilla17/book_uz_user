@@ -1,0 +1,47 @@
+{
+    "catalog": "All Genres",
+    "allView": "All View",
+    "services": "Services",
+    "servicesAll": "All services",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "serviceItems": {
+        "about": {
+            "label": "About us",
+            "description": "About our company"
+        },
+        "delivery": {
+            "label": "Delivery",
+            "description": "Delivery terms"
+        },
+        "payment": {
+            "label": "Payment methods",
+            "description": "How to pay"
+        },
+        "guarantee": {
+            "label": "Guarantee",
+            "description": "Product guarantee"
+        },
+        "contact": {
+            "label": "Contact",
+            "description": "Get in touch with us"
+        },
+        "faq": {
+            "label": "FAQ",
+            "description": "Frequently asked questions"
+        },
+        "terms": {
+            "label": "Terms of use",
+            "description": "Website rules"
+        },
+        "news": {
+            "label": "News",
+            "description": "Latest news"
+        }
+    },
+    "searchPlaceholder": "Book, author or genre...",
+    "search": "Search",
+    "cart": "Cart",
+    "profile": "Profile",
+    "myBooks": "My Books"
+}

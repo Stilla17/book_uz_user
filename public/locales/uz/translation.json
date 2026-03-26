@@ -1,0 +1,47 @@
+{
+    "catalog": "Barcha Janrlar",
+    "allView": "Barcha Kitoblar",
+    "services": "Xizmatlar",
+    "servicesAll": "Barcha xizmatlar",
+    "darkMode": "Tungi rejim",
+    "lightMode": "Yorug' rejim",
+    "serviceItems": {
+        "about": {
+            "label": "Biz haqimizda",
+            "description": "Kompaniyamiz haqida"
+        },
+        "delivery": {
+            "label": "Yetkazib berish",
+            "description": "Yetkazib berish shartlari"
+        },
+        "payment": {
+            "label": "To'lov usullari",
+            "description": "Qanday to'lash mumkin"
+        },
+        "guarantee": {
+            "label": "Kafolat",
+            "description": "Mahsulot kafolati"
+        },
+        "contact": {
+            "label": "Aloqa",
+            "description": "Biz bilan bog'lanish"
+        },
+        "faq": {
+            "label": "FAQ",
+            "description": "Tez-tez so'raladigan savollar"
+        },
+        "terms": {
+            "label": "Foydalanish shartlari",
+            "description": "Sayt qoidalari"
+        },
+        "news": {
+            "label": "Yangiliklar",
+            "description": "So'nggi yangiliklar"
+        }
+    },
+    "searchPlaceholder": "Kitob, muallif yoki janr...",
+    "search": "Qidirish",
+    "cart": "Savat",
+    "profile": "Profil",
+    "myBooks": "Mening kitoblarim"
+}
