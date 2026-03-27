@@ -10,7 +10,6 @@ import {
   ChevronLeft, 
   Sparkles, 
   TrendingUp, 
-  Clock, 
   Flame,
   Headphones,
   Award,
@@ -449,7 +448,7 @@ export const BookSection = ({
       </div>
 
       {/* Global Styles */}
-      <style jsx global>{`
+      <style>{`
         .book-swiper {
           padding: 15px 5px !important;
           margin: -15px -5px !important;

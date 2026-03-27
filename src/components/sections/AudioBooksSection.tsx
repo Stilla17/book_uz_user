@@ -541,7 +541,7 @@ export const AudioBooksSection = ({
       </div>
 
       {/* Custom Styles */}
-      <style jsx global>{`
+      <style>{`
         .audio-swiper {
           padding: 5px 0 20px !important;
           margin: -5px 0 !important;
