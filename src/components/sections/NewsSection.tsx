@@ -83,8 +83,9 @@ export const NewsSection = () => {
   };
 
   // Kategoriya uslubini olish
-  const getCategoryStyles = (badge?: string) => {
-    const badgeText = badge?.uz?.toLowerCase() || '';
+  const getCategoryStyles = (badge?: UserBanner["badge"] | string) => {
+    const badgeText =
+      typeof badge === "string" ? badge.toLowerCase() : badge?.uz?.toLowerCase() || "";
     
     if (badgeText.includes('yangilanish') || badgeText.includes('update')) {
       return {

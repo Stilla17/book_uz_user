@@ -13,6 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, Pagination } from "swiper/modules";
+import { toast } from "react-hot-toast";
 import { audioBookService } from "@/services/audioBook.service";
 import { AudioBook } from "@/types/audioBook.types";
 

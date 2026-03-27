@@ -5,7 +5,6 @@ import { Hero } from "@/components/sections/Hero";
 import { CategorySection } from "@/components/sections/Categories";
 import { BookSection } from "@/components/sections/BookSection";
 import { AuthorBannerSection } from "@/components/sections/AuthorBannerSection";
-import { AuthorBannerData } from "@/types";
 import { AuthorQuoteSection } from "@/components/sections/AuthorQuoteSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
@@ -16,10 +15,6 @@ import { DownloadAppSection } from "@/components/sections/DownloadAppSection";
 import { NewsSection } from "@/components/sections/NewsSection";
 
 const Page = () => {
-    // Tasavvur qilamiz bazadan ma'lumot kelyapti (Yoki null)
-    const authorFromDB: AuthorBannerData | null = null;
-    const quotesFromDB = null;
-
     return (
         <div className="flex flex-col bg-white dark:bg-slate-900">
             {/* Hero Section */}
@@ -43,7 +38,7 @@ const Page = () => {
             />
 
             {/* Author Banner */}
-            <AuthorBannerSection data={authorFromDB} />
+            <AuthorBannerSection />
 
             {/* Sizga yoqishi mumkin */}
             <BookSection

@@ -876,17 +876,16 @@ export default function OrderDetailPage() {
 
                     {/* Tracking Timeline */}
                     <div className="space-y-4">
-                      {[
+                      {([
                         { status: 'PENDING', label: 'Buyurtma qabul qilindi', date: order.createdAt },
                         { status: 'PROCESSING', label: 'Tayyorlanmoqda', date: order.status !== 'PENDING' ? order.updatedAt : null },
                         { status: 'SHIPPED', label: 'Jo\'natildi', date: null },
                         { status: 'DELIVERED', label: 'Yetkazildi', date: null },
-                      ].map((step, index, array) => {
-                        const isCompleted = order.status !== 'PENDING' && 
-                          (step.status === 'PENDING' || 
-                           (step.status === 'PROCESSING' && order.status !== 'PENDING') ||
-                           (step.status === 'SHIPPED' && (order.status === 'SHIPPED' || order.status === 'DELIVERED')) ||
-                           (step.status === 'DELIVERED' && order.status === 'DELIVERED'));
+                      ] as Array<{ status: Order["status"]; label: string; date: string | null }>).map((step, index, array) => {
+                        const timelineSteps: Order["status"][] = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
+                        const currentStepIndex = timelineSteps.indexOf(order.status);
+                        const stepIndex = timelineSteps.indexOf(step.status);
+                        const isCompleted = currentStepIndex > stepIndex;
                         
                         const isActive = order.status === step.status;
                         

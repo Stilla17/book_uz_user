@@ -138,11 +138,6 @@ const getIconBySlug = (slug: string): { icon: React.ReactNode; color: string; da
       color: "from-fuchsia-500 to-pink-500",
       darkColor: "dark:from-fuchsia-500 dark:to-pink-500" 
     },
-    sheriyat: { 
-      icon: <Feather size={24} />, 
-      color: "from-fuchsia-500 to-pink-500",
-      darkColor: "dark:from-fuchsia-500 dark:to-pink-500" 
-    },
   };
   
   return iconMap[slug] || { 

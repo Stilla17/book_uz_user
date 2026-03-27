@@ -199,6 +199,10 @@ export const UserService = {
     const response = await api.post('/users/address', address);
     return response.data;
   },
+  updateAddress: async (addressId: string, address: any) => {
+    const response = await api.patch(`/users/address/${addressId}`, address);
+    return response.data;
+  },
   deleteAddress: async (addressId: string) => {
     const response = await api.delete(`/users/address/${addressId}`);
     return response.data;
