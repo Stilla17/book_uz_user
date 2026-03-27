@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
   Check, 
   Sparkles, 
@@ -12,7 +12,7 @@ import {
   Award,
   Star,
   Zap,
-  Infinity,
+  Infinity as InfinityIcon,
   Calendar,
   ArrowRight,
   Loader2,
@@ -658,7 +658,7 @@ export default function SubscriptionPage() {
               { icon: <Library size={32} />, title: "50,000+ kitoblar", desc: "Eng katta raqamli kutubxona", color: "from-blue-500 to-cyan-500" },
               { icon: <Mic2 size={32} />, title: "10,000+ audio", desc: "Professional ovozlashtirish", color: "from-orange-500 to-pink-500" },
               { icon: <Download size={32} />, title: "Offline o'qish", desc: "Internet siz ham ishlaydi", color: "from-green-500 to-emerald-500" },
-              { icon: <Infinity size={32} />, title: "Cheksiz", desc: "Premium obunada barchasi ochiq", color: "from-purple-500 to-indigo-500" },
+              { icon: <InfinityIcon size={32} />, title: "Cheksiz", desc: "Premium obunada barchasi ochiq", color: "from-purple-500 to-indigo-500" },
               { icon: <WifiIcon size={32} />, title: "Sinxronizatsiya", desc: "Barcha qurilmalarda", color: "from-yellow-500 to-orange-500" },
               { icon: <BatteryFull size={32} />, title: "Energiya tejamkor", desc: "Battery saving mode", color: "from-teal-500 to-cyan-500" },
               { icon: <Heart size={32} />, title: "Sevimlilar", desc: "O'zingizga yoqqanlarini saqlang", color: "from-red-500 to-pink-500" },

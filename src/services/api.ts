@@ -29,7 +29,7 @@ api.interceptors.request.use(
   },
   (error) => {
     console.error('❌ Request Error:', error);
-    return Promise.reject(error);
+    throw error;
   }
 );
 
@@ -55,22 +55,21 @@ api.interceptors.response.use(
 
     // MUHIM: Agar xato /auth/refresh so'rovidan kelsa, interceptor hech narsa qilmasligi kerak
     if (originalRequest.url?.includes('/auth/refresh')) {
-      return Promise.reject(error);
+      throw error;
     }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        })
-          .then(() => {
-            // Yangi accessToken bilan so'rovni qayta jo'natish
-            if (accessToken) {
-              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-            }
-            return api(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
+        });
+
+        // Yangi accessToken bilan so'rovni qayta jo'natish
+        if (accessToken) {
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
+        return api(originalRequest);
       }
 
       originalRequest._retry = true;
@@ -111,10 +110,10 @@ api.interceptors.response.use(
             !window.location.pathname.includes('/auth/register')) {
           window.location.href = '/auth/login';
         }
-        return Promise.reject(refreshError);
+        throw refreshError;
       }
     }
-    return Promise.reject(error);
+    throw error;
   }
 );
 
