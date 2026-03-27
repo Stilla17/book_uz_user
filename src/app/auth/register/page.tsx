@@ -51,7 +51,6 @@ export default function RegisterPage() {
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-500/10 dark:bg-orange-600/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-3xl" />
       </div>
-
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -70,7 +69,7 @@ export default function RegisterPage() {
 
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white">Hisob yaratish</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">Xush kelibsiz! Ma'lumotlaringizni kiriting.</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">{'Xush kelibsiz! Ma\'lumotlaringizni kiriting.'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -183,9 +182,7 @@ export default function RegisterPage() {
             {isLoading ? (
               <Loader2 className="animate-spin" size={22} />
             ) : (
-              <>
-                Ro'yxatdan o'tish
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              <>{' Ro\'yxatdan o\'tish '}<ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </>
             )}
           </button>
@@ -201,8 +198,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Terms */}
-        <p className="mt-6 text-xs text-center text-gray-400 dark:text-gray-500">
-          Ro'yxatdan o'tish orqali siz{" "}
+        <p className="mt-6 text-xs text-center text-gray-400 dark:text-gray-500">{' Ro\'yxatdan o\'tish orqali siz'}{" "}
           <Link href="/terms" className="text-blue-500 dark:text-blue-400 hover:underline">Foydalanish shartlari</Link>
           {" "}va{" "}
           <Link href="/privacy" className="text-orange-500 dark:text-orange-400 hover:underline">Maxfiylik siyosati</Link>

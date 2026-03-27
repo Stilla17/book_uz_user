@@ -287,7 +287,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-12 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -344,7 +343,6 @@ export default function ContactPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header with animation */}
@@ -370,9 +368,7 @@ export default function ContactPage() {
             transition={{ delay: 0.3 }}
             className="text-3xl md:text-5xl font-black mb-4"
           >
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-400 dark:to-orange-400">
-              Biz bilan bog'laning
-            </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-400 dark:to-orange-400">{' Biz bilan bog\'laning '}</span>
           </motion.h1>
           
           <motion.p 
@@ -380,10 +376,7 @@ export default function ContactPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
             className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-lg"
-          >
-            Savollaringiz bormi? Bizning jamoa sizga yordam berishdan mamnun. 
-            Quyidagi ma'lumotlar orqali biz bilan bog'lanishingiz mumkin.
-          </motion.p>
+          >{' Savollaringiz bormi? Bizning jamoa sizga yordam berishdan mamnun. Quyidagi ma\'lumotlar orqali biz bilan bog\'lanishingiz mumkin. '}</motion.p>
         </motion.div>
 
         {/* Contact Info Grid */}
@@ -442,7 +435,7 @@ export default function ContactPage() {
                 transition={{ delay: 0.8 }}
                 className="text-2xl md:text-3xl font-black"
               >
-                <span className="text-[#005CB9] dark:text-blue-400">Do'konlarimiz</span>
+                <span className="text-[#005CB9] dark:text-blue-400">{'Do\'konlarimiz'}</span>
                 <span className="text-[#FF8A00] dark:text-orange-400"> manzillari</span>
               </motion.h2>
               <motion.p 
@@ -451,8 +444,7 @@ export default function ContactPage() {
                 transition={{ delay: 0.9 }}
                 className="text-sm text-gray-500 dark:text-gray-400 mt-1"
               >
-                {stores.length} ta shaharda do'konlarimiz mavjud
-              </motion.p>
+                {stores.length}{' ta shaharda do\'konlarimiz mavjud '}</motion.p>
             </div>
           </div>
 
@@ -538,8 +530,7 @@ export default function ContactPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-4 left-4 right-4">
                       <h3 className="text-xl font-black text-white mb-1">
-                        {selectedStoreData.city} do'koni
-                      </h3>
+                        {selectedStoreData.city}{' do\'koni '}</h3>
                       {selectedStoreData.isMain && (
                         <motion.span 
                           initial={{ scale: 0 }}
@@ -626,9 +617,7 @@ export default function ContactPage() {
                         onClick={() => setShowMap(!showMap)}
                         className="flex items-center gap-2 text-[#005CB9] dark:text-blue-400 hover:underline"
                       >
-                        <Navigation size={16} />
-                        Xaritada ko'rish
-                        <ChevronRight size={16} className={`transform transition-transform ${showMap ? 'rotate-90' : ''}`} />
+                        <Navigation size={16} />{' Xaritada ko\'rish '}<ChevronRight size={16} className={`transform transition-transform ${showMap ? 'rotate-90' : ''}`} />
                       </motion.button>
 
                       <AnimatePresence>
@@ -856,9 +845,7 @@ export default function ContactPage() {
               className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 shadow-lg p-6"
             >
               <h2 className="text-xl font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <HelpCircle size={20} className="text-[#005CB9] dark:text-blue-400" />
-                Tez-tez so'raladigan savollar
-              </h2>
+                <HelpCircle size={20} className="text-[#005CB9] dark:text-blue-400" />{' Tez-tez so\'raladigan savollar '}</h2>
               
               <div className="space-y-3">
                 {[

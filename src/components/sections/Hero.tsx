@@ -64,7 +64,7 @@ export const Hero = () => {
 
     if (loading || banners.length === 0) {
         return (
-            <section className='relative h-100 w-full overflow-hidden sm:h-[500px] lg:h-[600px]'>
+            <section className='relative h-100 w-full overflow-hidden sm:h-125 lg:h-150'>
                 <div className='absolute inset-0 animate-pulse bg-gradient-to-r from-gray-300 to-gray-200 dark:from-slate-800 dark:to-slate-800'>
                     <div className='absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10' />
                 </div>
@@ -111,13 +111,13 @@ export const Hero = () => {
                 }}
                 loop={true}
                 onSlideChange={handleSlideChange}
-                className='hero-swiper h-100 w-full sm:h-[500px] lg:h-[600px]'>
+                className='hero-swiper h-100 w-full sm:h-125 lg:h-150'>
                 {banners.map((banner) => (
                     <SwiperSlide key={banner._id}>
                         <div className='relative h-full w-full'>
                             {/* Background Image */}
                             <div
-                                className='swiper-slide-active:scale-110 absolute inset-0 scale-105 bg-cover bg-center transition-transform duration-[10000ms]'
+                                className='swiper-slide-active:scale-110 absolute inset-0 scale-105 bg-cover bg-center transition-transform duration-10000'
                                 style={{
                                     backgroundImage: `url(${banner.imageUrl})`
                                 }}

@@ -481,7 +481,6 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -538,7 +537,6 @@ export default function SettingsPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         
         {/* Header with animation */}
@@ -637,7 +635,7 @@ export default function SettingsPage() {
                 transition={{ delay: 0.1 }}
                 className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 p-6"
               >
-                <h2 className="text-lg font-black text-gray-900 dark:text-white mb-6">Profil ma'lumotlari</h2>
+                <h2 className="text-lg font-black text-gray-900 dark:text-white mb-6">{'Profil ma\'lumotlari'}</h2>
                 
                 <div className="flex flex-col md:flex-row gap-8">
                   {/* Avatar */}
@@ -719,7 +717,7 @@ export default function SettingsPage() {
                           disabled
                           className="mt-1 bg-gray-100 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400"
                         />
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Email o'zgartirilmaydi</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{'Email o\'zgartirilmaydi'}</p>
                       </motion.div>
                       
                       <motion.div
@@ -782,7 +780,7 @@ export default function SettingsPage() {
                 transition={{ delay: 0.1 }}
                 className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 p-6"
               >
-                <h2 className="text-lg font-black text-gray-900 dark:text-white mb-6">Parolni o'zgartirish</h2>
+                <h2 className="text-lg font-black text-gray-900 dark:text-white mb-6">{'Parolni o\'zgartirish'}</h2>
                 
                 <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
                   <motion.div
@@ -854,7 +852,7 @@ export default function SettingsPage() {
                     transition={{ delay: 0.5 }}
                     className="text-xs text-gray-400 dark:text-gray-500 mt-2"
                   >
-                    <p>Parol kamida 6 ta belgidan iborat bo'lishi kerak</p>
+                    <p>{'Parol kamida 6 ta belgidan iborat bo\'lishi kerak'}</p>
                   </motion.div>
 
                   <motion.div
@@ -1269,8 +1267,8 @@ export default function SettingsPage() {
               className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-red-200 dark:border-red-800"
             >
               <div>
-                <p className="font-bold text-gray-900 dark:text-white">Hisobni o'chirish</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Hisobingizni butunlay o'chirish</p>
+                <p className="font-bold text-gray-900 dark:text-white">{'Hisobni o\'chirish'}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{'Hisobingizni butunlay o\'chirish'}</p>
               </div>
               
               {!showDeleteConfirm ? (
@@ -1280,9 +1278,7 @@ export default function SettingsPage() {
                     variant="outline"
                     className="border-red-500 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20"
                   >
-                    <Trash2 size={16} className="mr-2" />
-                    Hisobni o'chirish
-                  </Button>
+                    <Trash2 size={16} className="mr-2" />{' Hisobni o\'chirish '}</Button>
                 </motion.div>
               ) : (
                 <motion.div 

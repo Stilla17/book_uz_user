@@ -383,7 +383,6 @@ export default function MyBooksPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -440,7 +439,6 @@ export default function MyBooksPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header with animation */}
@@ -566,9 +564,9 @@ export default function MyBooksPage() {
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="text-xs bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1 text-gray-700 dark:text-gray-300"
               >
-                <option value="recent">Oxirgi qo'shilgan</option>
-                <option value="title">Nomi bo'yicha</option>
-                <option value="progress">O'qish holati</option>
+                <option value="recent">{'Oxirgi qo\'shilgan'}</option>
+                <option value="title">{'Nomi bo\'yicha'}</option>
+                <option value="progress">{'O\'qish holati'}</option>
               </select>
             </div>
             
@@ -631,7 +629,7 @@ export default function MyBooksPage() {
                           />
                         </div>
                         <div className="flex justify-between items-center mt-1">
-                          <span className="text-[8px] text-gray-400 dark:text-gray-500">O'qilgan: {book.progress}%</span>
+                          <span className="text-[8px] text-gray-400 dark:text-gray-500">{'O\'qilgan: '}{book.progress}%</span>
                           {book.progress === 100 && (
                             <span className="text-[8px] text-green-600 dark:text-green-400 font-bold flex items-center gap-0.5">
                               <CheckCircle size={8} />
@@ -714,7 +712,7 @@ export default function MyBooksPage() {
               </div>
             ) : (
               // List View
-              <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 overflow-hidden">
+              (<div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 overflow-hidden">
                 {sortedBooks.map((book, index) => (
                   <motion.div 
                     key={book._id}
@@ -824,19 +822,17 @@ export default function MyBooksPage() {
                           </>
                         ) : (
                           <>
-                            <BookOpen size={14} />
-                            O'qish
-                          </>
+                            <BookOpen size={14} />{' O\'qish '}</>
                         )}
                       </button>
                     </div>
                   </motion.div>
                 ))}
-              </div>
+              </div>)
             )
           ) : (
             // Empty State with animation
-            <motion.div
+            (<motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.8 }}
@@ -845,18 +841,14 @@ export default function MyBooksPage() {
               <div className="w-24 h-24 bg-gradient-to-r from-[#005CB9]/10 to-[#FF8A00]/10 dark:from-blue-600/20 dark:to-orange-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <BookOpen size={48} className="text-[#005CB9] dark:text-blue-400" />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3">Kitoblar yo'q</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
-                Siz hali hech qanday kitob sotib olmagansiz. Katalogdan o'zingizga yoqqan kitoblarni toping va kutubxonangizni boyiting.
-              </p>
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3">{'Kitoblar yo\'q'}</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">{' Siz hali hech qanday kitob sotib olmagansiz. Katalogdan o\'zingizga yoqqan kitoblarni toping va kutubxonangizni boyiting. '}</p>
               <Link 
                 href="/catalog" 
                 className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white font-bold rounded-xl hover:shadow-lg dark:hover:shadow-2xl dark:hover:shadow-blue-900/20 transition-all"
               >
-                <BookOpen size={18} />
-                Katalogga o'tish
-              </Link>
-            </motion.div>
+                <BookOpen size={18} />{' Katalogga o\'tish '}</Link>
+            </motion.div>)
           )}
         </motion.div>
 
@@ -873,15 +865,14 @@ export default function MyBooksPage() {
           </div>
           <div className="p-2">
             <Shield size={16} className="mx-auto mb-1 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-400 dark:text-gray-500">Xavfsiz to'lov</span>
+            <span className="text-gray-400 dark:text-gray-500">{'Xavfsiz to\'lov'}</span>
           </div>
           <div className="p-2">
             <Package size={16} className="mx-auto mb-1 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-400 dark:text-gray-500">24/7 qo'llab-quvvatlash</span>
+            <span className="text-gray-400 dark:text-gray-500">{'24/7 qo\'llab-quvvatlash'}</span>
           </div>
         </motion.div>
       </div>
-
       {/* Quick View Modal with animation */}
       <AnimatePresence>
         {showQuickView && selectedBook && (

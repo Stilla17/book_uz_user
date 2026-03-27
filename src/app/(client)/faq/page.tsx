@@ -151,13 +151,11 @@ export default function FAQPage() {
           </div>
           
           <h1 className="text-3xl md:text-5xl font-black mb-4">
-            <span className="text-[#005CB9] dark:text-blue-400">Tez-tez so'raladigan</span>
+            <span className="text-[#005CB9] dark:text-blue-400">{'Tez-tez so\'raladigan'}</span>
             <span className="text-[#FF8A00] dark:text-orange-400"> savollar</span>
           </h1>
           
-          <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-lg">
-            Savollaringizga javob topa olmadingizmi? Biz bilan bog'lanishingiz mumkin.
-          </p>
+          <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-lg">{' Savollaringizga javob topa olmadingizmi? Biz bilan bog\'lanishingiz mumkin. '}</p>
         </motion.div>
 
         {/* Popular FAQs */}
@@ -188,7 +186,7 @@ export default function FAQPage() {
                   </h3>
                   <div className="flex items-center gap-2 mt-2 text-xs text-gray-400 dark:text-gray-500">
                     <Eye size={12} />
-                    <span>{faq.views} marta ko'rilgan</span>
+                    <span>{faq.views}{' marta ko\'rilgan'}</span>
                   </div>
                 </div>
               </div>
@@ -293,8 +291,7 @@ export default function FAQPage() {
                         </h3>
                         <div className="flex items-center gap-3 mt-1">
                           <span className="text-xs text-gray-400 dark:text-gray-500">
-                            {faq.views} marta ko'rilgan
-                          </span>
+                            {faq.views}{' marta ko\'rilgan '}</span>
                           {faq.helpful && (
                             <span className="text-xs text-green-600 dark:text-green-400">
                               {faq.helpful} kishi foydali deb topgan
@@ -310,7 +307,6 @@ export default function FAQPage() {
                       }`}
                     />
                   </button>
-                  
                   <AnimatePresence>
                     {openItems.includes(originalIndex) && (
                       <motion.div
@@ -339,9 +335,7 @@ export default function FAQPage() {
                                 Ha
                               </button>
                               <button className="flex items-center gap-1 px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors text-sm">
-                                <X size={14} />
-                                Yo'q
-                              </button>
+                                <X size={14} />{' Yo\'q '}</button>
                             </div>
                           )}
                           
@@ -366,9 +360,7 @@ export default function FAQPage() {
             >
               <HelpCircle size={64} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
               <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">Hech narsa topilmadi</p>
-              <p className="text-gray-400 dark:text-gray-500 mb-4">
-                "{searchQuery}" bo'yicha hech qanday savol topilmadi
-              </p>
+              <p className="text-gray-400 dark:text-gray-500 mb-4">{' "'}{searchQuery}{'" bo\'yicha hech qanday savol topilmadi '}</p>
               <button
                 onClick={() => {
                   setSearchQuery("");
@@ -442,14 +434,10 @@ export default function FAQPage() {
           <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">
             Savolingizga javob topa olmadingizmi?
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
-            Bizning qo'llab-quvvatlash jamoamiz sizga yordam berishga tayyor.
-          </p>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">{' Bizning qo\'llab-quvvatlash jamoamiz sizga yordam berishga tayyor. '}</p>
           <Link href="/contact">
             <Button className="bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white font-bold px-8 py-6 rounded-xl hover:shadow-lg dark:hover:shadow-2xl dark:hover:shadow-blue-900/20 transition-all">
-              <MessageCircle size={18} className="mr-2" />
-              Biz bilan bog'lanish
-            </Button>
+              <MessageCircle size={18} className="mr-2" />{' Biz bilan bog\'lanish '}</Button>
           </Link>
         </motion.div>
 
@@ -461,11 +449,11 @@ export default function FAQPage() {
           </div>
           <div className="p-2">
             <Shield size={16} className="mx-auto mb-1 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-400 dark:text-gray-500">Xavfsiz to'lov</span>
+            <span className="text-gray-400 dark:text-gray-500">{'Xavfsiz to\'lov'}</span>
           </div>
           <div className="p-2">
             <Headphones size={16} className="mx-auto mb-1 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-400 dark:text-gray-500">24/7 qo'llab-quvvatlash</span>
+            <span className="text-gray-400 dark:text-gray-500">{'24/7 qo\'llab-quvvatlash'}</span>
           </div>
         </div>
       </div>

@@ -260,7 +260,6 @@ export default function CategoriesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-12 relative overflow-hidden">
-      
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(30)].map((_, i) => {
@@ -312,7 +311,6 @@ export default function CategoriesPage() {
           className="absolute bottom-20 right-20 w-96 h-96 bg-[#FF8A00]/5 dark:bg-orange-600/10 rounded-full blur-3xl"
         />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header Section */}
@@ -347,9 +345,7 @@ export default function CategoriesPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
             className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-lg"
-          >
-            O'zingizga yoqqan janrni tanlang va eng sara kitoblarni kashf eting
-          </motion.p>
+          >{' O\'zingizga yoqqan janrni tanlang va eng sara kitoblarni kashf eting '}</motion.p>
         </motion.div>
 
         {/* Stats Cards */}
@@ -419,8 +415,8 @@ export default function CategoriesPage() {
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#005CB9] dark:focus:ring-blue-400 text-gray-900 dark:text-white"
               >
-                <option value="bookCount">Eng ko'p kitoblar</option>
-                <option value="name">Nomi bo'yicha</option>
+                <option value="bookCount">{'Eng ko\'p kitoblar'}</option>
+                <option value="name">{'Nomi bo\'yicha'}</option>
                 <option value="newest">Eng yangilar</option>
               </select>
 
@@ -727,7 +723,7 @@ export default function CategoriesPage() {
           </>
         ) : (
           // Empty State
-          <motion.div
+          (<motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.7 }}
@@ -744,16 +740,14 @@ export default function CategoriesPage() {
             <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-3">
               Kategoriya topilmadi
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
-              "{searchQuery}" bo'yicha hech qanday kategoriya topilmadi.
-            </p>
+            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">{' "'}{searchQuery}{'" bo\'yicha hech qanday kategoriya topilmadi. '}</p>
             <button
               onClick={() => setSearchQuery("")}
               className="px-6 py-3 bg-gradient-to-r from-[#005CB9] to-[#FF8A00] text-white font-bold rounded-xl hover:shadow-lg transition-all"
             >
               Qidiruvni tozalash
             </button>
-          </motion.div>
+          </motion.div>)
         )}
 
         {/* Popular Categories */}

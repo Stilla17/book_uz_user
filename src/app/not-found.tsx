@@ -191,7 +191,6 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center px-4 py-16 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Floating Icons */}
@@ -244,7 +243,6 @@ export default function NotFound() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container max-w-4xl mx-auto text-center relative z-10">
         
         {/* Floating Icon */}
@@ -354,9 +352,7 @@ export default function NotFound() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="relative"
         >
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-4">
-            Kechirasiz, siz qidirgan sahifa mavjud emas yoki o'chirilgan bo'lishi mumkin.
-          </p>
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-4">{' Kechirasiz, siz qidirgan sahifa mavjud emas yoki o\'chirilgan bo\'lishi mumkin. '}</p>
           <p className="text-base text-gray-500 dark:text-gray-500 max-w-xl mx-auto">
             Bosh sahifaga qaytib, 50,000+ kitoblar olamini kashf etishni davom ettiring.
           </p>
@@ -490,9 +486,7 @@ export default function NotFound() {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link href="/">
               <Button className="flex items-center gap-2 px-8 py-6 text-base bg-gradient-to-r from-blue-600 to-orange-600 hover:from-blue-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all">
-                <Home size={18} />
-                Bosh sahifaga o'tish
-              </Button>
+                <Home size={18} />{' Bosh sahifaga o\'tish '}</Button>
             </Link>
           </motion.div>
         </motion.div>

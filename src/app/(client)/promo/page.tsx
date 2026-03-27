@@ -370,7 +370,6 @@ export default function PromoPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -428,7 +427,6 @@ export default function PromoPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header */}
@@ -516,9 +514,7 @@ export default function PromoPage() {
         >
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 border border-[#005CB9]/20 dark:border-[#FF8A00]/20">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <BadgePercent size={18} className="text-[#005CB9]" />
-              Promokodni qo'llash
-            </h2>
+              <BadgePercent size={18} className="text-[#005CB9]" />{' Promokodni qo\'llash '}</h2>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Input
@@ -537,9 +533,7 @@ export default function PromoPage() {
                 {applying ? <Loader2 size={18} className="animate-spin" /> : "Qo'llash"}
               </Button>
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-              Promokodni qo'llash orqali savatdagi mahsulotlarga chegirma oling
-            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{' Promokodni qo\'llash orqali savatdagi mahsulotlarga chegirma oling '}</p>
           </div>
         </motion.div>
 
@@ -574,7 +568,6 @@ export default function PromoPage() {
                     }}
                     transition={{ duration: 0.3 }}
                   />
-
                   {/* Category Badge */}
                   <div className="absolute top-3 left-3 z-10">
                     <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${categoryColor} text-white shadow-lg`}>
@@ -582,7 +575,6 @@ export default function PromoPage() {
                       <span>{categoryLabel}</span>
                     </div>
                   </div>
-
                   {/* New/Hot Badges */}
                   <div className="absolute top-3 right-3 z-10 flex gap-1">
                     {promo.isNew && (
@@ -598,7 +590,6 @@ export default function PromoPage() {
                       </div>
                     )}
                   </div>
-
                   {/* Header Gradient */}
                   <div className={`bg-gradient-to-r ${categoryColor} p-6 pt-8`}>
                     <div className="flex items-center justify-between">
@@ -620,7 +611,6 @@ export default function PromoPage() {
                       </motion.button>
                     </div>
                   </div>
-
                   <div className="p-6">
                     {/* Discount */}
                     <div className="flex items-center justify-between mb-4">
@@ -634,8 +624,7 @@ export default function PromoPage() {
                         <div className="text-right">
                           <span className="text-xs text-gray-400">Maksimal</span>
                           <p className="font-bold text-[#FF8A00] dark:text-orange-400">
-                            {promo.maxDiscount.toLocaleString()} so'm
-                          </p>
+                            {promo.maxDiscount.toLocaleString()}{' so\'m '}</p>
                         </div>
                       )}
                     </div>
@@ -649,7 +638,7 @@ export default function PromoPage() {
                     {promo.minOrderAmount && (
                       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
                         <ShoppingBag size={14} />
-                        <span>Min. buyurtma: <span className="font-bold text-[#005CB9]">{promo.minOrderAmount.toLocaleString()} so'm</span></span>
+                        <span>Min. buyurtma: <span className="font-bold text-[#005CB9]">{promo.minOrderAmount.toLocaleString()}{' so\'m'}</span></span>
                       </div>
                     )}
 
@@ -699,7 +688,7 @@ export default function PromoPage() {
           </div>
         ) : (
           // Empty State
-          <motion.div
+          (<motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-16"
@@ -710,9 +699,7 @@ export default function PromoPage() {
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Promokod topilmadi
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
-              "{searchQuery}" bo'yicha hech qanday promokod topilmadi
-            </p>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">{' "'}{searchQuery}{'" bo\'yicha hech qanday promokod topilmadi '}</p>
             <Button
               onClick={() => {
                 setSearchQuery("");
@@ -722,7 +709,7 @@ export default function PromoPage() {
             >
               Filtrlarni tozalash
             </Button>
-          </motion.div>
+          </motion.div>)
         )}
 
         {/* Statistics */}
@@ -765,9 +752,7 @@ export default function PromoPage() {
         >
           <p className="text-gray-500 dark:text-gray-400">
             Promokodlar haqida savollaringiz bormi?{" "}
-            <Link href="/faq" className="text-[#005CB9] hover:text-[#FF8A00] font-bold">
-              FAQ bo'limiga o'tish
-            </Link>
+            <Link href="/faq" className="text-[#005CB9] hover:text-[#FF8A00] font-bold">{' FAQ bo\'limiga o\'tish '}</Link>
           </p>
         </motion.div>
       </div>

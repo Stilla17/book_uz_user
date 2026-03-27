@@ -546,7 +546,6 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -603,7 +602,6 @@ export default function OrdersPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header with animation */}
@@ -784,9 +782,7 @@ export default function OrdersPage() {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2 block">
-                      Vaqt oralig'i
-                    </label>
+                    <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2 block">{' Vaqt oralig\'i '}</label>
                     <select
                       value={dateFilter}
                       onChange={(e) => setDateFilter(e.target.value)}
@@ -846,9 +842,7 @@ export default function OrdersPage() {
                               animate={{ scale: 1 }}
                               className="text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full flex items-center gap-1"
                             >
-                              <CheckCircle size={10} />
-                              To'langan
-                            </motion.span>
+                              <CheckCircle size={10} />{' To\'langan '}</motion.span>
                           )}
                         </div>
                         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -874,12 +868,10 @@ export default function OrdersPage() {
                           animate={{ scale: 1 }}
                           className="text-lg font-black text-[#005CB9] dark:text-blue-400"
                         >
-                          {(order.totalAmount || 0).toLocaleString()} so'm
-                        </motion.span>
+                          {(order.totalAmount || 0).toLocaleString()}{' so\'m '}</motion.span>
                         {order.deliveryCost && order.deliveryCost > 0 && (
                           <p className="text-xs text-gray-400 dark:text-gray-500">
-                            Yetkazish: {order.deliveryCost.toLocaleString()} so'm
-                          </p>
+                            Yetkazish: {order.deliveryCost.toLocaleString()}{' so\'m '}</p>
                         )}
                       </div>
                       <motion.div whileHover={{ x: 5 }}>
@@ -954,8 +946,7 @@ export default function OrdersPage() {
                             </p>
                           )}
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            {item.quantity || 0} x {(getItemPrice(item)).toLocaleString()} so'm
-                          </p>
+                            {item.quantity || 0} x {(getItemPrice(item)).toLocaleString()}{' so\'m '}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -1066,7 +1057,7 @@ export default function OrdersPage() {
           </motion.div>
         ) : (
           // Empty State with animation
-          <motion.div
+          (<motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5, type: "spring" }}
@@ -1085,17 +1076,13 @@ export default function OrdersPage() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.7 }}
               className="text-2xl font-black text-gray-900 dark:text-white mb-3"
-            >
-              Buyurtmalar yo'q
-            </motion.h2>
+            >{' Buyurtmalar yo\'q '}</motion.h2>
             <motion.p 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.8 }}
               className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto"
-            >
-              Siz hali hech qanday buyurtma bermagansiz. Katalogdan o'zingizga yoqqan kitoblarni toping va buyurtma bering.
-            </motion.p>
+            >{' Siz hali hech qanday buyurtma bermagansiz. Katalogdan o\'zingizga yoqqan kitoblarni toping va buyurtma bering. '}</motion.p>
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -1107,11 +1094,9 @@ export default function OrdersPage() {
                 href="/catalog"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white font-bold rounded-xl hover:shadow-lg dark:hover:shadow-2xl dark:hover:shadow-blue-900/20 transition-all"
               >
-                <ShoppingBag size={18} />
-                Katalogga o'tish
-              </Link>
+                <ShoppingBag size={18} />{' Katalogga o\'tish '}</Link>
             </motion.div>
-          </motion.div>
+          </motion.div>)
         )}
 
         {/* Info Icons with animation */}
@@ -1137,7 +1122,6 @@ export default function OrdersPage() {
           ))}
         </motion.div>
       </div>
-
       {/* Order Details Modal */}
       <AnimatePresence>
         {showDetails && selectedOrder && (
@@ -1253,16 +1237,14 @@ export default function OrdersPage() {
                             )}
                             <div className="flex items-center justify-between mt-2">
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {item.quantity || 0} x {getItemPrice(item).toLocaleString()} so'm
-                              </p>
+                                {item.quantity || 0} x {getItemPrice(item).toLocaleString()}{' so\'m '}</p>
                               <motion.p 
                                 key={item.price}
                                 initial={{ scale: 1.2 }}
                                 animate={{ scale: 1 }}
                                 className="font-bold text-[#005CB9] dark:text-blue-400"
                               >
-                                {((item.quantity || 0) * getItemPrice(item)).toLocaleString()} so'm
-                              </motion.p>
+                                {((item.quantity || 0) * getItemPrice(item)).toLocaleString()}{' so\'m '}</motion.p>
                             </div>
                           </div>
                         </motion.div>
@@ -1307,7 +1289,7 @@ export default function OrdersPage() {
                       {selectedOrder.deliveryCost && selectedOrder.deliveryCost > 0 && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-500 dark:text-gray-400">Yetkazish narxi</span>
-                          <span className="font-bold text-gray-900 dark:text-white">{selectedOrder.deliveryCost.toLocaleString()} so'm</span>
+                          <span className="font-bold text-gray-900 dark:text-white">{selectedOrder.deliveryCost.toLocaleString()}{' so\'m'}</span>
                         </div>
                       )}
                       
@@ -1336,18 +1318,16 @@ export default function OrdersPage() {
                     transition={{ delay: 0.4 }}
                   >
                     <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                      <CreditCard size={16} className="text-green-600 dark:text-green-400" />
-                      To'lov
-                    </h4>
+                      <CreditCard size={16} className="text-green-600 dark:text-green-400" />{' To\'lov '}</h4>
                     <div className="bg-gray-50 dark:bg-slate-700/50 rounded-xl p-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">To'lov turi</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{'To\'lov turi'}</span>
                         <span className="text-sm font-bold text-gray-900 dark:text-white">
                           {getPaymentTypeText(selectedOrder.paymentType)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">To'lov holati</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{'To\'lov holati'}</span>
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           selectedOrder.paymentStatus === 'PAID' 
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
@@ -1367,8 +1347,7 @@ export default function OrdersPage() {
                           animate={{ scale: 1 }}
                           className="text-xl font-black text-[#005CB9] dark:text-blue-400"
                         >
-                          {(selectedOrder.totalAmount || 0).toLocaleString()} so'm
-                        </motion.span>
+                          {(selectedOrder.totalAmount || 0).toLocaleString()}{' so\'m '}</motion.span>
                       </div>
                     </div>
                   </motion.div>

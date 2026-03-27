@@ -377,7 +377,7 @@ export default function CheckoutPage() {
 
               {showAddressForm && (
                 <form onSubmit={handleAddAddress} className="mb-6 p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-4">Yangi manzil qo'shish</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-4">{'Yangi manzil qo\'shish'}</h3>
                   <div className="space-y-3">
                     <Input
                       placeholder="Shahar"
@@ -484,9 +484,7 @@ export default function CheckoutPage() {
                     onClick={() => setShowAddressForm(true)}
                     className="bg-[#005CB9] hover:bg-[#004a96] dark:bg-blue-600 dark:hover:bg-blue-700 text-white mt-2"
                   >
-                    <Plus size={16} className="mr-2" />
-                    Manzil qo'shish
-                  </Button>
+                    <Plus size={16} className="mr-2" />{' Manzil qo\'shish '}</Button>
                 </div>
               )}
             </div>
@@ -514,7 +512,7 @@ export default function CheckoutPage() {
                         Standart
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">3-5 kun</p>
-                      <p className="text-sm font-bold text-[#005CB9] dark:text-blue-400 mt-1">15,000 so'm</p>
+                      <p className="text-sm font-bold text-[#005CB9] dark:text-blue-400 mt-1">{'15,000 so\'m'}</p>
                     </div>
                   </div>
                 </button>
@@ -534,7 +532,7 @@ export default function CheckoutPage() {
                         Ekspress
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">1-2 kun</p>
-                      <p className="text-sm font-bold text-[#FF8A00] dark:text-orange-400 mt-1">35,000 so'm</p>
+                      <p className="text-sm font-bold text-[#FF8A00] dark:text-orange-400 mt-1">{'35,000 so\'m'}</p>
                     </div>
                   </div>
                 </button>
@@ -553,7 +551,7 @@ export default function CheckoutPage() {
                       <p className={`font-bold ${deliveryType === "PICKUP" ? "text-green-500 dark:text-green-400" : "text-gray-700 dark:text-gray-300"}`}>
                         Olib ketish
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Do'kondan</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{'Do\'kondan'}</p>
                       <p className="text-sm font-bold text-green-500 dark:text-green-400 mt-1">Bepul</p>
                     </div>
                   </div>
@@ -564,9 +562,7 @@ export default function CheckoutPage() {
             {/* Payment Method */}
             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6">
               <h2 className="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <CreditCard size={20} className="text-[#005CB9] dark:text-blue-400" />
-                To'lov usuli
-              </h2>
+                <CreditCard size={20} className="text-[#005CB9] dark:text-blue-400" />{' To\'lov usuli '}</h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
@@ -618,9 +614,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-3">
                     {getPaymentIcon("ONLINE")}
                     <div className="text-left">
-                      <p className={`font-bold ${paymentMethod === "ONLINE" ? "text-[#FF8A00] dark:text-orange-400" : "text-gray-700 dark:text-gray-300"}`}>
-                        Online to'lov
-                      </p>
+                      <p className={`font-bold ${paymentMethod === "ONLINE" ? "text-[#FF8A00] dark:text-orange-400" : "text-gray-700 dark:text-gray-300"}`}>{' Online to\'lov '}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Click, Payme, Apelsin</p>
                     </div>
                   </div>
@@ -642,7 +636,7 @@ export default function CheckoutPage() {
                 {appliedPromo ? (
                   <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                     <div>
-                      <p className="text-xs text-green-600 dark:text-green-400">Promokod qo'llanildi</p>
+                      <p className="text-xs text-green-600 dark:text-green-400">{'Promokod qo\'llanildi'}</p>
                       <p className="font-bold text-green-700 dark:text-green-400">{appliedPromo} ({discount}% chegirma)</p>
                     </div>
                     <button
@@ -663,9 +657,7 @@ export default function CheckoutPage() {
                     <Button
                       onClick={handleApplyPromo}
                       className="bg-[#005CB9] hover:bg-[#004a96] dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
-                    >
-                      Qo'llash
-                    </Button>
+                    >{' Qo\'llash '}</Button>
                   </div>
                 )}
               </div>
@@ -691,13 +683,11 @@ export default function CheckoutPage() {
                           {getProductTitle(product)}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {item.quantity} x {item.price.toLocaleString()} so'm
-                        </p>
+                          {item.quantity} x {item.price.toLocaleString()}{' so\'m '}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-bold text-[#005CB9] dark:text-blue-400">
-                          {(item.quantity * item.price).toLocaleString()} so'm
-                        </p>
+                          {(item.quantity * item.price).toLocaleString()}{' so\'m '}</p>
                       </div>
                     </div>
                   );
@@ -708,7 +698,7 @@ export default function CheckoutPage() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 dark:text-gray-400">Mahsulotlar summasi</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{calculateSubtotal().toLocaleString()} so'm</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{calculateSubtotal().toLocaleString()}{' so\'m'}</span>
                 </div>
                 
                 <div className="flex justify-between text-sm">
@@ -720,8 +710,7 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">Chegirma ({discount}%)</span>
                     <span className="font-bold text-green-600 dark:text-green-400">
-                      -{calculateDiscount(calculateSubtotal()).toLocaleString()} so'm
-                    </span>
+                      -{calculateDiscount(calculateSubtotal()).toLocaleString()}{' so\'m '}</span>
                   </div>
                 )}
                 
@@ -730,8 +719,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between">
                   <span className="font-bold text-gray-900 dark:text-white">Jami</span>
                   <span className="text-2xl font-black text-[#005CB9] dark:text-blue-400">
-                    {calculateTotal().toLocaleString()} so'm
-                  </span>
+                    {calculateTotal().toLocaleString()}{' so\'m '}</span>
                 </div>
               </div>
 
@@ -757,9 +745,7 @@ export default function CheckoutPage() {
               {/* Security Info */}
               <div className="mt-4 text-center">
                 <p className="text-xs text-gray-400 dark:text-gray-500">
-                  <Shield size={12} className="inline mr-1" />
-                  Ma'lumotlaringiz xavfsiz himoyalangan
-                </p>
+                  <Shield size={12} className="inline mr-1" />{' Ma\'lumotlaringiz xavfsiz himoyalangan '}</p>
               </div>
             </div>
           </div>
@@ -773,11 +759,11 @@ export default function CheckoutPage() {
           </div>
           <div className="p-2">
             <Shield size={16} className="mx-auto mb-1 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-400 dark:text-gray-500">Xavfsiz to'lov</span>
+            <span className="text-gray-400 dark:text-gray-500">{'Xavfsiz to\'lov'}</span>
           </div>
           <div className="p-2">
             <MessageCircle size={16} className="mx-auto mb-1 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-400 dark:text-gray-500">24/7 qo'llab-quvvatlash</span>
+            <span className="text-gray-400 dark:text-gray-500">{'24/7 qo\'llab-quvvatlash'}</span>
           </div>
         </div>
       </div>

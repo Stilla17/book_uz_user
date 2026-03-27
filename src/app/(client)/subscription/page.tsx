@@ -381,7 +381,6 @@ export default function SubscriptionPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -440,7 +439,6 @@ export default function SubscriptionPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header */}
@@ -475,9 +473,7 @@ export default function SubscriptionPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
             className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-lg"
-          >
-            O'zingizga mos tarifni tanlang va 50,000+ kitob va 10,000+ audio kitoblardan bahramand bo'ling
-          </motion.p>
+          >{' O\'zingizga mos tarifni tanlang va 50,000+ kitob va 10,000+ audio kitoblardan bahramand bo\'ling '}</motion.p>
         </motion.div>
 
         {/* Billing Toggle */}
@@ -558,7 +554,6 @@ export default function SubscriptionPage() {
                   }}
                   transition={{ duration: 0.3 }}
                 />
-
                 {plan.isPopular && (
                   <motion.div 
                     initial={{ y: -100 }}
@@ -571,7 +566,6 @@ export default function SubscriptionPage() {
                     </div>
                   </motion.div>
                 )}
-
                 {/* Trial Days Badge */}
                 {plan.trialDays && plan.trialDays > 0 && (
                   <motion.div
@@ -586,7 +580,6 @@ export default function SubscriptionPage() {
                     </div>
                   </motion.div>
                 )}
-
                 <div className={`p-8 ${plan.isPopular ? 'pt-16' : ''}`}>
                   
                   {/* Icon with Glow Effect */}
@@ -620,8 +613,7 @@ export default function SubscriptionPage() {
                       <span className="text-5xl font-black text-gray-900 dark:text-white">
                         {getDisplayPrice(plan)}
                       </span>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        so'm / {billingPeriod === "month" ? "oy" : "yil"}
+                      <span className="text-gray-500 dark:text-gray-400">{' so\'m / '}{billingPeriod === "month" ? "oy" : "yil"}
                       </span>
                     </div>
                     
@@ -634,7 +626,7 @@ export default function SubscriptionPage() {
                       >
                         <span className="flex items-center gap-1">
                           <Gift size={14} />
-                          {savings.amount} so'm tejasiz ({savings.percentage}%)
+                          {savings.amount}{' so\'m tejasiz ('}{savings.percentage}%)
                         </span>
                       </motion.div>
                     )}
@@ -773,7 +765,7 @@ export default function SubscriptionPage() {
                     <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</p>
                   </div>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">"{testimonial.comment}"</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{'"'}{testimonial.comment}{'"'}</p>
                 <div className="flex items-center gap-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} size={16} className="text-yellow-400 fill-yellow-400" />
@@ -794,14 +786,12 @@ export default function SubscriptionPage() {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Savollaringiz bormi?
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
-            Obuna haqida batafsil ma'lumot olish uchun FAQ bo'limiga o'ting
-          </p>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">{' Obuna haqida batafsil ma\'lumot olish uchun FAQ bo\'limiga o\'ting '}</p>
           <Link
             href="/faq"
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-lg group"
           >
-            <span>Tez-tez so'raladigan savollar</span>
+            <span>{'Tez-tez so\'raladigan savollar'}</span>
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>
@@ -815,11 +805,11 @@ export default function SubscriptionPage() {
         >
           <div className="flex items-center gap-2">
             <Shield size={20} />
-            <span className="text-sm">Xavfsiz to'lov</span>
+            <span className="text-sm">{'Xavfsiz to\'lov'}</span>
           </div>
           <div className="flex items-center gap-2">
             <Clock size={20} />
-            <span className="text-sm">24/7 qo'llab-quvvatlash</span>
+            <span className="text-sm">{'24/7 qo\'llab-quvvatlash'}</span>
           </div>
           <div className="flex items-center gap-2">
             <Globe size={20} />

@@ -407,7 +407,6 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-12 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => {
@@ -461,7 +460,6 @@ export default function NewsPage() {
 
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header */}
@@ -481,9 +479,7 @@ export default function NewsPage() {
             </span>
           </h1>
           
-          <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-lg">
-            Platformamizdagi eng so'nggi yangiliklar, yangi kitoblar va aksiyalardan xabardor bo'ling
-          </p>
+          <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-lg">{' Platformamizdagi eng so\'nggi yangiliklar, yangi kitoblar va aksiyalardan xabardor bo\'ling '}</p>
         </motion.div>
 
         {/* Search and Filter */}
@@ -579,7 +575,6 @@ export default function NewsPage() {
                         </div>
                       )}
                     </div>
-
                     {/* Content */}
                     <div className="p-4 space-y-2">
                       <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
@@ -618,9 +613,7 @@ export default function NewsPage() {
                       )}
 
                       <div className="pt-2">
-                        <span className="inline-flex items-center gap-1 text-xs font-bold text-[#ef7f1a] dark:text-orange-400 group-hover:gap-2 transition-all">
-                          Batafsil o'qish 
-                          <ArrowUpRight size={14} />
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-[#ef7f1a] dark:text-orange-400 group-hover:gap-2 transition-all">{' Batafsil o\'qish '}<ArrowUpRight size={14} />
                         </span>
                       </div>
                     </div>
@@ -681,7 +674,7 @@ export default function NewsPage() {
           </>
         ) : (
           // Empty State
-          <div className="text-center py-16">
+          (<div className="text-center py-16">
             <div className="w-32 h-32 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-800 rounded-full flex items-center justify-center mb-6">
               <Newspaper size={48} className="text-gray-400 dark:text-gray-500" />
             </div>
@@ -701,7 +694,7 @@ export default function NewsPage() {
             >
               Filtrlarni tozalash
             </Button>
-          </div>
+          </div>)
         )}
 
         {/* Stats */}

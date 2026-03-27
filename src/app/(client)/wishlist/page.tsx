@@ -331,7 +331,6 @@ export default function WishlistPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -388,7 +387,6 @@ export default function WishlistPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header with animation */}
@@ -451,9 +449,7 @@ export default function WishlistPage() {
                   <Link
                     href="/catalog"
                     className="px-4 py-2 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-400 hover:border-[#005CB9] dark:hover:border-blue-400 hover:text-[#005CB9] dark:hover:text-blue-400 transition-colors inline-block"
-                  >
-                    Katalogga o'tish
-                  </Link>
+                  >{' Katalogga o\'tish '}</Link>
                 </motion.div>
               </>
             )}
@@ -520,8 +516,7 @@ export default function WishlistPage() {
                         <Loader2 size={14} className="animate-spin mr-2" />
                       ) : (
                         <Trash2 size={14} className="mr-2" />
-                      )}
-                      O'chirish ({selectedItems.length})
+                      )}{' O\'chirish ('}{selectedItems.length})
                     </Button>
                   </motion.div>
                 )}
@@ -627,15 +622,13 @@ export default function WishlistPage() {
                           <div className="text-right">
                             {book.oldPrice && book.oldPrice > book.price && (
                               <span className="text-xs text-gray-400 dark:text-gray-500 line-through block">
-                                {book.oldPrice.toLocaleString()} so'm
-                              </span>
+                                {book.oldPrice.toLocaleString()}{' so\'m '}</span>
                             )}
                             <motion.span 
                               whileHover={{ scale: 1.1, color: "#005CB9" }}
                               className="text-xl font-black text-[#005CB9] dark:text-blue-400"
                             >
-                              {book.price?.toLocaleString() || 0} so'm
-                            </motion.span>
+                              {book.price?.toLocaleString() || 0}{' so\'m '}</motion.span>
                           </div>
 
                           <div className="flex items-center gap-2">
@@ -690,8 +683,7 @@ export default function WishlistPage() {
                         animate={{ scale: 1 }}
                         className="text-2xl font-black text-[#005CB9] dark:text-blue-400"
                       >
-                        {selectedTotalPrice.toLocaleString()} so'm
-                      </motion.p>
+                        {selectedTotalPrice.toLocaleString()}{' so\'m '}</motion.p>
                     </div>
                     
                     <div className="flex gap-3">
@@ -706,9 +698,7 @@ export default function WishlistPage() {
                             <Loader2 size={16} className="animate-spin mr-2" />
                           ) : (
                             <Trash2 size={16} className="mr-2" />
-                          )}
-                          Tanlanganlarni o'chirish
-                        </Button>
+                          )}{' Tanlanganlarni o\'chirish '}</Button>
                       </motion.div>
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button
@@ -716,9 +706,7 @@ export default function WishlistPage() {
                           className="bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white hover:shadow-lg dark:hover:shadow-2xl dark:hover:shadow-blue-900/20 transition-all"
                           disabled={selectedItems.length === 0}
                         >
-                          <ShoppingCart size={16} className="mr-2" />
-                          Savatga qo'shish
-                        </Button>
+                          <ShoppingCart size={16} className="mr-2" />{' Savatga qo\'shish '}</Button>
                       </motion.div>
                     </div>
                   </div>
@@ -751,7 +739,7 @@ export default function WishlistPage() {
           </>
         ) : (
           // Empty State with animation
-          <motion.div
+          (<motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, type: "spring" }}
@@ -770,18 +758,13 @@ export default function WishlistPage() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6 }}
               className="text-2xl font-black text-gray-900 dark:text-white mb-3"
-            >
-              Sevimli kitoblar yo'q
-            </motion.h2>
+            >{' Sevimli kitoblar yo\'q '}</motion.h2>
             <motion.p 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.7 }}
               className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto"
-            >
-              Hali hech qanday kitobni sevimlilarga qo'shmagansiz. 
-              Katalogdan o'zingizga yoqqan kitoblarni toping va ularni sevimlilarga qo'shing.
-            </motion.p>
+            >{' Hali hech qanday kitobni sevimlilarga qo\'shmagansiz. Katalogdan o\'zingizga yoqqan kitoblarni toping va ularni sevimlilarga qo\'shing. '}</motion.p>
             <motion.div 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -792,9 +775,7 @@ export default function WishlistPage() {
                 href="/catalog"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white font-bold rounded-xl hover:shadow-lg dark:hover:shadow-2xl dark:hover:shadow-blue-900/20 transition-all"
               >
-                <BookOpen size={18} />
-                Katalogga o'tish
-              </Link>
+                <BookOpen size={18} />{' Katalogga o\'tish '}</Link>
               <Link
                 href="/profile"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 font-bold rounded-xl hover:border-[#005CB9] dark:hover:border-blue-400 hover:text-[#005CB9] dark:hover:text-blue-400 transition-all"
@@ -802,7 +783,7 @@ export default function WishlistPage() {
                 Profilga qaytish
               </Link>
             </motion.div>
-          </motion.div>
+          </motion.div>)
         )}
       </div>
     </div>

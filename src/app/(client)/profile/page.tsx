@@ -466,7 +466,6 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-            
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Floating Icons */}
@@ -523,7 +522,6 @@ export default function ProfilePage() {
                 {/* Grid Pattern */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
             </div>
-
             <div className="container mx-auto px-4 max-w-6xl relative z-10">
                 
                 {/* Profile Header with animation */}
@@ -662,7 +660,7 @@ export default function ProfilePage() {
                                 transition={{ delay: 0.1 }}
                                 className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 p-6"
                             >
-                                <h2 className="text-lg font-black text-gray-900 dark:text-white mb-6">Shaxsiy ma'lumotlar</h2>
+                                <h2 className="text-lg font-black text-gray-900 dark:text-white mb-6">{'Shaxsiy ma\'lumotlar'}</h2>
                                 
                                 <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-md">
                                     <motion.div
@@ -690,7 +688,7 @@ export default function ProfilePage() {
                                             disabled
                                             className="mt-1 bg-gray-100 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400"
                                         />
-                                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Email o'zgartirilmaydi</p>
+                                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{'Email o\'zgartirilmaydi'}</p>
                                     </motion.div>
                                     
                                     <motion.div
@@ -762,7 +760,7 @@ export default function ProfilePage() {
                                     >
                                         <Heart size={48} className="mx-auto text-red-300 dark:text-red-700 mb-4" />
                                         <p className="text-red-500 dark:text-red-400 mb-2">Xatolik yuz berdi</p>
-                                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Sevimlilarni yuklab bo'lmadi</p>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{'Sevimlilarni yuklab bo\'lmadi'}</p>
                                         <Button 
                                             onClick={loadWishlist}
                                             className="bg-gradient-to-r from-[#005CB9] to-[#FF8A00] hover:from-[#004a96] hover:to-[#e67a00] dark:from-blue-600 dark:to-orange-600 text-white"
@@ -800,10 +798,8 @@ export default function ProfilePage() {
                                         className="text-center py-12"
                                     >
                                         <Heart size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                                        <p className="text-gray-500 dark:text-gray-400">Sevimli kitoblar yo'q</p>
-                                        <Link href="/catalog" className="text-[#005CB9] dark:text-blue-400 hover:underline text-sm mt-2 inline-block">
-                                            Katalogga o'tish
-                                        </Link>
+                                        <p className="text-gray-500 dark:text-gray-400">{'Sevimli kitoblar yo\'q'}</p>
+                                        <Link href="/catalog" className="text-[#005CB9] dark:text-blue-400 hover:underline text-sm mt-2 inline-block">{' Katalogga o\'tish '}</Link>
                                     </motion.div>
                                 )}
                             </motion.div>
@@ -852,7 +848,7 @@ export default function ProfilePage() {
                                                         <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.status)}`}>
                                                             {getStatusText(order.status)}
                                                         </span>
-                                                        <span className="text-sm font-black text-[#005CB9] dark:text-blue-400">{order.totalAmount.toLocaleString()} so'm</span>
+                                                        <span className="text-sm font-black text-[#005CB9] dark:text-blue-400">{order.totalAmount.toLocaleString()}{' so\'m'}</span>
                                                     </div>
                                                 </div>
                                                 
@@ -876,10 +872,8 @@ export default function ProfilePage() {
                                         className="text-center py-12"
                                     >
                                         <ShoppingBag size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                                        <p className="text-gray-500 dark:text-gray-400">Buyurtmalar yo'q</p>
-                                        <Link href="/catalog" className="text-[#005CB9] dark:text-blue-400 hover:underline text-sm mt-2 inline-block">
-                                            Katalogga o'tish
-                                        </Link>
+                                        <p className="text-gray-500 dark:text-gray-400">{'Buyurtmalar yo\'q'}</p>
+                                        <Link href="/catalog" className="text-[#005CB9] dark:text-blue-400 hover:underline text-sm mt-2 inline-block">{' Katalogga o\'tish '}</Link>
                                     </motion.div>
                                 )}
                             </motion.div>
@@ -1001,7 +995,7 @@ export default function ProfilePage() {
                                     >
                                         <MapPin size={48} className="mx-auto text-red-300 dark:text-red-700 mb-4" />
                                         <p className="text-red-500 dark:text-red-400 mb-2">Xatolik yuz berdi</p>
-                                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Manzillarni yuklab bo'lmadi</p>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{'Manzillarni yuklab bo\'lmadi'}</p>
                                         <Button 
                                             onClick={loadAddresses}
                                             className="bg-gradient-to-r from-[#005CB9] to-[#FF8A00] hover:from-[#004a96] hover:to-[#e67a00] dark:from-blue-600 dark:to-orange-600 text-white"
@@ -1065,7 +1059,7 @@ export default function ProfilePage() {
                                         className="text-center py-12"
                                     >
                                         <MapPin size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                                        <p className="text-gray-500 dark:text-gray-400">Manzillar yo'q</p>
+                                        <p className="text-gray-500 dark:text-gray-400">{'Manzillar yo\'q'}</p>
                                     </motion.div>
                                 )}
                             </motion.div>
@@ -1079,7 +1073,7 @@ export default function ProfilePage() {
                                 transition={{ delay: 0.1 }}
                                 className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 p-6"
                             >
-                                <h2 className="text-lg font-black text-gray-900 dark:text-white mb-6">Parolni o'zgartirish</h2>
+                                <h2 className="text-lg font-black text-gray-900 dark:text-white mb-6">{'Parolni o\'zgartirish'}</h2>
 
                                 <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
                                     <motion.div

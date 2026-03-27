@@ -395,7 +395,6 @@ export default function SearchPage() {
 
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
         </div>
-
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ scale: 0 }}
@@ -418,9 +417,7 @@ export default function SearchPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
             className="text-gray-500 dark:text-gray-400"
-          >
-            Qidirish uchun so'z kiriting
-          </motion.p>
+          >{' Qidirish uchun so\'z kiriting '}</motion.p>
         </div>
       </div>
     );
@@ -428,7 +425,6 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -485,7 +481,6 @@ export default function SearchPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header with animation */}
@@ -540,15 +535,13 @@ export default function SearchPage() {
             </motion.div>
             <div className="flex-1">
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Siz qidirdingiz</p>
-              <p className="text-lg font-black text-gray-900 dark:text-white">"{query}"</p>
+              <p className="text-lg font-black text-gray-900 dark:text-white">{'"'}{query}{'"'}</p>
             </div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/catalog"
                 className="px-4 py-2 bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all"
-              >
-                Katalogga o'tish
-              </Link>
+              >{' Katalogga o\'tish '}</Link>
             </motion.div>
           </div>
         </motion.div>
@@ -679,7 +672,7 @@ export default function SearchPage() {
               className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl border border-gray-100 dark:border-slate-700 p-6 mb-6 overflow-hidden"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-black text-gray-900 dark:text-white">Qo'shimcha filtrlar</h3>
+                <h3 className="font-black text-gray-900 dark:text-white">{'Qo\'shimcha filtrlar'}</h3>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -741,9 +734,7 @@ export default function SearchPage() {
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2 block">
-                    Narx oralig'i
-                  </label>
+                  <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2 block">{' Narx oralig\'i '}</label>
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
@@ -932,16 +923,13 @@ export default function SearchPage() {
                               {product.discountPrice && product.discountPrice > 0 ? (
                                 <>
                                   <span className="text-xs text-gray-400 dark:text-gray-500 line-through block">
-                                    {product.price.toLocaleString()} so'm
-                                  </span>
+                                    {product.price.toLocaleString()}{' so\'m '}</span>
                                   <span className="text-sm font-black text-[#FF8A00] dark:text-orange-400">
-                                    {product.discountPrice.toLocaleString()} so'm
-                                  </span>
+                                    {product.discountPrice.toLocaleString()}{' so\'m '}</span>
                                 </>
                               ) : (
                                 <span className="text-sm font-black text-[#005CB9] dark:text-blue-400">
-                                  {product.price.toLocaleString()} so'm
-                                </span>
+                                  {product.price.toLocaleString()}{' so\'m '}</span>
                               )}
                             </div>
 
@@ -1072,16 +1060,13 @@ export default function SearchPage() {
                                 {product.discountPrice && product.discountPrice > 0 ? (
                                   <>
                                     <span className="text-sm text-gray-400 line-through mr-2">
-                                      {product.price.toLocaleString()} so'm
-                                    </span>
+                                      {product.price.toLocaleString()}{' so\'m '}</span>
                                     <span className="text-xl font-black text-[#FF8A00] dark:text-orange-400">
-                                      {product.discountPrice.toLocaleString()} so'm
-                                    </span>
+                                      {product.discountPrice.toLocaleString()}{' so\'m '}</span>
                                   </>
                                 ) : (
                                   <span className="text-xl font-black text-[#005CB9] dark:text-blue-400">
-                                    {product.price.toLocaleString()} so'm
-                                  </span>
+                                    {product.price.toLocaleString()}{' so\'m '}</span>
                                 )}
                               </div>
 
@@ -1348,16 +1333,14 @@ export default function SearchPage() {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 1.3 }}
                   className="text-gray-500 dark:text-gray-400 mb-4 max-w-md mx-auto"
-                >
-                  "{query}" bo'yicha hech qanday natija topilmadi.
-                </motion.p>
+                >{' "'}{query}{'" bo\'yicha hech qanday natija topilmadi. '}</motion.p>
                 <motion.div 
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 1.4 }}
                   className="space-y-2 text-sm text-gray-400 dark:text-gray-500 mb-8"
                 >
-                  <p>Boshqa so'z bilan urinib ko'ring</p>
+                  <p>{'Boshqa so\'z bilan urinib ko\'ring'}</p>
                   <p>Yoki quyidagi variantlardan birini tanlang:</p>
                 </motion.div>
                 <motion.div 
@@ -1371,18 +1354,14 @@ export default function SearchPage() {
                       href="/catalog"
                       className="px-6 py-3 bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white font-bold rounded-xl hover:shadow-lg transition-all inline-flex items-center"
                     >
-                      <BookOpen size={18} className="mr-2" />
-                      Katalogga o'tish
-                    </Link>
+                      <BookOpen size={18} className="mr-2" />{' Katalogga o\'tish '}</Link>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link
                       href="/contact"
                       className="px-6 py-3 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl hover:border-[#005CB9] dark:hover:border-blue-400 transition-all inline-flex items-center"
                     >
-                      <MessageCircle size={18} className="mr-2" />
-                      Yordam so'rash
-                    </Link>
+                      <MessageCircle size={18} className="mr-2" />{' Yordam so\'rash '}</Link>
                   </motion.div>
                 </motion.div>
               </motion.div>

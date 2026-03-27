@@ -651,7 +651,6 @@ export default function BookDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900 py-4 sm:py-8 relative overflow-hidden">
-
       {/* ========== ANIMATED BACKGROUND ELEMENTS ========== */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         {/* Floating Icons */}
@@ -708,7 +707,6 @@ export default function BookDetailPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-3 sm:px-4 max-w-7xl relative z-10">
 
         {/* ========== BREADCRUMB ========== */}
@@ -854,19 +852,16 @@ export default function BookDetailPage() {
               {product.discountPrice && product.discountPrice > 0 ? (
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
-                    {product.discountPrice.toLocaleString()} so'm
-                  </span>
+                    {product.discountPrice.toLocaleString()}{' so\'m '}</span>
                   <span className="text-lg sm:text-xl text-gray-400 line-through">
-                    {product.price.toLocaleString()} so'm
-                  </span>
+                    {product.price.toLocaleString()}{' so\'m '}</span>
                   <span className="bg-red-500 text-white text-sm px-3 py-1 rounded-full">
                     -{getDiscountPercentage()}%
                   </span>
                 </div>
               ) : (
                 <span className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500">
-                  {product.price.toLocaleString()} so'm
-                </span>
+                  {product.price.toLocaleString()}{' so\'m '}</span>
               )}
             </div>
 
@@ -925,9 +920,7 @@ export default function BookDetailPage() {
                 disabled={product.stock === 0}
                 className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium py-3 sm:py-4 rounded-xl text-base sm:text-lg shadow-lg hover:shadow-xl transition-all"
               >
-                <ShoppingCart size={20} className="mr-2" />
-                Savatga qo'shish
-              </Button>
+                <ShoppingCart size={20} className="mr-2" />{' Savatga qo\'shish '}</Button>
 
               <Button
                 onClick={handleToggleWishlist}
@@ -1179,9 +1172,7 @@ export default function BookDetailPage() {
                         variant="outline"
                         size="sm"
                         className="text-red-600 border-red-200 hover:bg-red-50"
-                      >
-                        O'chirish
-                      </Button>
+                      >{' O\'chirish '}</Button>
                     </div>
                   )}
                 </div>
@@ -1492,9 +1483,7 @@ export default function BookDetailPage() {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                       Hali sharhlar mavjud emas
                     </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mb-4">
-                      Bu kitob haqida birinchi bo'lib fikr bildiring
-                    </p>
+                    <p className="text-gray-500 dark:text-gray-400 mb-4">{' Bu kitob haqida birinchi bo\'lib fikr bildiring '}</p>
                     {canReview && !userExistingReview && (
                       <Button
                         onClick={() => setShowReviewForm(true)}
@@ -1669,12 +1658,8 @@ export default function BookDetailPage() {
                     <div className="w-20 h-20 mx-auto bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
                       <MessageCircle size={32} className="text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      Hali muhokamalar yo'q
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Bu kitob haqida birinchi bo'lib muhokama boshlang
-                    </p>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{' Hali muhokamalar yo\'q '}</h3>
+                    <p className="text-gray-500 dark:text-gray-400">{' Bu kitob haqida birinchi bo\'lib muhokama boshlang '}</p>
                   </div>
                 )}
               </div>
@@ -1686,9 +1671,7 @@ export default function BookDetailPage() {
         {relatedProducts.length > 0 && (
           <div className="mt-8 sm:mt-12">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center gap-2">
-              <Sparkles size={24} className="text-orange-500" />
-              O'xshash kitoblar
-            </h2>
+              <Sparkles size={24} className="text-orange-500" />{' O\'xshash kitoblar '}</h2>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {relatedProducts.map((book, index) => (
@@ -1713,9 +1696,7 @@ export default function BookDetailPage() {
             </div>
             <div className="flex-1">
               <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">BOOK.UZ</h3>
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                O'zbekistonning eng katta onlayn kitob do'koni. 50,000+ kitoblar, audio kitoblar va elektron nashrlar.
-              </p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{' O\'zbekistonning eng katta onlayn kitob do\'koni. 50,000+ kitoblar, audio kitoblar va elektron nashrlar. '}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-4 sm:gap-6 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">

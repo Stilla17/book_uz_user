@@ -330,7 +330,6 @@ export default function CategoryDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -350,7 +349,6 @@ export default function CategoryDetailPage() {
           className="absolute bottom-20 right-20 w-96 h-96 bg-[#FF8A00]/5 rounded-full blur-3xl"
         />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Breadcrumb */}
@@ -558,9 +556,7 @@ export default function CategoryDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   {/* Price Range */}
                   <div>
-                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2 block">
-                      Narx oralig'i
-                    </label>
+                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2 block">{' Narx oralig\'i '}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -721,16 +717,13 @@ export default function CategoryDetailPage() {
                             {product.discountPrice ? (
                               <>
                                 <span className="text-xs text-gray-400 line-through block">
-                                  {product.price.toLocaleString()} so'm
-                                </span>
+                                  {product.price.toLocaleString()}{' so\'m '}</span>
                                 <span className="text-sm font-black text-[#FF8A00] dark:text-orange-400">
-                                  {product.discountPrice.toLocaleString()} so'm
-                                </span>
+                                  {product.discountPrice.toLocaleString()}{' so\'m '}</span>
                               </>
                             ) : (
                               <span className="text-sm font-black text-[#005CB9] dark:text-blue-400">
-                                {product.price.toLocaleString()} so'm
-                              </span>
+                                {product.price.toLocaleString()}{' so\'m '}</span>
                             )}
                           </div>
 
@@ -748,7 +741,7 @@ export default function CategoryDetailPage() {
               </div>
             ) : (
               // List View
-              <div className="space-y-4">
+              (<div className="space-y-4">
                 {products.map((product, index) => (
                   <motion.div
                     key={product._id}
@@ -807,16 +800,13 @@ export default function CategoryDetailPage() {
                             {product.discountPrice ? (
                               <>
                                 <span className="text-sm text-gray-400 line-through mr-2">
-                                  {product.price.toLocaleString()} so'm
-                                </span>
+                                  {product.price.toLocaleString()}{' so\'m '}</span>
                                 <span className="text-xl font-black text-[#FF8A00] dark:text-orange-400">
-                                  {product.discountPrice.toLocaleString()} so'm
-                                </span>
+                                  {product.discountPrice.toLocaleString()}{' so\'m '}</span>
                               </>
                             ) : (
                               <span className="text-xl font-black text-[#005CB9] dark:text-blue-400">
-                                {product.price.toLocaleString()} so'm
-                              </span>
+                                {product.price.toLocaleString()}{' so\'m '}</span>
                             )}
                           </div>
 
@@ -839,7 +829,7 @@ export default function CategoryDetailPage() {
                     </div>
                   </motion.div>
                 ))}
-              </div>
+              </div>)
             )}
 
             {/* Pagination */}
@@ -879,7 +869,7 @@ export default function CategoryDetailPage() {
           </>
         ) : (
           // Empty State
-          <motion.div
+          (<motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 p-12 text-center"
@@ -898,7 +888,7 @@ export default function CategoryDetailPage() {
                 Barcha kitoblar
               </button>
             </Link>
-          </motion.div>
+          </motion.div>)
         )}
       </div>
     </div>

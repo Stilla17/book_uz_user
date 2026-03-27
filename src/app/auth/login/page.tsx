@@ -39,7 +39,6 @@ export default function LoginPage() {
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-500/10 dark:bg-orange-600/5 rounded-full blur-3xl" />
       </div>
-
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -129,11 +128,8 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-8 pt-6 border-t border-gray-100 dark:border-slate-700 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Hali ro'yxatdan o'tmaganmisiz? {" "}
-            <Link href="/auth/register" className="text-orange-500 dark:text-orange-400 font-bold hover:underline underline-offset-4">
-              Ro'yxatdan o'tish
-            </Link>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{' Hali ro\'yxatdan o\'tmaganmisiz? '}{" "}
+            <Link href="/auth/register" className="text-orange-500 dark:text-orange-400 font-bold hover:underline underline-offset-4">{' Ro\'yxatdan o\'tish '}</Link>
           </p>
         </div>
 
@@ -167,7 +163,6 @@ export default function LoginPage() {
           </div>
         </div>
       </motion.div>
-
       {/* Parolni tiklash Modali */}
       <ForgotPasswordModal 
         isOpen={isModalOpen} 

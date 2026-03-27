@@ -626,7 +626,6 @@ const testBackendEndpoints = async () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -683,7 +682,6 @@ const testBackendEndpoints = async () => {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Debug panel - faqat developmentda ko'rsatish */}
@@ -696,7 +694,7 @@ const testBackendEndpoints = async () => {
           >
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle size={16} className="text-yellow-600 dark:text-yellow-400" />
-              <span className="text-sm font-bold text-yellow-800 dark:text-yellow-300">Debug ma'lumot</span>
+              <span className="text-sm font-bold text-yellow-800 dark:text-yellow-300">{'Debug ma\'lumot'}</span>
             </div>
             <div className="text-xs text-yellow-700 dark:text-yellow-400 space-y-1">
               <p>Backend URL: {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}</p>
@@ -860,8 +858,7 @@ const testBackendEndpoints = async () => {
                             
                             <div className="flex items-center gap-2 mt-2">
                               <span className="text-sm font-bold text-[#005CB9] dark:text-blue-400">
-                                {item.price.toLocaleString()} so'm
-                              </span>
+                                {item.price.toLocaleString()}{' so\'m '}</span>
                               
                               {/* Format Badge */}
                               {item.product.format && (
@@ -927,8 +924,7 @@ const testBackendEndpoints = async () => {
                                 animate={{ scale: 1 }}
                                 className="text-lg font-black text-[#005CB9] dark:text-blue-400"
                               >
-                                {(item.quantity * item.price).toLocaleString()} so'm
-                              </motion.p>
+                                {(item.quantity * item.price).toLocaleString()}{' so\'m '}</motion.p>
                             </div>
 
                             {/* Remove Button */}
@@ -974,7 +970,7 @@ const testBackendEndpoints = async () => {
                       className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800"
                     >
                       <div>
-                        <p className="text-xs text-green-600 dark:text-green-400">Promokod qo'llanildi</p>
+                        <p className="text-xs text-green-600 dark:text-green-400">{'Promokod qo\'llanildi'}</p>
                         <p className="font-bold text-green-700 dark:text-green-400">{appliedPromo} ({discount}% chegirma)</p>
                       </div>
                       <motion.button
@@ -998,9 +994,7 @@ const testBackendEndpoints = async () => {
                         <Button
                           onClick={handleApplyPromo}
                           className="bg-gradient-to-r from-[#005CB9] to-[#FF8A00] hover:from-[#004a96] hover:to-[#e67a00] dark:from-blue-600 dark:to-orange-600 text-white"
-                        >
-                          Qo'llash
-                        </Button>
+                        >{' Qo\'llash '}</Button>
                       </motion.div>
                     </div>
                   )}
@@ -1021,8 +1015,7 @@ const testBackendEndpoints = async () => {
                       animate={{ scale: 1 }}
                       className="font-bold text-gray-900 dark:text-white"
                     >
-                      {getSelectedTotal().toLocaleString()} so'm
-                    </motion.span>
+                      {getSelectedTotal().toLocaleString()}{' so\'m '}</motion.span>
                   </div>
                   
                   {discount > 0 && (
@@ -1034,8 +1027,7 @@ const testBackendEndpoints = async () => {
                         animate={{ scale: 1 }}
                         className="font-bold text-green-600 dark:text-green-400"
                       >
-                        -{(getSelectedTotal() * discount / 100).toLocaleString()} so'm
-                      </motion.span>
+                        -{(getSelectedTotal() * discount / 100).toLocaleString()}{' so\'m '}</motion.span>
                     </div>
                   )}
                   
@@ -1054,8 +1046,7 @@ const testBackendEndpoints = async () => {
                       animate={{ scale: 1 }}
                       className="text-2xl font-black text-[#005CB9] dark:text-blue-400"
                     >
-                      {getSelectedTotalWithDiscount().toLocaleString()} so'm
-                    </motion.span>
+                      {getSelectedTotalWithDiscount().toLocaleString()}{' so\'m '}</motion.span>
                   </div>
                 </motion.div>
 
@@ -1104,7 +1095,7 @@ const testBackendEndpoints = async () => {
           </div>
         ) : (
           // Empty Cart with animation
-          <motion.div
+          (<motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, type: "spring" }}
@@ -1123,17 +1114,13 @@ const testBackendEndpoints = async () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6 }}
               className="text-2xl font-black text-gray-900 dark:text-white mb-3"
-            >
-              Savat bo'sh
-            </motion.h2>
+            >{' Savat bo\'sh '}</motion.h2>
             <motion.p 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.7 }}
               className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto"
-            >
-              Savatingizda hali mahsulotlar yo'q. Katalogdan o'zingizga yoqqan kitoblarni toping va savatga qo'shing.
-            </motion.p>
+            >{' Savatingizda hali mahsulotlar yo\'q. Katalogdan o\'zingizga yoqqan kitoblarni toping va savatga qo\'shing. '}</motion.p>
             <motion.div 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -1145,9 +1132,7 @@ const testBackendEndpoints = async () => {
                   href="/catalog"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white font-bold rounded-xl hover:shadow-lg dark:hover:shadow-2xl dark:hover:shadow-blue-900/20 transition-all"
                 >
-                  <BookOpen size={18} />
-                  Katalogga o'tish
-                </Link>
+                  <BookOpen size={18} />{' Katalogga o\'tish '}</Link>
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
@@ -1159,7 +1144,7 @@ const testBackendEndpoints = async () => {
                 </Link>
               </motion.div>
             </motion.div>
-          </motion.div>
+          </motion.div>)
         )}
       </div>
     </div>

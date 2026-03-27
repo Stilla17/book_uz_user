@@ -468,7 +468,6 @@ export default function CatalogPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* ========== ANIMATED BACKGROUND ELEMENTS ========== */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         {/* Floating Icons */}
@@ -525,7 +524,6 @@ export default function CatalogPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
         {/* Header */}
@@ -712,9 +710,7 @@ export default function CatalogPage() {
 
                 {/* Price Range */}
                 <div>
-                  <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2 block">
-                    Narx oralig'i
-                  </label>
+                  <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2 block">{' Narx oralig\'i '}</label>
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
@@ -834,7 +830,7 @@ export default function CatalogPage() {
                   {appliedCoupon ? (
                     <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                       <div>
-                        <p className="text-xs text-green-600 dark:text-green-400">Qo'llanildi</p>
+                        <p className="text-xs text-green-600 dark:text-green-400">{'Qo\'llanildi'}</p>
                         <p className="font-bold text-green-700 dark:text-green-400">
                           {appliedCoupon.code} (-{appliedCoupon.discountPercentage}%)
                         </p>
@@ -975,16 +971,13 @@ export default function CatalogPage() {
                           {product.discountPrice && product.discountPrice > 0 ? (
                             <>
                               <span className="text-xs text-gray-400 dark:text-gray-500 line-through block">
-                                {product.price.toLocaleString()} so'm
-                              </span>
+                                {product.price.toLocaleString()}{' so\'m '}</span>
                               <span className="text-sm font-black text-[#FF8A00] dark:text-orange-400">
-                                {product.discountPrice.toLocaleString()} so'm
-                              </span>
+                                {product.discountPrice.toLocaleString()}{' so\'m '}</span>
                             </>
                           ) : (
                             <span className="text-sm font-black text-[#005CB9] dark:text-blue-400">
-                              {product.price.toLocaleString()} so'm
-                            </span>
+                              {product.price.toLocaleString()}{' so\'m '}</span>
                           )}
                         </div>
 
@@ -1022,7 +1015,7 @@ export default function CatalogPage() {
               </div>
             ) : (
               // List View
-              <div className="space-y-4">
+              (<div className="space-y-4">
                 {products.map((product) => (
                   <motion.div
                     key={product._id}
@@ -1143,16 +1136,13 @@ export default function CatalogPage() {
                             {product.discountPrice && product.discountPrice > 0 ? (
                               <>
                                 <span className="text-sm text-gray-400 dark:text-gray-500 line-through mr-2">
-                                  {product.price.toLocaleString()} so'm
-                                </span>
+                                  {product.price.toLocaleString()}{' so\'m '}</span>
                                 <span className="text-xl font-black text-[#FF8A00] dark:text-orange-400">
-                                  {product.discountPrice.toLocaleString()} so'm
-                                </span>
+                                  {product.discountPrice.toLocaleString()}{' so\'m '}</span>
                               </>
                             ) : (
                               <span className="text-xl font-black text-[#005CB9] dark:text-blue-400">
-                                {product.price.toLocaleString()} so'm
-                              </span>
+                                {product.price.toLocaleString()}{' so\'m '}</span>
                             )}
                           </div>
 
@@ -1200,7 +1190,7 @@ export default function CatalogPage() {
                     <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#005CB9]/20 dark:group-hover:border-blue-600/30 rounded-xl transition-all duration-300" />
                   </motion.div>
                 ))}
-              </div>
+              </div>)
             )}
 
             {/* Pagination */}
@@ -1255,7 +1245,7 @@ export default function CatalogPage() {
           </>
         ) : (
           // Empty State
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 p-12 text-center relative overflow-hidden">
+          (<div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 p-12 text-center relative overflow-hidden">
             {/* Floating Particles in empty state */}
             <motion.div
               className="absolute inset-0 pointer-events-none"
@@ -1264,21 +1254,18 @@ export default function CatalogPage() {
               }}
               transition={{ duration: 0.3 }}
             />
-            
             <div className="w-24 h-24 bg-gradient-to-r from-[#005CB9]/10 to-[#FF8A00]/10 dark:from-blue-600/20 dark:to-orange-600/20 rounded-full flex items-center justify-center mx-auto mb-6 relative z-10">
               <Search size={48} className="text-gray-400 dark:text-gray-500" />
             </div>
             <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-3 relative z-10">Kitob topilmadi</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto relative z-10">
-              Sizning so'rovingiz bo'yicha hech qanday kitob topilmadi. Boshqa filtrlar bilan urinib ko'ring.
-            </p>
+            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto relative z-10">{' Sizning so\'rovingiz bo\'yicha hech qanday kitob topilmadi. Boshqa filtrlar bilan urinib ko\'ring. '}</p>
             <Button
               onClick={handleResetFilters}
               className="bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg dark:hover:shadow-2xl dark:hover:shadow-blue-900/20 transition-all relative z-10"
             >
               Filtrlarni tozalash
             </Button>
-          </div>
+          </div>)
         )}
 
         {/* Info Icons */}
@@ -1289,11 +1276,11 @@ export default function CatalogPage() {
           </div>
           <div className="p-2">
             <Shield size={16} className="mx-auto mb-1 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-400 dark:text-gray-500">Xavfsiz to'lov</span>
+            <span className="text-gray-400 dark:text-gray-500">{'Xavfsiz to\'lov'}</span>
           </div>
           <div className="p-2">
             <MessageCircle size={16} className="mx-auto mb-1 text-gray-400 dark:text-gray-500" />
-            <span className="text-gray-400 dark:text-gray-500">24/7 qo'llab-quvvatlash</span>
+            <span className="text-gray-400 dark:text-gray-500">{'24/7 qo\'llab-quvvatlash'}</span>
           </div>
         </div>
       </div>

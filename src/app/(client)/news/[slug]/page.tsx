@@ -394,9 +394,7 @@ export default function NewsDetailPage() {
             transition={{ delay: 0.2 }}
             className="mt-12"
           >
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              O'xshash yangiliklar
-            </h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">{' O\'xshash yangiliklar '}</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {relatedNews.map((item) => {

@@ -394,7 +394,6 @@ export default function OrderDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800 py-8 relative overflow-hidden">
-      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}
@@ -451,7 +450,6 @@ export default function OrderDetailPage() {
         {/* Grid Pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
       </div>
-
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         
         {/* Back Button with animation */}
@@ -529,8 +527,7 @@ export default function OrderDetailPage() {
                 animate={{ scale: 1 }}
                 className="text-2xl font-black text-[#005CB9] dark:text-blue-400"
               >
-                {order.totalAmount?.toLocaleString() || 0} so'm
-              </motion.p>
+                {order.totalAmount?.toLocaleString() || 0}{' so\'m '}</motion.p>
             </div>
           </div>
 
@@ -652,8 +649,7 @@ export default function OrderDetailPage() {
                               </p>
                             )}
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                              {item.quantity || 0} x {getItemPrice(item).toLocaleString()} so'm
-                            </p>
+                              {item.quantity || 0} x {getItemPrice(item).toLocaleString()}{' so\'m '}</p>
                           </div>
                           <div className="text-right">
                             <motion.p 
@@ -662,8 +658,7 @@ export default function OrderDetailPage() {
                               animate={{ scale: 1 }}
                               className="font-bold text-[#005CB9] dark:text-blue-400"
                             >
-                              {getItemTotal(item).toLocaleString()} so'm
-                            </motion.p>
+                              {getItemTotal(item).toLocaleString()}{' so\'m '}</motion.p>
                           </div>
                         </motion.div>
                       ))
@@ -682,23 +677,23 @@ export default function OrderDetailPage() {
                     >
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500 dark:text-gray-400">Mahsulotlar summasi</span>
-                        <span className="text-gray-900 dark:text-white">{order.subtotal?.toLocaleString()} so'm</span>
+                        <span className="text-gray-900 dark:text-white">{order.subtotal?.toLocaleString()}{' so\'m'}</span>
                       </div>
                       {order.discount && order.discount > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-500 dark:text-gray-400">Chegirma</span>
-                          <span className="text-green-600 dark:text-green-400">-{order.discount.toLocaleString()} so'm</span>
+                          <span className="text-green-600 dark:text-green-400">-{order.discount.toLocaleString()}{' so\'m'}</span>
                         </div>
                       )}
                       {order.deliveryCost && order.deliveryCost > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-500 dark:text-gray-400">Yetkazish</span>
-                          <span className="text-gray-900 dark:text-white">{order.deliveryCost.toLocaleString()} so'm</span>
+                          <span className="text-gray-900 dark:text-white">{order.deliveryCost.toLocaleString()}{' so\'m'}</span>
                         </div>
                       )}
                       <div className="flex justify-between text-base font-bold pt-2 border-t border-gray-100 dark:border-slate-700">
                         <span className="text-gray-900 dark:text-white">Jami</span>
-                        <span className="text-[#005CB9] dark:text-blue-400">{order.totalAmount?.toLocaleString()} so'm</span>
+                        <span className="text-[#005CB9] dark:text-blue-400">{order.totalAmount?.toLocaleString()}{' so\'m'}</span>
                       </div>
                     </motion.div>
                   )}
@@ -712,9 +707,7 @@ export default function OrderDetailPage() {
                   className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 p-6"
                 >
                   <h2 className="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <Truck size={18} className="text-[#FF8A00] dark:text-orange-400" />
-                    Yetkazib berish ma'lumotlari
-                  </h2>
+                    <Truck size={18} className="text-[#FF8A00] dark:text-orange-400" />{' Yetkazib berish ma\'lumotlari '}</h2>
                   <div className="space-y-4">
                     <motion.div 
                       initial={{ x: -20, opacity: 0 }}
@@ -953,9 +946,7 @@ export default function OrderDetailPage() {
                 className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 p-6"
               >
                 <h2 className="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <MessageCircle size={18} className="text-[#005CB9] dark:text-blue-400" />
-                  Qo'llab-quvvatlash
-                </h2>
+                  <MessageCircle size={18} className="text-[#005CB9] dark:text-blue-400" />{' Qo\'llab-quvvatlash '}</h2>
                 
                 <div className="space-y-4">
                   <motion.div 
@@ -964,9 +955,7 @@ export default function OrderDetailPage() {
                     transition={{ delay: 0.9 }}
                     className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl"
                   >
-                    <p className="text-blue-800 dark:text-blue-300">
-                      Buyurtmangiz bo'yicha savollar bo'lsa, biz bilan bog'lanishingiz mumkin
-                    </p>
+                    <p className="text-blue-800 dark:text-blue-300">{' Buyurtmangiz bo\'yicha savollar bo\'lsa, biz bilan bog\'lanishingiz mumkin '}</p>
                   </motion.div>
 
                   <div className="grid grid-cols-1 gap-3">
@@ -1040,9 +1029,7 @@ export default function OrderDetailPage() {
               className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 p-6"
             >
               <h2 className="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <CreditCard size={18} className="text-green-600 dark:text-green-400" />
-                To'lov ma'lumotlari
-              </h2>
+                <CreditCard size={18} className="text-green-600 dark:text-green-400" />{' To\'lov ma\'lumotlari '}</h2>
               <div className="space-y-3">
                 <motion.div 
                   initial={{ x: 20, opacity: 0 }}
@@ -1050,7 +1037,7 @@ export default function OrderDetailPage() {
                   transition={{ delay: 1.6 }}
                   className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg"
                 >
-                  <span className="text-sm text-gray-500 dark:text-gray-400">To'lov turi</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{'To\'lov turi'}</span>
                   <span className="text-sm font-bold text-gray-900 dark:text-white">
                     {getPaymentTypeText(order.paymentType)}
                   </span>
@@ -1061,7 +1048,7 @@ export default function OrderDetailPage() {
                   transition={{ delay: 1.7 }}
                   className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg"
                 >
-                  <span className="text-sm text-gray-500 dark:text-gray-400">To'lov holati</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{'To\'lov holati'}</span>
                   <motion.span 
                     whileHover={{ scale: 1.05 }}
                     className={`text-xs px-2 py-1 rounded-full ${
@@ -1191,7 +1178,7 @@ export default function OrderDetailPage() {
               >
                 <MessageCircle size={24} className="mx-auto mb-2" />
                 <p className="font-bold">Yordam kerakmi?</p>
-                <p className="text-xs opacity-90">Operator bilan bog'lanishingiz mumkin</p>
+                <p className="text-xs opacity-90">{'Operator bilan bog\'lanishingiz mumkin'}</p>
               </button>
             </motion.div>
           </div>
