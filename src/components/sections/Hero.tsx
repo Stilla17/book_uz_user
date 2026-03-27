@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { UserBanner, userBannerService } from '@/services/userBanner.service';
 
 import { motion } from 'framer-motion';
-import { Infinity, Award, BookOpen, ChevronLeft, ChevronRight, Headphones, Sparkles } from 'lucide-react';
+import { Infinity as InfinityIcon, Award, BookOpen, ChevronLeft, ChevronRight, Headphones, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
