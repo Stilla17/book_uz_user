@@ -210,3 +210,21 @@
     --brand-blue: #00a0e3;
     --brand-orange: #ffb14d;
 }
+
+/* Force gradient-based UI to render as a flat orange background instead. */
+[class*='bg-gradient-to-'],
+[class*='bg-[linear-gradient'],
+[style*='linear-gradient'],
+[style*='radial-gradient'] {
+    background-image: none !important;
+    background: #e67600 !important;
+}
+
+[class*='bg-clip-text'],
+[class*='text-transparent'][class*='bg-gradient-to-'] {
+    background-image: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    color: #e67600 !important;
+    -webkit-text-fill-color: #e67600 !important;
+}
