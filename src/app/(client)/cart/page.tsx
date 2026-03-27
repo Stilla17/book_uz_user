@@ -43,6 +43,17 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+type ApiErrorLike = {
+    message?: string;
+    request?: unknown;
+    response?: {
+        status?: number;
+        data?: {
+            message?: string;
+        };
+    };
+};
+
 export default function CartPage() {
     const router = useRouter();
     const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -58,6 +69,12 @@ export default function CartPage() {
     const [cartCount, setCartCount] = useState(0);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
+    const getErrorMessage = (error: unknown, fallback = 'Xatolik yuz berdi') => {
+        const apiError = error as ApiErrorLike;
+
+        return apiError.response?.data?.message || apiError.message || fallback;
+    };
+
     // Track mouse position for parallax effect
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -67,6 +84,7 @@ export default function CartPage() {
             });
         };
         window.addEventListener('mousemove', handleMouseMove);
+
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
@@ -179,22 +197,27 @@ export default function CartPage() {
             if (response.data?.success) {
                 // Serverdan kelgan ma'lumotlar bilan yangilash
                 setCart(response.data.data);
-                const totalItems = response.data.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
+                const totalItems = response.data.data.items.reduce(
+                    (sum: number, item: CartItem) => sum + item.quantity,
+                    0
+                );
                 setCartCount(totalItems);
             }
-        } catch (error: any) {
-            console.error('❌ Xatolik:', error);
+        } catch (error: unknown) {
+            const apiError = error as ApiErrorLike;
 
-            if (error.response) {
-                console.error('Server javobi:', error.response.data);
-                console.error('Status kod:', error.response.status);
+            console.error('??? Xatolik:', error);
 
-                if (error.response.status === 500) {
+            if (apiError.response) {
+                console.error('Server javobi:', apiError.response.data);
+                console.error('Status kod:', apiError.response.status);
+
+                if (apiError.response.status === 500) {
                     toast.error('Serverda xatolik yuz berdi. Backend loglarni tekshiring.');
                 } else {
-                    toast.error(error.response.data?.message || 'Xatolik yuz berdi');
+                    toast.error(getErrorMessage(error));
                 }
-            } else if (error.request) {
+            } else if (apiError.request) {
                 toast.error("Server bilan bog'lanishda xatolik");
             } else {
                 toast.error('Xatolik yuz berdi');
@@ -262,13 +285,15 @@ export default function CartPage() {
                     data: getCartRes.data
                 });
                 console.log('✅ GET /cart:', getCartRes.status);
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const apiError = err as ApiErrorLike;
+
                 results.push({
                     endpoint: 'GET /cart',
-                    status: err.response?.status || 'Network Error',
-                    error: err.message
+                    status: apiError.response?.status || 'Network Error',
+                    error: apiError.message
                 });
-                console.error('❌ GET /cart:', err.response?.status || err.message);
+                console.error('??? GET /cart:', apiError.response?.status || apiError.message);
             }
 
             // 2. PATCH /cart/update - Miqdorni yangilash
@@ -290,14 +315,16 @@ export default function CartPage() {
                 } else {
                     console.log("⚠️ Savat bo'sh, PATCH test o'tkazib bo'lmadi");
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const apiError = err as ApiErrorLike;
+
                 results.push({
                     endpoint: 'PATCH /cart/update',
-                    status: err.response?.status || 'Network Error',
-                    error: err.message,
-                    responseData: err.response?.data
+                    status: apiError.response?.status || 'Network Error',
+                    error: apiError.message,
+                    responseData: apiError.response?.data
                 });
-                console.error('❌ PATCH /cart/update:', err.response?.status, err.response?.data);
+                console.error('??? PATCH /cart/update:', apiError.response?.status, apiError.response?.data);
             }
 
             // 3. POST /cart/add - Qo'shish
@@ -314,13 +341,15 @@ export default function CartPage() {
                     success: addRes.data?.success
                 });
                 console.log('✅ POST /cart/add:', addRes.status);
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const apiError = err as ApiErrorLike;
+
                 results.push({
                     endpoint: 'POST /cart/add',
-                    status: err.response?.status || 'Network Error',
-                    error: err.message
+                    status: apiError.response?.status || 'Network Error',
+                    error: apiError.message
                 });
-                console.error('❌ POST /cart/add:', err.response?.status);
+                console.error('??? POST /cart/add:', apiError.response?.status);
             }
 
             // 4. DELETE /cart/remove/:productId - O'chirish
@@ -335,13 +364,15 @@ export default function CartPage() {
                     });
                     console.log('✅ DELETE /cart/remove:', removeRes.status);
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const apiError = err as ApiErrorLike;
+
                 results.push({
                     endpoint: 'DELETE /cart/remove/:id',
-                    status: err.response?.status || 'Network Error',
-                    error: err.message
+                    status: apiError.response?.status || 'Network Error',
+                    error: apiError.message
                 });
-                console.error('❌ DELETE /cart/remove:', err.response?.status);
+                console.error('??? DELETE /cart/remove:', apiError.response?.status);
             }
 
             // 5. DELETE /cart/clear - Tozalash
@@ -353,13 +384,15 @@ export default function CartPage() {
                     success: clearRes.data?.success
                 });
                 console.log('✅ DELETE /cart/clear:', clearRes.status);
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const apiError = err as ApiErrorLike;
+
                 results.push({
                     endpoint: 'DELETE /cart/clear',
-                    status: err.response?.status || 'Network Error',
-                    error: err.message
+                    status: apiError.response?.status || 'Network Error',
+                    error: apiError.message
                 });
-                console.error('❌ DELETE /cart/clear:', err.response?.status);
+                console.error('??? DELETE /cart/clear:', apiError.response?.status);
             }
 
             // Natijalarni ko'rsatish
@@ -400,9 +433,9 @@ export default function CartPage() {
 
                 toast.success('Mahsulot savatdan olib tashlandi');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Remove error:', error);
-            toast.error(error.response?.data?.message || 'Xatolik yuz berdi');
+            toast.error(getErrorMessage(error));
         } finally {
             setUpdating(null);
         }
@@ -422,15 +455,16 @@ export default function CartPage() {
                 setCartCount(0);
                 toast.success('Savat tozalandi');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Clear error:', error);
-            toast.error(error.response?.data?.message || 'Xatolik yuz berdi');
+            toast.error(getErrorMessage(error));
         }
     };
 
     const handleApplyPromo = () => {
         if (!promoCode.trim()) {
             toast.error('Promokodni kiriting');
+
             return;
         }
 
@@ -1171,3 +1205,5 @@ export default function CartPage() {
         </div>
     );
 }
+
+
