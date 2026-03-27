@@ -57,7 +57,6 @@ export default function CategoriesPage() {
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact">("grid");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<"name" | "bookCount" | "newest">("bookCount");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
