@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { Metadata } from 'next';
-import { Rubik } from 'next/font/google';
+import { Lato } from 'next/font/google';
 
 import { ThemeProvider as NextThemeProvider } from 'next-themes';
 
@@ -14,10 +14,11 @@ import I18nProvider from '@/providers/I18nProvider';
 
 import { Toaster } from 'react-hot-toast';
 
-const rubik = Rubik({
+const lato = Lato({
     subsets: ['latin', 'cyrillic'], // O'zbek tili uchun lotin va kirill kerak bo'lishi mumkin
     display: 'swap',
-    variable: '--font-rubik' // CSS o'zgaruvchisi sifatida ishlatish uchun
+    weight: ['300', '400', '700', '900'],
+    variable: '--font-lato' // CSS o'zgaruvchisi sifatida ishlatish uchun
 });
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     return (
         <html lang='uz' suppressHydrationWarning>
             <body
-                className={`${rubik.className} ${rubik.variable} min-h-screen bg-white font-sans text-gray-900 antialiased transition-colors duration-300 dark:bg-slate-900 dark:text-white`}>
+                className={`${lato.className} ${lato.variable} min-h-screen bg-white font-sans text-gray-900 antialiased transition-colors duration-300 dark:bg-slate-900 dark:text-white`}>
                 <NextThemeProvider attribute='class' defaultTheme='light' enableSystem={false}>
                     <I18nProvider>
                         <CustomThemeProvider>

@@ -5,7 +5,6 @@ import { NavItem } from '@/types/nav.types';
 import {
     Award,
     CreditCard,
-    Download,
     FileText,
     Gift,
     Headphones,
@@ -56,13 +55,13 @@ export const bottomNav: NavItem[] = [
         href: '/gift-cards',
         icon: <Gift size={14} />,
         description: "Sovg'a kartalari"
-    },
-    {
-        label: 'Bepul',
-        href: '/catalog?price=0',
-        icon: <Download size={14} />,
-        description: 'Bepul kitoblar'
     }
+    // {
+    //     label: 'Bepul',
+    //     href: '/catalog?price=0',
+    //     icon: <Download size={14} />,
+    //     description: 'Bepul kitoblar'
+    // }
 ];
 
 export const serviceMenuItems = [

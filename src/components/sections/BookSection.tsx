@@ -292,7 +292,8 @@ export const BookSection = ({
         />
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        {/* <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" /> */}
+        <div className="absolute inset-0 bg-[#ef7f1a]/10 dark:bg-[#00a0e3]/5" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -341,7 +342,7 @@ export const BookSection = ({
 
         {/* Custom Navigation */}
         <div className="relative">
-          {/* Navigation Buttons */}
+          {/* Navigation Buttons
           <div className="absolute -top-14 right-0 flex gap-2 z-10">
             <motion.button
               ref={prevRef}
@@ -363,7 +364,7 @@ export const BookSection = ({
             >
               <ChevronRight size={20} className="text-gray-700 dark:text-gray-300" />
             </motion.button>
-          </div>
+          </div> */}
 
           {/* Swiper Slider */}
           <Swiper
@@ -386,7 +387,7 @@ export const BookSection = ({
               1024: { slidesPerView: 4.2, spaceBetween: 20 },
               1280: { slidesPerView: 5.2, spaceBetween: 25 },
             }}
-            className="book-swiper !pb-12"
+            className="book-swiper pb-12 mt-12"
           >
             {loading ? (
               Array.from({ length: 8 }).map((_, i) => (
@@ -409,27 +410,6 @@ export const BookSection = ({
             )}
           </Swiper>
         </div>
-
-        {/* Progress bar (only for autoplay sections) */}
-        {type !== "author" && type !== "default" && (
-          <motion.div 
-            className="w-full h-1.5 bg-gray-100 dark:bg-slate-700 rounded-full mt-6 overflow-hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <motion.div 
-              className={`h-full rounded-full bg-gradient-to-r ${config.gradient}`}
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
-              transition={{ 
-                duration: 5,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-            />
-          </motion.div>
-        )}
 
         {/* View count for popular section */}
         {type === "popular" && (

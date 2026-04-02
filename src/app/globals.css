@@ -123,12 +123,12 @@
         @apply border-border;
     }
 
-    /* Global UI font: Open Sans. DomaineText reserved for headings/content where needed. */
+    /* Global UI font: Lato. DomaineText reserved for headings/content where needed. */
     html,
     body {
         @apply bg-background text-foreground;
 
-        font-family: var(--font-rubik), var(--font-domaine);
+        font-family: var(--font-lato), var(--font-domaine);
         transition:
             background-color 0.3s ease,
             color 0.3s ease;
