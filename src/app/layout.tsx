@@ -15,7 +15,7 @@ import I18nProvider from '@/providers/I18nProvider';
 import { Toaster } from 'react-hot-toast';
 
 const lato = Lato({
-    subsets: ['latin', 'cyrillic'], // O'zbek tili uchun lotin va kirill kerak bo'lishi mumkin
+    subsets: ['latin', 'latin-ext'], // O'zbek tili uchun lotin va kirill kerak bo'lishi mumkin
     display: 'swap',
     weight: ['300', '400', '700', '900'],
     variable: '--font-lato' // CSS o'zgaruvchisi sifatida ishlatish uchun
