@@ -347,7 +347,7 @@ export default function CategoryDetailPage() {
                         Kategoriyalar
                     </Link>
                     <ChevronRight size={14} />
-                    <span className='font-bold text-[#005CB9] dark:text-blue-400'>{category.name.uz}</span>
+                    <span className='font-bold text-[#005CB9] dark:text-blue-400'>{category.title.uz}</span>
                 </motion.div>
 
                 {/* Category Header */}
@@ -361,7 +361,7 @@ export default function CategoryDetailPage() {
                             <div className='relative h-24 w-24 flex-shrink-0'>
                                 <Image
                                     src={categoryIcon}
-                                    alt={category.name.uz}
+                                    alt={category.title.uz}
                                     width={96}
                                     height={96}
                                     className='rounded-2xl object-cover'
@@ -381,9 +381,9 @@ export default function CategoryDetailPage() {
                         <div className='flex-1'>
                             <div className='mb-2 flex items-center gap-3'>
                                 <h1 className='text-4xl font-black text-gray-900 md:text-5xl dark:text-white'>
-                                    {category.name.uz}
+                                    {category.title.uz}
                                 </h1>
-                                <span className='text-sm text-gray-400 dark:text-gray-500'>/ {category.name.ru}</span>
+                                <span className='text-sm text-gray-400 dark:text-gray-500'>/ {category.title.ru}</span>
                             </div>
 
                             {category.description?.uz && (
@@ -424,7 +424,7 @@ export default function CategoryDetailPage() {
                                         key={sub._id ?? sub.slug}
                                         href={`/category/${category.slug}/${sub.slug}`}
                                         className='rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-[#005CB9] hover:text-white dark:bg-slate-700 dark:text-gray-400'>
-                                        {sub.name.uz}
+                                        {sub.title.uz}
                                     </Link>
                                 ))}
                             </div>
@@ -474,7 +474,7 @@ export default function CategoryDetailPage() {
                             <Search className='absolute top-1/2 left-3 -translate-y-1/2 text-gray-400' size={18} />
                             <input
                                 type='text'
-                                placeholder={`${category.name.uz} kitoblaridan qidirish...`}
+                                placeholder={`${category.title.uz} kitoblaridan qidirish...`}
                                 className='w-full rounded-lg border border-gray-200 bg-white py-2 pr-4 pl-10 focus:ring-2 focus:ring-[#005CB9] focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:focus:ring-blue-400'
                             />
                         </div>

@@ -86,7 +86,7 @@ interface SearchProduct {
 
 interface SearchCategory {
   _id: string;
-  name: {
+  title: {
     uz: string;
     ru?: string;
   };
@@ -1135,7 +1135,7 @@ export default function SearchPage() {
                             {category.image ? (
                               <Image
                                 src={category.image}
-                                alt={category.name.uz}
+                                alt={category.title.uz}
                                 width={40}
                                 height={40}
                                 className="rounded-lg object-cover"
@@ -1146,7 +1146,7 @@ export default function SearchPage() {
                           </div>
                           <div>
                             <p className="font-bold text-gray-900 dark:text-white group-hover:text-[#005CB9] dark:group-hover:text-blue-400 transition-colors">
-                              {category.name.uz}
+                              {category.title.uz}
                             </p>
                             {category.count && (
                               <p className="text-xs text-gray-400 dark:text-gray-500">

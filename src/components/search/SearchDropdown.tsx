@@ -30,7 +30,7 @@ interface SearchProduct {
 
 interface SearchCategory {
   _id: string;
-  name: {
+  title: {
     uz: string;
     ru?: string;
   };
@@ -196,7 +196,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-bold text-gray-900 group-hover:text-[#005CB9]">
-                        {category.name.uz}
+                        {category.title.uz}
                       </p>
                     </div>
                   </Link>

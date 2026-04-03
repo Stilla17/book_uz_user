@@ -45,7 +45,7 @@ import { categoryService } from "@/services/category.service";
 
 interface ICategory {
   _id: string;
-  name: { uz: string; ru: string; en?: string };
+  title: { uz: string; ru: string; en?: string };
   slug: string;
   icon?: string;
   image?: string;
@@ -350,7 +350,7 @@ export const CategorySection = ({
             </div>
           ) : (
             categories.map((cat, index) => {
-              const label = cat.name[lang as keyof typeof cat.name] || cat.name.uz || cat.name.ru;
+              const label = cat.title[lang as keyof typeof cat.title] || cat.title.uz || cat.title.ru;
               const iconConfig = getIconBySlug(cat.slug);
               const bookCount = cat.bookCount || cat.count || 0;
 

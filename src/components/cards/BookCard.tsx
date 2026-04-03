@@ -85,7 +85,7 @@ export const BookCard = ({ book }: { book: Book }) => {
     };
 
     if (!mounted) {
-        return <div className='h-[400px] animate-pulse rounded-xl bg-white p-3 dark:bg-slate-800' />;
+        return <div className='h-100 animate-pulse rounded-xl bg-white p-3 dark:bg-slate-800' />;
     }
 
     return (
@@ -116,7 +116,7 @@ export const BookCard = ({ book }: { book: Book }) => {
       </div> */}
 
             {/* Book Cover */}
-            <div className='relative mb-3 h-[230px] w-full overflow-hidden rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 shadow-md dark:from-slate-700 dark:to-slate-600'>
+            <div className='relative mb-3  h-[230px] w-full overflow-hidden rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 shadow-md dark:from-slate-700 dark:to-slate-600'>
                 {imageSrc ? (
                     <Image
                         src={imageSrc}

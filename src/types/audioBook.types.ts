@@ -16,7 +16,7 @@ export interface AudioBook {
   audioFileId?: string;
   duration: string;
   durationSeconds?: number;
-  category?: string | { _id: string; name: MultiLangField; slug: string };
+  category?: string | { _id: string; title: MultiLangField; slug: string };
   tags: string[];
   rating: number;
   reviewsCount: number;

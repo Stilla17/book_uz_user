@@ -78,7 +78,7 @@ interface Product {
   stock: number;
   category: {
     _id: string;
-    name: {
+    title: {
       uz: string;
     };
   };
@@ -163,14 +163,14 @@ export default function CatalogPage() {
 
   // Kategoriyalar (mock - API dan olinishi kerak)
   const categories = [
-    { _id: "1", name: { uz: "Detektiv" } },
-    { _id: "2", name: { uz: "Fantastika" } },
-    { _id: "3", name: { uz: "Fentezi" } },
-    { _id: "4", name: { uz: "Romantika" } },
-    { _id: "5", name: { uz: "Psixologiya" } },
-    { _id: "6", name: { uz: "Biznes" } },
-    { _id: "7", name: { uz: "Tarix" } },
-    { _id: "8", name: { uz: "Bolalar" } },
+    { _id: "1", title: { uz: "Detektiv" } },
+    { _id: "2", title: { uz: "Fantastika" } },
+    { _id: "3", title: { uz: "Fentezi" } },
+    { _id: "4", title: { uz: "Romantika" } },
+    { _id: "5", title: { uz: "Psixologiya" } },
+    { _id: "6", title: { uz: "Biznes" } },
+    { _id: "7", title: { uz: "Tarix" } },
+    { _id: "8", title: { uz: "Bolalar" } },
   ];
 
   // Mualliflar (mock - API dan olinishi kerak)
@@ -680,7 +680,7 @@ export default function CatalogPage() {
                     <option value="">Barchasi</option>
                     {categories.map(cat => (
                       <option key={cat._id} value={cat._id}>
-                        {cat.name.uz}
+                        {cat.title.uz}
                       </option>
                     ))}
                   </select>

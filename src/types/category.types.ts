@@ -1,43 +1,44 @@
 export interface MultiLangField {
-  uz: string;
-  ru: string;
-  en: string;
+    uz: string;
+    ru: string;
+    en: string;
 }
 
 export interface SubCategory {
-  _id?: string;
-  name: MultiLangField;
-  slug: string;
-  bookCount?: number;
+    _id?: string;
+    title: MultiLangField;
+    slug: string;
+    bookCount?: number;
 }
 
 export interface Category {
-  _id: string;
-  name: MultiLangField;
-  slug: string;
-  subCategories: SubCategory[];
-  icon?: string;
-  image?: string;
-  description?: MultiLangField;
-  order: number;
-  isActive: boolean;
-  isFeatured: boolean;
-  bookCount?: number;
-  createdAt?: string;
-  updatedAt?: string;
+    _id: string;
+    title: MultiLangField;
+    slug: string;
+    subCategories: SubCategory[];
+    subgenres: SubCategory[];
+    icon?: string;
+    image?: string;
+    description?: MultiLangField;
+    order: number;
+    isActive: boolean;
+    isFeatured: boolean;
+    bookCount?: number;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface CategoryFormData {
-  name: MultiLangField;
-  description?: MultiLangField;
-  icon?: File | string;
-  image?: File | string;
-  order: number;
-  isActive: boolean;
-  isFeatured: boolean;
+    title: MultiLangField;
+    description?: MultiLangField;
+    icon?: File | string;
+    image?: File | string;
+    order: number;
+    isActive: boolean;
+    isFeatured: boolean;
 }
 
 export interface SubCategoryFormData {
-  categoryId: string;
-  name: MultiLangField;
+    categoryId: string;
+    title: MultiLangField;
 }

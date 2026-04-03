@@ -86,8 +86,8 @@ export default function CategoriesPage() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(cat => 
-        cat.name.uz.toLowerCase().includes(query) ||
-        cat.name.ru.toLowerCase().includes(query) ||
+        cat.title.uz.toLowerCase().includes(query) ||
+        cat.title.ru.toLowerCase().includes(query) ||
         cat.description?.uz?.toLowerCase().includes(query)
       );
     }
@@ -95,7 +95,7 @@ export default function CategoriesPage() {
     // Sort
     filtered.sort((a, b) => {
       if (sortBy === "name") {
-        return a.name.uz.localeCompare(b.name.uz);
+        return a.title.uz.localeCompare(b.title.uz);
       } else if (sortBy === "bookCount") {
         return (b.bookCount || 0) - (a.bookCount || 0);
       } else {
@@ -512,7 +512,7 @@ export default function CategoriesPage() {
                           {category.image ? (
                             <Image
                               src={category.image}
-                              alt={category.name.uz}
+                              alt={category.title.uz}
                               fill
                               className="object-cover group-hover:scale-110 transition-transform duration-500"
                             />
@@ -550,7 +550,7 @@ export default function CategoriesPage() {
                         {/* Content */}
                         <div className="p-5">
                           <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 group-hover:text-[#005CB9] dark:group-hover:text-blue-400 transition-colors">
-                            {category.name.uz}
+                            {category.title.uz}
                           </h3>
                           
                           {category.description?.uz && (
@@ -567,7 +567,7 @@ export default function CategoriesPage() {
                                     key={sub._id ?? sub.slug}
                                     className="text-xs px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-full"
                                   >
-                                    {sub.name.uz}
+                                    {sub.title.uz}
                                 </span>
                               ))}
                               {category.subCategories.length > 3 && (
@@ -580,7 +580,7 @@ export default function CategoriesPage() {
 
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-gray-400 dark:text-gray-500">
-                              {category.name.ru}
+                              {category.title.ru}
                             </span>
                             <motion.div
                               whileHover={{ x: 5 }}
@@ -633,14 +633,14 @@ export default function CategoriesPage() {
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
                               <h3 className="text-xl font-black text-gray-900 dark:text-white group-hover:text-[#005CB9] dark:group-hover:text-blue-400 transition-colors">
-                                {category.name.uz}
+                                {category.title.uz}
                               </h3>
                               <ChevronRight className="text-[#005CB9] dark:text-blue-400" size={20} />
                             </div>
 
                             <div className="flex items-center gap-3 mt-1">
                               <span className="text-xs text-gray-400 dark:text-gray-500">
-                                {category.name.ru}
+                                {category.title.ru}
                               </span>
                               <span className="text-xs px-2 py-0.5 bg-[#005CB9]/10 dark:bg-blue-400/10 text-[#005CB9] dark:text-blue-400 rounded-full">
                                 {category.bookCount?.toLocaleString() || 0} ta kitob
@@ -673,7 +673,7 @@ export default function CategoriesPage() {
                                     key={sub._id ?? sub.slug}
                                     className="text-xs px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-full"
                                   >
-                                    {sub.name.uz}
+                                    {sub.title.uz}
                                   </span>
                                 ))}
                               </div>
@@ -708,7 +708,7 @@ export default function CategoriesPage() {
                           {icon}
                         </div>
                         <h3 className="font-bold text-sm text-gray-900 dark:text-white mb-1 line-clamp-1">
-                          {category.name.uz}
+                          {category.title.uz}
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           {category.bookCount?.toLocaleString()} ta
@@ -778,7 +778,7 @@ export default function CategoriesPage() {
                       className="inline-flex items-center gap-1 px-4 py-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-full border border-gray-200 dark:border-slate-700 hover:border-[#005CB9] dark:hover:border-blue-400 hover:text-[#005CB9] dark:hover:text-blue-400 transition-all"
                     >
                       <span>{getCategoryIcon(category)}</span>
-                      <span className="font-bold text-sm">{category.name.uz}</span>
+                      <span className="font-bold text-sm">{category.title.uz}</span>
                       <span className="text-xs text-gray-400">({category.bookCount})</span>
                     </Link>
                   </motion.div>

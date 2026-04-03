@@ -370,6 +370,7 @@ export const BookSection = ({
           <Swiper
             slidesPerView={1.4}
             spaceBetween={15}
+            loop={true}
             navigation={{
               prevEl: prevRef.current,
               nextEl: nextRef.current,

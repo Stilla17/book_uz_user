@@ -24,7 +24,7 @@ api.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    console.log(`📤 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    // console.log(`📤 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },
   (error) => {

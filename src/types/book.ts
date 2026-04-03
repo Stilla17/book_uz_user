@@ -25,7 +25,7 @@ export interface Product {
     stock: number;
     category: {
         _id: string;
-        name: {
+        title: {
             uz: string;
         };
     };

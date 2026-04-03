@@ -79,7 +79,7 @@ export const Navbar = () => {
             setLoadingCategories(true);
             // Use categoryService to get public categories and filter active ones
             const response = await categoryService.getAllCategoriesPublic();
-            // console.log("Kategoriyalar yuklandi:", response);
+            console.log('Kategoriyalar yuklandi:', response);
             setCategories(response);
         } catch (error) {
             console.error('Kategoriyalar yuklanmadi:', error);
@@ -136,10 +136,14 @@ export const Navbar = () => {
         return user.name.split(' ')[0] || 'Profil';
     };
 
-    const currentLanguage = i18n.language?.split('-')[0] as keyof Category['name'];
+    const currentLanguage = i18n.language?.split('-')[0] as keyof Category['title'];
+
+    const getLocalizedTitle = (title: Category['title']) => {
+        return title?.[currentLanguage] || title?.uz || '';
+    };
 
     const getLocalizedCategoryName = (category: Category) => {
-        return category.name[currentLanguage] || category.name.uz;
+        return getLocalizedTitle(category.title);
     };
 
     return (
@@ -188,6 +192,8 @@ export const Navbar = () => {
                                 </div>
 
                                 <div className='max-h-[calc(100vh-120px)] space-y-5 overflow-y-auto p-5'>
+                                    <NavbarControls variant='mobile' onLanguageSelect={() => setMobileOpen(false)} />
+
                                     <div className='relative'>
                                         <Input
                                             placeholder={t('searchPlaceholder')}
@@ -299,7 +305,7 @@ export const Navbar = () => {
                                                 Barchasi
                                             </Link>
                                         </div>
-                                        <div className='grid grid-cols-2 gap-2'>
+                                        {/* <div className='grid grid-cols-2 gap-2'>
                                             {categories.map((category) => (
                                                 <Link
                                                     key={category._id}
@@ -310,13 +316,20 @@ export const Navbar = () => {
                                                         <p className={`text-xs font-bold`}>
                                                             {getLocalizedCategoryName(category)}
                                                         </p>
+                                                        {category.subCategories?.map((sub, index) => (
+                                                            <p
+                                                                key={index}
+                                                                className={`text-[10px] text-gray-400 dark:text-slate-500`}>
+                                                                {getLocalizedTitle(sub.title)}
+                                                            </p>
+                                                        ))}
                                                         <p className='text-[8px] text-gray-400 dark:text-slate-500'>
                                                             {category.bookCount ?? 0} ta
                                                         </p>
                                                     </div>
                                                 </Link>
                                             ))}
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                     <a
@@ -328,8 +341,6 @@ export const Navbar = () => {
                                         </div>
                                         <Phone size={18} className='text-[#005CB9] dark:text-blue-400' />
                                     </a>
-
-                                    <NavbarControls variant='mobile' onLanguageSelect={() => setMobileOpen(false)} />
                                 </div>
                             </SheetContent>
                         </Sheet>
@@ -380,15 +391,19 @@ export const Navbar = () => {
                                                 key={category._id}
                                                 href={`/category/${category.slug}`}
                                                 onClick={() => setIsCatalogOpen(false)}
-                                                className={`group flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all hover:border-[#005CB9]/20 hover:bg-[#005CB9]/5 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10`}>
+                                                className={`flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all`}>
                                                 <div className='flex-1'>
-                                                    <p
-                                                        className={`text-sm font-bold ${getTextColor()} group-hover:text-[#005CB9] dark:group-hover:text-blue-400`}>
+                                                    <p className={` font-bold ${getTextColor()}`}>
                                                         {getLocalizedCategoryName(category)}
                                                     </p>
-                                                    <p className='text-xs text-gray-400 dark:text-slate-500'>
-                                                        {category.bookCount ?? 0} ta kitob
-                                                    </p>
+
+                                                    {category.subgenres?.map((sub, index) => (
+                                                        <p
+                                                            key={index}
+                                                            className={`text-[14px] text-gray-400 hover:text-[#FF8A00] dark:text-slate-500 dark:hover:text-[#FF8A00]`}>
+                                                            {getLocalizedTitle(sub.title)}
+                                                        </p>
+                                                    ))}
                                                 </div>
                                             </Link>
                                         ))}

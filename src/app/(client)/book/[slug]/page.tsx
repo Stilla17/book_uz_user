@@ -716,7 +716,7 @@ export default function BookDetailPage() {
                     <Link
                         href={`/catalog?category=${product.category._id}`}
                         className='flex-shrink-0 transition-colors hover:text-blue-600 dark:hover:text-blue-400'>
-                        {product.category.name.uz}
+                        {product.category.title.uz}
                     </Link>
                     <ChevronRight size={12} className='flex-shrink-0 sm:size-14' />
                     <span className='truncate font-medium text-gray-900 dark:text-white'>{getProductTitle()}</span>
@@ -801,7 +801,7 @@ export default function BookDetailPage() {
                                 <Link
                                     href={`/catalog?category=${product.category._id}`}
                                     className='text-gray-600 transition-colors hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400'>
-                                    {product.category.name.uz}
+                                    {product.category.title.uz}
                                 </Link>
                             </div>
                         </div>
