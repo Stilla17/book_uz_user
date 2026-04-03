@@ -363,7 +363,7 @@ export default function MyBooksPage() {
             className="absolute bottom-20 right-20 w-96 h-96 bg-[#ef7f1a]/5 rounded-full blur-3xl"
           />
 
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="brand-grid" />
         </div>
 
         <div className="text-center relative z-10">
@@ -437,7 +437,7 @@ export default function MyBooksPage() {
         />
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="brand-grid" />
       </div>
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         

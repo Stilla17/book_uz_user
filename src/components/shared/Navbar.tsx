@@ -20,9 +20,9 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { bottomNav, serviceMenuItems } from '@/data/navMenu';
 import { useAuth } from '@/hooks/useAuth';
+import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { api } from '@/services/api';
-import { categoryService } from '@/services/category.service';
 import { User as UserType } from '@/types';
 import { Category } from '@/types/category.types';
 
@@ -54,8 +54,6 @@ export const Navbar = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [loadingCart, setLoadingCart] = useState(false);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loadingCategories, setLoadingCategories] = useState(false);
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState('');
     const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -64,6 +62,7 @@ export const Navbar = () => {
     const { isDark, getBgColor, getTextColor, getBorderColor } = useThemeStyles();
 
     const { t, i18n } = useTranslation();
+    const { data: categories = [] } = usePublicCategoriesQuery();
 
     // Savatdagi mahsulotlar sonini olish
     useEffect(() => {
@@ -73,25 +72,6 @@ export const Navbar = () => {
             setCartCount(0);
         }
     }, [isAuthenticated]);
-
-    const loadCategories = async () => {
-        try {
-            setLoadingCategories(true);
-            // Use categoryService to get public categories and filter active ones
-            const response = await categoryService.getAllCategoriesPublic();
-            console.log('Kategoriyalar yuklandi:', response);
-            setCategories(response);
-        } catch (error) {
-            console.error('Kategoriyalar yuklanmadi:', error);
-        } finally {
-            setLoadingCategories(false);
-        }
-    };
-
-    // Kategoriyalarni yuklash
-    useEffect(() => {
-        loadCategories();
-    }, []);
 
     const loadCartCount = async () => {
         try {

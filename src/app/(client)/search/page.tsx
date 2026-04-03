@@ -56,74 +56,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api, UserService } from "@/services/api";
+import type { SearchAuthor, SearchCategory, SearchPagination, SearchProduct, SearchResults, SearchTab } from "@/types/search.types";
 import { toast } from "react-hot-toast";
-
-interface SearchProduct {
-  _id: string;
-  title: {
-    uz: string;
-    ru?: string;
-    en?: string;
-  };
-  slug: string;
-  price: number;
-  discountPrice?: number;
-  images: string[];
-  author?: {
-    _id: string;
-    name: string;
-  };
-  ratingAvg?: number;
-  ratingCount?: number;
-  format?: 'ebook' | 'audio' | 'paper';
-  language?: string;
-  publishYear?: number;
-  pages?: number;
-  duration?: string;
-  views?: number;
-  sales?: number;
-}
-
-interface SearchCategory {
-  _id: string;
-  title: {
-    uz: string;
-    ru?: string;
-  };
-  slug: string;
-  count?: number;
-  image?: string;
-  description?: string;
-}
-
-interface SearchAuthor {
-  _id: string;
-  name: string;
-  image?: string;
-  slug: string;
-  bookCount?: number;
-  bio?: string;
-  books?: SearchProduct[];
-}
-
-interface SearchResults {
-  products: SearchProduct[];
-  categories: SearchCategory[];
-  authors: SearchAuthor[];
-  totalCount: number;
-  totalProducts: number;
-  totalCategories: number;
-  totalAuthors: number;
-  trending?: SearchProduct[];
-  recommended?: SearchProduct[];
-}
-
-interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  pages: number;
-}
 
 export default function SearchPage() {
   const router = useRouter();
@@ -141,13 +75,13 @@ export default function SearchPage() {
     totalCategories: 0,
     totalAuthors: 0
   });
-  const [pagination, setPagination] = useState<Pagination>({
+  const [pagination, setPagination] = useState<SearchPagination>({
     page: 1,
     limit: 12,
     total: 0,
     pages: 1
   });
-  const [activeTab, setActiveTab] = useState<'all' | 'products' | 'categories' | 'authors'>('all');
+  const [activeTab, setActiveTab] = useState<SearchTab>('all');
   const [sortBy, setSortBy] = useState<string>("-createdAt");
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -393,7 +327,7 @@ export default function SearchPage() {
             className="absolute bottom-20 right-20 w-96 h-96 bg-[#ef7f1a]/5 rounded-full blur-3xl"
           />
 
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="brand-grid" />
         </div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
@@ -479,7 +413,7 @@ export default function SearchPage() {
         />
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="brand-grid" />
       </div>
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         

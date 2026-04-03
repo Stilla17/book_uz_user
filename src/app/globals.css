@@ -178,6 +178,20 @@
     }
 }
 
+@layer utilities {
+    .brand-overlay {
+        @apply absolute inset-0 bg-[#ef7f1a]/5 dark:bg-[#00a0e3]/5;
+    }
+
+    .brand-grid {
+        @apply absolute inset-0 bg-[#ef7f1a]/5 dark:bg-[#00a0e3]/5;
+    }
+
+    .dark .brand-grid {
+        @apply bg-[#ef7f1a]/5 dark:bg-[#00a0e3]/5;
+    }
+}
+
 /* Qolgan stillar */
 [data-state='open'].DropdownMenuContent {
     animation: slideDown 0.3s ease-out;
@@ -209,4 +223,8 @@
 .dark {
     --brand-blue: #00a0e3;
     --brand-orange: #ffb14d;
+}
+
+button{
+    cursor: pointer;
 }

@@ -10,6 +10,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { bookService } from '@/services/book.service';
 import { categoryService } from '@/services/category.service';
 import type { Category } from '@/types/category.types';
+import type {
+    CategoryPageFilterState,
+    CategoryPagePagination,
+    CategoryPageProduct
+} from '@/types/category-page.types';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -33,41 +38,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-interface Product {
-    _id: string;
-    title: {
-        uz: string;
-        ru?: string;
-        en?: string;
-    };
-    slug: string;
-    price: number;
-    discountPrice?: number;
-    images: string[];
-    author: {
-        _id: string;
-        name: string;
-    };
-    ratingAvg: number;
-    ratingCount: number;
-    isTop: boolean;
-    isDiscount: boolean;
-    format?: 'ebook' | 'audio' | 'paper';
-    language?: 'uz' | 'ru' | 'en';
-    stock?: number;
-}
-
-interface FilterState {
-    minPrice: string;
-    maxPrice: string;
-    author: string;
-    language: string;
-    format: string;
-    isTop: boolean;
-    isDiscount: boolean;
-    inStock: boolean;
-}
-
 export default function CategoryDetailPage() {
     const params = useParams();
     const router = useRouter();
@@ -76,8 +46,8 @@ export default function CategoryDetailPage() {
 
     const [loading, setLoading] = useState(true);
     const [category, setCategory] = useState<Category | null>(null);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [pagination, setPagination] = useState({
+    const [products, setProducts] = useState<CategoryPageProduct[]>([]);
+    const [pagination, setPagination] = useState<CategoryPagePagination>({
         page: 1,
         limit: 12,
         total: 0,
@@ -90,7 +60,7 @@ export default function CategoryDetailPage() {
     const [wishlist, setWishlist] = useState<string[]>([]);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-    const [filters, setFilters] = useState<FilterState>({
+    const [filters, setFilters] = useState<CategoryPageFilterState>({
         minPrice: '',
         maxPrice: '',
         author: '',
@@ -226,7 +196,7 @@ export default function CategoryDetailPage() {
         toast.success("Savatga qo'shildi");
     };
 
-    const handleFilterChange = (key: keyof FilterState, value: any) => {
+    const handleFilterChange = (key: keyof CategoryPageFilterState, value: any) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
         setPagination((prev) => ({ ...prev, page: 1 }));
     };
@@ -257,11 +227,11 @@ export default function CategoryDetailPage() {
         return count;
     };
 
-    const getDiscountedPrice = (product: Product) => {
+    const getDiscountedPrice = (product: CategoryPageProduct) => {
         return product.discountPrice || product.price;
     };
 
-    const getDiscountPercentage = (product: Product) => {
+    const getDiscountPercentage = (product: CategoryPageProduct) => {
         if (product.discountPrice) {
             return Math.round(((product.price - product.discountPrice) / product.price) * 100);
         }

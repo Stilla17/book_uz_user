@@ -43,5 +43,15 @@
     "search": "Search",
     "cart": "Cart",
     "profile": "Profile",
-    "myBooks": "My Books"
+    "myBooks": "My Books",
+    "booksSection": {
+        "newArrivals": "New Arrivals",
+        "bestWeek": "Best of the Week",
+        "bestMonth": "Best of the Month",
+        "newArrivalsSubtitle": "The latest releases",
+        "bestWeekSubtitle": "The most read books",
+        "bestMonthSubtitle": "The most read books",
+        "viewAll": "View All",
+        "basket": "Basket"
+    }
 }

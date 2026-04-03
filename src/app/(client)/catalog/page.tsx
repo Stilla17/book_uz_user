@@ -59,60 +59,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api, UserService } from "@/services/api";
+import type { CatalogFilterState, CatalogPagination, CatalogProduct } from "@/types/catalog.types";
 import { toast } from "react-hot-toast";
-
-interface Product {
-  _id: string;
-  title: {
-    uz: string;
-    ru?: string;
-    en?: string;
-  };
-  slug: string;
-  description?: {
-    uz?: string;
-  };
-  price: number;
-  discountPrice?: number;
-  images: string[];
-  stock: number;
-  category: {
-    _id: string;
-    title: {
-      uz: string;
-    };
-  };
-  author: {
-    _id: string;
-    name: string;
-  };
-  language: 'uz' | 'ru' | 'en';
-  isTop: boolean;
-  isDiscount: boolean;
-  ratingAvg: number;
-  ratingCount: number;
-  format?: 'ebook' | 'audio' | 'paper';
-}
-
-interface FilterState {
-  keyword: string;
-  category: string;
-  author: string;
-  minPrice: string;
-  maxPrice: string;
-  language: string;
-  format: string;
-  isTop: boolean;
-  isDiscount: boolean;
-  inStock: boolean;
-}
-
-interface Pagination {
-  total: number;
-  page: number;
-  pages: number;
-  limit: number;
-}
 
 export default function CatalogPage() {
   const router = useRouter();
@@ -120,8 +68,8 @@ export default function CatalogPage() {
   const { user, isAuthenticated } = useAuth();
   
   const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [pagination, setPagination] = useState<CatalogPagination>({
     total: 0,
     page: 1,
     pages: 1,
@@ -148,7 +96,7 @@ export default function CatalogPage() {
   } | null>(null);
 
   // Filter state
-  const [filters, setFilters] = useState<FilterState>({
+  const [filters, setFilters] = useState<CatalogFilterState>({
     keyword: searchParams.get('q') || "",
     category: searchParams.get('category') || "",
     author: searchParams.get('author') || "",
@@ -417,22 +365,22 @@ export default function CatalogPage() {
     return count;
   };
 
-  const getProductTitle = (product: Product) => {
+  const getProductTitle = (product: CatalogProduct) => {
     return product.title.uz || product.title.ru || product.title.en || "Noma'lum";
   };
 
-  const getProductDescription = (product: Product) => {
+  const getProductDescription = (product: CatalogProduct) => {
     return product.description?.uz || "Tavsif mavjud emas";
   };
 
-  const getDiscountedPrice = (product: Product) => {
+  const getDiscountedPrice = (product: CatalogProduct) => {
     if (product.discountPrice && product.discountPrice > 0) {
       return product.discountPrice;
     }
     return product.price;
   };
 
-  const getDiscountPercentage = (product: Product) => {
+  const getDiscountPercentage = (product: CatalogProduct) => {
     if (product.discountPrice && product.discountPrice > 0) {
       return Math.round(((product.price - product.discountPrice) / product.price) * 100);
     }
@@ -522,7 +470,7 @@ export default function CatalogPage() {
         />
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="brand-grid" />
       </div>
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         

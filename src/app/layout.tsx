@@ -11,6 +11,7 @@ import { Navbar } from '@/components/shared/Navbar';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider as CustomThemeProvider } from '@/context/ThemeContext';
 import I18nProvider from '@/providers/I18nProvider';
+import QueryProvider from '@/providers/QueryProvider';
 
 import { Toaster } from 'react-hot-toast';
 
@@ -32,18 +33,20 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             <body
                 className={`${lato.className} ${lato.variable} min-h-screen bg-white font-sans text-gray-900 antialiased transition-colors duration-300 dark:bg-slate-900 dark:text-white`}>
                 <NextThemeProvider attribute='class' defaultTheme='light' enableSystem={false}>
-                    <I18nProvider>
-                        <CustomThemeProvider>
-                            <AuthProvider>
-                                <div className='relative flex min-h-screen flex-col'>
-                                    <Toaster position='top-center' />
-                                    <Navbar />
-                                    <main className='flex-1'>{children}</main>
-                                    <Footer />
-                                </div>
-                            </AuthProvider>
-                        </CustomThemeProvider>
-                    </I18nProvider>
+                    <QueryProvider>
+                        <I18nProvider>
+                            <CustomThemeProvider>
+                                <AuthProvider>
+                                    <div className='relative flex min-h-screen flex-col'>
+                                        <Toaster position='top-center' />
+                                        <Navbar />
+                                        <main className='flex-1'>{children}</main>
+                                        <Footer />
+                                    </div>
+                                </AuthProvider>
+                            </CustomThemeProvider>
+                        </I18nProvider>
+                    </QueryProvider>
                 </NextThemeProvider>
             </body>
         </html>

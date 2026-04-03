@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { 
+import {
   ChevronRight, 
   BookOpen, 
   Headphones, 
@@ -40,20 +40,9 @@ import {
   Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { categoryService } from "@/services/category.service";
-
-interface ICategory {
-  _id: string;
-  title: { uz: string; ru: string; en?: string };
-  slug: string;
-  icon?: string;
-  image?: string;
-  count?: number;
-  bookCount?: number;
-  description?: { uz?: string; ru?: string; en?: string };
-  isFeatured?: boolean;
-}
+import { usePublicCategoriesQuery } from "@/hooks/queries/usePublicCategoriesQuery";
+import type { Category } from "@/types/category.types";
+import type { CategorySectionProps } from "@/types/section.types";
 
 // Icon mapping based on slug
 const getIconBySlug = (slug: string): { icon: React.ReactNode; color: string; darkColor: string } => {
@@ -152,17 +141,10 @@ export const CategorySection = ({
   lang = "uz",
   limit = 8,
   showAllLink = true,
-}: {
-  onCategoryClick?: (cat: ICategory) => void;
-  lang?: "uz" | "ru" | "en";
-  limit?: number;
-  showAllLink?: boolean;
-}) => {
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [loading, setLoading] = useState(true);
+}: CategorySectionProps) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const reduceMotion = useReducedMotion();
-  const { isDark, getBgColor, getTextColor, getBorderColor } = useThemeStyles();
+  const { data: categoriesData = [], isLoading: loading } = usePublicCategoriesQuery();
 
   // Track mouse position for parallax effect
   useEffect(() => {
@@ -176,36 +158,15 @@ export const CategorySection = ({
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Load categories from backend
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
-    try {
-      setLoading(true);
-      const data = await categoryService.getAllCategoriesPublic();
-      
-      // Filter active categories and sort by order/bookCount
-      const activeCategories = data
-        .filter(cat => cat.isActive !== false)
-        .sort((a, b) => {
-          // Sort by order first, then by bookCount
-          if (a.order !== undefined && b.order !== undefined) {
-            return a.order - b.order;
-          }
-          return (b.bookCount || 0) - (a.bookCount || 0);
-        })
-        .slice(0, limit);
-      
-      setCategories(activeCategories);
-    } catch (error) {
-      console.error("Kategoriyalar yuklanmadi:", error);
-      setCategories([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const categories = categoriesData
+    .filter((cat) => cat.isActive !== false)
+    .sort((a, b) => {
+      if (a.order !== undefined && b.order !== undefined) {
+        return a.order - b.order;
+      }
+      return (b.bookCount || 0) - (a.bookCount || 0);
+    })
+    .slice(0, limit);
 
   const title = lang === "uz" ? "Kategoriyalar" : lang === "ru" ? "Категории" : "Categories";
   const subtitle =
@@ -218,7 +179,7 @@ export const CategorySection = ({
   const allText = lang === "uz" ? "Hammasi" : lang === "ru" ? "Все" : "All";
   const viewAllText = lang === "uz" ? "Hammasini ko'rish" : lang === "ru" ? "Посмотреть все" : "View all";
 
-  const handleCategoryClick = (cat: ICategory) => {
+  const handleCategoryClick = (cat: Category) => {
     if (onCategoryClick) {
       onCategoryClick(cat);
     } else {
@@ -291,7 +252,7 @@ export const CategorySection = ({
         />
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="brand-grid" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -352,7 +313,7 @@ export const CategorySection = ({
             categories.map((cat, index) => {
               const label = cat.title[lang as keyof typeof cat.title] || cat.title.uz || cat.title.ru;
               const iconConfig = getIconBySlug(cat.slug);
-              const bookCount = cat.bookCount || cat.count || 0;
+              const bookCount = cat.bookCount || 0;
 
               return (
                 <motion.button

@@ -3,7 +3,7 @@
     "allView": "Все книги",
     "services": "Услуги",
     "servicesAll": "Все услуги",
-    "darkMode": "Темный режим",
+    "darkMode": "Тёмный режим",
     "lightMode": "Светлый режим",
     "serviceItems": {
         "about": {
@@ -43,5 +43,16 @@
     "search": "Поиск",
     "cart": "Корзина",
     "profile": "Профиль",
-    "myBooks": "Мои книги"
+    "myBooks": "Мои книги",
+    "booksSection": {
+        "newArrivals": "Новинки",
+        "bestWeek": "Лучшее за неделю",
+        "bestMonth": "Лучшее за месяц",
+        "newArrivalsSubtitle": "Самые новые издания",
+        "bestWeekSubtitle": "Самые читаемые книги",
+        "bestMonthSubtitle": "Самые читаемые книги",
+        "viewAll": "Посмотреть все",
+        "basket": "Корзина"
+
+    }
 }

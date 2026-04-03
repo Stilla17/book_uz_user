@@ -43,5 +43,16 @@
     "search": "Qidirish",
     "cart": "Savat",
     "profile": "Profil",
-    "myBooks": "Mening kitoblarim"
+    "myBooks": "Mening kitoblarim",
+    "booksSection": {
+        "newArrivals": "Yangi kelgan kitoblar",
+        "bestWeek": "Hafta xitlari",
+        "bestMonth": "Oylik xitlar",
+        "newArrivalsSubtitle": "Eng so'nggi nashrlar",
+        "bestWeekSubtitle": "Eng ko'p o'qilgan kitoblar",
+        "bestMonthSubtitle": "Eng ko'p o'qilgan kitoblar",
+        "viewAll": "Barchasini ko'rish",
+        "basket": "Savat"
+    }
+    
 }

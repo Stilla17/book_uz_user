@@ -50,6 +50,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { StoreLocation } from "@/types/contact.types";
 import { toast } from "react-hot-toast";
 
 // Telegram icon component
@@ -69,19 +70,6 @@ const TelegramContactIcon = ({ size = 20, className = "" }: { size?: number; cla
     </svg>
   );
 };
-
-interface StoreLocation {
-  id: string;
-  city: string;
-  region: string;
-  address: string;
-  phone: string;
-  workingHours: string;
-  coordinates: string;
-  image: string;
-  isMain?: boolean;
-  books: number;
-}
 
 export default function ContactPage() {
   const [loading, setLoading] = useState(false);
@@ -341,7 +329,7 @@ export default function ContactPage() {
         />
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="brand-grid" />
       </div>
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         

@@ -1,22 +1,28 @@
 // app/page.tsx
-"use client";
+'use client';
 
-import { Hero } from "@/components/sections/Hero";
-import { CategorySection } from "@/components/sections/Categories";
-import { BookSection } from "@/components/sections/BookSection";
-import { AuthorBannerSection } from "@/components/sections/AuthorBannerSection";
-import { AuthorQuoteSection } from "@/components/sections/AuthorQuoteSection";
-import { AboutSection } from "@/components/sections/AboutSection";
-import { ServicesSection } from "@/components/sections/ServicesSection";
-import { DeliverySection } from "@/components/sections/DeliverySection";
-import { SupportSection } from "@/components/sections/SupportSection";
-import { AudioBooksSection } from "@/components/sections/AudioBooksSection";
-import { DownloadAppSection } from "@/components/sections/DownloadAppSection";
-import { NewsSection } from "@/components/sections/NewsSection";
+import { AboutSection } from '@/components/sections/AboutSection';
+import { AudioBooksSection } from '@/components/sections/AudioBooksSection';
+import { AuthorBannerSection } from '@/components/sections/AuthorBannerSection';
+import { AuthorQuoteSection } from '@/components/sections/AuthorQuoteSection';
+import { BookSection } from '@/components/sections/BookSection';
+import { CategorySection } from '@/components/sections/Categories';
+import { DeliverySection } from '@/components/sections/DeliverySection';
+import { DownloadAppSection } from '@/components/sections/DownloadAppSection';
+import { Hero } from '@/components/sections/Hero';
+import { NewsSection } from '@/components/sections/NewsSection';
+import Publishers from '@/components/sections/Publishers';
+import { ServicesSection } from '@/components/sections/ServicesSection';
+import { SupportSection } from '@/components/sections/SupportSection';
+import { useTranslation } from 'react-i18next';
+
+// app/page.tsx
 
 const Page = () => {
+    const { t } = useTranslation();
+
     return (
-        <div className="flex flex-col bg-white dark:bg-slate-900">
+        <div className='flex flex-col bg-white dark:bg-slate-900'>
             {/* Hero Section */}
             <Hero />
 
@@ -25,27 +31,30 @@ const Page = () => {
 
             {/* Yangi kelgan kitoblar */}
             <BookSection
-                title="Yangi kelgan kitoblar"
-                subtitle="Eng so'nggi nashrlar"
-                type="new"
+                title={t('booksSection.newArrivals')}
+                subtitle={t('booksSection.newArrivalsSubtitle')}
+                type='new'
             />
 
             {/* Hafta xitlari */}
             <BookSection
-                title="Hafta xitlari"
-                subtitle="Eng ko'p o'qilgan kitoblar"
-                type="popular"
+                title={t('booksSection.bestWeek')}
+                subtitle={t('booksSection.bestWeekSubtitle')}
+                type='popular'
             />
 
             {/* Author Banner */}
-            <AuthorBannerSection />
+            {/* <AuthorBannerSection /> */}
 
             {/* Sizga yoqishi mumkin */}
             <BookSection
-                title="Sizga yoqishi mumkin"
-                subtitle="Shaxsiy tavsiyalar"
-                type="default"
+                title={t('booksSection.bestMonth')}
+                subtitle={t('booksSection.bestMonthSubtitle')}
+                type='default'
             />
+
+            {/* Nashryotlar */}
+            <Publishers />
 
             {/* Author Quote */}
             <AuthorQuoteSection />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -48,18 +48,16 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { categoryService } from "@/services/category.service";
+import { usePublicCategoriesQuery } from "@/hooks/queries/usePublicCategoriesQuery";
 import { toast } from "react-hot-toast";
 
 export default function CategoriesPage() {
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact">("grid");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<"name" | "bookCount" | "newest">("bookCount");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { data: categories = [], isLoading: loading, error } = usePublicCategoriesQuery();
 
   // Mouse position for parallax effect
   useEffect(() => {
@@ -73,16 +71,16 @@ export default function CategoriesPage() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Load categories
   useEffect(() => {
-    loadCategories();
-  }, []);
+    if (error) {
+      console.error("Kategoriyalar yuklanmadi:", error);
+      toast.error("Kategoriyalar yuklanmadi");
+    }
+  }, [error]);
 
-  // Filter and sort categories
-  useEffect(() => {
-    let filtered = [...categories];
+  const filteredCategories = useMemo(() => {
+    let filtered = categories.filter((cat) => cat.isActive !== false);
 
-    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(cat => 
@@ -92,35 +90,15 @@ export default function CategoriesPage() {
       );
     }
 
-    // Sort
-    filtered.sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       if (sortBy === "name") {
         return a.title.uz.localeCompare(b.title.uz);
       } else if (sortBy === "bookCount") {
         return (b.bookCount || 0) - (a.bookCount || 0);
-      } else {
-        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
       }
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
     });
-
-    setFilteredCategories(filtered);
   }, [categories, searchQuery, sortBy]);
-
-  const loadCategories = async () => {
-    try {
-      setLoading(true);
-      const data = await categoryService.getAllCategoriesPublic();
-      
-      // Faqat faol kategoriyalarni ko'rsatish
-      const activeCategories = data.filter(cat => cat.isActive !== false);
-      setCategories(activeCategories);
-    } catch (error) {
-      console.error("Kategoriyalar yuklanmadi:", error);
-      toast.error("Kategoriyalar yuklanmadi");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getCategoryIcon = (category: Category) => {
     if (category.icon) {

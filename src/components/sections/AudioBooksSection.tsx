@@ -16,22 +16,12 @@ import { Navigation, Autoplay, Pagination } from "swiper/modules";
 import { toast } from "react-hot-toast";
 import { audioBookService } from "@/services/audioBook.service";
 import { AudioBook } from "@/types/audioBook.types";
+import type { AudioBooksSectionProps } from "@/types/section.types";
 
 // Swiper CSS
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
-interface AudioBooksSectionProps {
-  autoPlay?: boolean;
-  title?: string;
-  subtitle?: string;
-  limit?: number;
-  category?: string;
-  hit?: boolean;
-  new?: boolean;
-  showCategories?: boolean;
-}
 
 export const AudioBooksSection = ({ 
   autoPlay = true,
@@ -258,7 +248,7 @@ export const AudioBooksSection = ({
         />
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="brand-grid" />
       </div>
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">

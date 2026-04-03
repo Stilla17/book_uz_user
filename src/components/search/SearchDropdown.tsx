@@ -13,62 +13,16 @@ import {
   Grid3x3,
   ChevronRight
 } from "lucide-react";
-import { api } from "@/services/api";
 import { useDebounce } from "@/hooks/useDebounce";
-
-interface SearchProduct {
-  _id: string;
-  title: {
-    uz: string;
-    ru?: string;
-    en?: string;
-  };
-  images: string[];
-  price: number;
-  slug: string;
-}
-
-interface SearchCategory {
-  _id: string;
-  title: {
-    uz: string;
-    ru?: string;
-  };
-  slug: string;
-}
-
-interface SearchAuthor {
-  _id: string;
-  name: string;
-  image?: string;
-  slug: string;
-}
-
-interface SearchResults {
-  products: SearchProduct[];
-  categories: SearchCategory[];
-  authors: SearchAuthor[];
-  totalCount: number;
-}
-
-interface SearchDropdownProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  onClose?: () => void;
-}
+import { useSearchSuggestionsQuery } from "@/hooks/queries/useSearchSuggestionsQuery";
+import type { SearchDropdownProps, SearchProduct } from "@/types/search.types";
 
 export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchDropdownProps) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<SearchResults>({
-    products: [],
-    categories: [],
-    authors: [],
-    totalCount: 0
-  });
   const [showResults, setShowResults] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debouncedQuery = useDebounce(searchQuery, 500);
+  const { data: results, isFetching: loading } = useSearchSuggestionsQuery(debouncedQuery);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -83,28 +37,11 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
 
   useEffect(() => {
     if (debouncedQuery.length >= 2) {
-      fetchSuggestions();
       setShowResults(true);
     } else {
-      setResults({ products: [], categories: [], authors: [], totalCount: 0 });
       setShowResults(false);
     }
   }, [debouncedQuery]);
-
-  const fetchSuggestions = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/search/suggestions?q=${encodeURIComponent(debouncedQuery)}`);
-      
-      if (response.data?.success) {
-        setResults(response.data.data);
-      }
-    } catch (error) {
-      console.error("Qidiruv xatosi:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -143,14 +80,14 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
           <Loader2 size={24} className="animate-spin mx-auto text-[#005CB9] mb-2" />
           <p className="text-sm text-gray-500">Qidirilmoqda...</p>
         </div>
-      ) : results.totalCount > 0 ? (
+      ) : (results?.totalCount ?? 0) > 0 ? (
         <div className="max-h-[80vh] overflow-y-auto">
           {/* Products */}
-          {results.products.length > 0 && (
+          {(results?.products?.length ?? 0) > 0 && (
             <div className="p-4 border-b border-gray-100">
               <h3 className="text-xs font-bold text-gray-400 uppercase mb-3">Kitoblar</h3>
               <div className="space-y-2">
-                {results.products.map((product) => (
+                {results!.products.map((product) => (
                   <Link
                     key={product._id}
                     href={`/book/${product.slug}`}
@@ -180,11 +117,11 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
           )}
 
           {/* Categories */}
-          {results.categories.length > 0 && (
+          {(results?.categories?.length ?? 0) > 0 && (
             <div className="p-4 border-b border-gray-100">
               <h3 className="text-xs font-bold text-gray-400 uppercase mb-3">Kategoriyalar</h3>
               <div className="space-y-2">
-                {results.categories.map((category) => (
+                {results!.categories.map((category) => (
                   <Link
                     key={category._id}
                     href={`/category/${category.slug}`}
@@ -206,11 +143,11 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
           )}
 
           {/* Authors */}
-          {results.authors.length > 0 && (
+          {(results?.authors?.length ?? 0) > 0 && (
             <div className="p-4 border-b border-gray-100">
               <h3 className="text-xs font-bold text-gray-400 uppercase mb-3">Mualliflar</h3>
               <div className="space-y-2">
-                {results.authors.map((author) => (
+                {results!.authors.map((author) => (
                   <Link
                     key={author._id}
                     href={`/author/${author.slug}`}
@@ -237,7 +174,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
               onClick={handleSearch}
               className="w-full flex items-center justify-between text-sm font-bold text-[#005CB9] hover:text-[#FF8A00] transition-colors"
             >
-              <span>Barcha natijalar ({results.totalCount})</span>
+              <span>Barcha natijalar ({results?.totalCount ?? 0})</span>
               <ChevronRight size={16} />
             </button>
           </div>

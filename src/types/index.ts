@@ -136,7 +136,7 @@ export interface UserSubscription {
 // Category Types
 export interface Category {
   _id: string;
-  name: {
+  title: {
     uz: string;
     ru: string;
   };

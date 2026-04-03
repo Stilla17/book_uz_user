@@ -637,7 +637,7 @@ export default function CartPage() {
                         className='absolute right-20 bottom-20 h-96 w-96 rounded-full bg-[#ef7f1a]/5 blur-3xl'
                     />
 
-                    <div className='absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]' />
+                    <div className='brand-grid' />
                 </div>
 
                 <div className='relative z-10 text-center'>
@@ -713,7 +713,7 @@ export default function CartPage() {
                 />
 
                 {/* Grid Pattern */}
-                <div className='absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]' />
+                <div className='brand-grid' />
             </div>
             <div className='relative z-10 container mx-auto max-w-7xl px-4'>
                 {/* Debug panel - faqat developmentda ko'rsatish */}

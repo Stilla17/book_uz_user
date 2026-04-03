@@ -5,15 +5,7 @@ import { useEffect, useState } from 'react';
 import { UserBanner, userBannerService } from '@/services/userBanner.service';
 
 import { motion } from 'framer-motion';
-import {
-    Infinity as InfinityIcon,
-    Award,
-    BookOpen,
-    ChevronLeft,
-    ChevronRight,
-    Headphones,
-    Sparkles
-} from 'lucide-react';
+import { Award, BookOpen, Headphones, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
@@ -64,11 +56,11 @@ export const Hero = () => {
         }
     };
 
-    if (!mounted) {
-        return (
-            <section className='relative h-100 w-full bg-gradient-to-r from-[#005CB9] to-[#FF8A00] sm:h-[500px] lg:h-[600px] dark:from-blue-600 dark:to-orange-600' />
-        );
-    }
+    // if (!mounted) {
+    //     return (
+    //         <section className='relative h-100 w-full bg-gradient-to-r from-[#005CB9] to-[#FF8A00] sm:h-[500px] lg:h-[600px] dark:from-blue-600 dark:to-orange-600' />
+    //     );
+    // }
 
     if (loading || banners.length === 0) {
         return (
