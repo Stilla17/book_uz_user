@@ -2,6 +2,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import 'leaflet/dist/leaflet.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -227,4 +228,32 @@
 
 button{
     cursor: pointer;
+}
+
+.branch-pin-wrapper {
+    background: transparent;
+    border: 0;
+}
+
+.branch-pin {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px 9999px 9999px 0;
+    border: 2px solid #ffffff;
+    background: #ef7f1a;
+    box-shadow: 0 8px 18px rgb(239 127 26 / 35%);
+    transform: rotate(-45deg);
+}
+
+.branch-pin::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background: #ffffff;
 }

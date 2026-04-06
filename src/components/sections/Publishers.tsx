@@ -92,14 +92,9 @@ const Publishers = () => {
                             <span className='ml-2 text-[#ef7f1a] dark:text-orange-300'>bir sahifada</span>
                         </h2>
                         <p className='mt-3 max-w-xl text-sm leading-6 text-slate-600 md:text-base dark:text-slate-300'>
-                            Kitob.uz vitrinasi uchun saralangan nashriyotlar. Har bir emblem ortida o‘z uslubi,
+                            Book.uz vitrinasi uchun saralangan nashriyotlar. Har bir emblem ortida o‘z uslubi,
                             yo‘nalishi va o‘quvchiga mos katalogi bor.
                         </p>
-                    </div>
-
-                    <div className='flex items-center gap-2 self-start rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/70'>
-                        <Sparkles size={16} className='text-[#005CB9] dark:text-blue-300' />
-                        <span className='text-sm font-bold text-slate-700 dark:text-slate-200'>Top hamkorlar</span>
                     </div>
                 </motion.div>
 
@@ -121,21 +116,14 @@ const Publishers = () => {
                                 <div
                                     className={`relative flex h-18 w-18 items-center justify-center rounded-[24px] bg-gradient-to-br ${publisher.gradient} text-2xl font-black text-white shadow-lg shadow-slate-300/40 transition-transform duration-300 group-hover:scale-105 dark:shadow-slate-950/40`}>
                                     <span>{publisher.emblem}</span>
-                                    <div className='absolute -right-1 -bottom-1 rounded-full border border-white/60 bg-white/85 p-1 dark:border-slate-800 dark:bg-slate-900/85'>
-                                        <Crown size={12} className={publisher.accent} />
-                                    </div>
-                                </div>
-
-                                <div className='flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300'>
-                                    <Star size={12} className='fill-[#ef7f1a] text-[#ef7f1a]' />
-                                    Verified
+                                    
                                 </div>
                             </div>
 
                             <div className='space-y-2'>
                                 <h3 className='text-xl font-black tracking-tight text-slate-900 dark:text-white'>
                                     {publisher.name}
-                                </h3>
+                                </h3>   
                                 <p className='text-sm leading-6 text-slate-600 dark:text-slate-300'>
                                     {publisher.focus}
                                 </p>
