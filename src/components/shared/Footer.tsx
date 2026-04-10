@@ -3,26 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { motion, useReducedMotion } from 'framer-motion';
-import {
-    ArrowUp,
-    BookOpen,
-    Facebook,
-    Headphones,
-    Heart,
-    Instagram,
-    Mail,
-    MapPin,
-    Phone,
-    Send,
-    Sparkles,
-    Star,
-    Youtube
-} from 'lucide-react';
+import PaymentMethodLogo from '../PaymentIcons/PaymentMethodLogo';
+import { motion } from 'framer-motion';
+import { ArrowUp, Facebook, Instagram, Mail, MapPin, Phone, Send, Youtube } from 'lucide-react';
 
 export const Footer = () => {
     const currentYear = new Date().getFullYear();
-    const reduceMotion = useReducedMotion();
 
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -55,10 +41,12 @@ export const Footer = () => {
 
     const socials = [
         { name: 'Instagram', href: '#', Icon: Instagram, color: 'hover:bg-pink-600' },
-        { name: 'Telegram', href: '#', Icon: TelegramIcon, color: 'hover:bg-blue-500' },
+        { name: 'Telegram', href: '#', Icon: Send, color: 'hover:bg-blue-500' },
         { name: 'Facebook', href: '#', Icon: Facebook, color: 'hover:bg-blue-600' },
         { name: 'YouTube', href: '#', Icon: Youtube, color: 'hover:bg-red-600' }
     ];
+
+    const paymentMethods = ['Uzcard', 'Click', 'Payme', 'Humo', 'Visa', 'Mastercard'];
 
     return (
         <footer className='relative overflow-hidden bg-gradient-to-b from-slate-900 to-black text-slate-300'>
@@ -86,9 +74,6 @@ export const Footer = () => {
                             <div className='grid h-15 w-15 place-items-center rounded-xl bg-gradient-to-r text-lg font-black text-white'>
                                 <img src='/images/Logo.svg' alt='' />
                             </div>
-                            <div>
-                                <div className='text-[10px] text-slate-400'>Raqamli kutubxona</div>
-                            </div>
                         </Link>
 
                         <p className='max-w-sm text-xs leading-relaxed text-slate-400'>
@@ -111,7 +96,7 @@ export const Footer = () => {
                                 />
                                 <button
                                     type='submit'
-                                    className='shrink-0 rounded-lg  px-3 py-1.5 text-xs font-bold bg-white text-black transition-all hover:shadow-lg'>
+                                    className='shrink-0 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-black transition-all hover:shadow-lg'>
                                     <Send size={12} />
                                 </button>
                             </form>
@@ -183,56 +168,52 @@ export const Footer = () => {
                         <div className='space-y-2'>
                             <a
                                 href='tel:+998901234567'
-                                className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2 transition-all hover:border-[#005CB9]/30'>
-                                <div className='grid h-7 w-7 place-items-center rounded-lg bg-[#005CB9]/10'>
-                                    <Phone size={12} className='text-[#005CB9]' />
+                                className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2 transition-all'>
+                                <div className='grid h-7 w-7 place-items-center rounded-lg bg-white/10'>
+                                    <Phone size={12} className='text-white' />
                                 </div>
-                                <div>
-                                    <div className='text-[8px] text-slate-500 uppercase'>Telefon</div>
-                                    <div className='text-xs font-bold text-white'>+998 90 123-45-67</div>
-                                </div>
+                                <div className='text-xs font-bold text-white'>+998 90 123-45-67</div>
                             </a>
 
                             <a
                                 href='mailto:support@book.uz'
-                                className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2 transition-all hover:border-[#FF8A00]/30'>
-                                <div className='grid h-7 w-7 place-items-center rounded-lg bg-[#FF8A00]/10'>
-                                    <Mail size={12} className='text-[#FF8A00]' />
+                                className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2'>
+                                <div className='grid h-7 w-7 place-items-center rounded-lg bg-white/10'>
+                                    <Mail size={12} className='text-white' />
                                 </div>
-                                <div>
-                                    <div className='text-[8px] text-slate-500 uppercase'>Email</div>
-                                    <div className='text-xs font-bold text-white'>support@book.uz</div>
-                                </div>
+                                <div className='text-xs font-bold text-white'>support@book.uz</div>
                             </a>
 
                             <div className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2'>
                                 <div className='grid h-7 w-7 place-items-center rounded-lg bg-white/10'>
-                                    <MapPin size={12} className='text-slate-400' />
+                                    <MapPin size={12} className='text-white' />
                                 </div>
-                                <div>
-                                    <div className='text-[8px] text-slate-500 uppercase'>Manzil</div>
-                                    <div className='text-xs font-bold text-white'>Toshkent, Chilonzor</div>
-                                </div>
+                                <div className='text-xs font-bold text-nowrap text-white'>Toshkent, Chilonzor</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Payment Methods */}
-                <div className='mb-6 flex justify-center gap-3'>
-                    {['Uzcard', 'Humo', 'Visa', 'Mastercard', 'Payme', 'Click'].map((payment, i) => (
-                        <div
-                            key={i}
-                            className='rounded-md border border-white/5 bg-white/5 px-2 py-1 text-[8px] font-bold text-slate-400'>
-                            {payment}
-                        </div>
-                    ))}
+                <div className='mb-6'>
+                    <div className='mb-3 text-center text-[10px] font-bold tracking-[0.24em] text-slate-500 uppercase'>
+                        To'lov tizimlari
+                    </div>
+                    <div className='flex flex-wrap justify-center gap-3'>
+                        {paymentMethods.map((payment) => (
+                            <div
+                                key={payment}
+                                className='group flex h-12 min-w-19.5 items-center justify-center rounded-xl px-3 transition-all'>
+                                <PaymentMethodLogo name={payment} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Bottom bar */}
                 <div className='flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-4 text-[10px] md:flex-row'>
                     <p className='text-slate-500'>
-                        © {currentYear} <span className='font-bold text-white'>BOOK.UZ</span>. Barcha huquqlar
+                        © {currentYear} <span className='font-bold text-white'> BOOK.UZ</span>. Barcha huquqlar
                         himoyalangan.
                     </p>
 
@@ -248,7 +229,7 @@ export const Footer = () => {
                         {/* Scroll top */}
                         <button
                             onClick={scrollToTop}
-                            className='ml-2 grid h-7 w-7 place-items-center rounded-lg  bg-white text-black transition-all hover:shadow-lg'
+                            className='fixed right-5 bottom-5 z-50 grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-1 hover:shadow-lg'
                             aria-label='Scroll to top'>
                             <ArrowUp size={14} />
                         </button>
@@ -258,20 +239,3 @@ export const Footer = () => {
         </footer>
     );
 };
-
-// Telegram icon
-function TelegramIcon({ size = 14, className = '' }: { size?: number; className?: string }) {
-    return (
-        <svg
-            width={size}
-            height={size}
-            className={className}
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2'>
-            <path d='m22 2-7 20-4-9-9-4Z' />
-            <path d='M22 2 11 13' />
-        </svg>
-    );
-}
