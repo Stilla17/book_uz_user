@@ -66,7 +66,7 @@ const Page = () => {
             <ServicesSection />
 
             {/* Delivery Section */}
-            <DeliverySection />
+            {/* <DeliverySection /> */}
 
             {/* Support Section */}
             <SupportSection />

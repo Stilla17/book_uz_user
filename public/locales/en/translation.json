@@ -53,5 +53,11 @@
         "bestMonthSubtitle": "The most read books",
         "viewAll": "View All",
         "basket": "Basket"
+    },
+    "publish": {
+        "title": "Publishers",
+        "label": "Reliable publishers with books for every taste",
+        "desc": " A curated selection of publishers for the Book.uz showcase. Behind each emblem lies a unique style, direction, and catalog tailored to every reader.",
+        "viewDetails": "View Details"
     }
 }

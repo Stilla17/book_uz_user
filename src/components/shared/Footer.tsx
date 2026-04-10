@@ -111,7 +111,7 @@ export const Footer = () => {
                                 />
                                 <button
                                     type='submit'
-                                    className='shrink-0 rounded-lg bg-gradient-to-r from-[#005CB9] to-[#FF8A00] px-3 py-1.5 text-xs font-bold text-white transition-all hover:shadow-lg'>
+                                    className='shrink-0 rounded-lg  px-3 py-1.5 text-xs font-bold bg-white text-black transition-all hover:shadow-lg'>
                                     <Send size={12} />
                                 </button>
                             </form>
@@ -176,7 +176,7 @@ export const Footer = () => {
 
                     <div className='space-y-3 lg:col-span-2'>
                         <h4 className='flex items-center gap-1 text-sm font-bold text-white'>
-                            <span className='h-3 w-1 rounded-full bg-gradient-to-r from-[#005CB9] to-[#FF8A00]' />
+                            <span className='h-3 w-1 rounded-full bg-[#FF8A00]' />
                             Aloqa
                         </h4>
 
@@ -248,7 +248,7 @@ export const Footer = () => {
                         {/* Scroll top */}
                         <button
                             onClick={scrollToTop}
-                            className='ml-2 grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-r from-[#005CB9] to-[#FF8A00] text-white transition-all hover:shadow-lg'
+                            className='ml-2 grid h-7 w-7 place-items-center rounded-lg  bg-white text-black transition-all hover:shadow-lg'
                             aria-label='Scroll to top'>
                             <ArrowUp size={14} />
                         </button>

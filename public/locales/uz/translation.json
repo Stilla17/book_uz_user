@@ -53,6 +53,12 @@
         "bestMonthSubtitle": "Eng ko'p o'qilgan kitoblar",
         "viewAll": "Barchasini ko'rish",
         "basket": "Savat"
+    },
+    "publish": {
+        "title": "Nashriyotlar",
+        "label": "Ishonchli nashriyotlar bilan",
+        "desc": " Book.uz vitrinasi uchun saralangan nashriyotlar. Har bir emblem ortida o‘z uslubi, yo‘nalishi va o‘quvchiga mos katalogi bor.",
+        "viewDetails": "Batafsil"
     }
     
 }

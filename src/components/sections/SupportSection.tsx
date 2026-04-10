@@ -139,16 +139,6 @@ export const SupportSection = () => {
         
         {/* Header */}
         <div className="text-center mb-10">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00a0e3]/10 to-[#ef7f1a]/10 dark:from-blue-600/20 dark:to-orange-600/20 rounded-full mb-4"
-          >
-            <Headphones size={16} className="text-[#00a0e3] dark:text-blue-400" />
-            <span className="text-xs font-bold text-[#ef7f1a] dark:text-orange-400">QO'LLAB-QUVVATLASH</span>
-            <Sparkles size={12} className="text-[#ef7f1a] dark:text-orange-400" />
-          </motion.div>
-          
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -192,7 +182,6 @@ export const SupportSection = () => {
           {[
             { id: "faq", label: "FAQ" },
             { id: "contact", label: "Aloqa" },
-            { id: "chat", label: "Chat" }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -204,7 +193,7 @@ export const SupportSection = () => {
               {activeTab === tab.id && (
                 <motion.div 
                   layoutId="activeSupportTab"
-                  className="absolute inset-0 bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 rounded-lg"
+                  className="absolute inset-0  bg-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 rounded-lg"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                 />
               )}
@@ -284,14 +273,14 @@ export const SupportSection = () => {
               </motion.div>
             )}
 
-            {activeTab === "chat" && (
+            {/* {activeTab === "chat" && (
               <motion.div 
                 key="chat"
                 className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden"
                 initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              >
+              > */}
                 {/* Chat Header */}
-                <div className="bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 p-4 text-white flex items-center justify-between">
+                {/* <div className="bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 p-4 text-white flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                       <Headphones size={16} />
@@ -304,10 +293,10 @@ export const SupportSection = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Chat Body */}
-                <div className="h-[250px] p-4 overflow-y-auto bg-gray-50/30 dark:bg-slate-700/30 space-y-4">
+                {/* <div className="h-[250px] p-4 overflow-y-auto bg-gray-50/30 dark:bg-slate-700/30 space-y-4">
                   <div className="flex gap-2">
                     <div className="w-6 h-6 bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white">
                       B
@@ -323,10 +312,10 @@ export const SupportSection = () => {
                       </div>
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 {/* Chat Input */}
-                <div className="p-3 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 flex gap-2">
+                {/* <div className="p-3 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 flex gap-2">
                   <input 
                     type="text" 
                     value={message}
@@ -340,9 +329,9 @@ export const SupportSection = () => {
                   >
                     {sent ? <CheckCircle size={16} /> : <Send size={16} />}
                   </button>
-                </div>
-              </motion.div>
-            )}
+                </div> */}
+              {/* </motion.div>
+            )} */}
           </AnimatePresence>
         </div>
 
@@ -350,7 +339,7 @@ export const SupportSection = () => {
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          className="text-center mt-8"
+          className="text-center"
         >
           <a 
             href="tel:+998901234567" 

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { BookOpen, Building2, ChevronRight, Crown, Sparkles, Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type PublisherItem = {
     id: string;
@@ -71,6 +72,8 @@ const publishers: PublisherItem[] = [
 ];
 
 const Publishers = () => {
+    const { t } = useTranslation();
+
     return (
         <section className='relative overflow-hidden bg-gradient-to-b from-white to-slate-50 py-16 dark:from-slate-900 dark:to-slate-950'>
             <div className='brand-grid pointer-events-none absolute inset-0 opacity-80' />
@@ -85,15 +88,13 @@ const Publishers = () => {
                     <div className='max-w-2xl'>
                         <div className='mb-4 inline-flex items-center gap-2 rounded-full border border-[#ef7f1a]/20 bg-[#ef7f1a]/10 px-4 py-2 text-xs font-black tracking-[0.18em] text-[#ef7f1a] uppercase dark:border-orange-400/20 dark:bg-orange-400/10 dark:text-orange-300'>
                             <Building2 size={14} />
-                            Nashriyotlar
+                            {t('publish.title')}
                         </div>
                         <h2 className='text-3xl font-black tracking-tight text-slate-900 md:text-4xl dark:text-white'>
-                            Ishonchli nashriyotlar bilan
-                            <span className='ml-2 text-[#ef7f1a] dark:text-orange-300'>bir sahifada</span>
+                            {t('publish.label')}
                         </h2>
                         <p className='mt-3 max-w-xl text-sm leading-6 text-slate-600 md:text-base dark:text-slate-300'>
-                            Book.uz vitrinasi uchun saralangan nashriyotlar. Har bir emblem ortida o‘z uslubi,
-                            yo‘nalishi va o‘quvchiga mos katalogi bor.
+                            {t('publish.desc')}
                         </p>
                     </div>
                 </motion.div>
@@ -102,11 +103,8 @@ const Publishers = () => {
                     {publishers.map((publisher, index) => (
                         <motion.article
                             key={publisher.id}
-                            initial={{ opacity: 0, y: 24 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, amount: 0.2 }}
-                            transition={{ duration: 0.45, delay: index * 0.06 }}
-                            whileHover={{ y: -6 }}
                             className='group relative overflow-hidden rounded-[28px] border border-slate-200/70 bg-white/85 p-5 shadow-[0_18px_50px_-26px_rgba(15,23,42,0.45)] backdrop-blur-sm transition-all dark:border-slate-700 dark:bg-slate-900/75'>
                             <div
                                 className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${publisher.gradient} opacity-90`}
@@ -116,14 +114,13 @@ const Publishers = () => {
                                 <div
                                     className={`relative flex h-18 w-18 items-center justify-center rounded-[24px] bg-gradient-to-br ${publisher.gradient} text-2xl font-black text-white shadow-lg shadow-slate-300/40 transition-transform duration-300 group-hover:scale-105 dark:shadow-slate-950/40`}>
                                     <span>{publisher.emblem}</span>
-                                    
                                 </div>
                             </div>
 
                             <div className='space-y-2'>
                                 <h3 className='text-xl font-black tracking-tight text-slate-900 dark:text-white'>
                                     {publisher.name}
-                                </h3>   
+                                </h3>
                                 <p className='text-sm leading-6 text-slate-600 dark:text-slate-300'>
                                     {publisher.focus}
                                 </p>
@@ -136,7 +133,7 @@ const Publishers = () => {
                                 </div>
 
                                 <div className='flex items-center gap-1 text-sm font-bold text-slate-400 transition-colors group-hover:text-[#005CB9] dark:text-slate-500 dark:group-hover:text-blue-300'>
-                                    <span>Batafsil</span>
+                                    <span>{t('publish.viewDetails')}</span>
                                     <ChevronRight size={16} />
                                 </div>
                             </div>
