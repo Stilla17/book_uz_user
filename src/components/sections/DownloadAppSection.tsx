@@ -1,22 +1,19 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import Image from 'next/image';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import {
     Apple,
-    ArrowRight,
     Award,
     BookOpen,
-    CheckCircle2,
     ChevronRight,
     Cloud,
     Coffee,
     Compass,
     Crown,
-    Download,
     Flower2,
     Gem,
     Headphones,
@@ -24,9 +21,7 @@ import {
     Moon,
     Music,
     PlayCircle,
-    QrCode,
     ShieldCheck,
-    Smartphone,
     Sparkles,
     Star,
     Sun,
@@ -42,18 +37,11 @@ export const DownloadAppSection = () => {
         offset: ['start end', 'end start']
     });
 
-    const [particles, setParticles] = useState<Particle[]>([]);
-
-    const y = useTransform(scrollYProgress, [0, 1], [0, -30]);
-    const opacity = useTransform(scrollYProgress, [0, 0.3, 0.6], [0.6, 1, 0.6]);
-
     const features = [
         { icon: <Headphones size={16} />, title: 'Oflayn rejim', desc: 'Internetisiz tinglang' },
         { icon: <Zap size={16} />, title: 'Tez yuklash', desc: '2x tezroq' },
-        { icon: <ShieldCheck size={16} />, title: 'Xavfsiz', desc: "Ma'lumotlar himoyalangan" },
         { icon: <Music size={16} />, title: 'Audio kitoblar', desc: '500+ audio' },
-        { icon: <BookOpen size={16} />, title: 'Elektron kitoblar', desc: '10K+ kitoblar' },
-        { icon: <Cloud size={16} />, title: 'Cloud sinxron', desc: 'Barcha qurilmalarda' }
+        { icon: <BookOpen size={16} />, title: 'Elektron kitoblar', desc: '10K+ kitoblar' }
     ];
 
     const reviews = [
@@ -120,25 +108,13 @@ export const DownloadAppSection = () => {
                 <div className='absolute right-0 bottom-0 h-[400px] w-[400px] animate-pulse rounded-full bg-[#ef7f1a]/10 blur-[100px] delay-1000 dark:bg-orange-600/10' />
             </div>
 
-            {/* Floating Particles */}
-            {particles.map((p, i) => (
-                <motion.div
-                    key={i}
-                    className='absolute rounded-full bg-white/5 dark:bg-white/10'
-                    style={{ top: p.top, left: p.left, width: p.size, height: p.size }}
-                    animate={{ y: [0, -20, 20, -20], x: [0, 20, -20, 20], opacity: [0, 0.3, 0] }}
-                    transition={{ duration: p.duration, delay: p.delay, repeat: Infinity }}
-                />
-            ))}
-
             <div className='relative z-10 container mx-auto max-w-6xl px-4'>
                 <motion.div
                     className='relative overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 shadow-2xl md:p-10 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900'
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    style={{ y, opacity }}>
+                    transition={{ duration: 0.6 }}>
                     {/* Decorative lines */}
                     <div className='absolute top-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#00a0e3] to-transparent dark:via-blue-600' />
                     <div className='absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#ef7f1a] to-transparent dark:via-orange-600' />
@@ -154,16 +130,6 @@ export const DownloadAppSection = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: 0.2 }}
                             className='space-y-6'>
-                            {/* Badge */}
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-gradient-to-r from-[#00a0e3]/20 to-[#ef7f1a]/20 px-3 py-1.5 dark:border-slate-700 dark:from-blue-600/30 dark:to-orange-600/30'>
-                                <Sparkles size={14} className='text-[#ef7f1a] dark:text-orange-400' />
-                                <span className='text-xs font-bold text-white dark:text-white'>Yangi versiya 2.0</span>
-                            </motion.div>
-
                             <h2 className='text-3xl leading-tight font-black text-white md:text-4xl dark:text-white'>
                                 <span className='text-[#00a0e3] dark:text-blue-400'>Kutubxonangiz</span>
                                 <br />
@@ -291,14 +257,6 @@ export const DownloadAppSection = () => {
                             </div>
                         </motion.div>
                     </div>
-
-                    {/* Bottom CTA */}
-                    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className='mt-6 text-center'>
-                        <button className='group inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white dark:text-slate-400 dark:hover:text-white'>
-                            <span>Ilova haqida</span>
-                            <ChevronRight size={12} className='transition-transform group-hover:translate-x-1' />
-                        </button>
-                    </motion.div>
                 </motion.div>
             </div>
         </section>

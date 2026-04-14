@@ -6,11 +6,13 @@ const withBundleAnalyzer = initializeBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  distDir: "build",
   output: "standalone",
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "backend.book.uz" },
 
       // ✅ qo‘shildi (Uzcard/Humo)
       { protocol: "https", hostname: "upload.wikimedia.org" },

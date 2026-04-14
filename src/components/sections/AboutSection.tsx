@@ -29,7 +29,6 @@ import {
 } from 'lucide-react';
 
 export const AboutSection = () => {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
 
     const stats = [
@@ -40,73 +39,9 @@ export const AboutSection = () => {
         { icon: <BookHeadphones size={24} />, label: 'Audio kitoblar', value: '10K+' }
     ];
 
-    const floatingIcons = [Sparkles, Star, Heart, Crown, Zap, Award, Gem, Flower2, Sun, Moon, Cloud, Coffee, Compass];
-
-    useEffect(() => {
-        const handleMouseMove = (event: MouseEvent) => {
-            setMousePosition({
-                x: (event.clientX / window.innerWidth - 0.5) * 20,
-                y: (event.clientY / window.innerHeight - 0.5) * 20
-            });
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
-
     return (
         <section className='relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-16 dark:from-slate-900 dark:to-slate-900'>
-            <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-                {[...Array(15)].map((_, i) => {
-                    const IconComponent = floatingIcons[i % floatingIcons.length];
-                    const randomTop = Math.random() * 100;
-                    const randomLeft = Math.random() * 100;
-                    const randomFontSize = Math.random() * 30 + 15;
-
-                    return (
-                        <motion.div
-                            key={i}
-                            className='absolute text-[#00a0e3]/10 dark:text-[#ef7f1a]/10'
-                            style={{
-                                top: `${randomTop}%`,
-                                left: `${randomLeft}%`,
-                                fontSize: `${randomFontSize}px`
-                            }}
-                            animate={{
-                                y: [0, -20, 20, 0],
-                                x: [0, 20, -20, 0],
-                                rotate: [0, 180, 360, 0],
-                                opacity: [0.1, 0.2, 0.15, 0.1]
-                            }}
-                            transition={{
-                                duration: Math.random() * 15 + 10,
-                                repeat: Infinity,
-                                delay: Math.random() * 5
-                            }}>
-                            <IconComponent />
-                        </motion.div>
-                    );
-                })}
-
-                <motion.div
-                    animate={{
-                        x: mousePosition.x * 2,
-                        y: mousePosition.y * 2
-                    }}
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute top-20 left-20 h-96 w-96 rounded-full bg-[#00a0e3]/5 blur-3xl'
-                />
-                <motion.div
-                    animate={{
-                        x: mousePosition.x * -2,
-                        y: mousePosition.y * -2
-                    }}
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute right-20 bottom-20 h-96 w-96 rounded-full bg-[#ef7f1a]/5 blur-3xl'
-                />
-
-                <div className='brand-grid' />
-            </div>
+            <div className='brand-grid' />
 
             <div className='relative z-10 container mx-auto max-w-[1400px] px-4'>
                 <div className='flex flex-col items-center gap-12 lg:flex-row lg:gap-16'>

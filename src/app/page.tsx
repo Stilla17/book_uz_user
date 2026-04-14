@@ -44,7 +44,7 @@ const Page = () => {
             />
 
             {/* Author Banner */}
-            {/* <AuthorBannerSection /> */}
+            <AuthorBannerSection />
 
             {/* Sizga yoqishi mumkin */}
             <BookSection

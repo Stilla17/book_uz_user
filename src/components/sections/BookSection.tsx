@@ -1,7 +1,8 @@
-// components/sections/BookSection.tsx
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+
+import type { BookSectionProps } from '@/types/section.types';
 
 import { Book, BookCard } from '../cards/BookCard';
 import { BookCardSkeleton } from '../cards/BookCardSkeleton';
@@ -9,7 +10,6 @@ import { motion } from 'framer-motion';
 import {
     Award,
     BookOpen,
-    ChevronLeft,
     ChevronRight,
     Cloud,
     Coffee,
@@ -28,13 +28,12 @@ import {
     TrendingUp,
     Zap
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import type { BookSectionProps } from '@/types/section.types';
-import { useTranslation } from 'react-i18next';
 
 export const BookSection = ({
     title,
@@ -44,26 +43,11 @@ export const BookSection = ({
     viewAllLink = '/catalog'
 }: BookSectionProps) => {
     const [loading, setLoading] = useState(true);
-    const [isHovered, setIsHovered] = useState(false);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const prevRef = useRef<HTMLButtonElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
 
     const { t } = useTranslation();
 
-    // Track mouse position for parallax effect
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({
-                x: (e.clientX / window.innerWidth - 0.5) * 20,
-                y: (e.clientY / window.innerHeight - 0.5) * 20
-            });
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
-
-    // Mock books with more data
     const mockBooks: Book[] = [
         {
             _id: '1',
@@ -76,7 +60,7 @@ export const BookSection = ({
             discount: 25,
             isHit: true,
             format: 'paper',
-            image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1887'
+            image: 'https://backend.book.uz/user-api/img/img-file-5a14f0417dee3390eddd4478f513e9ad.JPG'
         },
         {
             _id: '2',
@@ -87,7 +71,7 @@ export const BookSection = ({
             reviewsCount: 892,
             isNew: true,
             format: 'ebook',
-            image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1948'
+            image: 'https://backend.book.uz/user-api/img/img-file-213a5f767d557777e7f781ded5e28b20.jpg'
         },
         {
             _id: '3',
@@ -166,28 +150,6 @@ export const BookSection = ({
 
     const displayBooks = books && books.length > 0 ? books : mockBooks;
 
-    // Floating icons array
-    const floatingIcons = [
-        BookOpen,
-        Sparkles,
-        Star,
-        Heart,
-        Crown,
-        Zap,
-        Award,
-        Gem,
-        Diamond,
-        Flower2,
-        Sun,
-        Moon,
-        Cloud,
-        Coffee,
-        Compass,
-        Headphones,
-        TrendingUp,
-        Flame
-    ];
-
     // Section icon and color based on type
     const getSectionConfig = () => {
         switch (type) {
@@ -244,65 +206,11 @@ export const BookSection = ({
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.6 }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}>
+            transition={{ duration: 0.6 }}>
             {/* Animated Background Elements */}
-            <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-                {/* Floating Icons */}
-                {[...Array(15)].map((_, i) => {
-                    const IconComponent = floatingIcons[i % floatingIcons.length];
-                    const randomTop = Math.random() * 100;
-                    const randomLeft = Math.random() * 100;
-                    const randomFontSize = Math.random() * 30 + 15;
 
-                    return (
-                        <motion.div
-                            key={i}
-                            className='absolute text-[#00a0e3]/10 dark:text-[#ef7f1a]/10'
-                            style={{
-                                top: `${randomTop}%`,
-                                left: `${randomLeft}%`,
-                                fontSize: `${randomFontSize}px`
-                            }}
-                            animate={{
-                                y: [0, -20, 20, 0],
-                                x: [0, 20, -20, 0],
-                                rotate: [0, 180, 360, 0],
-                                opacity: [0.1, 0.2, 0.15, 0.1]
-                            }}
-                            transition={{
-                                duration: Math.random() * 15 + 10,
-                                repeat: Infinity,
-                                delay: Math.random() * 5
-                            }}>
-                            <IconComponent />
-                        </motion.div>
-                    );
-                })}
-
-                {/* Gradient Orbs with Parallax */}
-                <motion.div
-                    animate={{
-                        x: mousePosition.x * 2,
-                        y: mousePosition.y * 2
-                    }}
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute top-20 left-20 h-96 w-96 rounded-full bg-[#00a0e3]/5 blur-3xl'
-                />
-                <motion.div
-                    animate={{
-                        x: mousePosition.x * -2,
-                        y: mousePosition.y * -2
-                    }}
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute right-20 bottom-20 h-96 w-96 rounded-full bg-[#ef7f1a]/5 blur-3xl'
-                />
-
-                {/* Grid Pattern */}
-                {/* <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" /> */}
-                <div className='brand-overlay' />
-            </div>
+            {/* <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" /> */}
+            <div className='brand-overlay' />
 
             <div className='relative z-10 container mx-auto px-4'>
                 {/* Header with animation */}
@@ -348,30 +256,6 @@ export const BookSection = ({
 
                 {/* Custom Navigation */}
                 <div className='relative'>
-                    {/* Navigation Buttons
-          <div className="absolute -top-14 right-0 flex gap-2 z-10">
-            <motion.button
-              ref={prevRef}
-              className={`p-2.5 rounded-full bg-white dark:bg-slate-700 shadow-lg hover:shadow-xl transition-all ${
-                !isHovered ? 'opacity-50' : 'opacity-100'
-              } hover:bg-[#00a0e3] dark:hover:bg-blue-600 hover:text-white`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <ChevronLeft size={20} className="text-gray-700 dark:text-gray-300" />
-            </motion.button>
-            <motion.button
-              ref={nextRef}
-              className={`p-2.5 rounded-full bg-white dark:bg-slate-700 shadow-lg hover:shadow-xl transition-all ${
-                !isHovered ? 'opacity-50' : 'opacity-100'
-              } hover:bg-[#ef7f1a] dark:hover:bg-orange-600 hover:text-white`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <ChevronRight size={20} className="text-gray-700 dark:text-gray-300" />
-            </motion.button>
-          </div> */}
-
                     {/* Swiper Slider */}
                     <Swiper
                         slidesPerView={1.4}
@@ -407,80 +291,14 @@ export const BookSection = ({
                               ))
                             : displayBooks.map((book, index) => (
                                   <SwiperSlide key={book._id}>
-                                      <motion.div
-                                          initial={{ opacity: 0, y: 20 }}
-                                          animate={{ opacity: 1, y: 0 }}
-                                          transition={{ delay: index * 0.05 }}>
+                                      <motion.div transition={{ delay: index * 0.05 }}>
                                           <BookCard book={book} />
                                       </motion.div>
                                   </SwiperSlide>
                               ))}
                     </Swiper>
                 </div>
-
-                {/* View count for popular section */}
             </div>
-
-            {/* Global Styles */}
-            <style>{`
-        .book-swiper {
-          padding: 15px 5px !important;
-          margin: -15px -5px !important;
-        }
-        
-        .book-swiper .swiper-slide {
-          height: auto;
-          transition: all 0.3s ease;
-        }
-        
-        .book-swiper .swiper-slide:hover {
-          transform: translateY(-5px);
-        }
-        
-        /* Hide default navigation */
-        .book-swiper .swiper-button-next,
-        .book-swiper .swiper-button-prev {
-          display: none;
-        }
-        
-        /* Custom scrollbar */
-        .book-swiper::-webkit-scrollbar {
-          height: 4px;
-        }
-        
-        .book-swiper::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-        
-        .dark .book-swiper::-webkit-scrollbar-track {
-          background: #1e293b;
-        }
-        
-        .book-swiper::-webkit-scrollbar-thumb {
-          background: #00a0e3;
-          border-radius: 10px;
-        }
-        
-        .dark .book-swiper::-webkit-scrollbar-thumb {
-          background: #3b82f6;
-        }
-        
-        .book-swiper::-webkit-scrollbar-thumb:hover {
-          background: #ef7f1a;
-        }
-        
-        .dark .book-swiper::-webkit-scrollbar-thumb:hover {
-          background: #f97316;
-        }
-        
-        /* Shimmer animation */
-        @keyframes shimmer {
-          100% {
-            transform: translateX(100%);
-          }
-        }
-      `}</style>
         </motion.section>
     );
 };

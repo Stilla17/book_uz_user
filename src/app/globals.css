@@ -226,7 +226,7 @@
     --brand-orange: #ffb14d;
 }
 
-button{
+button {
     cursor: pointer;
 }
 
@@ -256,4 +256,115 @@ button{
     height: 8px;
     border-radius: 9999px;
     background: #ffffff;
+}
+
+.book-swiper {
+    padding: 15px 5px !important;
+    margin: -15px -5px !important;
+}
+
+.book-swiper .swiper-slide {
+    height: auto;
+    transition: all 0.3s ease;
+}
+
+.book-swiper .swiper-slide:hover {
+    transform: translateY(-5px);
+}
+
+/* Hide default navigation */
+.book-swiper .swiper-button-next,
+.book-swiper .swiper-button-prev {
+    display: none;
+}
+
+/* Custom scrollbar */
+.book-swiper::-webkit-scrollbar {
+    height: 4px;
+}
+
+.book-swiper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.dark .book-swiper::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+.book-swiper::-webkit-scrollbar-thumb {
+    background: #00a0e3;
+    border-radius: 10px;
+}
+
+.dark .book-swiper::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+}
+
+.book-swiper::-webkit-scrollbar-thumb:hover {
+    background: #ef7f1a;
+}
+
+.dark .book-swiper::-webkit-scrollbar-thumb:hover {
+    background: #f97316;
+}
+
+/* audio swiper */
+
+.audio-swiper {
+    padding: 5px 0 20px !important;
+    margin: -5px 0 !important;
+}
+
+.audio-swiper .swiper-slide {
+    height: auto;
+    transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet {
+    width: 6px;
+    height: 6px;
+    background: #00a0e3;
+    opacity: 0.2;
+    transition: all 0.3s ease;
+}
+
+.dark .swiper-pagination-bullet {
+    background: #3b82f6;
+}
+
+.swiper-pagination-bullet-active {
+    opacity: 1;
+    width: 20px;
+    border-radius: 4px;
+    background: #ef7f1a;
+}
+
+.dark .swiper-pagination-bullet-active {
+    background: #f97316;
+}
+
+.swiper-pagination {
+    position: relative !important;
+    margin-top: 20px !important;
+}
+
+.animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+}
+
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
 }

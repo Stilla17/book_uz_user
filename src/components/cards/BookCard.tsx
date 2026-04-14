@@ -9,8 +9,6 @@ import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-// components/cards/BookCard.tsx
-
 export interface Book {
     _id: string;
     title: string | { uz: string; ru: string; en: string };
@@ -51,10 +49,10 @@ export const BookCard = ({ book }: { book: Book }) => {
     };
 
     const fallbackImages = [
-        'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887',
-        'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1887',
-        'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1887',
-        'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1887'
+        'https://backend.book.uz/user-api/img/img-file-6080c55bb05c0ebeac3da4d480f14a6c.jpg',
+        'https://backend.book.uz/user-api/img/img-file-6080c55bb05c0ebeac3da4d480f14a6c.jpg',
+        'https://backend.book.uz/user-api/img/img-file-6080c55bb05c0ebeac3da4d480f14a6c.jpg',
+        'https://backend.book.uz/user-api/img/img-file-6080c55bb05c0ebeac3da4d480f14a6c.jpg'
     ];
 
     const imageSrc =
@@ -64,11 +62,12 @@ export const BookCard = ({ book }: { book: Book }) => {
 
     return (
         <motion.div
-            className='group relative flex h-full flex-col rounded-xl border border-gray-100 bg-white p-3 transition-all duration-300 hover:border-[#00a0e3]/20 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:border-[#ef7f1a]/30'
+            className='group relative flex h-full flex-col rounded-xl border border-gray-100 bg-white px-3 pb-3 transition-all duration-300 hover:border-[#00a0e3]/20 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:border-[#ef7f1a]/30'
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}>
-            <div className='relative mb-3 h-[230px] w-full overflow-hidden rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 shadow-md dark:from-slate-700 dark:to-slate-600'>
+            <div className='relative mb-3 flex h-80 w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 via-white to-slate-200  shadow-md dark:from-slate-700 dark:via-slate-800 dark:to-slate-900'>
+                {/* <div className='pointer-events-none absolute inset-x-5 bottom-2 h-5 rounded-full bg-slate-900/10 blur-xl dark:bg-black/40' /> */}
                 <button
                     type='button'
                     aria-label='Bookmark'
@@ -81,20 +80,21 @@ export const BookCard = ({ book }: { book: Book }) => {
                     <Heart size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
                 </button>
 
-                {imageSrc ? (
-                    <Image
-                        src={imageSrc}
-                        alt={getBookTitle()}
-                        fill
-                        sizes='(max-width: 768px) 100vw, 200px'
-                        className='object-cover transition-transform duration-700 group-hover:scale-110'
-                        onError={() => setImageError(true)}
-                    />
-                ) : (
-                    <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-[#00a0e3]/10 to-[#ef7f1a]/10 dark:from-blue-600/10 dark:to-orange-600/10'>
-                        <span className='text-4xl'>?</span>
-                    </div>
-                )}
+                <div className='group relative flex h-full w-full items-center justify-center'>
+                    {imageSrc ? (
+                        <Image
+                            src={imageSrc}
+                            alt={getBookTitle()}
+                            fill
+                            className='object-contain p-0.5 transition-transform duration-700 group-hover:scale-105'
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-[#00a0e3]/10 to-[#ef7f1a]/10 dark:from-blue-600/10 dark:to-orange-600/10'>
+                            <span className='text-4xl'>?</span>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className='flex flex-grow flex-col space-y-2'>
