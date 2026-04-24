@@ -12,7 +12,6 @@ import {
   Megaphone, 
   Sparkles, 
   Newspaper, 
-  ChevronRight,
   Clock, 
   Tag, 
   Star, 
@@ -32,12 +31,12 @@ import {
   Search,
   X,
   Eye,
-  Filter,
-  ChevronLeft
+  Filter
 } from "lucide-react";
 import { api } from "@/services/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Pagination, PaginationNextIcon, PaginationPreviousIcon } from "@/components/shared/Pagination";
 
 interface NewsItem {
   _id: string;
@@ -622,55 +621,16 @@ export default function NewsPage() {
               })}
             </div>
 
-            {/* Pagination */}
-            {pagination.pages > 1 && (
-              <div className="flex justify-center gap-2 mt-12">
-                <button
-                  onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
-                  disabled={pagination.page === 1}
-                  className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold hover:border-[#00a0e3] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronLeft size={16} className="mx-auto" />
-                </button>
-                
-                {[...Array(pagination.pages)].map((_, i) => {
-                  const pageNum = i + 1;
-                  if (
-                    pageNum === 1 ||
-                    pageNum === pagination.pages ||
-                    (pageNum >= pagination.page - 1 && pageNum <= pagination.page + 1)
-                  ) {
-                    return (
-                      <button
-                        key={i}
-                        onClick={() => setPagination(prev => ({ ...prev, page: pageNum }))}
-                        className={`w-10 h-10 rounded-lg font-bold ${
-                          pagination.page === pageNum
-                            ? "bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] text-white"
-                            : "border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#00a0e3]"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  } else if (
-                    (pageNum === pagination.page - 2 && pagination.page > 3) ||
-                    (pageNum === pagination.page + 2 && pagination.page < pagination.pages - 2)
-                  ) {
-                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
-                  }
-                  return null;
-                })}
-                
-                <button
-                  onClick={() => setPagination(prev => ({ ...prev, page: Math.min(pagination.pages, prev.page + 1) }))}
-                  disabled={pagination.page === pagination.pages}
-                  className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold hover:border-[#00a0e3] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronRight size={16} className="mx-auto" />
-                </button>
-              </div>
-            )}
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+              previousLabel={PaginationPreviousIcon}
+              nextLabel={PaginationNextIcon}
+              siblingCount={1}
+              variant="square"
+              className="mt-12"
+            />
           </>
         ) : (
           // Empty State

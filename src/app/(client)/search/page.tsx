@@ -9,8 +9,6 @@ import {
   Search,
   Filter,
   X,
-  ChevronLeft,
-  ChevronRight,
   Grid3x3,
   List,
   Star,
@@ -53,11 +51,22 @@ import {
   Compass
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { Pagination, PaginationNextIcon, PaginationPreviousIcon } from "@/components/shared/Pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api, UserService } from "@/services/api";
 import type { SearchAuthor, SearchCategory, SearchPagination, SearchProduct, SearchResults, SearchTab } from "@/types/search.types";
 import { toast } from "react-hot-toast";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://backend.book.uz/user-api/";
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887";
+
+const getImageUrl = (image?: string) => {
+  if (!image) return FALLBACK_IMAGE;
+  if (image.startsWith("http://") || image.startsWith("https://")) return image;
+
+  return `${API_BASE_URL.replace(/\/$/, "")}/${image.replace(/^\//, "")}`;
+};
 
 export default function SearchPage() {
   const router = useRouter();
@@ -795,7 +804,7 @@ export default function SearchPage() {
                         <Link href={`/book/${product.slug}`}>
                           <div className="relative h-[200px] w-full overflow-hidden bg-gray-100 dark:bg-slate-700">
                             <Image
-                              src={product.images?.[0] || "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887"}
+                              src={getImageUrl(product.images?.[0])}
                               alt={getProductTitle(product)}
                               fill
                               className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -911,7 +920,7 @@ export default function SearchPage() {
                               className="relative w-20 h-24 rounded-lg overflow-hidden"
                             >
                               <Image
-                                src={product.images?.[0] || "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887"}
+                                src={getImageUrl(product.images?.[0])}
                                 alt={getProductTitle(product)}
                                 fill
                                 className="object-cover"
@@ -1068,7 +1077,7 @@ export default function SearchPage() {
                           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#005CB9]/10 to-[#FF8A00]/10 dark:from-blue-600/20 dark:to-orange-600/20 flex items-center justify-center">
                             {category.image ? (
                               <Image
-                                src={category.image}
+                                src={getImageUrl(category.image)}
                                 alt={category.title.uz}
                                 width={40}
                                 height={40}
@@ -1139,7 +1148,7 @@ export default function SearchPage() {
                           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#005CB9]/10 to-[#FF8A00]/10 dark:from-blue-600/20 dark:to-orange-600/20 flex items-center justify-center overflow-hidden">
                             {author.image ? (
                               <Image
-                                src={author.image}
+                                src={getImageUrl(author.image)}
                                 alt={author.name}
                                 width={48}
                                 height={48}
@@ -1216,7 +1225,7 @@ export default function SearchPage() {
                         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl border border-gray-100 dark:border-slate-700 overflow-hidden hover:shadow-xl transition-all">
                           <div className="relative h-[150px] w-full">
                             <Image
-                              src={product.images?.[0] || "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887"}
+                              src={getImageUrl(product.images?.[0])}
                               alt={getProductTitle(product)}
                               fill
                               className="object-cover"
@@ -1301,66 +1310,15 @@ export default function SearchPage() {
               </motion.div>
             )}
 
-            {/* Pagination */}
-            {pagination.pages > 1 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 2.3 }}
-                className="flex items-center justify-center gap-2 mt-8"
-              >
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-                  disabled={pagination.page === 1}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-[#005CB9] dark:hover:border-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-400"
-                >
-                  <ChevronLeft size={16} />
-                </motion.button>
-                
-                {[...Array(pagination.pages)].map((_, i) => {
-                  const pageNum = i + 1;
-                  if (
-                    pageNum === 1 ||
-                    pageNum === pagination.pages ||
-                    (pageNum >= pagination.page - 2 && pageNum <= pagination.page + 2)
-                  ) {
-                    return (
-                      <motion.button
-                        key={pageNum}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => setPagination(prev => ({ ...prev, page: pageNum }))}
-                        className={`w-10 h-10 rounded-lg font-bold transition-colors ${
-                          pagination.page === pageNum
-                            ? 'bg-gradient-to-r from-[#005CB9] to-[#FF8A00] dark:from-blue-600 dark:to-orange-600 text-white'
-                            : 'border border-gray-200 dark:border-slate-700 hover:border-[#005CB9] dark:hover:border-blue-400 hover:text-[#005CB9] dark:hover:text-blue-400 text-gray-700 dark:text-gray-300'
-                        }`}
-                      >
-                        {pageNum}
-                      </motion.button>
-                    );
-                  } else if (
-                    pageNum === pagination.page - 3 ||
-                    pageNum === pagination.page + 3
-                  ) {
-                    return <span key={pageNum} className="text-gray-400 dark:text-gray-500">...</span>;
-                  }
-                  return null;
-                })}
-                
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                  disabled={pagination.page === pagination.pages}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-[#005CB9] dark:hover:border-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-400"
-                >
-                  <ChevronRight size={16} />
-                </motion.button>
-              </motion.div>
-            )}
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+              previousLabel={PaginationPreviousIcon}
+              nextLabel={PaginationNextIcon}
+              variant="square"
+              className="mt-8"
+            />
           </>
         )}
 

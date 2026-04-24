@@ -1,11 +1,11 @@
-// app/about/page.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
 
+import MiniCard from '@/components/shared/MiniCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { statistics, teamMembers, timelineEvents, values } from '@/data/about';
@@ -13,44 +13,26 @@ import { api } from '@/services/api';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    Award,
     BookOpen,
     Clock,
-    Cloud,
-    Coffee,
-    Compass,
-    Crown,
-    Diamond,
     Eye,
     Facebook,
-    Flower2,
-    Gem,
     Heart,
     Instagram,
     Linkedin,
     Loader2,
     Mail,
     MapPin,
-    Moon,
     Phone,
     Send,
     Sparkles,
-    Star,
-    Sun,
     Target,
     Twitter,
     Users,
     Twitter as XIcon,
-    Youtube,
-    Zap
+    Youtube
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
-// app/about/page.tsx
-
-// app/about/page.tsx
-
-// app/about/page.tsx
 
 export default function AboutPage() {
     const tabs: Array<{ id: 'team' | 'values' | 'history'; label: string; icon: React.ReactNode }> = [
@@ -62,20 +44,6 @@ export default function AboutPage() {
     const [activeTab, setActiveTab] = useState<'team' | 'values' | 'history'>('team');
     const [email, setEmail] = useState('');
     const [submitting, setSubmitting] = useState(false);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-    // Track mouse position for parallax effect
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({
-                x: (e.clientX / window.innerWidth - 0.5) * 20,
-                y: (e.clientY / window.innerHeight - 0.5) * 20
-            });
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
 
     const handleSubscribe = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -99,79 +67,6 @@ export default function AboutPage() {
 
     return (
         <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-50 py-12 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900'>
-            {/* Animated Background Elements */}
-            <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-                {/* Floating Icons */}
-                {[...Array(25)].map((_, i) => {
-                    const icons = [
-                        BookOpen,
-                        Sparkles,
-                        Star,
-                        Heart,
-                        Crown,
-                        Zap,
-                        Award,
-                        Gem,
-                        Diamond,
-                        Flower2,
-                        Sun,
-                        Moon,
-                        Cloud,
-                        Coffee,
-                        Compass
-                    ];
-                    const IconComponent = icons[i % icons.length];
-                    const randomTop = Math.random() * 100;
-                    const randomLeft = Math.random() * 100;
-                    const randomFontSize = Math.random() * 40 + 20;
-
-                    return (
-                        <motion.div
-                            key={i}
-                            className='absolute text-[#00a0e3]/10 dark:text-[#ef7f1a]/10'
-                            style={{
-                                top: `${randomTop}%`,
-                                left: `${randomLeft}%`,
-                                fontSize: `${randomFontSize}px`
-                            }}
-                            animate={{
-                                y: [0, -30, 30, 0],
-                                x: [0, 30, -30, 0],
-                                rotate: [0, 180, 360, 0],
-                                opacity: [0.1, 0.3, 0.2, 0.1]
-                            }}
-                            transition={{
-                                duration: Math.random() * 20 + 10,
-
-                                delay: Math.random() * 5
-                            }}>
-                            <IconComponent />
-                        </motion.div>
-                    );
-                })}
-
-                {/* Gradient Orbs with Parallax */}
-                <motion.div
-                    animate={{
-                        x: mousePosition.x * 2,
-                        y: mousePosition.y * 2
-                    }}
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute top-20 left-20 h-96 w-96 rounded-full bg-[#00a0e3]/10 blur-3xl'
-                />
-                <motion.div
-                    animate={{
-                        x: mousePosition.x * -2,
-                        y: mousePosition.y * -2
-                    }}
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute right-20 bottom-20 h-96 w-96 rounded-full bg-[#ef7f1a]/10 blur-3xl'
-                />
-
-                {/* Grid Pattern */}
-                <div className='brand-grid' />
-            </div>
-
             <div className='relative z-10 container mx-auto max-w-7xl px-4'>
                 {/* Hero Section */}
                 <motion.div
@@ -182,9 +77,13 @@ export default function AboutPage() {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.2, type: 'spring' }}
-                        className='mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#00a0e3]/10 to-[#ef7f1a]/10 px-6 py-2'>
-                        <Sparkles size={16} className='text-[#00a0e3]' />
-                        <span className='text-sm font-bold text-[#ef7f1a]'>BIZ HAQIMIZDA</span>
+                        className='mb-6 inline-flex items-center gap-2 rounded-full border border-[#00a0e3]/25 bg-white/85 px-6 py-2 shadow-[0_14px_40px_-28px_rgba(0,160,227,0.75)] backdrop-blur dark:border-[#ef7f1a]/35 dark:bg-slate-900/80'>
+                        <span className='grid h-7 w-7 place-items-center rounded-full bg-[#00a0e3]/10 text-[#00a0e3] dark:bg-[#ef7f1a]/15 dark:text-[#ef7f1a]'>
+                            <Sparkles size={15} />
+                        </span>
+                        <span className='text-sm font-black tracking-wide text-[#005CB9] dark:text-orange-200'>
+                            BIZ HAQIMIZDA
+                        </span>
                     </motion.div>
 
                     <motion.h1
@@ -192,21 +91,15 @@ export default function AboutPage() {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
                         className='mb-6 text-5xl font-black md:text-7xl'>
-                        <span className='bg-gradient-to-r from-[#00a0e3] via-[#ef7f1a] to-[#00a0e3] bg-clip-text text-transparent'>
-                            Kitobxonlar uchun
-                        </span>
+                        <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>Kitobxonlar uchun</span>
                         <br />
                         <span className='text-gray-900 dark:text-white'>eng yaxshi platforma</span>
                     </motion.h1>
 
-                    <motion.p
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.4 }}
-                        className='mx-auto max-w-3xl text-xl text-gray-500 dark:text-gray-400'>
+                    <p className='mx-auto max-w-3xl text-xl text-gray-500 dark:text-gray-400'>
                         {"BOOK.UZ - O'zbekistonning eng katta raqamli kutubxonasi. Biz 50,000+ kitob va 10,000+ audio"}
                         {" kitoblar bilan sizga eng yaxshi o'qish tajribasini taqdim etamiz."}
-                    </motion.p>
+                    </p>
 
                     {/* CTA Buttons with new colors */}
                     <motion.div
@@ -215,7 +108,7 @@ export default function AboutPage() {
                         transition={{ delay: 0.5 }}
                         className='mt-8 flex flex-col justify-center gap-4 sm:flex-row'>
                         <Link href='/catalog'>
-                            <Button className='rounded-xl bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] px-8 py-6 text-lg text-white transition-all hover:shadow-xl'>
+                            <Button className='group rounded-xl border border-[#ef7f1a]/20 bg-[#ef7f1a] px-8 py-6 text-lg font-black text-white shadow-[0_18px_44px_-26px_rgba(239,127,26,0.95)] transition-all hover:-translate-y-0.5 dark:border-orange-300/20 dark:bg-[#ef7f1a]'>
                                 <BookOpen size={20} className='mr-2' />
                                 {"Kitoblarni ko'rish"}
                             </Button>
@@ -223,7 +116,7 @@ export default function AboutPage() {
                         <Link href='/contact'>
                             <Button
                                 variant='outline'
-                                className='rounded-xl border-2 border-gray-200 px-8 py-6 text-lg transition-all hover:border-[#00a0e3] hover:text-[#00a0e3] dark:border-gray-700'>
+                                className='rounded-xl border-2 border-gray-200 px-8 py-6 text-lg dark:border-gray-700'>
                                 <Mail size={20} className='mr-2' />
                                 {"Bog'lanish"}
                             </Button>
@@ -232,28 +125,7 @@ export default function AboutPage() {
                 </motion.div>
 
                 {/* Statistics Grid */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className='mb-20 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6'>
-                    {statistics.map((stat, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: index * 0.1 + 0.7 }}
-                            whileHover={{ y: -5, scale: 1.05 }}
-                            className='rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-lg transition-all hover:shadow-xl dark:border-slate-700 dark:bg-slate-800'>
-                            <div
-                                className={`mx-auto h-14 w-14 bg-gradient-to-br ${stat.color} mb-3 flex items-center justify-center rounded-xl text-white`}>
-                                {stat.icon}
-                            </div>
-                            <div className='text-2xl font-black text-gray-900 dark:text-white'>{stat.value}</div>
-                            <div className='text-sm text-gray-500 dark:text-gray-400'>{stat.label}</div>
-                        </motion.div>
-                    ))}
-                </motion.div>
+                <MiniCard items={statistics} />
 
                 {/* Tabs with new colors */}
                 <div className='mb-8'>

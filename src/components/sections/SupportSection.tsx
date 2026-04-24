@@ -1,286 +1,212 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  MessageCircle, 
-  Phone, 
-  Mail, 
-  HelpCircle, 
-  Headphones, 
-  Users, 
-  Award, 
-  Sparkles,
-  Send, 
-  Clock, 
-  CheckCircle, 
-  ChevronDown,
-  ChevronRight,
-  Star,
-  Heart,
-  Crown,
-  Zap,
-  Gem,
-  Flower2,
-  Sun,
-  Moon,
-  Cloud,
-  Coffee,
-  Compass
-} from "lucide-react";
+import React, { useEffect, useState } from 'react';
+
+import MiniCard from '@/components/shared/MiniCard';
+import { faqs, supportStats } from '@/data/support';
+
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    Award,
+    ChevronDown,
+    ChevronRight,
+    Clock,
+    Cloud,
+    Coffee,
+    Compass,
+    Crown,
+    Flower2,
+    Gem,
+    Headphones,
+    Heart,
+    Mail,
+    MessageCircle,
+    Moon,
+    Phone,
+    Sparkles,
+    Star,
+    Sun,
+    Users,
+    Zap
+} from 'lucide-react';
 
 export const SupportSection = () => {
-  const [activeTab, setActiveTab] = useState<"faq" | "contact" | "chat">("faq");
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [activeTab, setActiveTab] = useState<'faq' | 'contact' | 'chat'>('faq');
+    const [openFaq, setOpenFaq] = useState<number | null>(0);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Track mouse position for parallax effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
-      });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+    // Track mouse position for parallax effect
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            setMousePosition({
+                x: (e.clientX / window.innerWidth - 0.5) * 20,
+                y: (e.clientY / window.innerHeight - 0.5) * 20
+            });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
 
-  const faqs = [
-    {
-      question: "Kitobni qanday qaytarish mumkin?",
-      answer: "Agar kitobda nuqson bo'lsa, 14 kun ichida bepul almashtirib beramiz. Buning uchun do'konimizga murojaat qilishingiz yoki support@book.uz ga xabar yozishingiz mumkin."
-    },
-    {
-      question: "Audio kitobni qanday tinglash mumkin?",
-      answer: "Sotib olingan audio kitoblar 'Mening kutubxonam' bo'limida. Yuklab olib, oflayn rejimda ham tinglashingiz mumkin. Mobil ilovamiz orqali ham qulay."
-    },
-    {
-      question: "Yetkazib berish narxi qancha?",
-      answer: "Toshkent bo'ylab 15,000 so'm. 300,000 so'mdan yuqori xaridlarda BEPUL! Viloyatlarga yetkazish narxi 20,000-35,000 so'm."
-    }
-  ];
+    return (
+        <section className='relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-12 dark:from-slate-900 dark:to-slate-800'>
+            <div className='brand-grid' />
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
-    setSent(true);
-    setTimeout(() => {
-      setSent(false);
-      setMessage("");
-    }, 2000);
-  };
+            <div className='relative z-10 container mx-auto max-w-6xl px-4'>
+                {/* Header */}
+                <div className='mb-10 text-center'>
+                    <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        className='mb-2 text-3xl font-black md:text-4xl'>
+                        <span className='text-[#00a0e3] dark:text-blue-400'>Sizga qanday</span>{' '}
+                        <span className='text-[#ef7f1a] dark:text-orange-400'>yordam bera olamiz?</span>
+                    </motion.h2>
+                </div>
 
-  // Floating icons array
-  const floatingIcons = [Sparkles, Star, Heart, Crown, Zap, Award, Gem, Flower2, Sun, Moon, Cloud, Coffee, Compass, Headphones, MessageCircle];
+                {/* Quick Stats */}
+                <MiniCard items={supportStats} initialDelay={0} itemDelayStep={0.05} />
 
-  return (
-    <section className="py-12 bg-gradient-to-b from-white to-gray-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden relative">
-      
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Floating Icons */}
-        {[...Array(15)].map((_, i) => {
-          const IconComponent = floatingIcons[i % floatingIcons.length];
-          const randomTop = Math.random() * 100;
-          const randomLeft = Math.random() * 100;
-          const randomFontSize = Math.random() * 30 + 15;
-          
-          return (
-            <motion.div
-              key={i}
-              className="absolute text-[#00a0e3]/10 dark:text-[#ef7f1a]/10"
-              style={{
-                top: `${randomTop}%`,
-                left: `${randomLeft}%`,
-                fontSize: `${randomFontSize}px`,
-              }}
-              animate={{
-                y: [0, -20, 20, 0],
-                x: [0, 20, -20, 0],
-                rotate: [0, 180, 360, 0],
-                opacity: [0.1, 0.2, 0.15, 0.1],
-              }}
-              transition={{
-                duration: Math.random() * 15 + 10,
-                repeat: Infinity,
-                delay: Math.random() * 5,
-              }}
-            >
-              <IconComponent />
-            </motion.div>
-          );
-        })}
+                {/* Support Tabs */}
+                <div className='mx-auto mb-8 flex max-w-xs rounded-xl bg-gray-100 p-1 dark:bg-slate-700'>
+                    {[
+                        { id: 'faq', label: 'FAQ' },
+                        { id: 'contact', label: 'Aloqa' }
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`relative flex-1 rounded-lg py-2.5 text-xs font-bold transition-all ${
+                                activeTab === tab.id ? 'text-white' : 'text-gray-500 dark:text-gray-400'
+                            }`}>
+                            {activeTab === tab.id && (
+                                <motion.div
+                                    layoutId='activeSupportTab'
+                                    className='absolute inset-0 rounded-lg bg-[#ef7f1a] dark:from-blue-600 dark:to-orange-600'
+                                    transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
+                                />
+                            )}
+                            <span className='relative z-10'>{tab.label}</span>
+                        </button>
+                    ))}
+                </div>
 
-        {/* Gradient Orbs with Parallax */}
-        <motion.div
-          animate={{
-            x: mousePosition.x * 2,
-            y: mousePosition.y * 2,
-          }}
-          transition={{ type: "spring", damping: 50 }}
-          className="absolute top-20 left-20 w-96 h-96 bg-[#00a0e3]/5 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            x: mousePosition.x * -2,
-            y: mousePosition.y * -2,
-          }}
-          transition={{ type: "spring", damping: 50 }}
-          className="absolute bottom-20 right-20 w-96 h-96 bg-[#ef7f1a]/5 rounded-full blur-3xl"
-        />
+                {/* Dynamic Content */}
+                <div className='mx-auto min-h-[350px] max-w-3xl'>
+                    <AnimatePresence mode='wait'>
+                        {activeTab === 'faq' && (
+                            <motion.div
+                                key='faq'
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className='space-y-2'>
+                                {faqs.map((f, i) => (
+                                    <div
+                                        key={i}
+                                        className='overflow-hidden rounded-xl border border-gray-100 bg-white dark:border-slate-700 dark:bg-slate-800'>
+                                        <button
+                                            onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                                            className='flex w-full items-center justify-between p-4 text-left'>
+                                            <span className='text-sm font-bold text-gray-800 dark:text-gray-200'>
+                                                {f.question}
+                                            </span>
+                                            <div
+                                                className={`rounded-full p-1.5 transition-all ${
+                                                    openFaq === i
+                                                        ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
+                                                        : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-gray-400'
+                                                }`}>
+                                                <ChevronDown
+                                                    size={14}
+                                                    className={`transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
+                                                />
+                                            </div>
+                                        </button>
+                                        <AnimatePresence>
+                                            {openFaq === i && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    className='border-t border-gray-50 px-4 pt-2 pb-4 text-xs text-gray-500 dark:border-slate-700 dark:text-gray-400'>
+                                                    {f.answer}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                ))}
+                            </motion.div>
+                        )}
 
-        {/* Grid Pattern */}
-        <div className="brand-grid" />
-      </div>
+                        {activeTab === 'contact' && (
+                            <motion.div
+                                key='contact'
+                                className='grid grid-cols-1 gap-3 md:grid-cols-2'
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}>
+                                {[
+                                    {
+                                        icon: <Phone size={18} />,
+                                        title: 'Telefon',
+                                        val: '+998 71 200-99-99',
+                                        sub: "Bepul qo'ng'iroq",
+                                        color: 'blue'
+                                    },
+                                    {
+                                        icon: <Mail size={18} />,
+                                        title: 'Email',
+                                        val: 'support@book.uz',
+                                        sub: '24/7',
+                                        color: 'orange'
+                                    },
+                                    {
+                                        icon: <MessageCircle size={18} />,
+                                        title: 'Telegram',
+                                        val: '@bookuz_bot',
+                                        sub: 'Online',
+                                        color: 'blue'
+                                    },
+                                    {
+                                        icon: <Clock size={18} />,
+                                        title: 'Ish vaqti',
+                                        val: '09:00 - 22:00',
+                                        sub: 'Dushanba-Yakshanba',
+                                        color: 'orange'
+                                    }
+                                ].map((c, i) => (
+                                    <div
+                                        key={i}
+                                        className='group rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-[#00a0e3]/20 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-500/30'>
+                                        <div
+                                            className={`flex items-center gap-3 ${
+                                                c.color === 'blue'
+                                                    ? 'text-[#00a0e3] dark:text-blue-400'
+                                                    : 'text-[#ef7f1a] dark:text-orange-400'
+                                            } mb-2`}>
+                                            {c.icon}
+                                            <span className='text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500'>
+                                                {c.title}
+                                            </span>
+                                        </div>
+                                        <div className='ml-9 text-sm font-black text-gray-900 dark:text-white'>
+                                            {c.val}
+                                        </div>
+                                        <div className='mt-1 ml-9 text-[10px] text-gray-400 dark:text-gray-500'>
+                                            {c.sub}
+                                        </div>
+                                    </div>
+                                ))}
+                            </motion.div>
+                        )}
 
-      <div className="container mx-auto px-4 max-w-6xl relative z-10">
-        
-        {/* Header */}
-        <div className="text-center mb-10">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-4xl font-black mb-2"
-          >
-            <span className="text-[#00a0e3] dark:text-blue-400">Sizga qanday</span>{" "}
-            <span className="text-[#ef7f1a] dark:text-orange-400">yordam bera olamiz?</span>
-          </motion.h2>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-          {[
-            { icon: <Users size={16}/>, val: "50K+", lab: "Mijozlar", color: "blue" },
-            { icon: <MessageCircle size={16}/>, val: "10 min", lab: "Tezkor javob", color: "orange" },
-            { icon: <Clock size={16}/>, val: "24/7", lab: "Xizmat", color: "blue" },
-            { icon: <Award size={16}/>, val: "99%", lab: "Mamnun", color: "orange" },
-          ].map((s, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 text-center"
-            >
-              <div className={`inline-flex p-2 rounded-lg mb-2 ${
-                s.color === 'blue' 
-                  ? 'bg-[#00a0e3]/10 dark:bg-blue-600/20 text-[#00a0e3] dark:text-blue-400' 
-                  : 'bg-[#ef7f1a]/10 dark:bg-orange-600/20 text-[#ef7f1a] dark:text-orange-400'
-              }`}>
-                {s.icon}
-              </div>
-              <div className="text-lg font-black text-gray-900 dark:text-white">{s.val}</div>
-              <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase">{s.lab}</div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Support Tabs */}
-        <div className="flex p-1 bg-gray-100 dark:bg-slate-700 rounded-xl max-w-xs mx-auto mb-8">
-          {[
-            { id: "faq", label: "FAQ" },
-            { id: "contact", label: "Aloqa" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`relative flex-1 py-2.5 text-xs font-bold rounded-lg transition-all ${
-                activeTab === tab.id ? "text-white" : "text-gray-500 dark:text-gray-400"
-              }`}
-            >
-              {activeTab === tab.id && (
-                <motion.div 
-                  layoutId="activeSupportTab"
-                  className="absolute inset-0  bg-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 rounded-lg"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                />
-              )}
-              <span className="relative z-10">{tab.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Dynamic Content */}
-        <div className="max-w-3xl mx-auto min-h-[350px]">
-          <AnimatePresence mode="wait">
-            {activeTab === "faq" && (
-              <motion.div 
-                key="faq"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="space-y-2"
-              >
-                {faqs.map((f, i) => (
-                  <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 overflow-hidden">
-                    <button 
-                      onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                      className="w-full flex items-center justify-between p-4 text-left"
-                    >
-                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{f.question}</span>
-                      <div className={`p-1.5 rounded-full transition-all ${
-                        openFaq === i 
-                          ? 'bg-[#ef7f1a] dark:bg-orange-600 text-white' 
-                          : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400'
-                      }`}>
-                        <ChevronDown size={14} className={`transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
-                      </div>
-                    </button>
-                    <AnimatePresence>
-                      {openFaq === i && (
-                        <motion.div 
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="px-4 pb-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-50 dark:border-slate-700 pt-2"
-                        >
-                          {f.answer}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-
-            {activeTab === "contact" && (
-              <motion.div 
-                key="contact"
-                className="grid grid-cols-1 md:grid-cols-2 gap-3"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              >
-                {[
-                  { icon: <Phone size={18} />, title: "Telefon", val: "+998 71 200-99-99", sub: "Bepul qo'ng'iroq", color: "blue" },
-                  { icon: <Mail size={18} />, title: "Email", val: "support@book.uz", sub: "24/7", color: "orange" },
-                  { icon: <MessageCircle size={18} />, title: "Telegram", val: "@bookuz_bot", sub: "Online", color: "blue" },
-                  { icon: <Clock size={18} />, title: "Ish vaqti", val: "09:00 - 22:00", sub: "Dushanba-Yakshanba", color: "orange" },
-                ].map((c, i) => (
-                  <div key={i} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 hover:border-[#00a0e3]/20 dark:hover:border-blue-500/30 transition-all group">
-                    <div className={`flex items-center gap-3 ${
-                      c.color === 'blue' 
-                        ? 'text-[#00a0e3] dark:text-blue-400' 
-                        : 'text-[#ef7f1a] dark:text-orange-400'
-                    } mb-2`}>
-                      {c.icon}
-                      <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">{c.title}</span>
-                    </div>
-                    <div className="text-sm font-black text-gray-900 dark:text-white ml-9">{c.val}</div>
-                    <div className="text-[10px] text-gray-400 dark:text-gray-500 ml-9 mt-1">{c.sub}</div>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-
-            {/* {activeTab === "chat" && (
+                        {/* {activeTab === "chat" && (
               <motion.div 
                 key="chat"
                 className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden"
                 initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               > */}
-                {/* Chat Header */}
-                {/* <div className="bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 p-4 text-white flex items-center justify-between">
+                        {/* Chat Header */}
+                        {/* <div className="bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 p-4 text-white flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                       <Headphones size={16} />
@@ -295,8 +221,8 @@ export const SupportSection = () => {
                   </div>
                 </div> */}
 
-                {/* Chat Body */}
-                {/* <div className="h-[250px] p-4 overflow-y-auto bg-gray-50/30 dark:bg-slate-700/30 space-y-4">
+                        {/* Chat Body */}
+                        {/* <div className="h-[250px] p-4 overflow-y-auto bg-gray-50/30 dark:bg-slate-700/30 space-y-4">
                   <div className="flex gap-2">
                     <div className="w-6 h-6 bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] dark:from-blue-600 dark:to-orange-600 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white">
                       B
@@ -314,8 +240,8 @@ export const SupportSection = () => {
                   )}
                 </div> */}
 
-                {/* Chat Input */}
-                {/* <div className="p-3 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 flex gap-2">
+                        {/* Chat Input */}
+                        {/* <div className="p-3 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 flex gap-2">
                   <input 
                     type="text" 
                     value={message}
@@ -330,27 +256,22 @@ export const SupportSection = () => {
                     {sent ? <CheckCircle size={16} /> : <Send size={16} />}
                   </button>
                 </div> */}
-              {/* </motion.div>
+                        {/* </motion.div>
             )} */}
-          </AnimatePresence>
-        </div>
+                    </AnimatePresence>
+                </div>
 
-        {/* Bottom Support Link */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          className="text-center"
-        >
-          <a 
-            href="tel:+998901234567" 
-            className="inline-flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-[#00a0e3] dark:hover:text-blue-400 transition-colors"
-          >
-            <Phone size={14} />
-            <span>+998 (90) 123-45-67</span>
-            <ChevronRight size={14} />
-          </a>
-        </motion.div>
-      </div>
-    </section>
-  );
+                {/* Bottom Support Link */}
+                <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className='text-center'>
+                    <a
+                        href='tel:+998901234567'
+                        className='inline-flex items-center gap-2 text-xs text-gray-500 transition-colors hover:text-[#00a0e3] dark:text-gray-400 dark:hover:text-blue-400'>
+                        <Phone size={14} />
+                        <span>+998 (90) 123-45-67</span>
+                        <ChevronRight size={14} />
+                    </a>
+                </motion.div>
+            </div>
+        </section>
+    );
 };

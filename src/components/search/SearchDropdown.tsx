@@ -17,6 +17,16 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchSuggestionsQuery } from "@/hooks/queries/useSearchSuggestionsQuery";
 import type { SearchDropdownProps, SearchProduct } from "@/types/search.types";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://backend.book.uz/user-api/';
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887";
+
+const getImageUrl = (image?: string) => {
+  if (!image) return FALLBACK_IMAGE;
+  if (image.startsWith('http://') || image.startsWith('https://')) return image;
+
+  return `${API_BASE_URL.replace(/\/$/, '')}/${image.replace(/^\//, '')}`;
+};
+
 export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchDropdownProps) => {
   const router = useRouter();
   const [showResults, setShowResults] = useState(false);
@@ -96,7 +106,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                   >
                     <div className="relative w-10 h-14 rounded-lg overflow-hidden flex-shrink-0">
                       <Image
-                        src={product.images?.[0] || "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887"}
+                        src={getImageUrl(product.images?.[0])}
                         alt={getProductTitle(product)}
                         fill
                         className="object-cover"
@@ -171,6 +181,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
           {/* View all results */}
           <div className="p-4 bg-gradient-to-r from-[#005CB9]/5 to-[#FF8A00]/5">
             <button
+              type="button"
               onClick={handleSearch}
               className="w-full flex items-center justify-between text-sm font-bold text-[#005CB9] hover:text-[#FF8A00] transition-colors"
             >

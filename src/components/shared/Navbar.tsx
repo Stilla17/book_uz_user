@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { type FormEvent, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,58 +11,39 @@ import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { bottomNav, serviceMenuItems } from '@/data/navMenu';
-import { useAuth } from '@/hooks/useAuth';
 import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
+import { useAuth } from '@/hooks/useAuth';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
+import { getLocalizedCategoryName, getLocalizedTitle, getUserFirstName, getUserInitials } from '@/lib/navbar-utils';
 import { api } from '@/services/api';
-import { User as UserType } from '@/types';
-import { Category } from '@/types/category.types';
 
-import NavbarControls from './NavbarControls';
+import NavbarMobile from '../mobile/NavbarMobile';
+import NavIcon from './NavIcon';
 import NavbarFooter from './NavbarFooter';
 import NavbarHeader from './NavbarHeader';
-import {
-    BookOpen,
-    ChevronDown,
-    Grid3x3,
-    Heart,
-    Info,
-    Library,
-    LogOut,
-    Menu,
-    Phone,
-    Search,
-    Settings,
-    ShoppingCart,
-    User,
-    UserCircle,
-    X
-} from 'lucide-react';
+import UserDropdown from './UserDropdown';
+import { BookOpen, ChevronDown, Grid3x3, Info, Menu, Search, ShoppingCart, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // Kategoriya interfeysi
 export const Navbar = () => {
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
-    const [loadingCart, setLoadingCart] = useState(false);
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState('');
     const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
-    const { user, isAuthenticated, logout, isLoading } = useAuth();
+    const { user, isAuthenticated, logout, wishlistCount } = useAuth();
     const { isDark, getBgColor, getTextColor, getBorderColor } = useThemeStyles();
 
     const { t, i18n } = useTranslation();
     const { data: categories = [] } = usePublicCategoriesQuery();
+    const myBooksHref = '/my-books';
 
     // Savatdagi mahsulotlar sonini olish
     useEffect(() => {
@@ -75,7 +56,6 @@ export const Navbar = () => {
 
     const loadCartCount = async () => {
         try {
-            setLoadingCart(true);
             const response = await api.get('/cart');
             if (response.data?.success && response.data.data?.items) {
                 const totalItems = response.data.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
@@ -86,8 +66,6 @@ export const Navbar = () => {
         } catch (error) {
             console.error("Savat ma'lumotlarini olishda xatolik:", error);
             setCartCount(0);
-        } finally {
-            setLoadingCart(false);
         }
     };
 
@@ -101,29 +79,14 @@ export const Navbar = () => {
         router.push('/');
     };
 
-    const getUserInitials = (): string => {
-        if (!user?.name) return 'U';
-        return user.name
-            .split(' ')
-            .map((n: string) => n[0])
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
-    };
+    const submitSearch = (event?: FormEvent<HTMLFormElement>) => {
+        event?.preventDefault();
 
-    const getUserFirstName = (): string => {
-        if (!user?.name) return 'Profil';
-        return user.name.split(' ')[0] || 'Profil';
-    };
+        const query = searchQuery.trim();
+        if (!query) return;
 
-    const currentLanguage = i18n.language?.split('-')[0] as keyof Category['title'];
-
-    const getLocalizedTitle = (title: Category['title']) => {
-        return title?.[currentLanguage] || title?.uz || '';
-    };
-
-    const getLocalizedCategoryName = (category: Category) => {
-        return getLocalizedTitle(category.title);
+        setShowSearchDropdown(false);
+        router.push(`/search?q=${encodeURIComponent(query)}`);
     };
 
     return (
@@ -137,194 +100,11 @@ export const Navbar = () => {
                 {/* Chap qism - Logo va Katalog */}
                 <div className='flex items-center gap-2 md:gap-4'>
                     {/* Mobile burger */}
-                    <div className='lg:hidden'>
-                        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-                            <SheetTrigger asChild>
-                                <Button
-                                    variant='outline'
-                                    className={`h-11 w-11 rounded-xl border p-0 ${getBorderColor()} ${getBgColor('card')}`}
-                                    aria-label='Open menu'>
-                                    <Menu size={20} className={getTextColor()} />
-                                </Button>
-                            </SheetTrigger>
-
-                            <SheetContent
-                                side='left'
-                                showCloseButton={false}
-                                className={`w-[88vw] p-0 sm:w-105 ${getBgColor('card')}`}>
-                                <SheetTitle className='sr-only'>Mobil menyu</SheetTitle>
-                                <SheetDescription className='sr-only'>
-                                    Sayt bo‘limlari, katalog, qidiruv va sozlamalar.
-                                </SheetDescription>
-
-                                <div className={`border-b p-5 ${getBorderColor()} flex items-center justify-between`}>
-                                    <Link href='/' className='group flex min-w-fit flex-col items-center gap-1 pt-2'>
-                                        <div className='mt-1 flex items-center text-xl leading-none font-black tracking-tighter md:text-2xl'>
-                                            <img src='/images/Logo.svg' alt='Logo' />
-                                        </div>
-                                    </Link>
-
-                                    <SheetClose asChild>
-                                        <Button variant='ghost' className='h-10 w-10 rounded-xl p-0'>
-                                            <X size={18} className={getTextColor()} />
-                                        </Button>
-                                    </SheetClose>
-                                </div>
-
-                                <div className='max-h-[calc(100vh-120px)] space-y-5 overflow-y-auto p-5'>
-                                    <NavbarControls variant='mobile' onLanguageSelect={() => setMobileOpen(false)} />
-
-                                    <div className='relative'>
-                                        <Input
-                                            placeholder={t('searchPlaceholder')}
-                                            className={`h-12 rounded-2xl pr-12 ${getBgColor('muted')} border-2 ${getBorderColor()}`}
-                                        />
-                                        <button className='absolute top-1/2 right-3 -translate-y-1/2 text-slate-500 dark:text-slate-400'>
-                                            <Search size={18} />
-                                        </button>
-                                    </div>
-
-                                    <div className='grid grid-cols-2 gap-3'>
-                                        <MobileAction
-                                            href='/cart'
-                                            icon={<ShoppingCart size={18} />}
-                                            label={t('cart')}
-                                            badge={cartCount > 0 ? cartCount.toString() : undefined}
-                                            onClick={() => setMobileOpen(false)}
-                                        />
-                                        <MobileAction
-                                            href='/my-books'
-                                            icon={<BookOpen size={18} />}
-                                            label={t('myBooks')}
-                                            onClick={() => setMobileOpen(false)}
-                                        />
-                                        <MobileAction
-                                            href='/catalog'
-                                            icon={<Grid3x3 size={18} />}
-                                            label={t('catalog')}
-                                            onClick={() => setMobileOpen(false)}
-                                        />
-                                        {isAuthenticated && user ? (
-                                            <MobileAction
-                                                href='/profile'
-                                                icon={<UserCircle size={18} />}
-                                                label={getUserFirstName()}
-                                                primary
-                                                onClick={() => setMobileOpen(false)}
-                                            />
-                                        ) : (
-                                            <MobileAction
-                                                href='/auth/login'
-                                                icon={<User size={18} />}
-                                                label={t('profile')}
-                                                primary
-                                                onClick={() => setMobileOpen(false)}
-                                            />
-                                        )}
-                                    </div>
-
-                                    {/* Bottom Navigation (Mobile) */}
-                                    <div className='space-y-2'>
-                                        <div className={`text-sm font-extrabold ${getTextColor()}`}>Bo‘limlar</div>
-                                        <div className='grid grid-cols-2 gap-2'>
-                                            {bottomNav.map((item) => (
-                                                <Link
-                                                    key={item.label}
-                                                    href={item.href}
-                                                    onClick={() => setMobileOpen(false)}
-                                                    className={`flex items-center gap-2 rounded-xl border p-3 ${getBorderColor()} transition-all hover:border-[#005CB9] dark:hover:border-blue-400 ${
-                                                        item.highlight ? 'bg-[#FF8A00]/10' : getBgColor('card')
-                                                    }`}>
-                                                    <span className={item.color}>{item.icon}</span>
-                                                    <span className={`text-whitefont-bold text-xs ${getTextColor()}`}>
-                                                        {item.label}
-                                                    </span>
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Xizmatlar bo'limi (Mobile) */}
-                                    <div className='space-y-2'>
-                                        <div className={`text-sm font-extrabold ${getTextColor()}`}>
-                                            {t('services')}
-                                        </div>
-                                        <div className='grid grid-cols-2 gap-2'>
-                                            {serviceMenuItems.slice(0, 6).map((item, index) => (
-                                                <Link
-                                                    key={index}
-                                                    href={item.href}
-                                                    onClick={() => setMobileOpen(false)}
-                                                    className={`flex flex-col items-center gap-1 p-2 ${getBgColor('card')} border ${getBorderColor()} rounded-lg transition-colors hover:border-[#005CB9] dark:hover:border-blue-400`}>
-                                                    <div className='text-[#005CB9] dark:text-blue-400'>{item.icon}</div>
-                                                    <span
-                                                        className={`text-center text-[10px] font-bold ${getTextColor()}`}>
-                                                        {t(item.label)}
-                                                    </span>
-                                                </Link>
-                                            ))}
-                                        </div>
-                                        <Link
-                                            href='/services'
-                                            onClick={() => setMobileOpen(false)}
-                                            className={`mt-2 block text-center text-xs font-bold text-[#005CB9] hover:underline dark:text-blue-400`}>
-                                            {t('servicesAll')} →
-                                        </Link>
-                                    </div>
-
-                                    {/* Mobile kategoriyalar */}
-                                    <div className='space-y-2'>
-                                        <div className='flex items-center justify-between'>
-                                            <div className={`text-sm font-extrabold ${getTextColor()}`}>
-                                                {t('catalog')}
-                                            </div>
-                                            <Link
-                                                href='/catalog'
-                                                onClick={() => setMobileOpen(false)}
-                                                className={`text-xs font-bold text-[#005CB9] hover:underline dark:text-blue-400`}>
-                                                Barchasi
-                                            </Link>
-                                        </div>
-                                        {/* <div className='grid grid-cols-2 gap-2'>
-                                            {categories.map((category) => (
-                                                <Link
-                                                    key={category._id}
-                                                    href={`/category/${category.slug}`}
-                                                    onClick={() => setMobileOpen(false)}
-                                                    className={`flex items-center gap-2 p-2 ${getBgColor('card')} border ${getBorderColor()} rounded-lg transition-colors hover:border-[#005CB9] dark:hover:border-blue-400`}>
-                                                    <div className='flex-1'>
-                                                        <p className={`text-xs font-bold`}>
-                                                            {getLocalizedCategoryName(category)}
-                                                        </p>
-                                                        {category.subCategories?.map((sub, index) => (
-                                                            <p
-                                                                key={index}
-                                                                className={`text-[10px] text-gray-400 dark:text-slate-500`}>
-                                                                {getLocalizedTitle(sub.title)}
-                                                            </p>
-                                                        ))}
-                                                        <p className='text-[8px] text-gray-400 dark:text-slate-500'>
-                                                            {category.bookCount ?? 0} ta
-                                                        </p>
-                                                    </div>
-                                                </Link>
-                                            ))}
-                                        </div> */}
-                                    </div>
-
-                                    <a
-                                        href='tel:+998901234567'
-                                        className={`flex items-center justify-between rounded-2xl border ${getBorderColor()} ${getBgColor('muted')} p-4`}>
-                                        <div className='text-sm'>
-                                            <div className={`font-extrabold ${getTextColor()}`}>Aloqa</div>
-                                            <div className={`${getTextColor('muted')}`}>+998 (90) 123-45-67</div>
-                                        </div>
-                                        <Phone size={18} className='text-[#005CB9] dark:text-blue-400' />
-                                    </a>
-                                </div>
-                            </SheetContent>
-                        </Sheet>
-                    </div>
+                    <NavbarMobile
+                        cartCount={cartCount}
+                        isAuthenticated={isAuthenticated}
+                        userFirstName={getUserFirstName(user)}
+                    />
 
                     {/* LOGO */}
                     <Link href='/' className='group flex items-center gap-2 max-md:hidden'>
@@ -373,15 +153,15 @@ export const Navbar = () => {
                                                 onClick={() => setIsCatalogOpen(false)}
                                                 className={`flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all`}>
                                                 <div className='flex-1'>
-                                                    <p className={` font-bold ${getTextColor()}`}>
-                                                        {getLocalizedCategoryName(category)}
+                                                    <p className={`font-bold ${getTextColor()}`}>
+                                                        {getLocalizedCategoryName(category, i18n.language)}
                                                     </p>
 
                                                     {category.subgenres?.map((sub, index) => (
                                                         <p
                                                             key={index}
                                                             className={`text-[14px] text-gray-400 hover:text-[#FF8A00] dark:text-slate-500 dark:hover:text-[#FF8A00]`}>
-                                                            {getLocalizedTitle(sub.title)}
+                                                            {getLocalizedTitle(sub.title, i18n.language)}
                                                         </p>
                                                     ))}
                                                 </div>
@@ -469,35 +249,33 @@ export const Navbar = () => {
                 </div>
 
                 {/* O'rta qism - SEARCH */}
-                <div className='relative mx-auto max-w-2xl flex-1 max-sm:hidden'>
+                <form className='relative mx-auto max-w-2xl flex-1 max-sm:hidden' onSubmit={submitSearch}>
                     <Input
                         placeholder={t('searchPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => {
                             setSearchQuery(e.target.value);
-                            setShowSearchDropdown(true);
+                            setShowSearchDropdown(e.target.value.trim().length >= 2);
                         }}
-                        onFocus={() => setShowSearchDropdown(true)}
+                        onFocus={() => setShowSearchDropdown(searchQuery.trim().length >= 2)}
                         className={`h-11 w-full rounded-xl pr-24 md:h-12 md:pr-28 ${getBgColor('muted')} border-2 ${getBorderColor()} focus:border-[#f07e1a] focus-visible:ring-0 dark:focus:border-[#f07e1a]`}
                     />
                     <Button
-                        onClick={() => {
-                            if (searchQuery.trim()) {
-                                router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-                            }
-                        }}
+                        type='submit'
                         className='absolute top-1/2 right-1.5 flex h-9 -translate-y-1/2 cursor-pointer items-center gap-2 rounded-lg bg-[#f07e1a] px-4 font-extrabold text-white hover:bg-[#f07e1ab9] md:h-10'>
                         <Search size={18} />
                         <span className='hidden sm:inline'>{t('search')}</span>
                     </Button>
 
                     {/* Search Dropdown */}
-                    <SearchDropdown
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                        onClose={() => setShowSearchDropdown(false)}
-                    />
-                </div>
+                    {showSearchDropdown && (
+                        <SearchDropdown
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                            onClose={() => setShowSearchDropdown(false)}
+                        />
+                    )}
+                </form>
 
                 {/* O'ng qism - ACTIONS */}
                 <div className='flex items-center gap-3 max-md:hidden md:gap-5'>
@@ -506,17 +284,23 @@ export const Navbar = () => {
                         label={t('cart')}
                         badge={cartCount > 0 ? cartCount.toString() : undefined}
                         href='/cart'
-                        isDark={isDark}
                     />
 
-                    <NavIcon icon={<BookOpen size={22} />} label={t('myBooks')} href='/my-books' isDark={isDark} />
+                    <div className='relative'>
+                        {wishlistCount > 0 && (
+                            <span className='absolute -top-2 right-7 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#f07e1a] text-[14px]'>
+                                {wishlistCount}
+                            </span>
+                        )}
+                        <NavIcon icon={<BookOpen size={22} />} label={t('myBooks')} href={myBooksHref} />
+                    </div>
 
                     {isAuthenticated && user ? (
                         <UserDropdown
                             user={user}
                             onLogout={handleLogout}
-                            initials={getUserInitials()}
-                            firstName={getUserFirstName()}
+                            initials={getUserInitials(user)}
+                            firstName={getUserFirstName(user)}
                             isDark={isDark}
                         />
                     ) : (
@@ -526,7 +310,6 @@ export const Navbar = () => {
                             primary
                             href='/auth/login'
                             onClick={handleLoginClick}
-                            isDark={isDark}
                         />
                     )}
                 </div>
@@ -537,178 +320,3 @@ export const Navbar = () => {
         </header>
     );
 };
-
-// Desktop NavIcon component
-const NavIcon = ({
-    icon,
-    label,
-    badge,
-    primary,
-    href = '#',
-    onClick,
-    isDark
-}: {
-    icon: React.ReactNode;
-    label: string;
-    badge?: string;
-    primary?: boolean;
-    href?: string;
-    onClick?: () => void;
-    isDark: boolean;
-}) => (
-    <Link
-        href={href}
-        onClick={onClick}
-        className={`group relative flex flex-col items-center gap-1 ${
-            primary
-                ? 'text-[#005CB9] dark:text-blue-400'
-                : 'text-slate-600 hover:text-[#005CB9] dark:text-slate-300 dark:hover:text-blue-400'
-        }`}>
-        <div className='p-1 transition-transform group-hover:scale-110'>{icon}</div>
-        <span className='text-[10px] font-extrabold tracking-tight uppercase'>{label}</span>
-        {badge && (
-            <span className='absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-[#FF8A00] text-[10px] font-black text-white dark:border-slate-950 dark:bg-orange-600'>
-                {badge}
-            </span>
-        )}
-    </Link>
-);
-
-// User Dropdown for authenticated users
-const UserDropdown = ({
-    user,
-    onLogout,
-    initials,
-    firstName,
-    isDark
-}: {
-    user: UserType;
-    onLogout: () => void;
-    initials: string;
-    firstName: string;
-    isDark: boolean;
-}) => (
-    <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-            <button className='group flex flex-col items-center gap-1 text-[#005CB9] outline-none dark:text-blue-400'>
-                <div className='p-1 transition-transform group-hover:scale-110'>
-                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-[#005CB9] to-[#FF8A00] text-sm font-bold text-white dark:from-blue-600 dark:to-orange-600'>
-                        {initials}
-                    </div>
-                </div>
-                <span className='max-w-17.5 truncate text-[10px] font-extrabold text-slate-600 uppercase dark:text-slate-300'>
-                    {firstName}
-                </span>
-            </button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent
-            align='end'
-            className={`w-64 rounded-2xl p-2 ${isDark ? 'border-slate-700 bg-slate-900' : 'border-gray-200 bg-white'}`}>
-            <DropdownMenuLabel
-                className={`px-3 py-2 text-xs font-black uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                <div className='flex items-center gap-2'>
-                    <UserCircle size={16} className={isDark ? 'text-blue-400' : 'text-[#005CB9]'} />
-                    <span className={isDark ? 'text-white' : 'text-gray-900'}>{user?.name || 'Foydalanuvchi'}</span>
-                </div>
-            </DropdownMenuLabel>
-
-            <DropdownMenuSeparator className={isDark ? 'bg-slate-700' : 'bg-gray-100'} />
-
-            <DropdownMenuItem
-                asChild
-                className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                <Link href='/profile' className='flex items-center gap-2 py-2'>
-                    <UserCircle size={18} className='text-[#005CB9] dark:text-blue-400' />
-                    <span>Shaxsiy kabinet</span>
-                </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-                asChild
-                className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                <Link href='/my-books' className='flex items-center gap-2 py-2'>
-                    <Library size={18} className='text-[#005CB9] dark:text-blue-400' />
-                    <span>Mening kitoblarim</span>
-                </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-                asChild
-                className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                <Link href='/wishlist' className='flex items-center gap-2 py-2'>
-                    <Heart size={18} className='text-[#FF8A00] dark:text-orange-400' />
-                    <span>Sevimlilar</span>
-                </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-                asChild
-                className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                <Link href='/orders' className='flex items-center gap-2 py-2'>
-                    <ShoppingCart size={18} className='text-[#005CB9] dark:text-blue-400' />
-                    <span>Buyurtmalarim</span>
-                </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-                asChild
-                className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                <Link href='/settings' className='flex items-center gap-2 py-2'>
-                    <Settings size={18} className={isDark ? 'text-slate-400' : 'text-slate-500'} />
-                    <span>Sozlamalar</span>
-                </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator className={isDark ? 'bg-slate-700' : 'bg-gray-100'} />
-
-            <DropdownMenuItem
-                onClick={onLogout}
-                className={`cursor-pointer rounded-xl text-red-500 focus:text-red-500 ${isDark ? 'focus:bg-red-500/10' : 'focus:bg-red-50'} py-2`}>
-                <LogOut size={18} className='mr-2' />
-                Chiqish
-            </DropdownMenuItem>
-        </DropdownMenuContent>
-    </DropdownMenu>
-);
-
-// Mobile quick action card
-function MobileAction({
-    href,
-    icon,
-    label,
-    badge,
-    primary,
-    onClick
-}: {
-    href: string;
-    icon: React.ReactNode;
-    label: string;
-    badge?: string;
-    primary?: boolean;
-    onClick?: () => void;
-}) {
-    return (
-        <Link
-            href={href}
-            onClick={onClick}
-            className={`relative flex items-center gap-3 rounded-2xl border p-4 transition-all ${
-                primary
-                    ? 'border-transparent bg-[#2572c0] text-white dark:bg-blue-200'
-                    : 'border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white'
-            }`}>
-            <div
-                className={`grid h-10 w-10 place-items-center rounded-2xl ${
-                    primary ? 'bg-white/15' : 'bg-slate-100 dark:bg-slate-700'
-                }`}>
-                {icon}
-            </div>
-            <div className='font-extrabold'>{label}</div>
-            {badge && (
-                <span className='absolute top-2 right-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#FF8A00] text-[10px] font-black text-white dark:bg-orange-600'>
-                    {badge}
-                </span>
-            )}
-        </Link>
-    );
-}

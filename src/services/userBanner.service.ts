@@ -1,6 +1,5 @@
 // services/userBanner.service.ts
 import { api } from './api';
-import { Book } from '@/types'; // Book tipini import qilish (agar kerak bo'lsa)
 
 export interface UserBanner {
   _id: string;

@@ -2,38 +2,27 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
+import { bookService } from '@/services/book.service';
+import type { Product } from '@/types';
+import type { Book } from '@/types/book';
 import type { BookSectionProps } from '@/types/section.types';
 
-import { Book, BookCard } from '../cards/BookCard';
+import { BookCard } from '../cards/BookCard';
 import { BookCardSkeleton } from '../cards/BookCardSkeleton';
 import { motion } from 'framer-motion';
-import {
-    Award,
-    BookOpen,
-    ChevronRight,
-    Cloud,
-    Coffee,
-    Compass,
-    Crown,
-    Diamond,
-    Flame,
-    Flower2,
-    Gem,
-    Headphones,
-    Heart,
-    Moon,
-    Sparkles,
-    Star,
-    Sun,
-    TrendingUp,
-    Zap
-} from 'lucide-react';
+import { Award, BookOpen, ChevronRight, Flame, Headphones, Sparkles, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
+
+type TextLike = string | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown } | null | undefined;
+type ProductShape = Product & {
+    title?: TextLike;
+    author?: string | { name?: unknown };
+};
 
 export const BookSection = ({
     title,
@@ -43,6 +32,7 @@ export const BookSection = ({
     viewAllLink = '/catalog'
 }: BookSectionProps) => {
     const [loading, setLoading] = useState(true);
+    const [fetchedBooks, setFetchedBooks] = useState<Book[]>([]);
     const prevRef = useRef<HTMLButtonElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
 
@@ -51,12 +41,12 @@ export const BookSection = ({
     const mockBooks: Book[] = [
         {
             _id: '1',
+            slug: 'sariq-devni-minib',
             title: 'Sariq devni minib',
             author: "Xudoyberdi To'xtaboyev",
             price: 45000,
             oldPrice: 60000,
             rating: 4.9,
-            reviewsCount: 1245,
             discount: 25,
             isHit: true,
             format: 'paper',
@@ -64,91 +54,173 @@ export const BookSection = ({
         },
         {
             _id: '2',
+            slug: 'yulduzli-tunlar',
             title: 'Yulduzli tunlar',
             author: 'Pirimqul Qodirov',
             price: 55000,
             rating: 5.0,
-            reviewsCount: 892,
             isNew: true,
             format: 'ebook',
             image: 'https://backend.book.uz/user-api/img/img-file-213a5f767d557777e7f781ded5e28b20.jpg'
         },
         {
             _id: '3',
+            slug: 'stiv-jobs',
             title: 'Stiv Jobs',
             author: 'Uolter Ayzekson',
             price: 89000,
             oldPrice: 110000,
             rating: 4.8,
-            reviewsCount: 2341,
             isHit: true,
             format: 'paper',
             image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1887'
         },
         {
             _id: '4',
+            slug: 'boy-ota-kambagal-ota',
             title: "Boy ota, kambag'al ota",
             author: 'Robert Kiyosaki',
             price: 35000,
             rating: 4.7,
-            reviewsCount: 5678,
             isNew: true,
             format: 'ebook',
             image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1824'
         },
         {
             _id: '5',
+            slug: 'atomic-habits',
             title: 'Atomic Habits',
             author: 'James Clear',
             price: 42000,
             rating: 4.9,
-            reviewsCount: 4321,
             format: 'audio',
             isFree: true,
             image: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1888'
         },
         {
             _id: '6',
+            slug: 'zukko-bolajon',
             title: 'Zukko bolajon',
             author: 'Ertaklar olami',
             price: 25000,
             rating: 4.5,
-            reviewsCount: 567,
             isNew: true,
             format: 'ebook',
             image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1948'
         },
         {
             _id: '7',
+            slug: 'kichik-shahzoda',
             title: 'Kichik shahzoda',
             author: 'Antuan de Sent-Ekzyuperi',
             price: 32000,
             oldPrice: 45000,
             rating: 4.9,
-            reviewsCount: 3456,
             discount: 29,
             format: 'paper',
             image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887'
         },
         {
             _id: '8',
+            slug: 'shaytanat',
             title: 'Shaytanat',
             author: 'Tohir Malik',
             price: 68000,
             rating: 4.9,
-            reviewsCount: 2891,
             isHit: true,
             format: 'paper',
             image: 'https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?q=80&w=1935'
         }
     ];
 
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 1000);
-        return () => clearTimeout(timer);
-    }, []);
+    const getText = (value: TextLike, fallback: string): string => {
+        if (!value) return fallback;
+        if (typeof value === 'string') return value || fallback;
+        if (typeof value.uz === 'string') return value.uz;
+        if (typeof value.ru === 'string') return value.ru;
+        if (typeof value.en === 'string') return value.en;
+        if (typeof value.name === 'string') return value.name;
+        if (typeof value.title === 'string') return value.title;
 
-    const displayBooks = books && books.length > 0 ? books : mockBooks;
+        return fallback;
+    };
+
+    const getAuthorName = (author: ProductShape['author']) => {
+        if (!author) return "Noma'lum muallif";
+        if (typeof author === 'string') return author;
+
+        return getText({ name: author.name }, "Noma'lum muallif");
+    };
+
+    const mapProductToBook = (product: Product): Book => {
+        const productShape = product as ProductShape;
+        const price = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
+        const oldPrice = product.discountPrice && product.discountPrice > 0 ? product.price : undefined;
+        const discount = oldPrice && oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : undefined;
+
+        return {
+            _id: product._id,
+            slug: product.slug,
+            title: getText(productShape.title, "Noma'lum kitob"),
+            author: getAuthorName(productShape.author),
+            price,
+            oldPrice,
+            rating: product.ratingAvg || 0,
+            reviewsCount: product.ratingCount || 0,
+            stock: product.stock,
+            image: product.images?.[0],
+            discount,
+            isHit: product.isTop,
+            isNew: type === 'new',
+            format: product.format
+        };
+    };
+
+    const getRequestParams = () => ({
+        limit: 8,
+        ...(type === 'popular' && { isTop: true }),
+        ...(type === 'discount' && { isDiscount: true }),
+        ...(type === 'audio' && { format: 'audio' })
+    });
+
+    useEffect(() => {
+        let ignore = false;
+
+        const loadBooks = async () => {
+            if (books && books.length > 0) {
+                setFetchedBooks([]);
+                setLoading(false);
+
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const response = await bookService.getAllProducts(getRequestParams());
+                if (!ignore) {
+                    setFetchedBooks(response.products.map(mapProductToBook));
+                }
+            } catch (error) {
+                console.error('BookSection kitoblari yuklanmadi:', error);
+                if (!ignore) {
+                    setFetchedBooks([]);
+                }
+            } finally {
+                if (!ignore) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadBooks();
+
+        return () => {
+            ignore = true;
+        };
+    }, [books, type]);
+
+    const displayBooks = books && books.length > 0 ? books : fetchedBooks.length > 0 ? fetchedBooks : mockBooks;
 
     // Section icon and color based on type
     const getSectionConfig = () => {

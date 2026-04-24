@@ -42,3 +42,24 @@ export interface SubCategoryFormData {
     categoryId: string;
     title: MultiLangField;
 }
+
+export type FilterSelectOption = {
+    value: string;
+    label: string;
+};
+
+export type FilterSelectGroup = {
+    label: string;
+    options: FilterSelectOption[];
+};
+
+export type FilterSelectProps = {
+    label: string;
+    value?: string;
+    placeholder: string;
+    options?: FilterSelectOption[];
+    groups?: FilterSelectGroup[];
+    onChange: (value: string) => void;
+    allLabel?: string;
+    disabled?: boolean;
+};

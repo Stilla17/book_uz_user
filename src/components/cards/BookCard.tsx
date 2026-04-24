@@ -1,73 +1,110 @@
-// components/cards/BookCard.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { type MouseEvent, useEffect, useState } from 'react';
 
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+import { useAuth } from '@/hooks/useAuth';
+import { useBookWishlist } from '@/hooks/useBookWishlist';
+import { type Book, type BookCardProps } from '@/types/book';
+import { getImageUrl } from '@/utils/image';
+import { handleToggleFavorite, isBookInGuestWishlist } from '@/utils/wishlist';
 
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export interface Book {
-    _id: string;
-    title: string | { uz: string; ru: string; en: string };
-    author: string | { name: string };
-    price: number;
-    oldPrice?: number;
-    rating: number;
-    reviewsCount?: number;
-    image?: string;
-    discount?: number;
-    isNew?: boolean;
-    isHit?: boolean;
-    isFree?: boolean;
-    format?: 'ebook' | 'audio' | 'paper';
-}
+export type { Book } from '@/types/book';
 
-export const BookCard = ({ book }: { book: Book }) => {
-    const [isBookmarked, setIsBookmarked] = useState(false);
-    const [imageError, setImageError] = useState(false);
-    const [mounted, setMounted] = useState(false);
+type TextLike =
+    | string
+    | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown }
+    | null
+    | undefined;
 
+export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
     const { t } = useTranslation();
+    const router = useRouter();
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const {
+        isBookmarked,
+        setIsBookmarked,
+        favoriteLoading,
+        setFavoriteLoading,
+        user,
+        updateWishlistCount,
+        syncWishlist
+    } = useBookWishlist(book);
+
+    const getText = (value: TextLike, fallback: string): string => {
+        if (!value) return fallback;
+        if (typeof value === 'string') return value || fallback;
+        if (typeof value.uz === 'string') return value.uz;
+        if (typeof value.ru === 'string') return value.ru;
+        if (typeof value.en === 'string') return value.en;
+        if (typeof value.name === 'string') return value.name;
+        if (typeof value.title === 'string') return value.title;
+
+        return fallback;
+    };
+
+    console.log(book)
 
     const getBookTitle = () => {
-        if (!book.title) return "Noma'lum kitob";
-        if (typeof book.title === 'string') return book.title;
-        return book.title.uz || book.title.ru || book.title.en || "Noma'lum kitob";
+        return getText(book.title, "Noma'lum kitob");
     };
 
     const getAuthorName = () => {
-        if (!book.author) return "Noma'lum muallif";
         if (typeof book.author === 'string') return book.author;
-        return (book.author as { name?: string }).name || "Noma'lum muallif";
+
+        return getText(book.author?.name ? { name: book.author.name } : book.author, "Noma'lum muallif");
     };
 
-    const fallbackImages = [
-        'https://backend.book.uz/user-api/img/img-file-6080c55bb05c0ebeac3da4d480f14a6c.jpg',
-        'https://backend.book.uz/user-api/img/img-file-6080c55bb05c0ebeac3da4d480f14a6c.jpg',
-        'https://backend.book.uz/user-api/img/img-file-6080c55bb05c0ebeac3da4d480f14a6c.jpg',
-        'https://backend.book.uz/user-api/img/img-file-6080c55bb05c0ebeac3da4d480f14a6c.jpg'
-    ];
+    const bookHref = `/book/${slug ?? book.slug ?? book._id}`;
 
-    const imageSrc =
-        imageError || !book.image || book.image === ''
-            ? fallbackImages[Math.floor(Math.random() * fallbackImages.length)]
-            : book.image;
+    const openBookDetails = (event: MouseEvent<HTMLDivElement>) => {
+        const target = event.target as HTMLElement;
+        if (target.closest('a, button')) return;
+
+        router.push(bookHref);
+    };
+
+    const toggleFavorite = async () => {
+        if (favoriteLoading) return;
+
+        const nextBookmarked = !isBookmarked;
+        setIsBookmarked(nextBookmarked);
+        onWishlistChange?.(book._id, nextBookmarked);
+        setFavoriteLoading(true);
+
+        try {
+            const response = await handleToggleFavorite(book, user?.id ?? user?._id);
+            const nextWishlist = response?.data?.wishlist;
+
+            if (user && Array.isArray(nextWishlist)) {
+                syncWishlist(nextWishlist);
+            } else {
+                updateWishlistCount();
+            }
+        } catch (error) {
+            setIsBookmarked(!nextBookmarked);
+            onWishlistChange?.(book._id, !nextBookmarked);
+            console.error('Wishlist yangilanmadi:', error);
+        } finally {
+            setFavoriteLoading(false);
+        }
+    };
 
     return (
         <motion.div
-            className='group relative flex h-full flex-col rounded-xl border border-gray-100 bg-white px-3 pb-3 transition-all duration-300 hover:border-[#00a0e3]/20 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:border-[#ef7f1a]/30'
+            className='group relative flex h-full cursor-pointer flex-col rounded-xl border border-gray-100 bg-white px-3 pb-3 transition-all duration-300 hover:border-[#00a0e3]/20 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:border-[#ef7f1a]/30'
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}>
-            <div className='relative mb-3 flex h-80 w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 via-white to-slate-200  shadow-md dark:from-slate-700 dark:via-slate-800 dark:to-slate-900'>
-                {/* <div className='pointer-events-none absolute inset-x-5 bottom-2 h-5 rounded-full bg-slate-900/10 blur-xl dark:bg-black/40' /> */}
+            transition={{ duration: 0.3 }}
+            onClick={openBookDetails}>
+            <div className='relative mb-3 flex h-80 w-full items-center justify-center overflow-hidden rounded-2xl'>
                 <button
                     type='button'
                     aria-label='Bookmark'
@@ -76,43 +113,43 @@ export const BookCard = ({ book }: { book: Book }) => {
                             ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
                             : 'bg-white/90 text-gray-600 hover:bg-[#ef7f1a] hover:text-white dark:bg-slate-800/90 dark:text-gray-300 dark:hover:bg-orange-600'
                     }`}
-                    onClick={() => setIsBookmarked(!isBookmarked)}>
+                    disabled={favoriteLoading}
+                    onClick={toggleFavorite}>
                     <Heart size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
                 </button>
 
-                <div className='group relative flex h-full w-full items-center justify-center'>
-                    {imageSrc ? (
-                        <Image
-                            src={imageSrc}
-                            alt={getBookTitle()}
-                            fill
-                            className='object-contain p-0.5 transition-transform duration-700 group-hover:scale-105'
-                            onError={() => setImageError(true)}
-                        />
-                    ) : (
-                        <div className='flex h-full w-full items-center justify-center bg-gradient-to-br from-[#00a0e3]/10 to-[#ef7f1a]/10 dark:from-blue-600/10 dark:to-orange-600/10'>
-                            <span className='text-4xl'>?</span>
-                        </div>
-                    )}
-                </div>
+                <Link
+                    href={bookHref}
+                    aria-label={`${getBookTitle()} haqida batafsil`}
+                    className='group relative flex h-full w-full items-center justify-center'>
+                    <Image
+                        src={getImageUrl(book.image)}
+                        alt={getBookTitle()}
+                        fill
+                        sizes='(max-width: 480px) 70vw, (max-width: 768px) 42vw, (max-width: 1024px) 30vw, 220px'
+                        className='object-contain p-0.5 transition-transform duration-700 group-hover:scale-105'
+                    />
+                </Link>
             </div>
 
-            <div className='flex flex-grow flex-col space-y-2'>
-                <h3 className='line-clamp-2 text-[18px] leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
-                    {getBookTitle()}
-                </h3>
+            <div className='flex grow flex-col space-y-2'>
+                <Link href={bookHref} className='block'>
+                    <h3 className='line-clamp-2 text-[18px] leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
+                        {getBookTitle()}
+                    </h3>
 
-                <p className='line-clamp-1 flex items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
-                    {getAuthorName()}
-                </p>
+                    <p className='line-clamp-1 flex items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
+                        {getAuthorName()}
+                    </p>
+                </Link>
 
                 <div className='flex items-center gap-2 pt-1'>
                     <div className='inline-flex items-center gap-1 rounded-md bg-[#f3f4f6] px-2 py-1 text-[13px] font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-100'>
-                        <span>{(book.rating || 0).toFixed(1)}</span>
+                        <span> {Number(book?.rating || 0).toFixed(1)}</span>
                         <Star size={13} className='text-[#f59e0b]' fill='currentColor' />
                     </div>
                     <span className='text-[11px] text-gray-400 dark:text-gray-500'>
-                        {book.reviewsCount || Math.floor(Math.random() * 1000) + 100} ta
+                        {book.stock ?? book.reviewsCount ?? 0} ta
                     </span>
                 </div>
 

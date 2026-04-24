@@ -25,14 +25,14 @@ export const statistics: Statistic[] = [
         labelEn: 'Books',
         color: 'from-[#00a0e3] to-[#4dc3ff]'
     },
-    {
-        icon: <Headphones size={28} />,
-        value: '10,000+',
-        label: 'Audio kitoblar',
-        labelRu: 'Аудиокниги',
-        labelEn: 'Audiobooks',
-        color: 'from-[#ef7f1a] to-[#ff9f4d]'
-    },
+    // {
+    //     icon: <Headphones size={28} />,
+    //     value: '10,000+',
+    //     label: 'Audio kitoblar',
+    //     labelRu: 'Аудиокниги',
+    //     labelEn: 'Audiobooks',
+    //     color: 'from-[#ef7f1a] to-[#ff9f4d]'
+    // },
     {
         icon: <Users size={28} />,
         value: '1M+',

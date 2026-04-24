@@ -1,14 +1,41 @@
-export interface Product {
+export type LocalizedText = string | { uz?: string; ru?: string; en?: string };
+
+export interface Book {
     _id: string;
-    title: {
-        uz: string;
-        ru?: string;
-        en?: string;
-    };
-    slug: string;
-    description?: {
-        uz?: string;
-    };
+    slug?: string;
+    title: LocalizedText;
+    description?: LocalizedText;
+    author?: string | { _id?: string; name: string; bio?: string; image?: string; booksCount?: number };
+    authorName?: string | { name: string };
+    price: number;
+    oldPrice?: number;
+    discountPrice?: number;
+    reviewsCount?: number;
+    ratingAvg?: number;
+    ratingCount?: number;
+    rating?: number;
+    stock?: number;
+    images?: string[];
+    image?: string;
+    barcode?: string;
+    discount?: number;
+    isNew?: boolean;
+    isHit?: boolean;
+    isFree?: boolean;
+    isTop?: boolean;
+    isDiscount?: boolean;
+    format?: 'ebook' | 'audio' | 'paper';
+    isWishlisted?: boolean;
+    category?:
+        | string
+        | { _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }
+        | Array<{ _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }>;
+    contentLanguage?: string;
+    numberOfPage?: number;
+    year?: number;
+    publisherName?: string;
+    language?: string;
+    cover?: string;
     details?: {
         publisher?: string;
         publishedYear?: number;
@@ -19,29 +46,6 @@ export interface Product {
         dimensions?: string;
         cover?: string;
     };
-    price: number;
-    discountPrice?: number;
-    images: string[];
-    stock: number;
-    category: {
-        _id: string;
-        title: {
-            uz: string;
-        };
-    };
-    author: {
-        _id: string;
-        name: string;
-        bio?: string;
-        image?: string;
-        booksCount?: number;
-    };
-    language: 'uz' | 'ru' | 'en';
-    isTop: boolean;
-    isDiscount: boolean;
-    ratingAvg: number;
-    ratingCount: number;
-    format?: 'ebook' | 'audio' | 'paper';
     pages?: number;
     duration?: string;
     publisher?: string;
@@ -50,6 +54,8 @@ export interface Product {
     views?: number;
     sales?: number;
 }
+
+export type Product = Book;
 
 export interface Review {
     _id: string;
@@ -93,3 +99,9 @@ export interface ReviewStats {
         5: number;
     };
 }
+
+export type BookCardProps = {
+    book: Book;
+    slug?: string;
+    onWishlistChange?: (bookId: string, isWishlisted: boolean) => void;
+};

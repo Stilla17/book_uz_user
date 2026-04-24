@@ -1,8 +1,6 @@
-// app/page.tsx
 'use client';
 
 import { AboutSection } from '@/components/sections/AboutSection';
-import { AudioBooksSection } from '@/components/sections/AudioBooksSection';
 import { AuthorBannerSection } from '@/components/sections/AuthorBannerSection';
 import { AuthorQuoteSection } from '@/components/sections/AuthorQuoteSection';
 import { BookSection } from '@/components/sections/BookSection';
@@ -14,9 +12,8 @@ import { NewsSection } from '@/components/sections/NewsSection';
 import Publishers from '@/components/sections/Publishers';
 import { ServicesSection } from '@/components/sections/ServicesSection';
 import { SupportSection } from '@/components/sections/SupportSection';
-import { useTranslation } from 'react-i18next';
 
-// app/page.tsx
+import { useTranslation } from 'react-i18next';
 
 const Page = () => {
     const { t } = useTranslation();
@@ -43,15 +40,15 @@ const Page = () => {
                 type='popular'
             />
 
-            {/* Author Banner */}
-            <AuthorBannerSection />
-
             {/* Sizga yoqishi mumkin */}
             <BookSection
                 title={t('booksSection.bestMonth')}
                 subtitle={t('booksSection.bestMonthSubtitle')}
                 type='default'
             />
+
+            {/* Author Banner */}
+            {/* <AuthorBannerSection /> */}
 
             {/* Nashryotlar */}
             <Publishers />
@@ -70,9 +67,6 @@ const Page = () => {
 
             {/* Support Section */}
             <SupportSection />
-
-            {/* Audio Books Section */}
-            <AudioBooksSection />
 
             {/* Download App Section */}
             <DownloadAppSection />

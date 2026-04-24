@@ -1,4 +1,4 @@
-import type { Book } from '@/components/cards/BookCard';
+import type { Book } from '@/types/book';
 import type { Category } from '@/types/category.types';
 
 export interface BookSectionProps {
