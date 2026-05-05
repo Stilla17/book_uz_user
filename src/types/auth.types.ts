@@ -17,21 +17,16 @@ export interface AuthState {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    wishlistCount: number;
 }
 
 export interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<void>;
     register: (userData: unknown) => Promise<void>;
     logout: () => Promise<void>;
-    updateWishlistCount: () => void;
-    syncWishlist: (wishlist: unknown[]) => void;
 }
 
 export type AuthAction =
     | { type: 'AUTH_START' }
     | { type: 'AUTH_SUCCESS'; payload: User | null }
     | { type: 'AUTH_FAILURE' }
-    | { type: 'LOGOUT' }
-    | { type: 'SET_WISHLIST_COUNT'; payload: number }
-    | { type: 'SYNC_WISHLIST'; payload: unknown[] };
+    | { type: 'LOGOUT' };

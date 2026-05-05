@@ -9,6 +9,7 @@ import DottedLine from '@/components/shared/DottedLine';
 import { Loading } from '@/components/shared/Loading';
 import TabPanel from '@/components/shared/TabPanel';
 import { Button } from '@/components/ui/button';
+import { useBookCart } from '@/hooks/useBookCart';
 import { useBookWishlist } from '@/hooks/useBookWishlist';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
@@ -35,15 +36,13 @@ export default function BookDetailPage() {
         enabled: !!slug
     });
 
-    const {
-        isBookmarked,
-        setIsBookmarked,
-        favoriteLoading,
-        setFavoriteLoading,
-        user,
-        updateWishlistCount,
-        syncWishlist
-    } = useBookWishlist(book ?? undefined);
+    const { isBookmarked, setIsBookmarked, favoriteLoading, setFavoriteLoading, user } = useBookWishlist(
+        book ?? undefined
+    );
+    const { cartItems, addItem, updateQuantity, removeItem } = useBookCart();
+    const cartItem = useMemo(() => cartItems.find((item) => item.book._id === book?._id), [book?._id, cartItems]);
+    const cartQuantity = cartItem?.quantity ?? 0;
+    const stockLimit = book?.stock && book.stock > 0 ? book.stock : undefined;
 
     const bookView = useMemo(
         () => ({
@@ -77,20 +76,55 @@ export default function BookDetailPage() {
         setFavoriteLoading(true);
 
         try {
-            const response = await handleToggleFavorite(book, user?.id ?? user?._id);
-            const nextWishlist = response?.data?.wishlist;
-
-            if (user && Array.isArray(nextWishlist)) {
-                syncWishlist(nextWishlist);
-            } else {
-                updateWishlistCount();
-            }
+            await handleToggleFavorite(book, user?.id ?? user?._id);
         } catch (error) {
             setIsBookmarked(!nextBookmarked);
             console.error('Wishlist yangilanmadi:', error);
         } finally {
             setFavoriteLoading(false);
         }
+    };
+
+    const getCartBook = () => {
+        if (!book) return null;
+
+        return {
+            _id: book._id,
+            title: book.title,
+            slug: book.slug,
+            price: book.price,
+            images: book.image ?? book.images?.[0] ?? '',
+            stock: book.stock ?? 0
+        };
+    };
+
+    const incrementCartQuantity = async () => {
+        const cartBook = getCartBook();
+        if (!book || !cartBook) return;
+
+
+        if (stockLimit && cartQuantity >= stockLimit) return;
+
+        if (cartQuantity > 0) {
+            await updateQuantity(book._id, cartQuantity + 1);
+        } else {
+            await addItem(cartBook);
+        }
+    };
+
+    const decrementCartQuantity = async () => {
+        if (!book || cartQuantity <= 0) return;
+
+        if (cartQuantity === 1) {
+            await removeItem(book._id);
+        } else {
+            await updateQuantity(book._id, cartQuantity - 1);
+        }
+    };
+
+    const addBookToCart = async () => {
+        if (cartQuantity > 0) return;
+        await incrementCartQuantity();
     };
 
     if (bookLoading) {
@@ -175,28 +209,37 @@ export default function BookDetailPage() {
                                 <div className='flex items-center gap-1.5'>
                                     <button
                                         type='button'
+                                        onClick={decrementCartQuantity}
                                         aria-label='Kamaytirish'
                                         className='flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-[#ef7f1a] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800'>
                                         <Minus size={18} />
                                     </button>
 
                                     <div className='flex h-11 min-w-16 items-center justify-center rounded-xl bg-gradient-to-b from-slate-50 to-white px-4 text-center text-lg font-black text-slate-900 ring-1 ring-slate-200 dark:from-slate-900 dark:to-slate-950 dark:text-white dark:ring-slate-700'>
-                                        0
+                                        {cartQuantity}
                                     </div>
 
                                     <button
                                         type='button'
                                         aria-label='Ko‘paytirish'
-                                        className='flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-[#ef7f1a] active:scale-95 dark:bg-white dark:text-slate-900 dark:hover:bg-orange-100'>
+                                        disabled={Boolean(
+                                            !book?.stock ||
+                                            book.stock <= 0 ||
+                                            (stockLimit && cartQuantity >= stockLimit)
+                                        )}
+                                        onClick={incrementCartQuantity}
+                                        className='flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-[#ef7f1a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900 dark:hover:bg-orange-100'>
                                         <Plus size={18} />
                                     </button>
                                 </div>
                             </div>
 
                             <div className='mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]'>
-                                <Button className='h-14 rounded-2xl bg-[#ef7f1a] text-base font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] dark:shadow-none'>
+                                <Button
+                                    onClick={addBookToCart}
+                                    className='h-14 rounded-2xl bg-[#ef7f1a] text-base font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] dark:shadow-none'>
                                     <ShoppingCart size={20} />
-                                    Savatga qo'shish
+                                    {cartQuantity > 0 ? 'Savatda' : "Savatga qo'shish"}
                                 </Button>
                                 <Button
                                     variant='outline'
@@ -212,6 +255,7 @@ export default function BookDetailPage() {
                 </motion.section>
 
                 <TabPanel
+                    bookId={book?._id}
                     description={bookView.description}
                     author={bookView.author}
                     category={bookView.category}

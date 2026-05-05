@@ -1,11 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import cartReducer from './features/cartSlice';
+import checkoutReducer from './features/checkoutSlice';
 import globalReducer from './features/globalSlice';
+import wishlistReducer from './features/wishlistSlice';
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
-            global: globalReducer
+            global: globalReducer,
+            cart: cartReducer,
+            wishlist: wishlistReducer,
+            checkout: checkoutReducer
         }
     });
 };

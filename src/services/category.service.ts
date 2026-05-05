@@ -6,7 +6,7 @@ export const categoryService = {
   async getAllCategoriesPublic(): Promise<Category[]> {
     try {
       const response = await api.get('/categories?all=true');
-      console.log('Public categories response:', response.data);
+      // console.log('Public categories response:', response.data); 
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching categories:', error);

@@ -1,19 +1,25 @@
 'use client';
 
-import { type MouseEvent, useEffect, useState } from 'react';
+import { type MouseEvent } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { useAuth } from '@/hooks/useAuth';
 import { useBookWishlist } from '@/hooks/useBookWishlist';
-import { type Book, type BookCardProps } from '@/types/book';
+import { UserService } from '@/services/api';
+import { addCart } from '@/store/features/cartSlice';
+import { type WishlistBook, toggleWishlist } from '@/store/features/wishlistSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { type BookCardProps } from '@/types/book';
+import { addGuestCart } from '@/utils/cartStorage';
 import { getImageUrl } from '@/utils/image';
-import { handleToggleFavorite, isBookInGuestWishlist } from '@/utils/wishlist';
+import { toggleGuestWishlist } from '@/utils/wishlistStorage';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 export type { Book } from '@/types/book';
@@ -27,16 +33,109 @@ type TextLike =
 export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
     const { t } = useTranslation();
     const router = useRouter();
+    const queryClient = useQueryClient();
+    const dispatch = useAppDispatch();
+    const isBookInCart = useAppSelector((state) => state.cart.items.some((item) => item.book._id === book._id));
 
-    const {
-        isBookmarked,
-        setIsBookmarked,
-        favoriteLoading,
-        setFavoriteLoading,
-        user,
-        updateWishlistCount,
-        syncWishlist
-    } = useBookWishlist(book);
+    const addCartMutation = useMutation({
+        mutationFn: async (data: { productId: string; quantity: number }) => {
+            await UserService.addToCart(data);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['cart'] });
+            toast.success('savatga qoshildi');
+        }
+    });
+
+    const wishlistMutation = useMutation({
+        mutationFn: ({ bookId, shouldRemove }: { bookId: string; shouldRemove: boolean }) => {
+            return shouldRemove ? UserService.removeWishlist(bookId) : UserService.toggleWishlist(bookId);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['wishlist'] });
+        }
+    });
+
+    const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+
+        if (isBookInCart || addCartMutation.isPending) {
+            toast('Bu kitob savatda bor');
+            return;
+        }
+
+        const cartItem = {
+            book: {
+                _id: book._id,
+                title: book.title,
+                slug: book.slug,
+                price: book.price,
+                images: book.image ?? book.images?.[0] ?? '',
+                stock: book.stock ?? 0
+            },
+            quantity: 1
+        };
+
+        if (user) {
+            addCartMutation.mutate(
+                { productId: book._id, quantity: 1 },
+                {
+                    onSuccess: () => {
+                        dispatch(addCart(cartItem));
+                    }
+                }
+            );
+        } else {
+            addGuestCart([cartItem]);
+            dispatch(addCart(cartItem));
+            queryClient.invalidateQueries({ queryKey: ['cart'] });
+            toast.success('savatga qoshildi');
+        }
+    };
+
+    const handleWishlist = (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+
+        if (favoriteLoading || wishlistMutation.isPending) return;
+
+        const wishlistBook: WishlistBook = {
+            _id: book._id,
+            title: book.title,
+            slug: book.slug,
+            price: book.price,
+            images: book.images?.length ? book.images : book.image ? [book.image] : [],
+            stock: book.stock ?? 0
+        };
+        const previousBookmarked = isBookmarked;
+        const nextBookmarked = !previousBookmarked;
+
+        setIsBookmarked(nextBookmarked);
+        setFavoriteLoading(true);
+        onWishlistChange?.(book._id, nextBookmarked);
+        dispatch(toggleWishlist(wishlistBook));
+
+        if (user) {
+            wishlistMutation.mutate(
+                { bookId: book._id, shouldRemove: previousBookmarked },
+                {
+                    onError: () => {
+                        setIsBookmarked(previousBookmarked);
+                        onWishlistChange?.(book._id, previousBookmarked);
+                        dispatch(toggleWishlist(wishlistBook));
+                        toast.error('Wishlist yangilanmadi');
+                    },
+                    onSettled: () => {
+                        setFavoriteLoading(false);
+                    }
+                }
+            );
+        } else {
+            toggleGuestWishlist(wishlistBook);
+            setFavoriteLoading(false);
+        }
+    };
+
+    const { isBookmarked, setIsBookmarked, favoriteLoading, setFavoriteLoading, user } = useBookWishlist(book);
 
     const getText = (value: TextLike, fallback: string): string => {
         if (!value) return fallback;
@@ -49,8 +148,6 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
         return fallback;
     };
-
-    console.log(book)
 
     const getBookTitle = () => {
         return getText(book.title, "Noma'lum kitob");
@@ -71,32 +168,6 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
         router.push(bookHref);
     };
 
-    const toggleFavorite = async () => {
-        if (favoriteLoading) return;
-
-        const nextBookmarked = !isBookmarked;
-        setIsBookmarked(nextBookmarked);
-        onWishlistChange?.(book._id, nextBookmarked);
-        setFavoriteLoading(true);
-
-        try {
-            const response = await handleToggleFavorite(book, user?.id ?? user?._id);
-            const nextWishlist = response?.data?.wishlist;
-
-            if (user && Array.isArray(nextWishlist)) {
-                syncWishlist(nextWishlist);
-            } else {
-                updateWishlistCount();
-            }
-        } catch (error) {
-            setIsBookmarked(!nextBookmarked);
-            onWishlistChange?.(book._id, !nextBookmarked);
-            console.error('Wishlist yangilanmadi:', error);
-        } finally {
-            setFavoriteLoading(false);
-        }
-    };
-
     return (
         <motion.div
             className='group relative flex h-full cursor-pointer flex-col rounded-xl border border-gray-100 bg-white px-3 pb-3 transition-all duration-300 hover:border-[#00a0e3]/20 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:border-[#ef7f1a]/30'
@@ -113,8 +184,8 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                             ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
                             : 'bg-white/90 text-gray-600 hover:bg-[#ef7f1a] hover:text-white dark:bg-slate-800/90 dark:text-gray-300 dark:hover:bg-orange-600'
                     }`}
-                    disabled={favoriteLoading}
-                    onClick={toggleFavorite}>
+                    disabled={favoriteLoading || wishlistMutation.isPending}
+                    onClick={handleWishlist}>
                     <Heart size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
                 </button>
 
@@ -173,9 +244,12 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                         </div>
 
                         <motion.button
+                            type='button'
                             className='flex transform items-center gap-1 rounded-xl bg-[#ef7f1a] p-2.5 text-white shadow-md transition-all hover:shadow-lg active:scale-90'
                             whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}>
+                            whileTap={{ scale: 0.95 }}
+                            disabled={addCartMutation.isPending}
+                            onClick={handleAddToCart}>
                             <ShoppingCart size={18} />
                             <span className='hidden font-medium md:inline'>{t('booksSection.basket')}</span>
                         </motion.button>

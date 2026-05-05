@@ -1,11 +1,33 @@
 import React from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserService } from '@/services/api';
+import { useQuery } from '@tanstack/react-query';
 
+import FormComment from './FormComment';
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
+
+type BookComment = {
+    _id?: string;
+    id?: string;
+    name?: string;
+    text?: string;
+    comment?: string;
+    content?: string;
+    message?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    user?:
+        | string
+        | {
+              name?: string;
+              email?: string;
+              avatar?: string;
+          };
+};
 
 type TabPanelProps = {
+    bookId?: string;
     description?: string;
     author?: string;
     category?: string;
@@ -16,7 +38,76 @@ type TabPanelProps = {
     reviewsCount?: number;
 };
 
+const getCommentList = (data: unknown): BookComment[] => {
+    if (Array.isArray(data)) return data;
+
+    if (data && typeof data === 'object') {
+        const value = data as {
+            comment?: BookComment[] | BookComment;
+            comments?: BookComment[];
+            items?: BookComment[];
+            docs?: BookComment[];
+            results?: BookComment[];
+            data?:
+                | BookComment[]
+                | {
+                      comment?: BookComment[] | BookComment;
+                      comments?: BookComment[];
+                      items?: BookComment[];
+                      docs?: BookComment[];
+                      results?: BookComment[];
+                  };
+        };
+
+        if (Array.isArray(value.comment)) return value.comment;
+        if (value.comment && typeof value.comment === 'object') return [value.comment];
+        if (Array.isArray(value.comments)) return value.comments;
+        if (Array.isArray(value.items)) return value.items;
+        if (Array.isArray(value.docs)) return value.docs;
+        if (Array.isArray(value.results)) return value.results;
+        if (Array.isArray(value.data)) return value.data;
+
+        if (value.data && typeof value.data === 'object') {
+            if (Array.isArray(value.data.comment)) return value.data.comment;
+            if (value.data.comment && typeof value.data.comment === 'object') return [value.data.comment];
+            if (Array.isArray(value.data.comments)) return value.data.comments;
+            if (Array.isArray(value.data.items)) return value.data.items;
+            if (Array.isArray(value.data.docs)) return value.data.docs;
+            if (Array.isArray(value.data.results)) return value.data.results;
+        }
+    }
+
+    return [];
+};
+
+const getCommentAuthor = (comment: BookComment) => {
+    if (comment.name) return comment.name;
+    if (comment.user && typeof comment.user === 'object')
+        return comment.user.name || comment.user.email || 'Foydalanuvchi';
+
+    return 'Foydalanuvchi';
+};
+
+const getCommentText = (comment: BookComment) =>
+    comment.text || comment.comment || comment.content || comment.message || '';
+
+const getCommentInitial = (name: string) => name.trim().charAt(0).toUpperCase() || 'F';
+
+const formatCommentDate = (date?: string) => {
+    if (!date) return 'Yangi izoh';
+
+    const parsedDate = new Date(date);
+    if (Number.isNaN(parsedDate.getTime())) return 'Yangi izoh';
+
+    return parsedDate.toLocaleDateString('uz-UZ', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+};
+
 const TabPanel = ({
+    bookId,
     description,
     author,
     category,
@@ -26,6 +117,15 @@ const TabPanel = ({
     year,
     reviewsCount
 }: TabPanelProps) => {
+    const { data: commentsData, isLoading: commentsLoading } = useQuery({
+        queryKey: ['comments', bookId],
+        queryFn: () => UserService.getComments(bookId!),
+        enabled: !!bookId
+    });
+
+    const comments = getCommentList(commentsData);
+    const totalComments = commentsData ? comments.length : reviewsCount || 0;
+
     return (
         <motion.section
             initial={{ opacity: 0, y: 16 }}
@@ -121,27 +221,77 @@ const TabPanel = ({
                         </div>
 
                         <div className='rounded-2xl bg-slate-50 p-4 text-center dark:bg-slate-950/60'>
-                            <p className='text-2xl font-black text-slate-900 dark:text-white'>{reviewsCount || 0}</p>
+                            <p className='text-2xl font-black text-slate-900 dark:text-white'>{totalComments}</p>
                             <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>Jami izoh</p>
                         </div>
                     </div>
 
                     <div className='mt-6 space-y-4'>
-                        <div className='rounded-2xl border border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/60'>
-                            <div className='flex items-center justify-between gap-3'>
-                                <div>
-                                    <p className='font-bold text-slate-900 dark:text-white'>Foydalanuvchi izohi</p>
-                                    <p className='text-sm text-slate-500 dark:text-slate-400'>Namuna ko‘rinish</p>
-                                </div>
-                                <div className='inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow-sm dark:bg-slate-900 dark:text-slate-200'>
-                                    <Star size={14} className='fill-yellow-400 text-yellow-400' />
-                                    5.0
-                                </div>
+                        {bookId ? <FormComment bookId={bookId} /> : null}
+
+                        {commentsLoading ? (
+                            <div className='space-y-3'>
+                                {Array.from({ length: 2 }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className='animate-pulse rounded-2xl border border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/60'>
+                                        <div className='flex items-center gap-3'>
+                                            <div className='size-10 rounded-2xl bg-slate-200 dark:bg-slate-800' />
+                                            <div className='space-y-2'>
+                                                <div className='h-4 w-36 rounded-full bg-slate-200 dark:bg-slate-800' />
+                                                <div className='h-3 w-24 rounded-full bg-slate-200 dark:bg-slate-800' />
+                                            </div>
+                                        </div>
+                                        <div className='mt-4 h-4 w-full rounded-full bg-slate-200 dark:bg-slate-800' />
+                                        <div className='mt-2 h-4 w-2/3 rounded-full bg-slate-200 dark:bg-slate-800' />
+                                    </div>
+                                ))}
                             </div>
-                            <p className='mt-4 leading-7 text-slate-600 dark:text-slate-300'>
-                                Juda qulay o‘qiladigan nashr. Sifatli bosilgan va sovg‘a uchun ham mos ko‘rinadi.
-                            </p>
-                        </div>
+                        ) : comments.length ? (
+                            <div className='space-y-3'>
+                                {comments.map((comment, index) => {
+                                    const authorName = getCommentAuthor(comment);
+                                    const commentText = getCommentText(comment);
+
+                                    return (
+                                        <div
+                                            key={comment._id || comment.id || `${authorName}-${index}`}
+                                            className='rounded-2xl border border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950/60'>
+                                            <div className='flex items-start justify-between gap-3'>
+                                                <div className='flex min-w-0 items-center gap-3'>
+                                                    <span className='flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#ef7f1a]/10 text-sm font-black text-[#ef7f1a] dark:bg-white/10 dark:text-orange-300'>
+                                                        {getCommentInitial(authorName)}
+                                                    </span>
+                                                    <div className='min-w-0'>
+                                                        <p className='truncate font-bold text-slate-900 dark:text-white'>
+                                                            {authorName}
+                                                        </p>
+                                                        <p className='text-sm text-slate-500 dark:text-slate-400'>
+                                                            {formatCommentDate(comment.createdAt || comment.updatedAt)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p className='mt-4 leading-7 whitespace-pre-line text-slate-600 dark:text-slate-300'>
+                                                {commentText}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className='rounded-2xl border border-dashed border-orange-200 bg-orange-50/60 p-6 text-center dark:border-slate-800 dark:bg-slate-950/60'>
+                                <div className='mx-auto flex size-12 items-center justify-center rounded-2xl bg-white text-xl font-black text-[#ef7f1a] shadow-sm dark:bg-slate-900 dark:text-orange-300'>
+                                    0
+                                </div>
+                                <h3 className='mt-4 text-lg font-black text-slate-900 dark:text-white'>
+                                    Hozircha izohlar yo'q
+                                </h3>
+                                <p className='mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400'>
+                                    Bu kitob haqida birinchi fikrni siz qoldirishingiz mumkin.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </TabsContent>
             </Tabs>

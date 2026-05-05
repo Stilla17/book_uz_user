@@ -4,12 +4,16 @@ import React, { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { UserService, api } from '@/services/api';
+import { addCart } from '@/store/features/cartSlice';
+import { useAppDispatch } from '@/store/hooks';
+import { addGuestCart } from '@/utils/cartStorage';
+import { getImageUrl } from '@/utils/image';
+import { getWishlistFromLocalStorage, removeGuestWishlist } from '@/utils/wishlistStorage';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -44,15 +48,19 @@ import { toast } from 'react-hot-toast';
 
 interface WishlistBook {
     _id: string;
-    title: {
-        uz: string;
-        ru?: string;
-        en?: string;
-    };
-    author?: {
-        name: string;
-        _id?: string;
-    };
+    title:
+        | string
+        | {
+              uz: string;
+              ru?: string;
+              en?: string;
+          };
+    author?:
+        | string
+        | {
+              name: string;
+              _id?: string;
+          };
     price: number;
     oldPrice?: number;
     ratingAvg?: number;
@@ -65,8 +73,8 @@ interface WishlistBook {
 }
 
 export default function WishlistPage() {
-    const router = useRouter();
-    const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+    const { isAuthenticated, isLoading: authLoading } = useAuth();
+    const dispatch = useAppDispatch();
 
     const [loading, setLoading] = useState(true);
     const [wishlist, setWishlist] = useState<WishlistBook[]>([]);
@@ -78,13 +86,8 @@ export default function WishlistPage() {
     useEffect(() => {
         if (authLoading) return;
 
-        if (!isAuthenticated) {
-            router.push('/auth/login?redirect=/wishlist');
-            return;
-        }
-
         loadWishlist();
-    }, [isAuthenticated, authLoading, router]);
+    }, [isAuthenticated, authLoading]);
 
     useEffect(() => {
         if (wishlist.length > 0) {
@@ -99,6 +102,11 @@ export default function WishlistPage() {
     const loadWishlist = async () => {
         try {
             setLoading(true);
+            if (!isAuthenticated) {
+                setWishlist(getWishlistFromLocalStorage() as WishlistBook[]);
+                return;
+            }
+
             const response = await UserService.getWishlist();
 
             if (response?.success) {
@@ -117,6 +125,14 @@ export default function WishlistPage() {
     const handleRemoveFromWishlist = async (productId: string) => {
         try {
             setRemovingItems((prev) => [...prev, productId]);
+            if (!isAuthenticated) {
+                removeGuestWishlist(productId);
+                setWishlist(wishlist.filter((book) => book._id !== productId));
+                setSelectedItems(selectedItems.filter((id) => id !== productId));
+                toast.success("Sevimlilardan o'chirildi");
+                return;
+            }
+
             const response = await UserService.toggleWishlist(productId);
 
             if (response?.success) {
@@ -137,6 +153,18 @@ export default function WishlistPage() {
         try {
             setRemovingItems(selectedItems);
 
+            if (!isAuthenticated) {
+                for (const id of selectedItems) {
+                    removeGuestWishlist(id);
+                }
+
+                setWishlist(wishlist.filter((book) => !selectedItems.includes(book._id)));
+                setSelectedItems([]);
+                setSelectAll(false);
+                toast.success(`${selectedItems.length} ta kitob sevimlilardan o'chirildi`);
+                return;
+            }
+
             for (const id of selectedItems) {
                 await UserService.toggleWishlist(id);
             }
@@ -154,6 +182,28 @@ export default function WishlistPage() {
 
     const handleAddToCart = async (bookId: string) => {
         try {
+            const book = wishlist.find((item) => item._id === bookId);
+            if (!book) return;
+
+            if (!isAuthenticated) {
+                const cartItem = {
+                    book: {
+                        _id: book._id,
+                        title: book.title,
+                        slug: book.slug,
+                        price: book.price,
+                        images: book.images?.[0] ?? '',
+                        stock: book.inStock === false ? 0 : 1
+                    },
+                    quantity: 1
+                };
+
+                addGuestCart([cartItem]);
+                dispatch(addCart(cartItem));
+                toast.success("Savatga qo'shildi");
+                return;
+            }
+
             await api.post('/cart/add', { productId: bookId, quantity: 1 });
             toast.success("Savatga qo'shildi");
         } catch (error: any) {
@@ -165,6 +215,30 @@ export default function WishlistPage() {
         if (selectedItems.length === 0) return;
 
         try {
+            if (!isAuthenticated) {
+                selectedItems.forEach((id) => {
+                    const book = wishlist.find((item) => item._id === id);
+                    if (!book) return;
+
+                    const cartItem = {
+                        book: {
+                            _id: book._id,
+                            title: book.title,
+                            slug: book.slug,
+                            price: book.price,
+                            images: book.images?.[0] ?? '',
+                            stock: book.inStock === false ? 0 : 1
+                        },
+                        quantity: 1
+                    };
+
+                    addGuestCart([cartItem]);
+                    dispatch(addCart(cartItem));
+                });
+                toast.success(`${selectedItems.length} ta kitob savatga qo'shildi`);
+                return;
+            }
+
             for (const id of selectedItems) {
                 await api.post('/cart/add', { productId: id, quantity: 1 });
             }
@@ -178,6 +252,27 @@ export default function WishlistPage() {
         if (wishlist.length === 0) return;
 
         try {
+            if (!isAuthenticated) {
+                wishlist.forEach((book) => {
+                    const cartItem = {
+                        book: {
+                            _id: book._id,
+                            title: book.title,
+                            slug: book.slug,
+                            price: book.price,
+                            images: book.images?.[0] ?? '',
+                            stock: book.inStock === false ? 0 : 1
+                        },
+                        quantity: 1
+                    };
+
+                    addGuestCart([cartItem]);
+                    dispatch(addCart(cartItem));
+                });
+                toast.success(`${wishlist.length} ta kitob savatga qo'shildi`);
+                return;
+            }
+
             for (const book of wishlist) {
                 await api.post('/cart/add', { productId: book._id, quantity: 1 });
             }
@@ -206,6 +301,7 @@ export default function WishlistPage() {
     };
 
     const getBookTitle = (book: WishlistBook): string => {
+        if (typeof book.title === 'string') return book.title;
         return book.title?.uz || book.title?.ru || book.title?.en || "Noma'lum";
     };
 
@@ -215,10 +311,7 @@ export default function WishlistPage() {
     };
 
     const getBookImage = (book: WishlistBook): string => {
-        if (book.images && book.images.length > 0 && book.images[0]) {
-            return book.images[0];
-        }
-        return 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887';
+        return getImageUrl(book.images);
     };
 
     const getFormatIcon = (format?: string) => {
@@ -267,10 +360,6 @@ export default function WishlistPage() {
                 </div>
             </div>
         );
-    }
-
-    if (!isAuthenticated) {
-        return null;
     }
 
     return (

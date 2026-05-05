@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { UserBanner, userBannerService } from '@/services/userBanner.service';
 
 import { motion } from 'framer-motion';
-import { Award, BookOpen, Headphones, Sparkles } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
@@ -17,8 +17,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 export const Hero = () => {
     const [banners, setBanners] = useState<UserBanner[]>([]);
     const [loading, setLoading] = useState(true);
-    const [mounted, setMounted] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(0);
 
     const { i18n } = useTranslation();
 
@@ -36,13 +34,11 @@ export const Hero = () => {
     };
 
     useEffect(() => {
-        setMounted(true);
         fetchBanners();
     }, []);
 
     // Banner ko'rilganligini qayd etish
     const handleSlideChange = (swiper: any) => {
-        setActiveIndex(swiper.realIndex);
         if (banners[swiper.realIndex]) {
             userBannerService.trackView(banners[swiper.realIndex]._id);
         }
@@ -55,12 +51,6 @@ export const Hero = () => {
             window.location.href = link;
         }
     };
-
-    // if (!mounted) {
-    //     return (
-    //         <section className='relative h-100 w-full bg-gradient-to-r from-[#005CB9] to-[#FF8A00] sm:h-[500px] lg:h-[600px] dark:from-blue-600 dark:to-orange-600' />
-    //     );
-    // }
 
     if (loading || banners.length === 0) {
         return (
@@ -78,14 +68,6 @@ export const Hero = () => {
         if (!field) return '';
 
         return field[currentLanguage] || field.uz || field.ru || field.en || '';
-    };
-
-    const getBadgeIcon = (badge: string) => {
-        if (badge?.toLowerCase().includes('chegirma'))
-            return <Sparkles size={16} className='text-[#FF8A00] dark:text-orange-400' />;
-        if (badge?.toLowerCase().includes('audio'))
-            return <Headphones size={16} className='text-[#005CB9] dark:text-blue-400' />;
-        return <Award size={16} className='text-[#FF8A00] dark:text-orange-400' />;
     };
 
     return (
@@ -142,51 +124,6 @@ export const Hero = () => {
                                 className='relative flex h-full items-center justify-center px-4 sm:px-6 lg:px-8'
                                 style={{ color: banner.textColor || '#ffffff' }}>
                                 <div className='mx-auto max-w-4xl text-center'>
-                                    {/* Badge */}
-                                    {getLocalizedText(banner.badge) && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.6, delay: 0.2 }}
-                                            className='mb-4 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-3 py-1.5 backdrop-blur-md sm:mb-6 sm:px-4 sm:py-2'>
-                                            {getBadgeIcon(getLocalizedText(banner.badge))}
-                                            <span className='text-xs font-bold text-white sm:text-sm'>
-                                                {getLocalizedText(banner.badge)}
-                                            </span>
-                                        </motion.div>
-                                    )}
-
-                                    {/* Subtitle */}
-                                    {getLocalizedText(banner.subtitle) && (
-                                        <motion.span
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.6, delay: 0.3 }}
-                                            className='mb-2 block text-xs font-light tracking-[0.2em] text-white/90 uppercase sm:mb-3 sm:text-sm md:text-base'>
-                                            {getLocalizedText(banner.subtitle)}
-                                        </motion.span>
-                                    )}
-
-                                    {/* Title */}
-                                    <motion.h1
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.6, delay: 0.4 }}
-                                        className='mb-3 px-2 text-2xl font-black sm:mb-4 sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl'>
-                                        {getLocalizedText(banner.title)}
-                                    </motion.h1>
-
-                                    {/* Description */}
-                                    {getLocalizedText(banner.description) && (
-                                        <motion.p
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.6, delay: 0.5 }}
-                                            className='mx-auto mb-6 line-clamp-2 max-w-2xl px-4 text-sm text-white/90 opacity-90 sm:mb-8 sm:line-clamp-3 sm:text-base md:text-lg lg:text-xl'>
-                                            {getLocalizedText(banner.description)}
-                                        </motion.p>
-                                    )}
-
                                     {/* CTA Buttons */}
                                     {getLocalizedText(banner.buttonText) && (
                                         <motion.div

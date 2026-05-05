@@ -205,7 +205,6 @@ export const values = [
         description: "Har bir foydalanuvchimizni qadrlaymiz va ularning ehtiyojlarini birinchi o'ringa qo'yamiz.",
         descriptionRu: 'Мы ценим каждого пользователя и ставим их потребности на первое место.',
         descriptionEn: 'We value every user and prioritize their needs.',
-        color: 'from-[#00a0e3] to-[#ef7f1a]'
     },
     {
         icon: <Target size={24} />,
@@ -215,7 +214,6 @@ export const values = [
         description: 'Eng yuqori sifatli kitoblar va audio kontentni taqdim etamiz.',
         descriptionRu: 'Мы предоставляем книги и аудиоконтент высочайшего качества.',
         descriptionEn: 'We provide the highest quality books and audio content.',
-        color: 'from-[#00a0e3] to-[#4dc3ff]'
     },
     {
         icon: <Eye size={24} />,
@@ -225,7 +223,6 @@ export const values = [
         description: 'Doimiy ravishda yangi texnologiyalarni joriy qilamiz va xizmatlarimizni takomillashtiramiz.',
         descriptionRu: 'Мы постоянно внедряем новые технологии и улучшаем наши услуги.',
         descriptionEn: 'We constantly introduce new technologies and improve our services.',
-        color: 'from-[#ef7f1a] to-[#ff9f4d]'
     },
     {
         icon: <Shield size={24} />,
@@ -235,6 +232,5 @@ export const values = [
         description: "Ma'lumotlaringiz xavfsizligi va to'lovlar ishonchliligiga kafolat beramiz.",
         descriptionRu: 'Мы гарантируем безопасность ваших данных и надежность платежей.',
         descriptionEn: 'We guarantee the security of your data and reliability of payments.',
-        color: 'from-[#00a0e3] to-[#4dc3ff]'
     }
 ];

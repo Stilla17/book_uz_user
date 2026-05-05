@@ -1,130 +1,165 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Link from 'next/link';
 
 import AsideCart from '@/components/shared/AsideCart';
+import QuantityControl from '@/components/shared/QuantityControl';
+import { useBookCart } from '@/hooks/useBookCart';
+import { setLoading } from '@/store/features/globalSlice';
+import { useAppDispatch } from '@/store/hooks';
+import { getImageUrl } from '@/utils/image';
 
 import { motion } from 'framer-motion';
-import { ArrowLeft, Heart, Minus, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Trash2 } from 'lucide-react';
 
-const cartItems = [
-    {
-        id: '1',
-        title: 'Sariq devni minib',
-        author: "Xudoyberdi To'xtaboyev",
-        format: 'Qattiq muqova',
-        price: '45 000',
-        oldPrice: '60 000',
-        image: 'https://backend.book.uz/user-api/img/img-file-5a14f0417dee3390eddd4478f513e9ad.JPG'
-    }
-];
+const getTitle = (title: string | { uz?: string; ru?: string; en?: string }) => {
+    if (typeof title === 'string') return title;
+    return title.uz || title.ru || title.en || "Noma'lum kitob";
+};
 
 export default function CartPage() {
+    const dispatch = useAppDispatch();
+    const {
+        cartItems,
+        loadingCart,
+        authLoading,
+        isAuthenticated,
+        totalPrice,
+        totalQuantity,
+        updateQuantity,
+        removeItem,
+        clearItems
+    } = useBookCart();
+
+    useEffect(() => {
+        dispatch(setLoading(authLoading || loadingCart));
+
+        return () => {
+            dispatch(setLoading(false));
+        };
+    }, [authLoading, dispatch, loadingCart]);
+
+    if (authLoading || loadingCart) return null;
+
     return (
-        <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(239,127,26,0.16),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.08),_transparent_32%),linear-gradient(180deg,_#fffaf5_0%,_#fff_48%,_#f8fafc_100%)] py-8 dark:bg-[radial-gradient(circle_at_top_left,_rgba(239,127,26,0.10),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(59,130,246,0.08),_transparent_30%),linear-gradient(180deg,_#0f172a_0%,_#111827_50%,_#0b1220_100%)]'>
+        <div className='min-h-screen bg-slate-50 py-6 sm:py-8 dark:bg-slate-950'>
             <div className='container mx-auto max-w-7xl px-4'>
+                <div className='mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-slate-800'>
+                    <div>
+                        <p className='text-sm font-bold text-[#ef7f1a]'>Savat</p>
+                        <h1 className='mt-2 text-2xl font-black text-slate-950 sm:text-3xl dark:text-white'>
+                            Tanlangan kitoblar
+                        </h1>
+                        <p className='mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400'>
+                            Miqdorni tekshiring, kerak bo'lmagan kitoblarni olib tashlang va checkoutga o'ting.
+                        </p>
+                    </div>
+
+                    <div className='inline-flex w-fit items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200'>
+                        <ShoppingBag className='size-5 text-[#ef7f1a]' />
+                        {totalQuantity} ta mahsulot
+                    </div>
+                </div>
+
                 <div className='grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]'>
                     <motion.section
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.05 }}
                         className='space-y-4'>
-                        <div className='flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-orange-100 bg-white/85 p-4 shadow-lg shadow-orange-100/50 backdrop-blur dark:border-slate-700 dark:bg-slate-900/70 dark:shadow-none'>
-                            <Link
-                                href='/catalog'
-                                className='inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-orange-200 hover:text-[#ef7f1a] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200'>
-                                <ArrowLeft size={16} />
-                                Xaridni davom ettirish
-                            </Link>
+                        <div className='flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
+                            <div className='flex flex-wrap items-center gap-3'>
+                                <Link
+                                    href='/catalog'
+                                    className='inline-flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-orange-200 hover:text-[#ef7f1a] dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200'>
+                                    <ArrowLeft size={16} />
+                                    Xaridni davom ettirish
+                                </Link>
+                                <span className='rounded-full bg-orange-50 px-3 py-1 text-sm font-bold text-[#ef7f1a] dark:bg-slate-800 dark:text-orange-300'>
+                                    {isAuthenticated ? 'Server cart' : 'Guest cart'}
+                                </span>
+                            </div>
 
-                            <div className='flex flex-wrap items-center gap-2'>
+                            {cartItems.length > 0 && (
                                 <button
                                     type='button'
-                                    className='inline-flex items-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300'>
+                                    onClick={clearItems}
+                                    className='inline-flex h-11 items-center gap-2 rounded-xl bg-rose-50 px-4 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300'>
                                     <Trash2 size={16} />
                                     Hammasini tozalash
                                 </button>
-                            </div>
+                            )}
                         </div>
 
-                        {cartItems.map((item, index) => (
-                            <motion.article
-                                key={item.id}
-                                initial={{ opacity: 0, y: 18 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.08 + index * 0.05 }}
-                                className='rounded-[30px] border border-orange-100 bg-white/90 p-4 shadow-lg shadow-orange-100/50 backdrop-blur dark:border-slate-700 dark:bg-slate-900/75 dark:shadow-none'>
-                                <div className='flex flex-col gap-5 md:flex-row'>
-                                    <div className='mx-auto flex h-52 w-full max-w-40 items-center justify-center overflow-hidden rounded-[24px] bg-gradient-to-br from-orange-50 via-white to-amber-50 p-4 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950'>
-                                        <img
-                                            src={item.image}
-                                            alt={item.title}
-                                            className='h-full w-full object-contain'
-                                        />
-                                    </div>
-
-                                    <div className='flex min-w-0 flex-1 flex-col justify-between gap-5'>
-                                        <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
-                                            <div className='min-w-0'>
-                                                <div className='inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-[#ef7f1a] dark:bg-slate-800 dark:text-orange-300'>
-                                                    {item.format}
-                                                </div>
-                                                <h2 className='mt-3 text-2xl font-black text-slate-900 dark:text-white'>
-                                                    {item.title}
-                                                </h2>
-                                                <p className='mt-2 text-sm text-slate-500 dark:text-slate-400'>
-                                                    {item.author}
-                                                </p>
-                                            </div>
-
-                                            <div className='rounded-2xl bg-slate-50 px-4 py-3 text-left lg:text-right dark:bg-slate-800/70'>
-                                                <p className='mt-1 text-2xl font-black text-[#ef7f1a]'>
-                                                    {item.price} so'm
-                                                </p>
-                                            </div>
+                        {cartItems.length > 0 ? (
+                            cartItems.map((item, index) => (
+                                <motion.article
+                                    key={item.book._id}
+                                    initial={{ opacity: 0, y: 18 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.08 + index * 0.05 }}
+                                    className='rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
+                                    <div className='flex flex-col gap-5 md:flex-row md:items-center'>
+                                        <div className='mx-auto flex h-44 w-full max-w-36 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-4 md:mx-0 dark:bg-slate-950'>
+                                            <img
+                                                src={getImageUrl(item.book.images)}
+                                                alt={getTitle(item.book.title)}
+                                                className='h-full w-full object-contain'
+                                            />
                                         </div>
 
-                                        <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
-                                            <div className='inline-flex w-fit items-center gap-1.5 rounded-2xl border border-slate-200 bg-slate-50 p-1.5 dark:border-slate-700 dark:bg-slate-950'>
-                                                <button
-                                                    type='button'
-                                                    className='flex h-11 w-11 items-center justify-center rounded-xl text-slate-600 transition hover:bg-white hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-800'>
-                                                    <Minus size={18} />
-                                                </button>
-                                                <div className='flex h-11 min-w-16 items-center justify-center rounded-xl bg-white px-4 text-lg font-black text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white'>
-                                                    1
+                                        <div className='flex min-w-0 flex-1 flex-col justify-between gap-5'>
+                                            <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
+                                                <div className='min-w-0'>
+                                                    <h2 className='text-xl leading-7 font-black text-slate-900 dark:text-white'>
+                                                        {getTitle(item.book.title)}
+                                                    </h2>
+                                                    <p className='mt-2 text-sm font-semibold text-slate-500 dark:text-slate-400'>
+                                                        Omborda: {item.book.stock || 0} ta
+                                                    </p>
                                                 </div>
-                                                <button
-                                                    type='button'
-                                                    className='flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white transition hover:bg-[#ef7f1a] dark:bg-white dark:text-slate-900'>
-                                                    <Plus size={18} />
-                                                </button>
+
+                                                <div className='rounded-xl bg-slate-50 px-4 py-3 text-left lg:text-right dark:bg-slate-950'>
+                                                    <p className='text-xl font-black text-[#ef7f1a]'>
+                                                        {item.book.price.toLocaleString()} so'm
+                                                    </p>
+                                                </div>
                                             </div>
 
-                                            <div className='flex flex-wrap items-center gap-3'>
+                                            <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
+                                                <QuantityControl
+                                                    quantity={item.quantity}
+                                                    min={1}
+                                                    max={item.book.stock || undefined}
+                                                    onDecrement={() => updateQuantity(item.book._id, item.quantity - 1)}
+                                                    onIncrement={() => updateQuantity(item.book._id, item.quantity + 1)}
+                                                />
+
                                                 <button
                                                     type='button'
-                                                    className='inline-flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200'>
-                                                    <Heart size={16} />
-                                                    Sevimliga saqlash
-                                                </button>
-                                                <button
-                                                    type='button'
-                                                    className='inline-flex items-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300'>
+                                                    onClick={() => removeItem(item.book._id)}
+                                                    className='inline-flex h-11 w-fit items-center gap-2 rounded-xl bg-rose-50 px-4 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300'>
                                                     <Trash2 size={16} />
                                                     Olib tashlash
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </motion.article>
-                        ))}
+                                </motion.article>
+                            ))
+                        ) : (
+                            <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
+                                <h2 className='text-2xl font-black text-slate-900 dark:text-white'>Savat bo'sh</h2>
+                                <p className='mt-2 text-sm text-slate-500 dark:text-slate-400'>
+                                    Katalogdan kitob qo'shsangiz, shu yerda ko'rinadi.
+                                </p>
+                            </div>
+                        )}
                     </motion.section>
 
-                    <AsideCart />
+                    <AsideCart totalPrice={totalPrice} totalQuantity={totalQuantity} />
                 </div>
             </div>
         </div>

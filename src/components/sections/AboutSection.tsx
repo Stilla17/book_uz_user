@@ -1,32 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { BranchMap } from '@/components/map/Map';
 import { branchLocations } from '@/components/map/branches';
 
-import { motion } from 'framer-motion';
-import {
-    Award,
-    Book,
-    BookHeadphones,
-    BookOpen,
-    Building2,
-    Cloud,
-    Coffee,
-    Compass,
-    Crown,
-    Flower2,
-    Gem,
-    Heart,
-    MapPin,
-    Moon,
-    Sparkles,
-    Star,
-    Sun,
-    Truck,
-    Zap
-} from 'lucide-react';
+import { Award, Book, BookHeadphones, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
 
 export const AboutSection = () => {
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);

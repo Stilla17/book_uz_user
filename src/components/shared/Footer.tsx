@@ -1,9 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
-import PaymentMethodLogo from '../PaymentIcons/PaymentMethodLogo';
 import { motion } from 'framer-motion';
 import { ArrowUp, Facebook, Instagram, Mail, MapPin, Phone, Send, Youtube } from 'lucide-react';
 
@@ -191,22 +189,6 @@ export const Footer = () => {
                                 <div className='text-xs font-bold text-nowrap text-white'>Toshkent, Chilonzor</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* Payment Methods */}
-                <div className='mb-6'>
-                    <div className='mb-3 text-center text-[10px] font-bold tracking-[0.24em] text-slate-500 uppercase'>
-                        To'lov tizimlari
-                    </div>
-                    <div className='flex flex-wrap justify-center gap-3'>
-                        {paymentMethods.map((payment) => (
-                            <div
-                                key={payment}
-                                className='group flex h-12 min-w-19.5 items-center justify-center rounded-xl px-3 transition-all'>
-                                <PaymentMethodLogo name={payment} />
-                            </div>
-                        ))}
                     </div>
                 </div>
 

@@ -89,7 +89,6 @@ export const userBannerService = {
         url += `?type=${type}`;
       }
       const response = await api.get(url);
-      console.log(response);
 
       return response.data.data || [];
     } catch (error) {

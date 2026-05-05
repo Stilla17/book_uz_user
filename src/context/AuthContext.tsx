@@ -1,25 +1,22 @@
 'use client';
 
-import React, { type ReactNode, createContext, useCallback, useEffect, useReducer } from 'react';
+import React, { type ReactNode, createContext, useEffect, useReducer } from 'react';
 
 import { AuthServiceAPI, UserService } from '@/services/api';
+import { type CartItem, setCart } from '@/store/features/cartSlice';
+import { type WishlistBook, setWishlist } from '@/store/features/wishlistSlice';
+import { useAppDispatch } from '@/store/hooks';
 import type { AuthAction, AuthContextType, AuthState } from '@/types/auth.types';
-import { clearGuestWishlist, getGuestWishlist, getGuestWishlistProductIds } from '@/utils/wishlist';
+import { clearGuestCart, getCartFromLocalStotage } from '@/utils/cartStorage';
+import { clearGuestWishlist, getWishlistFromLocalStorage } from '@/utils/wishlistStorage';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const initialState: AuthState = {
     user: null,
     isAuthenticated: false,
-    isLoading: true,
-    wishlistCount: 0
+    isLoading: true
 };
-
-const getGuestWishlistCount = () => {
-    return getGuestWishlist().length;
-};
-
-const getUserWishlistCount = (user: AuthState['user']) => user?.wishlist?.length ?? 0;
 
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
     switch (action.type) {
@@ -29,45 +26,146 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
             return {
                 user: action.payload,
                 isAuthenticated: Boolean(action.payload),
-                isLoading: false,
-                wishlistCount: action.payload ? getUserWishlistCount(action.payload) : getGuestWishlistCount()
+                isLoading: false
             };
         case 'AUTH_FAILURE':
             return {
                 ...state,
                 user: null,
                 isAuthenticated: false,
-                isLoading: false,
-                wishlistCount: getGuestWishlistCount()
+                isLoading: false
             };
         case 'LOGOUT':
-            return { user: null, isAuthenticated: false, isLoading: false, wishlistCount: getGuestWishlistCount() };
-        case 'SET_WISHLIST_COUNT':
-            return { ...state, wishlistCount: action.payload };
-        case 'SYNC_WISHLIST':
-            return {
-                ...state,
-                user: state.user ? { ...state.user, wishlist: action.payload } : state.user,
-                wishlistCount: action.payload.length
-            };
+            return { user: null, isAuthenticated: false, isLoading: false };
         default:
             return state;
     }
 };
 
+const getResponseData = (response: any) => response?.data?.data ?? response?.data ?? response;
+
+const getArrayData = (response: any) => {
+    const data = getResponseData(response);
+
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.items)) return data.items;
+    if (Array.isArray(data?.products)) return data.products;
+    if (Array.isArray(data?.wishlist)) return data.wishlist;
+
+    return [];
+};
+
+const normalizeCartItem = (item: any): CartItem | null => {
+    const book = item?.book ?? item?.product ?? item?.productId ?? item;
+    if (!book || typeof book !== 'object' || !book._id) return null;
+
+    return {
+        book: {
+            _id: book._id,
+            title: book.title ?? "Noma'lum kitob",
+            slug: book.slug,
+            price: item?.price ?? book.price ?? 0,
+            images: book.image ?? book.images?.[0] ?? '',
+            stock: book.stock ?? 0
+        },
+        quantity: item?.quantity ?? 1
+    };
+};
+
+const normalizeWishlistBook = (item: any): WishlistBook | null => {
+    const book = item?.book ?? item?.product ?? item;
+    if (!book || typeof book !== 'object' || !book._id) return null;
+
+    return {
+        _id: book._id,
+        title: book.title ?? "Noma'lum kitob",
+        slug: book.slug,
+        price: book.price ?? 0,
+        images: Array.isArray(book.images) ? book.images : book.image ? [book.image] : [],
+        stock: book.stock ?? 0
+    };
+};
+
+const isValidId = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0;
+
+const getCartItemProductId = (item: any) => {
+    if (typeof item?.productId === 'string') return item.productId;
+    if (typeof item?.product === 'string') return item.product;
+    if (typeof item?.book === 'string') return item.book;
+
+    return item?.book?._id ?? item?.product?._id ?? item?._id;
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
+    const reduxDispatch = useAppDispatch();
 
-    const updateWishlistCount = useCallback(() => {
-        dispatch({
-            type: 'SET_WISHLIST_COUNT',
-            payload: state.user ? getUserWishlistCount(state.user) : getGuestWishlistCount()
-        });
-    }, [state.user]);
+    const syncGuestData = async () => {
+        const guestCart = getCartFromLocalStotage();
+        const guestWishlist = getWishlistFromLocalStorage();
 
-    const syncWishlist = useCallback((wishlist: unknown[]) => {
-        dispatch({ type: 'SYNC_WISHLIST', payload: wishlist });
-    }, []);
+        let cartSynced = guestCart.length === 0;
+        let wishlistSynced = guestWishlist.length === 0;
+
+        try {
+            if (guestCart.length) {
+                const serverCartResponse = await UserService.getCart().catch(() => null);
+                const serverCartIds = new Set(
+                    getArrayData(serverCartResponse)
+                        .map((item: any) => getCartItemProductId(item))
+                        .filter(isValidId)
+                );
+                const cartItemsToSync = guestCart.filter(
+                    (item) => isValidId(item?.book?._id) && !serverCartIds.has(item.book._id)
+                );
+
+                const cartSyncResults = await Promise.allSettled(
+                    cartItemsToSync.map((item) => {
+                        const quantity = Number(item.quantity);
+
+                        return UserService.addToCart({
+                            productId: item.book._id,
+                            quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1
+                        });
+                    })
+                );
+                cartSynced = cartSyncResults.every((result) => result.status === 'fulfilled');
+            }
+
+            if (guestWishlist.length) {
+                const bookIds = guestWishlist.map((book) => book._id).filter(isValidId);
+
+                try {
+                    await UserService.syncWishlist(bookIds);
+                    wishlistSynced = true;
+                } catch {
+                    const wishlistSyncResults = await Promise.allSettled(
+                        bookIds.map((bookId) => UserService.addWishlist(bookId))
+                    );
+
+                    wishlistSynced = wishlistSyncResults.every((result) => result.status === 'fulfilled');
+                }
+            }
+        } catch (error) {
+            console.error("Guest ma'lumotlarini serverga yuborishda xatolik:", error);
+        }
+
+        const [cartResponse, wishlistResponse] = await Promise.allSettled([
+            UserService.getCart(),
+            UserService.getWishlist()
+        ]);
+
+        if (cartResponse.status === 'fulfilled') {
+            reduxDispatch(setCart(getArrayData(cartResponse.value).map(normalizeCartItem).filter(Boolean)));
+        }
+
+        if (wishlistResponse.status === 'fulfilled') {
+            reduxDispatch(setWishlist(getArrayData(wishlistResponse.value).map(normalizeWishlistBook).filter(Boolean)));
+        }
+
+        if (cartSynced) clearGuestCart();
+        if (wishlistSynced) clearGuestWishlist();
+    };
 
     useEffect(() => {
         const initAuth = async () => {
@@ -75,18 +173,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             try {
                 const res = await AuthServiceAPI.refresh();
                 if (res && res.success && res.data) {
-                    const guestProductIds = getGuestWishlistProductIds();
-                    let nextUser = res.data.user;
-
-                    if (guestProductIds.length) {
-                        const mergeResponse = await UserService.mergeWishlist(guestProductIds);
-                        if (mergeResponse?.success) {
-                            nextUser = { ...nextUser, wishlist: mergeResponse.data };
-                            clearGuestWishlist();
-                        }
-                    }
-
-                    dispatch({ type: 'AUTH_SUCCESS', payload: nextUser });
+                    await syncGuestData();
+                    dispatch({ type: 'AUTH_SUCCESS', payload: res.data.user });
                 } else {
                     dispatch({ type: 'AUTH_FAILURE' });
                 }
@@ -98,17 +186,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         initAuth();
     }, []);
 
-    useEffect(() => {
-        updateWishlistCount();
-    }, [updateWishlistCount]);
-
     const login = async (email: string, password: string) => {
         dispatch({ type: 'AUTH_START' });
         try {
-            const productIds = getGuestWishlistProductIds();
-            const res = await AuthServiceAPI.login({ email, password, productIds });
+            const res = await AuthServiceAPI.login({ email, password });
             if (res.success && res.data) {
-                if (productIds.length) clearGuestWishlist();
+                await syncGuestData();
                 dispatch({ type: 'AUTH_SUCCESS', payload: res.data.user });
             }
         } catch (error: any) {
@@ -120,10 +203,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const register = async (userData: any) => {
         dispatch({ type: 'AUTH_START' });
         try {
-            const productIds = getGuestWishlistProductIds();
-            const res = await AuthServiceAPI.register({ ...userData, productIds });
+            const res = await AuthServiceAPI.register(userData);
             if (res.success && res.data) {
-                if (productIds.length) clearGuestWishlist();
+                await syncGuestData();
                 dispatch({ type: 'AUTH_SUCCESS', payload: res.data.user });
             }
         } catch (error: any) {
@@ -141,10 +223,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             dispatch({ type: 'LOGOUT' });
         }
     };
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-    return (
-        <AuthContext.Provider value={{ ...state, login, register, logout, updateWishlistCount, syncWishlist }}>
-            {children}
-        </AuthContext.Provider>
-    );
+
+    return <AuthContext.Provider value={{ ...state, login, register, logout }}>{children}</AuthContext.Provider>;
 };

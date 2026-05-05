@@ -3,7 +3,15 @@ import type { ReactNode } from 'react';
 export type { User, AuthAction, AuthContextType, AuthState } from './auth.types';
 export type { AuthorBannerData, Banner, BannerFormData, MultiLangField, QuoteBannerData } from './banner.types';
 export type { Book, BookCardProps, Product, Reply, Review, ReviewStats } from './book';
-export type { Category, CategoryFormData, FilterSelectGroup, FilterSelectOption, FilterSelectProps, SubCategory, SubCategoryFormData } from './category.types';
+export type {
+    Category,
+    CategoryFormData,
+    FilterSelectGroup,
+    FilterSelectOption,
+    FilterSelectProps,
+    SubCategory,
+    SubCategoryFormData
+} from './category.types';
 
 export interface ApiResponse<T = unknown> {
     success: boolean;
@@ -129,3 +137,25 @@ export interface Coupon {
 export type Theme = 'light' | 'dark';
 export type Language = 'uz' | 'ru' | 'en';
 export type Currency = 'UZS' | 'USD' | 'RUB';
+
+export type CreateCommentPayload = {
+    bookId: string;
+    name: string;
+    text: string;
+};
+
+export interface OrderPayload {
+    user?: string;
+    items: Array<{ product: string; quantity: number; priceAtTime: number }>;
+    guestName?: string;
+    description?: string;
+    totalAmount: number;
+    shippingAddress: {
+        city: string;
+        region: string;
+        street: string;
+        phone: string;
+    };
+    deliveryType: 'PICKUP' | 'DELIVERY' | 'POST';
+    paymentType: 'CASH' | 'CLICK' | 'UZUM' | 'PAYME' | 'XAZNA';
+}

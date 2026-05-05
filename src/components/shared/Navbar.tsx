@@ -20,7 +20,12 @@ import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQue
 import { useAuth } from '@/hooks/useAuth';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { getLocalizedCategoryName, getLocalizedTitle, getUserFirstName, getUserInitials } from '@/lib/navbar-utils';
-import { api } from '@/services/api';
+import { UserService, api } from '@/services/api';
+import { setCart } from '@/store/features/cartSlice';
+import { setWishlist } from '@/store/features/wishlistSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { getCartFromLocalStotage } from '@/utils/cartStorage';
+import { getWishlistFromLocalStorage } from '@/utils/wishlistStorage';
 
 import NavbarMobile from '../mobile/NavbarMobile';
 import NavIcon from './NavIcon';
@@ -34,25 +39,43 @@ import { useTranslation } from 'react-i18next';
 export const Navbar = () => {
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const [wishlistCount, setWishlistCount] = useState(0);
     const router = useRouter();
+    const dispatch = useAppDispatch();
     const [searchQuery, setSearchQuery] = useState('');
     const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
-    const { user, isAuthenticated, logout, wishlistCount } = useAuth();
+    const { user, isAuthenticated, logout } = useAuth();
     const { isDark, getBgColor, getTextColor, getBorderColor } = useThemeStyles();
 
     const { t, i18n } = useTranslation();
     const { data: categories = [] } = usePublicCategoriesQuery();
     const myBooksHref = '/my-books';
 
+    const countCartItems = useAppSelector(
+        (state) => state.cart.items.length
+        // state.cart.items.reduce((total, item) => total + item.quantity, 0)
+    );
+    const countWishlistItems = useAppSelector((state) => state.wishlist.items.length);
+    const cartDisplayCount = countCartItems;
+    const wishlistDisplayCount = countWishlistItems;
+
     // Savatdagi mahsulotlar sonini olish
     useEffect(() => {
         if (isAuthenticated) {
             loadCartCount();
+            loadWishlistCount();
         } else {
-            setCartCount(0);
+            const guestCart = getCartFromLocalStotage();
+            const totalItems = guestCart.reduce((sum, item) => sum + item.quantity, 0);
+            const guestWishlist = getWishlistFromLocalStorage();
+
+            dispatch(setCart(guestCart));
+            dispatch(setWishlist(guestWishlist));
+            setCartCount(totalItems);
+            setWishlistCount(guestWishlist.length);
         }
-    }, [isAuthenticated]);
+    }, [dispatch, isAuthenticated]);
 
     const loadCartCount = async () => {
         try {
@@ -69,6 +92,19 @@ export const Navbar = () => {
         }
     };
 
+    const loadWishlistCount = async () => {
+        try {
+            const response = await UserService.getWishlist();
+            const wishlist = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
+
+            dispatch(setWishlist(wishlist));
+            setWishlistCount(wishlist.length);
+        } catch (error) {
+            console.error("Wishlist ma'lumotlarini olishda xatolik:", error);
+            setWishlistCount(0);
+        }
+    };
+
     const handleLoginClick = () => {
         router.push('/auth/login');
     };
@@ -76,6 +112,9 @@ export const Navbar = () => {
     const handleLogout = async () => {
         await logout();
         setCartCount(0);
+        setWishlistCount(0);
+        dispatch(setCart([]));
+        dispatch(setWishlist([]));
         router.push('/');
     };
 
@@ -101,7 +140,7 @@ export const Navbar = () => {
                 <div className='flex items-center gap-2 md:gap-4'>
                     {/* Mobile burger */}
                     <NavbarMobile
-                        cartCount={cartCount}
+                        cartCount={cartDisplayCount}
                         isAuthenticated={isAuthenticated}
                         userFirstName={getUserFirstName(user)}
                     />
@@ -279,17 +318,19 @@ export const Navbar = () => {
 
                 {/* O'ng qism - ACTIONS */}
                 <div className='flex items-center gap-3 max-md:hidden md:gap-5'>
-                    <NavIcon
-                        icon={<ShoppingCart size={22} />}
-                        label={t('cart')}
-                        badge={cartCount > 0 ? cartCount.toString() : undefined}
-                        href='/cart'
-                    />
+                    <div className='relative'>
+                        {cartDisplayCount > 0 && (
+                            <span className='absolute text-white -top-1 -right-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#f07e1a] text-[14px]'>
+                                {cartDisplayCount}
+                            </span>
+                        )}
+                        <NavIcon icon={<ShoppingCart size={22} />} label={t('cart')} href='/cart' />
+                    </div>
 
                     <div className='relative'>
-                        {wishlistCount > 0 && (
-                            <span className='absolute -top-2 right-7 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#f07e1a] text-[14px]'>
-                                {wishlistCount}
+                        {wishlistDisplayCount > 0 && (
+                            <span className='absolute text-white -top-1 right-7 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#f07e1a] text-[14px]'>
+                                {wishlistDisplayCount}
                             </span>
                         )}
                         <NavIcon icon={<BookOpen size={22} />} label={t('myBooks')} href={myBooksHref} />

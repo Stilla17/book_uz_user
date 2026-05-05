@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 
-import { isBookInGuestWishlist } from '@/utils/wishlist';
-
 import { useAuth } from './useAuth';
 import { Book } from '@/types/book';
+import { isBookInGuestWishlist } from '@/utils/wishlistStorage';
 
 export const useBookWishlist = (book?: Book) => {
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
 
-    const { user, updateWishlistCount, syncWishlist } = useAuth();
+    const { user } = useAuth();
 
     useEffect(() => {
         if (!book?._id) return;
@@ -31,8 +30,6 @@ export const useBookWishlist = (book?: Book) => {
         setIsBookmarked,
         favoriteLoading,
         setFavoriteLoading,
-        user,
-        updateWishlistCount,
-        syncWishlist
+        user
     };
 };

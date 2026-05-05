@@ -1,55 +1,24 @@
-import { UserService } from '@/services/api';
 import type { Book } from '@/components/cards/BookCard';
+import { UserService } from '@/services/api';
+import { type WishlistBook } from '@/store/features/wishlistSlice';
 
-export const GUEST_WISHLIST_KEY = 'guest_wishlist';
+import { toggleGuestWishlist } from './wishlistStorage';
 
-export type GuestWishlistBook = Book;
-
-const isGuestWishlistBook = (value: unknown): value is GuestWishlistBook => {
-    return Boolean(value && typeof value === 'object' && '_id' in value);
-};
-
-export const getGuestWishlist = (): GuestWishlistBook[] => {
-    if (typeof window === 'undefined') return [];
-
-    try {
-        const localData = localStorage.getItem(GUEST_WISHLIST_KEY);
-        const wishlist = localData ? JSON.parse(localData) : [];
-
-        return Array.isArray(wishlist) ? wishlist.filter(isGuestWishlistBook) : [];
-    } catch {
-        return [];
-    }
-};
-
-export const getGuestWishlistProductIds = () => getGuestWishlist().map((book) => book._id);
-
-export const isBookInGuestWishlist = (bookId: string) => getGuestWishlist().some((book) => book._id === bookId);
-
-export const clearGuestWishlist = () => {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(GUEST_WISHLIST_KEY);
-};
-
-export const handleToggleFavorite = async (book: GuestWishlistBook, userId?: string | null) => {
+export const handleToggleFavorite = async (book: Book, userId?: string | null) => {
     const bookId = book._id;
 
     if (userId) {
         return UserService.toggleWishlist(bookId);
     }
 
-    let wishlist = getGuestWishlist();
-    const isAlreadySaved = wishlist.some((item) => item._id === bookId);
+    const wishlistBook: WishlistBook = {
+        _id: book._id,
+        title: book.title,
+        slug: book.slug,
+        price: book.price,
+        images: book.images?.length ? book.images : book.image ? [book.image] : [],
+        stock: book.stock ?? 0
+    };
 
-    if (isAlreadySaved) {
-        wishlist = wishlist.filter((item) => item._id !== bookId);
-    } else {
-        wishlist.push(book);
-    }
-
-    if (typeof window !== 'undefined') {
-        localStorage.setItem(GUEST_WISHLIST_KEY, JSON.stringify(wishlist));
-    }
-
-    return { success: true, data: { action: isAlreadySaved ? 'removed' : 'added', wishlist } };
+    return toggleGuestWishlist(wishlistBook);
 };

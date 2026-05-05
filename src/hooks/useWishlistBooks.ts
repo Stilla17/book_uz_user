@@ -5,12 +5,14 @@ import { useEffect, useState } from 'react';
 import { type Book } from '@/components/cards/BookCard';
 import { useAuth } from '@/hooks/useAuth';
 import { UserService } from '@/services/api';
-import { getGuestWishlist } from '@/utils/wishlist';
+import { setWishlist, type WishlistBook } from '@/store/features/wishlistSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { getWishlistFromLocalStorage } from '@/utils/wishlistStorage';
 
 type ServerWishlistBook = {
     _id: string;
     slug?: string;
-    title: string | { uz: string; ru?: string; en?: string };
+    title: string | { uz?: string; ru?: string; en?: string };
     author?: string | { name: string };
     price: number;
     discountPrice?: number;
@@ -20,7 +22,38 @@ type ServerWishlistBook = {
     images?: string[];
 };
 
-const mapServerBookToCardBook = (book: ServerWishlistBook): Book => ({
+const getArrayData = (response: any) => {
+    const data = response?.data?.data ?? response?.data ?? response;
+
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.wishlist)) return data.wishlist;
+    if (Array.isArray(data?.items)) return data.items;
+
+    return [];
+};
+
+const normalizeWishlistBook = (item: any): WishlistBook | null => {
+    const book = item?.book ?? item?.product ?? item;
+    if (!book || typeof book !== 'object' || !book._id) return null;
+
+    return {
+        _id: book._id,
+        slug: book.slug,
+        title: book.title ?? "Noma'lum kitob",
+        price: book.discountPrice && book.discountPrice > 0 ? book.discountPrice : book.price ?? 0,
+        images: Array.isArray(book.images) ? book.images : book.image ? [book.image] : [],
+        stock: book.stock ?? 0
+    };
+};
+
+type WishlistCardSource = WishlistBook & {
+    author?: string | { name: string };
+    discountPrice?: number;
+    ratingAvg?: number;
+    ratingCount?: number;
+};
+
+const mapWishlistBookToCardBook = (book: WishlistCardSource): Book => ({
     _id: book._id,
     slug: book.slug,
     title:
@@ -43,6 +76,8 @@ const mapServerBookToCardBook = (book: ServerWishlistBook): Book => ({
 
 export const useWishlistBooks = () => {
     const { isAuthenticated, isLoading: authLoading } = useAuth();
+    const dispatch = useAppDispatch();
+    const wishlistItems = useAppSelector((state) => state.wishlist.items);
     const [books, setBooks] = useState<Book[]>([]);
     const [loadingBooks, setLoadingBooks] = useState(true);
 
@@ -55,10 +90,17 @@ export const useWishlistBooks = () => {
             try {
                 if (isAuthenticated) {
                     const response = await UserService.getWishlist();
-                    const wishlist = Array.isArray(response?.data) ? response.data : [];
-                    setBooks(wishlist.map(mapServerBookToCardBook));
+                    const wishlist = getArrayData(response)
+                        .map((item: any) => normalizeWishlistBook(item))
+                        .filter((item: WishlistBook | null): item is WishlistBook => Boolean(item));
+
+                    dispatch(setWishlist(wishlist));
+                    setBooks(wishlist.map(mapWishlistBookToCardBook));
                 } else {
-                    setBooks(getGuestWishlist().map((book) => ({ ...book, isWishlisted: true })));
+                    const guestWishlist = getWishlistFromLocalStorage();
+
+                    dispatch(setWishlist(guestWishlist));
+                    setBooks(guestWishlist.map(mapWishlistBookToCardBook));
                 }
             } catch (error) {
                 console.error('Kitoblar yuklanmadi:', error);
@@ -69,7 +111,12 @@ export const useWishlistBooks = () => {
         };
 
         loadBooks();
-    }, [authLoading, isAuthenticated]);
+    }, [authLoading, dispatch, isAuthenticated]);
+
+    useEffect(() => {
+        if (loadingBooks) return;
+        setBooks(wishlistItems.map(mapWishlistBookToCardBook));
+    }, [loadingBooks, wishlistItems]);
 
     const removeBook = (bookId: string) => {
         setBooks((currentBooks) => currentBooks.filter((book) => book._id !== bookId));
