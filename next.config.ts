@@ -6,8 +6,6 @@ const withBundleAnalyzer = initializeBundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  distDir: "build",
-  output: "standalone",
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
