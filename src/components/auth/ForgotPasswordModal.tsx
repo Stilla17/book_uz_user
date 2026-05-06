@@ -1,4 +1,3 @@
-// components/auth/ForgotPasswordModal.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -8,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { AuthServiceAPI } from '@/services/api';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, ArrowLeft, CheckCircle, Eye, EyeOff, Key, Loader2, Lock, Mail, Send, X } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Eye, EyeOff, Key, Loader2, Lock, Mail, Send, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 interface ForgotPasswordModalProps {

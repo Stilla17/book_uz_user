@@ -75,11 +75,34 @@ const getCartProductId = (product: unknown) => {
     return book._id || book.id || '';
 };
 
-const getClickRedirectUrl = (response: any) =>
-    response?.data?.payment?.redirectUrl ||
-    response?.data?.clickUrl ||
-    response?.payment?.redirectUrl ||
-    response?.clickUrl;
+const redirectUrlKeys = new Set(['redirectUrl', 'paymentUrl', 'paymeUrl', 'clickUrl', 'url']);
+
+const getPaymentRedirectUrl = (response: unknown): string => {
+    const visited = new WeakSet<object>();
+
+    const findUrl = (value: unknown): string => {
+        if (!value || typeof value !== 'object') return '';
+        if (visited.has(value)) return '';
+
+        visited.add(value);
+
+        for (const [key, nestedValue] of Object.entries(value)) {
+            if (redirectUrlKeys.has(key) && typeof nestedValue === 'string' && /^https?:\/\//.test(nestedValue)) {
+                return nestedValue;
+            }
+
+            const nestedUrl = findUrl(nestedValue);
+
+            if (nestedUrl) return nestedUrl;
+        }
+
+        return '';
+    };
+
+    return findUrl(response);
+};
+
+const isOnlinePayment = (paymentTitle: string) => ['Click', 'Payme', 'Xazna'].includes(paymentTitle);
 
 const CheckoutPage = () => {
     const router = useRouter();
@@ -207,19 +230,33 @@ const CheckoutPage = () => {
         try {
             const response = await createOrder.mutateAsync(payload);
             const orderId = response?.data?._id || response?.data?.id || response?._id || response?.id;
-            const clickRedirectUrl = getClickRedirectUrl(response);
+            let paymentRedirectUrl = getPaymentRedirectUrl(response);
 
-            try {
-                await clearItems();
-            } catch (clearCartError) {
-                console.warn('Savatni tozalashda xatolik, lekin buyurtma yaratildi:', clearCartError);
+            if (!paymentRedirectUrl && selectedPayment === 'Click' && orderId) {
+                const clickResponse = await UserService.createClickPayment(orderId);
+
+                paymentRedirectUrl = getPaymentRedirectUrl(clickResponse);
+            }
+
+            if (!isOnlinePayment(selectedPayment)) {
+                try {
+                    await clearItems();
+                } catch (clearCartError) {
+                    console.warn('Savatni tozalashda xatolik, lekin buyurtma yaratildi:', clearCartError);
+                }
             }
 
             dispatch(resetCheckout());
             toast.success('Buyurtma muvaffaqiyatli yaratildi');
 
-            if (clickRedirectUrl) {
-                window.location.href = clickRedirectUrl;
+            if (paymentRedirectUrl) {
+                window.location.href = paymentRedirectUrl;
+                return;
+            }
+
+            if (isOnlinePayment(selectedPayment)) {
+                toast.error(`${selectedPayment} to'lov havolasi backenddan qaytmadi`);
+                console.warn('Payment redirect URL topilmadi. Backend javobi:', response);
                 return;
             }
 

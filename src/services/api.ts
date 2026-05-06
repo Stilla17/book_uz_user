@@ -192,6 +192,11 @@ export const UserService = {
         return response.data;
     },
 
+    createClickPayment: async (orderId: string) => {
+        const response = await api.post('/click/create-order', { orderId });
+        return response.data;
+    },
+
     getOrders: async () => {
         const response = await api.get('/orders');
         return response.data.data;

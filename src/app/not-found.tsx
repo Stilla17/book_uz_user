@@ -22,13 +22,7 @@ import {
   Mail,
   Phone,
   Clock,
-  MapPin,
-  Menu,
-  X,
-  ChevronRight,
   Star,
-  Award,
-  Zap,
   Globe,
   Mic2,
   Library,
@@ -46,8 +40,6 @@ import {
   Calendar,
   Users,
   Rocket,
-  Moon,
-  Sun,
   Wind,
   Feather,
   Leaf,
@@ -63,16 +55,9 @@ import {
   Flame,
   Droplets,
   Snowflake,
-  CloudRain,
-  CloudSnow,
-  CloudLightning,
-  Tornado,
   Rainbow,
-  Compass as CompassIcon,
   Navigation,
   Map,
-  Globe2,
-  Earth,
   Satellite,
   Telescope,
   Microscope,
@@ -80,35 +65,6 @@ import {
   Brain,
   Cpu,
   Bot,
-  Smartphone,
-  Tablet,
-  Laptop,
-  Monitor,
-  Tv,
-  RadioReceiver,
-  RadioTower,
-  SatelliteDish,
-  Wifi,
-  Bluetooth,
-  Zap as ZapIcon,
-  Battery,
-  BatteryCharging,
-  BatteryFull,
-  BatteryLow,
-  BatteryMedium,
-  BatteryWarning,
-  Power,
-  PowerOff,
-  PowerCircle,
-  CircleDot,
-  CircleDashed,
-  CircleDotDashed,
-  CircleEllipsis,
-  CircleOff,
-  CircleSlash,
-  CircleSlash2,
-  CircleSlashed,
-
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -144,7 +100,6 @@ const floatingIcons = [
 
 export default function NotFound() {
   const router = useRouter();
-  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [randomFact, setRandomFact] = useState(bookFacts[0]);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -167,17 +122,6 @@ export default function NotFound() {
     return () => clearInterval(interval);
   }, []);
 
-  // Track mouse position for parallax effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
-      });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,8 +130,6 @@ export default function NotFound() {
     }
   };
 
-  // Get random icon component
-  const RandomIcon = floatingIcons[currentIconIndex];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center px-4 py-16 relative overflow-hidden">
@@ -245,21 +187,6 @@ export default function NotFound() {
       </div>
       <div className="container max-w-4xl mx-auto text-center relative z-10">
         
-        {/* Floating Icon */}
-        <motion.div
-          animate={{
-            rotate: 360,
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-            scale: { duration: 3, repeat: Infinity },
-          }}
-          className="absolute -top-20 left-1/2 transform -translate-x-1/2 text-blue-500/20 dark:text-blue-400/20"
-          style={{ fontSize: "120px" }}
-        >
-          <RandomIcon />
-        </motion.div>
 
         {/* Main 404 Text with Parallax */}
         <motion.div

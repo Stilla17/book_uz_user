@@ -6,8 +6,6 @@ import { Lato } from 'next/font/google';
 import { ThemeProvider as NextThemeProvider } from 'next-themes';
 
 import '@/app/globals.css';
-import { Footer } from '@/components/shared/Footer';
-import { Navbar } from '@/components/shared/Navbar';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider as CustomThemeProvider } from '@/context/ThemeContext';
 import I18nProvider from '@/providers/I18nProvider';
@@ -39,12 +37,8 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                             <I18nProvider>
                                 <CustomThemeProvider>
                                     <AuthProvider>
-                                        <div className='relative flex min-h-screen flex-col'>
-                                            <Toaster position='top-center' />
-                                            <Navbar />
-                                            <main className='flex-1'>{children}</main>
-                                            <Footer />
-                                        </div>
+                                        <Toaster position='top-center' />
+                                        {children}
                                     </AuthProvider>
                                 </CustomThemeProvider>
                             </I18nProvider>

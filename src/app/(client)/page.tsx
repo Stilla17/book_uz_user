@@ -1,11 +1,9 @@
 'use client';
 
 import { AboutSection } from '@/components/sections/AboutSection';
-import { AuthorBannerSection } from '@/components/sections/AuthorBannerSection';
 import { AuthorQuoteSection } from '@/components/sections/AuthorQuoteSection';
 import { BookSection } from '@/components/sections/BookSection';
 import { CategorySection } from '@/components/sections/Categories';
-import { DeliverySection } from '@/components/sections/DeliverySection';
 import { DownloadAppSection } from '@/components/sections/DownloadAppSection';
 import { Hero } from '@/components/sections/Hero';
 import { NewsSection } from '@/components/sections/NewsSection';
@@ -47,9 +45,6 @@ const Page = () => {
                 type='default'
             />
 
-            {/* Author Banner */}
-            {/* <AuthorBannerSection /> */}
-
             {/* Nashryotlar */}
             <Publishers />
 
@@ -61,9 +56,6 @@ const Page = () => {
 
             {/* Services Section */}
             <ServicesSection />
-
-            {/* Delivery Section */}
-            {/* <DeliverySection /> */}
 
             {/* Support Section */}
             <SupportSection />
