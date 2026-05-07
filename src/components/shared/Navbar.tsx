@@ -19,6 +19,7 @@ import { bottomNav, serviceMenuItems } from '@/data/navMenu';
 import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
 import { useAuth } from '@/hooks/useAuth';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
+import { getCatalogCategoryHref, getCatalogSubgenreHref } from '@/lib/catalog-links';
 import { getLocalizedCategoryName, getLocalizedTitle, getUserFirstName, getUserInitials } from '@/lib/navbar-utils';
 import { UserService, api } from '@/services/api';
 import { setCart } from '@/store/features/cartSlice';
@@ -186,25 +187,28 @@ export const Navbar = () => {
 
                                     <div className='grid grid-cols-3 gap-3'>
                                         {categories.map((category) => (
-                                            <Link
+                                            <div
                                                 key={category._id}
-                                                href={`/category/${category.slug}`}
-                                                onClick={() => setIsCatalogOpen(false)}
                                                 className={`flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all`}>
                                                 <div className='flex-1'>
-                                                    <p className={`font-bold ${getTextColor()}`}>
+                                                    <Link
+                                                        href={getCatalogCategoryHref(category)}
+                                                        onClick={() => setIsCatalogOpen(false)}
+                                                        className={`block font-bold ${getTextColor()} hover:text-[#FF8A00] dark:hover:text-[#FF8A00]`}>
                                                         {getLocalizedCategoryName(category, i18n.language)}
-                                                    </p>
+                                                    </Link>
 
                                                     {category.subgenres?.map((sub, index) => (
-                                                        <p
+                                                        <Link
                                                             key={index}
-                                                            className={`text-[14px] text-gray-400 hover:text-[#FF8A00] dark:text-slate-500 dark:hover:text-[#FF8A00]`}>
+                                                            href={getCatalogSubgenreHref(category, sub)}
+                                                            onClick={() => setIsCatalogOpen(false)}
+                                                            className={`block text-[14px] text-gray-400 hover:text-[#FF8A00] dark:text-slate-500 dark:hover:text-[#FF8A00]`}>
                                                             {getLocalizedTitle(sub.title, i18n.language)}
-                                                        </p>
+                                                        </Link>
                                                     ))}
                                                 </div>
-                                            </Link>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>

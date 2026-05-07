@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { UserBanner, userBannerService } from '@/services/userBanner.service';
 
 import { motion } from 'framer-motion';
-import { BookOpen } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
@@ -135,11 +135,11 @@ export const Hero = () => {
                                                 onClick={() => handleBannerClick(banner._id, banner.buttonLink)}
                                                 className='group relative w-full transform cursor-pointer overflow-hidden rounded-full bg-[#FF8A00] px-6 py-2.5 text-sm font-bold text-white transition-all hover:scale-105 hover:shadow-xl sm:w-auto sm:px-8 sm:py-3 sm:text-base'>
                                                 <span className='relative z-10 flex items-center justify-center gap-2'>
-                                                    <BookOpen
+                                                    <Eye
                                                         size={18}
                                                         className='transition-colors group-hover:text-white'
                                                     />
-                                                    {getLocalizedText(banner.buttonText)}
+                                                    Barcha kitoblar
                                                 </span>
 
                                                 {/* Hover effekti uchun biroz to'qroq rang beramiz */}

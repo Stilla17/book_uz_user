@@ -256,7 +256,7 @@ export default function CatalogPage() {
                                 </div>
 
                                 <Pagination
-                                    currentPage={currentPage}
+                                    currentPage={currentPage}   
                                     totalPages={totalPages}
                                     onPageChange={handlePageChange}
                                 />

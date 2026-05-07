@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchSuggestionsQuery } from "@/hooks/queries/useSearchSuggestionsQuery";
+import { getCatalogCategoryHref } from "@/lib/catalog-links";
 import type { SearchDropdownProps, SearchProduct } from "@/types/search.types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://backend.book.uz/user-api/';
@@ -134,7 +135,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                 {results!.categories.map((category) => (
                   <Link
                     key={category._id}
-                    href={`/category/${category.slug}`}
+                    href={getCatalogCategoryHref(category)}
                     onClick={handleItemClick}
                     className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors group"
                   >

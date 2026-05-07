@@ -15,7 +15,6 @@ import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
-import { handleToggleFavorite } from '@/utils/wishlist';
 import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
@@ -36,9 +35,9 @@ export default function BookDetailPage() {
         enabled: !!slug
     });
 
-    const { isBookmarked, setIsBookmarked, favoriteLoading, setFavoriteLoading, user } = useBookWishlist(
-        book ?? undefined
-    );
+    const { isBookmarked, favoriteLoading, toggleFavorite } = useBookWishlist(book ?? undefined, {
+        queryKeys: [['book', slug]]
+    });
     const { cartItems, addItem, updateQuantity, removeItem } = useBookCart();
     const cartItem = useMemo(() => cartItems.find((item) => item.book._id === book?._id), [book?._id, cartItems]);
     const cartQuantity = cartItem?.quantity ?? 0;
@@ -68,23 +67,6 @@ export default function BookDetailPage() {
         ];
     }, [book, bookView.title]);
 
-    const toggleFavorite = async () => {
-        if (!book || favoriteLoading) return;
-
-        const nextBookmarked = !isBookmarked;
-        setIsBookmarked(nextBookmarked);
-        setFavoriteLoading(true);
-
-        try {
-            await handleToggleFavorite(book, user?.id ?? user?._id);
-        } catch (error) {
-            setIsBookmarked(!nextBookmarked);
-            console.error('Wishlist yangilanmadi:', error);
-        } finally {
-            setFavoriteLoading(false);
-        }
-    };
-
     const getCartBook = () => {
         if (!book) return null;
 
@@ -101,7 +83,6 @@ export default function BookDetailPage() {
     const incrementCartQuantity = async () => {
         const cartBook = getCartBook();
         if (!book || !cartBook) return;
-
 
         if (stockLimit && cartQuantity >= stockLimit) return;
 
@@ -124,7 +105,10 @@ export default function BookDetailPage() {
 
     const addBookToCart = async () => {
         if (cartQuantity > 0) return;
-        await incrementCartQuantity();
+
+        if ((book?.stock ?? 0) > 0) {
+            await incrementCartQuantity();
+        }
     };
 
     if (bookLoading) {
