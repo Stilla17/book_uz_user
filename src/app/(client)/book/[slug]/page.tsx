@@ -18,7 +18,7 @@ import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
-import { Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import { Heart, Minus, PackageCheck, Plus, ShoppingCart, Star, Store } from 'lucide-react';
 
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
@@ -35,6 +35,8 @@ export default function BookDetailPage() {
         enabled: !!slug
     });
 
+    console.log(book);
+
     const { isBookmarked, favoriteLoading, toggleFavorite } = useBookWishlist(book ?? undefined, {
         queryKeys: [['book', slug]]
     });
@@ -42,6 +44,10 @@ export default function BookDetailPage() {
     const cartItem = useMemo(() => cartItems.find((item) => item.book._id === book?._id), [book?._id, cartItems]);
     const cartQuantity = cartItem?.quantity ?? 0;
     const stockLimit = book?.stock && book.stock > 0 ? book.stock : undefined;
+    const availableBranchStocks = useMemo(
+        () => book?.branchStocks?.filter((item) => (item.available ?? 0) > 0) ?? [],
+        [book?.branchStocks]
+    );
 
     const bookView = useMemo(
         () => ({
@@ -139,19 +145,60 @@ export default function BookDetailPage() {
                         </h1>
                         <p className='mt-3 text-lg text-gray-500 dark:text-gray-400'>{bookView.author}</p>
 
-                        <div className='mt-5 flex flex-wrap items-center gap-3'>
+                        <div className='mt-5'>
                             <span className='inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-2 font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-100'>
                                 {Number(book?.ratingAvg || 0).toFixed(1)}
                                 <Star size={16} className='fill-yellow-400 text-yellow-400' />
                             </span>
-                            {book?.stock && book.stock > 0 ? (
-                                <span className='flex items-center gap-2 text-sm text-green-500'>
-                                    <span className='relative flex h-3 w-3'>
-                                        <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75'></span>
-                                        <span className='relative inline-flex h-3 w-3 rounded-full bg-green-500'></span>
-                                    </span>
-                                    {book.stock} dona mavjud
-                                </span>
+
+                            {availableBranchStocks.length ? (
+                                <div className='mt-5 space-y-3 border-t border-orange-100 pt-4 dark:border-slate-700'>
+                                    <div className='flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200'>
+                                        <PackageCheck size={18} className='text-green-500' />
+                                        Do'konlardagi mavjudlik
+                                    </div>
+
+                                    <div className='space-y-2'>
+                                        {availableBranchStocks.map((item, index) => {
+                                            const available = Math.max(item.available ?? 0, 0);
+                                            const quantity = Math.max(item.quantity ?? available, available, 1);
+                                            const percent = Math.min((available / quantity) * 100, 100);
+
+                                            return (
+                                                <div
+                                                    key={item._id ?? item.storeId ?? index}
+                                                    className='rounded-lg border border-slate-200 bg-white/70 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900/40'>
+                                                    <div className='flex items-start justify-between gap-3'>
+                                                        <div className='flex min-w-0 items-center gap-2'>
+                                                            <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400'>
+                                                                <Store size={17} />
+                                                            </span>
+                                                            <div className='min-w-0'>
+                                                                <p className='truncate font-semibold text-slate-900 dark:text-white'>
+                                                                    {item.storeName || "Do'kon"}
+                                                                </p>
+                                                                <p className='text-xs text-slate-500 dark:text-slate-400'>
+                                                                    Zaxirada mavjud
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <span className='shrink-0 rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-600 dark:bg-green-500/10 dark:text-green-400'>
+                                                            {available} dona
+                                                        </span>
+                                                    </div>
+
+                                                    <div className='mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800'>
+                                                        <div
+                                                            className='h-full rounded-full bg-green-500'
+                                                            style={{ width: `${percent}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             ) : (
                                 <span className='flex items-center gap-2 text-sm text-red-500'>
                                     <span className='h-3 w-3 rounded-full bg-red-500'></span>

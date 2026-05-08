@@ -67,7 +67,6 @@ export const AuthorQuoteSection = ({
     const [quotes, setQuotes] = useState<UserBanner[]>([]);
     const [isPaused, setIsPaused] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const swiperRef = useRef<any>(null);
     const prevRef = useRef<HTMLButtonElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
@@ -110,31 +109,6 @@ export const AuthorQuoteSection = ({
             userBannerService.trackView(quotes[swiper.realIndex]._id);
         }
     };
-
-    // Floating icons array
-    const floatingIcons = [
-        Sparkles,
-        Star,
-        Heart,
-        Crown,
-        Zap,
-        Award,
-        Gem,
-        Diamond,
-        Flower2,
-        Sun,
-        Moon,
-        Cloud,
-        Coffee,
-        Compass,
-        Feather,
-        Leaf,
-        BookOpen,
-        Headphones,
-        TrendingUp,
-        Flame,
-        Quote
-    ];
 
     if (loading) {
         return (
@@ -264,9 +238,6 @@ export const AuthorQuoteSection = ({
                                     onClick={() => handleQuoteClick(item._id, item.buttonLink)}>
                                     <motion.div
                                         className='absolute inset-0'
-                                        animate={{
-                                            background: `radial-gradient(circle at ${mousePosition.x + 50}% ${mousePosition.y + 50}%, rgba(0, 160, 227, 0.05), transparent 70%)`
-                                        }}
                                         transition={{ duration: 0.3 }}
                                     />
 

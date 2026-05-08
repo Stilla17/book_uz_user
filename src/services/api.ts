@@ -1,4 +1,4 @@
-import { CreateCommentPayload, OrderPayload } from '@/types';
+import { CreateCommentPayload, OrderPayload, Product, PublisherItems } from '@/types';
 
 import axios from 'axios';
 
@@ -349,5 +349,82 @@ export const UserService = {
     deleteAccount: async (password: string) => {
         const response = await api.delete('/account', { data: { password } });
         return response.data;
+    }
+};
+
+type PublisherPaginationParams = {
+    page?: number;
+    limit?: number;
+};
+
+type PublisherPagination = {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type PublishersResponse = {
+    publishers: PublisherItems[];
+    pagination: PublisherPagination;
+};
+
+export type PublisherProductsResponse = {
+    publisher: PublisherItems | null;
+    products: Product[];
+    pagination: PublisherPagination;
+};
+
+const normalizePublishersResponse = (data: any, fallbackLimit: number): PublishersResponse => {
+    const publishers = Array.isArray(data?.publishers) ? data.publishers : Array.isArray(data) ? data : [];
+    const paginationSource = data?.pagination ?? data;
+    const limit = Number(paginationSource?.limit ?? fallbackLimit);
+    const total = Number(paginationSource?.total ?? paginationSource?.totalItems ?? publishers.length);
+    const page = Number(paginationSource?.page ?? paginationSource?.currentPage ?? 1);
+    const totalPages = Number(
+        paginationSource?.totalPages ?? paginationSource?.pages ?? Math.max(1, Math.ceil(total / Math.max(limit, 1)))
+    );
+
+    return {
+        publishers,
+        pagination: {
+            page: Number.isFinite(page) ? page : 1,
+            limit: Number.isFinite(limit) ? limit : fallbackLimit,
+            total: Number.isFinite(total) ? total : publishers.length,
+            totalPages: Number.isFinite(totalPages) ? totalPages : 1
+        }
+    };
+};
+
+export const ClientService = {
+    getPublishers: async (params?: PublisherPaginationParams): Promise<PublishersResponse> => {
+        const response = await api.get('/publishers', { params });
+        return normalizePublishersResponse(response.data.data, params?.limit ?? 12);
+    },
+
+    getPublisherProducts: async (slug: string, params?: PublisherPaginationParams): Promise<PublisherProductsResponse> => {
+        const response = await api.get(`/publishers/${slug}/products`, { params });
+        const data = response.data.data;
+        const products = Array.isArray(data?.products) ? data.products : [];
+        const paginationSource = data?.pagination ?? data;
+        const limit = Number(paginationSource?.limit ?? params?.limit ?? 12);
+        const total = Number(paginationSource?.total ?? products.length);
+        const page = Number(paginationSource?.page ?? params?.page ?? 1);
+        const totalPages = Number(
+            paginationSource?.totalPages ??
+                paginationSource?.pages ??
+                Math.max(1, Math.ceil(total / Math.max(limit, 1)))
+        );
+
+        return {
+            publisher: data?.publisher ?? null,
+            products,
+            pagination: {
+                page: Number.isFinite(page) ? page : 1,
+                limit: Number.isFinite(limit) ? limit : params?.limit ?? 12,
+                total: Number.isFinite(total) ? total : products.length,
+                totalPages: Number.isFinite(totalPages) ? totalPages : 1
+            }
+        };
     }
 };

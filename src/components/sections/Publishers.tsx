@@ -1,78 +1,24 @@
 'use client';
 
+import Link from 'next/link';
+
+import PublisherCard from '@/components/cards/PublisherCard';
+import { ClientService } from '@/services/api';
+import { useQuery } from '@tanstack/react-query';
+
 import { motion } from 'framer-motion';
-import { BookOpen, Building2, ChevronRight, Crown, Sparkles, Star } from 'lucide-react';
+import { Building2, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-type PublisherItem = {
-    id: string;
-    name: string;
-    emblem: string;
-    focus: string;
-    books: string;
-    gradient: string;
-    accent: string;
-};
-
-const publishers: PublisherItem[] = [
-    {
-        id: 'hilol',
-        name: 'Hilol Nashr',
-        emblem: 'HN',
-        focus: 'Badiiy va ma’rifiy to‘plamlar',
-        books: '1200+ kitob',
-        gradient: 'from-[#005CB9] via-[#0a7bd8] to-[#47b8ff]',
-        accent: 'text-[#005CB9] dark:text-blue-300'
-    },
-    {
-        id: 'akadem',
-        name: 'Akademnashr',
-        emblem: 'AN',
-        focus: 'Tarix, tafakkur va klassika',
-        books: '860+ nashr',
-        gradient: 'from-[#ef7f1a] via-[#ff9d4d] to-[#ffd08a]',
-        accent: 'text-[#ef7f1a] dark:text-orange-300'
-    },
-    {
-        id: 'yangi-asr',
-        name: 'Yangi Asr Avlodi',
-        emblem: 'YA',
-        focus: 'Bolalar va o‘smirlar adabiyoti',
-        books: '940+ nom',
-        gradient: 'from-[#0f766e] via-[#14b8a6] to-[#67e8f9]',
-        accent: 'text-teal-600 dark:text-teal-300'
-    },
-    {
-        id: 'sharq',
-        name: 'Sharq NMAK',
-        emblem: 'SH',
-        focus: 'Ilmiy va madaniy meros',
-        books: '700+ to‘plam',
-        gradient: 'from-[#7c3aed] via-[#a855f7] to-[#f0abfc]',
-        accent: 'text-violet-600 dark:text-violet-300'
-    },
-    {
-        id: 'manaviyat',
-        name: 'Ma’naviyat',
-        emblem: 'MN',
-        focus: 'Jamiyat va qadriyat mavzulari',
-        books: '520+ nashr',
-        gradient: 'from-[#be123c] via-[#f43f5e] to-[#fda4af]',
-        accent: 'text-rose-600 dark:text-rose-300'
-    },
-    {
-        id: 'booklab',
-        name: 'BookLab Studio',
-        emblem: 'BL',
-        focus: 'Zamonaviy tarjima va biznes kitoblari',
-        books: '410+ kitob',
-        gradient: 'from-slate-700 via-slate-500 to-slate-300',
-        accent: 'text-slate-700 dark:text-slate-200'
-    }
-];
 
 const Publishers = () => {
     const { t } = useTranslation();
+
+    const { data } = useQuery({
+        queryKey: ['publishers-preview'],
+        queryFn: () => ClientService.getPublishers({ page: 1, limit: 6 })
+    });
+    const publishers = data?.publishers ?? [];
+    const totalPublishers = data?.pagination.total ?? publishers.length;
 
     return (
         <section className='relative overflow-hidden bg-gradient-to-b from-white to-slate-50 py-16 dark:from-slate-900 dark:to-slate-950'>
@@ -100,46 +46,30 @@ const Publishers = () => {
                 </motion.div>
 
                 <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
-                    {publishers.map((publisher, index) => (
-                        <motion.article
-                            key={publisher.id}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, amount: 0.2 }}
-                            className='group relative overflow-hidden rounded-[28px] border border-slate-200/70 bg-white/85 p-5 shadow-[0_18px_50px_-26px_rgba(15,23,42,0.45)] backdrop-blur-sm transition-all dark:border-slate-700 dark:bg-slate-900/75'>
-                            <div
-                                className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${publisher.gradient} opacity-90`}
-                            />
+                    {publishers.map((pub, index) => {
+                        const visibleClass =
+                            index < 2
+                                ? ''
+                                : index < 4
+                                  ? 'hidden md:block'
+                                  : index < 6
+                                    ? 'hidden xl:block'
+                                    : 'hidden';
 
-                            <div className='mb-5 flex items-start justify-between gap-4'>
-                                <div
-                                    className={`relative flex h-18 w-18 items-center justify-center rounded-[24px] bg-gradient-to-br ${publisher.gradient} text-2xl font-black text-white shadow-lg shadow-slate-300/40 transition-transform duration-300 group-hover:scale-105 dark:shadow-slate-950/40`}>
-                                    <span>{publisher.emblem}</span>
-                                </div>
-                            </div>
-
-                            <div className='space-y-2'>
-                                <h3 className='text-xl font-black tracking-tight text-slate-900 dark:text-white'>
-                                    {publisher.name}
-                                </h3>
-                                <p className='text-sm leading-6 text-slate-600 dark:text-slate-300'>
-                                    {publisher.focus}
-                                </p>
-                            </div>
-
-                            <div className='mt-6 flex items-center justify-between border-t border-slate-200/80 pt-4 dark:border-slate-700'>
-                                <div className='flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200'>
-                                    <BookOpen size={16} className={publisher.accent} />
-                                    <span>{publisher.books}</span>
-                                </div>
-
-                                <div className='flex items-center gap-1 text-sm font-bold text-slate-400 transition-colors group-hover:text-[#005CB9] dark:text-slate-500 dark:group-hover:text-blue-300'>
-                                    <span>{t('publish.viewDetails')}</span>
-                                    <ChevronRight size={16} />
-                                </div>
-                            </div>
-                        </motion.article>
-                    ))}
+                        return <PublisherCard key={pub._id} publisher={pub} className={visibleClass} />;
+                    })}
                 </div>
+
+                {totalPublishers > publishers.length ? (
+                    <div className='mt-8 flex justify-center'>
+                        <Link
+                            href='/publishers'
+                            className='inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#ef7f1a] px-6 text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] dark:shadow-none'>
+                            Barchasini ko'rish
+                            <ChevronRight size={18} />
+                        </Link>
+                    </div>
+                ) : null}
             </div>
         </section>
     );

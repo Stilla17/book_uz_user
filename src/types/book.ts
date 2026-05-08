@@ -15,6 +15,14 @@ export interface Book {
     ratingCount?: number;
     rating?: number;
     stock?: number;
+    branchStocks?: Array<{
+        _id?: string;
+        storeName?: string;
+        storeId: string;
+        quantity: number;
+        reserve: number;
+        available: number;
+    }>;
     images?: string[];
     image?: string;
     barcode?: string;
@@ -26,10 +34,7 @@ export interface Book {
     isDiscount?: boolean;
     format?: 'ebook' | 'audio' | 'paper';
     isWishlisted?: boolean;
-    category?:
-        | string
-        | { _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }
-        | Array<{ _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }>;
+    category?: Array<{ _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }>;
     contentLanguage?: string;
     numberOfPage?: number;
     year?: number;

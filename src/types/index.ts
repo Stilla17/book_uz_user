@@ -159,3 +159,11 @@ export interface OrderPayload {
     deliveryType: 'PICKUP' | 'DELIVERY' | 'POST';
     paymentType: 'CASH' | 'CLICK' | 'UZUM' | 'PAYME' | 'XAZNA';
 }
+
+export interface PublisherItems {
+    _id: string;
+    booksCount: number;
+    image: string;
+    slug?: string;
+    name: string;
+}
