@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import PublisherCard from '@/components/cards/PublisherCard';
 import BreadCrumb from '@/components/shared/BreadCrumb';
@@ -12,24 +12,31 @@ import { motion } from 'framer-motion';
 import { Building2 } from 'lucide-react';
 
 const PUBLISHERS_PER_PAGE = 12;
+const FETCH_PUBLISHERS_LIMIT = 100;
 
 const PublishersPage = () => {
     const [page, setPage] = useState(1);
 
     const { data, isLoading } = useQuery({
-        queryKey: ['publishers', page, PUBLISHERS_PER_PAGE],
-        queryFn: () => ClientService.getPublishers({ page, limit: PUBLISHERS_PER_PAGE })
+        queryKey: ['publishers', FETCH_PUBLISHERS_LIMIT],
+        queryFn: () => ClientService.getPublishers({ page: 1, limit: FETCH_PUBLISHERS_LIMIT })
     });
 
-    const publishers = data?.publishers ?? [];
-    const pagination = data?.pagination ?? {
-        page,
-        limit: PUBLISHERS_PER_PAGE,
-        total: publishers.length,
-        totalPages: 1
-    };
-    const totalPages = Math.max(1, pagination.totalPages);
+    const sortedPublishers = useMemo(
+        () =>
+            [...(data?.publishers ?? [])].sort(
+                (firstPublisher, secondPublisher) => secondPublisher.booksCount - firstPublisher.booksCount
+            ),
+        [data?.publishers]
+    );
+    const totalPublishers = data?.pagination.total ?? sortedPublishers.length;
+    const totalPages = Math.max(1, Math.ceil(sortedPublishers.length / PUBLISHERS_PER_PAGE));
     const currentPage = Math.min(page, totalPages);
+    const publishers = useMemo(() => {
+        const startIndex = (currentPage - 1) * PUBLISHERS_PER_PAGE;
+
+        return sortedPublishers.slice(startIndex, startIndex + PUBLISHERS_PER_PAGE);
+    }, [currentPage, sortedPublishers]);
 
     const handlePageChange = (nextPage: number) => {
         setPage(nextPage);
@@ -75,7 +82,7 @@ const PublishersPage = () => {
                 ) : (
                     <>
                         <div className='mb-5 flex items-center justify-between gap-4 text-sm text-slate-500 dark:text-slate-400'>
-                            <span>{pagination.total} ta nashriyot</span>
+                            <span>{totalPublishers} ta nashriyot</span>
                             <span>
                                 {currentPage} / {totalPages} sahifa
                             </span>

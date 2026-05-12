@@ -2,6 +2,7 @@
 
 import { AboutSection } from '@/components/sections/AboutSection';
 import { AuthorQuoteSection } from '@/components/sections/AuthorQuoteSection';
+import Authors from '@/components/sections/Authors';
 import { BookSection } from '@/components/sections/BookSection';
 import { CategorySection } from '@/components/sections/Categories';
 import { DownloadAppSection } from '@/components/sections/DownloadAppSection';
@@ -44,6 +45,8 @@ const Page = () => {
                 subtitle={t('booksSection.bestMonthSubtitle')}
                 type='default'
             />
+
+            <Authors />
 
             {/* Nashryotlar */}
             <Publishers />

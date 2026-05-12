@@ -33,7 +33,11 @@ const PAGE_LIMIT = 12;
 const CATALOG_GRID_CLASS_NAME = 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3';
 const CATALOG_LIST_CLASS_NAME = 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
 
-type TextLike = string | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown } | null | undefined;
+type TextLike =
+    | string
+    | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown }
+    | null
+    | undefined;
 type ProductShape = Product & {
     title?: TextLike;
     author?: string | { name?: unknown };
@@ -148,6 +152,15 @@ export default function CatalogPage() {
         }),
         [filters, page, selectedCategory]
     );
+    const shouldUseAuthorProducts =
+        Boolean(filters.author) &&
+        !filters.keyword &&
+        !filters.category &&
+        !filters.subgenre &&
+        !filters.publisher &&
+        !filters.language &&
+        !filters.minPrice &&
+        !filters.maxPrice;
 
     const {
         data: productsData,
@@ -155,8 +168,11 @@ export default function CatalogPage() {
         isError,
         refetch
     } = useQuery({
-        queryKey: ['catalog-products', requestParams],
-        queryFn: () => bookService.getAllProducts(requestParams)
+        queryKey: ['catalog-products', shouldUseAuthorProducts ? 'author-products' : 'all-products', requestParams],
+        queryFn: () =>
+            shouldUseAuthorProducts && filters.author
+                ? bookService.getProductsByAuthor(filters.author, { page, limit: PAGE_LIMIT })
+                : bookService.getAllProducts(requestParams)
     });
 
     const products = productsData?.products ?? [];
@@ -256,7 +272,7 @@ export default function CatalogPage() {
                                 </div>
 
                                 <Pagination
-                                    currentPage={currentPage}   
+                                    currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={handlePageChange}
                                 />

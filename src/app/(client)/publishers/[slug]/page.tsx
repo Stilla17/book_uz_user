@@ -17,7 +17,11 @@ import { Building2, Search } from 'lucide-react';
 
 const PAGE_LIMIT = 12;
 
-type TextLike = string | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown } | null | undefined;
+type TextLike =
+    | string
+    | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown }
+    | null
+    | undefined;
 type ProductShape = Product & {
     title?: TextLike;
     author?: string | { name?: unknown } | null;

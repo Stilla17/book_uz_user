@@ -5,13 +5,13 @@ import React, { type FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { bottomNav, serviceMenuItems } from '@/data/navMenu';
+import MobileAction from '@/components/shared/MobileAction';
+import NavbarControls from '@/components/shared/NavbarControls';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { bottomNav, serviceMenuItems } from '@/data/navMenu';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
-import MobileAction from '@/components/shared/MobileAction';
-import NavbarControls from '@/components/shared/NavbarControls';
 
 import { BookOpen, Grid3x3, Menu, Phone, Search, ShoppingCart, User, UserCircle, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
         if (!query) return;
 
         setMobileOpen(false);
-        router.push(`/search?q=${encodeURIComponent(query)}`);
+        router.push(`/catalog?search=${encodeURIComponent(query)}`);
     };
     return (
         <div>

@@ -37,11 +37,23 @@ const normalizeProductList = (data: any, fallbackLimit: number): ProductListResp
 
     const rawPagination = data?.pagination ?? data?.meta ?? data;
     const limit = getNumber(rawPagination?.limit, rawPagination?.perPage, data?.limit, fallbackLimit) ?? fallbackLimit;
-    const total = getNumber(rawPagination?.total, rawPagination?.totalItems, rawPagination?.totalDocs, data?.total, products.length) ?? products.length;
+    const total =
+        getNumber(
+            rawPagination?.total,
+            rawPagination?.totalItems,
+            rawPagination?.totalDocs,
+            data?.total,
+            products.length
+        ) ?? products.length;
     const page = getNumber(rawPagination?.page, rawPagination?.currentPage, data?.page, 1) ?? 1;
     const pages =
-        getNumber(rawPagination?.pages, rawPagination?.totalPages, rawPagination?.totalPage, data?.pages, data?.totalPages) ??
-        Math.max(1, Math.ceil(total / Math.max(limit, 1)));
+        getNumber(
+            rawPagination?.pages,
+            rawPagination?.totalPages,
+            rawPagination?.totalPage,
+            data?.pages,
+            data?.totalPages
+        ) ?? Math.max(1, Math.ceil(total / Math.max(limit, 1)));
 
     return {
         products,
@@ -77,6 +89,19 @@ export const bookService = {
         } catch (error) {
             console.error('Error fetching books by author:', error);
             return { books: [] };
+        }
+    },
+
+    async getProductsByAuthor(authorId: string, params?: any): Promise<ProductListResponse> {
+        try {
+            const response = await api.get(`/authors/${authorId}/products`, { params });
+            return normalizeProductList(response.data?.data, params?.limit || 12);
+        } catch (error) {
+            console.error('Error fetching author products:', error);
+            return {
+                products: [],
+                pagination: { page: 1, limit: params?.limit || 12, total: 0, pages: 1 }
+            };
         }
     },
 

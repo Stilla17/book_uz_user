@@ -134,7 +134,7 @@ export const teamMembers: TeamMember[] = [
 // Timeline events
 export const timelineEvents: TimelineEvent[] = [
     {
-        year: '2020',
+        year: '2018',
         title: 'BOOK.UZ tashkil topdi',
         titleRu: 'BOOK.UZ основан',
         titleEn: 'BOOK.UZ founded',
@@ -144,7 +144,7 @@ export const timelineEvents: TimelineEvent[] = [
         icon: <Rocket size={20} />
     },
     {
-        year: '2021',
+        year: '2019',
         title: "10,000 kitoblar to'plami",
         titleRu: '10,000 книг в коллекции',
         titleEn: '10,000 books collection',
@@ -154,7 +154,7 @@ export const timelineEvents: TimelineEvent[] = [
         icon: <BookOpen size={20} />
     },
     {
-        year: '2022',
+        year: '2020',
         title: 'Audio kitoblar xizmati',
         titleRu: 'Сервис аудиокниг',
         titleEn: 'Audiobook service',
@@ -164,7 +164,7 @@ export const timelineEvents: TimelineEvent[] = [
         icon: <Headphones size={20} />
     },
     {
-        year: '2023',
+        year: '2021',
         title: '1 million foydalanuvchi',
         titleRu: '1 миллион пользователей',
         titleEn: '1 million users',
@@ -174,7 +174,7 @@ export const timelineEvents: TimelineEvent[] = [
         icon: <Users size={20} />
     },
     {
-        year: '2024',
+        year: '2022',
         title: 'Xalqaro bozorga chiqish',
         titleRu: 'Выход на международный рынок',
         titleEn: 'International expansion',
@@ -184,7 +184,37 @@ export const timelineEvents: TimelineEvent[] = [
         icon: <Globe size={20} />
     },
     {
+        year: '2023',
+        title: 'Premium obuna xizmati',
+        titleRu: 'Премиум подписка',
+        titleEn: 'Premium subscription',
+        description: 'Cheksiz kitoblar va maxsus imkoniyatlarga ega premium obunani ishga tushirdik.',
+        descriptionRu: 'Мы запустили премиум-подписку с безлимитными книгами.',
+        descriptionEn: 'We launched premium subscription with unlimited books.',
+        icon: <Crown size={20} />
+    },
+    {
+        year: '2024',
+        title: 'Premium obuna xizmati',
+        titleRu: 'Премиум подписка',
+        titleEn: 'Premium subscription',
+        description: 'Cheksiz kitoblar va maxsus imkoniyatlarga ega premium obunani ishga tushirdik.',
+        descriptionRu: 'Мы запустили премиум-подписку с безлимитными книгами.',
+        descriptionEn: 'We launched premium subscription with unlimited books.',
+        icon: <Crown size={20} />
+    },
+    {
         year: '2025',
+        title: 'Premium obuna xizmati',
+        titleRu: 'Премиум подписка',
+        titleEn: 'Premium subscription',
+        description: 'Cheksiz kitoblar va maxsus imkoniyatlarga ega premium obunani ishga tushirdik.',
+        descriptionRu: 'Мы запустили премиум-подписку с безлимитными книгами.',
+        descriptionEn: 'We launched premium subscription with unlimited books.',
+        icon: <Crown size={20} />
+    },
+    {
+        year: '2026',
         title: 'Premium obuna xizmati',
         titleRu: 'Премиум подписка',
         titleEn: 'Premium subscription',
@@ -204,7 +234,7 @@ export const values = [
         titleEn: 'Love for readers',
         description: "Har bir foydalanuvchimizni qadrlaymiz va ularning ehtiyojlarini birinchi o'ringa qo'yamiz.",
         descriptionRu: 'Мы ценим каждого пользователя и ставим их потребности на первое место.',
-        descriptionEn: 'We value every user and prioritize their needs.',
+        descriptionEn: 'We value every user and prioritize their needs.'
     },
     {
         icon: <Target size={24} />,
@@ -213,7 +243,7 @@ export const values = [
         titleEn: 'Quality',
         description: 'Eng yuqori sifatli kitoblar va audio kontentni taqdim etamiz.',
         descriptionRu: 'Мы предоставляем книги и аудиоконтент высочайшего качества.',
-        descriptionEn: 'We provide the highest quality books and audio content.',
+        descriptionEn: 'We provide the highest quality books and audio content.'
     },
     {
         icon: <Eye size={24} />,
@@ -222,7 +252,7 @@ export const values = [
         titleEn: 'Innovation',
         description: 'Doimiy ravishda yangi texnologiyalarni joriy qilamiz va xizmatlarimizni takomillashtiramiz.',
         descriptionRu: 'Мы постоянно внедряем новые технологии и улучшаем наши услуги.',
-        descriptionEn: 'We constantly introduce new technologies and improve our services.',
+        descriptionEn: 'We constantly introduce new technologies and improve our services.'
     },
     {
         icon: <Shield size={24} />,
@@ -231,6 +261,6 @@ export const values = [
         titleEn: 'Reliability',
         description: "Ma'lumotlaringiz xavfsizligi va to'lovlar ishonchliligiga kafolat beramiz.",
         descriptionRu: 'Мы гарантируем безопасность ваших данных и надежность платежей.',
-        descriptionEn: 'We guarantee the security of your data and reliability of payments.',
+        descriptionEn: 'We guarantee the security of your data and reliability of payments.'
     }
 ];

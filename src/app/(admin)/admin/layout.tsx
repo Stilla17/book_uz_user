@@ -1,12 +1,12 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { type FormEvent, type ReactNode, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+import { useTheme } from '@/context/ThemeContext';
 import logo from '../../../../public/images/Logo.svg';
 import {
     BarChart3,
@@ -17,6 +17,7 @@ import {
     ImageIcon,
     LayoutDashboard,
     MessageSquareText,
+    Moon,
     Newspaper,
     PanelLeftClose,
     PanelLeftOpen,
@@ -25,6 +26,7 @@ import {
     Search,
     Settings,
     ShoppingCart,
+    Sun,
     Tags,
     TicketPercent,
     Users
@@ -47,7 +49,7 @@ const menuItems = [
     },
     {
         label: 'Janrlar',
-        href: '/admin/genres',
+        href: '/admin/genre',
         icon: Tags
     },
     {
@@ -109,7 +111,22 @@ const menuItems = [
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
     const pathname = usePathname();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { theme, setTheme } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [headerSearch, setHeaderSearch] = useState('');
+
+    useEffect(() => {
+        setHeaderSearch(pathname.startsWith('/admin/book') ? searchParams.get('search') || '' : '');
+    }, [pathname, searchParams]);
+
+    const handleHeaderSearch = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const query = headerSearch.trim();
+        router.push(query ? `/admin/book?search=${encodeURIComponent(query)}` : '/admin/book');
+    };
 
     return (
         <div className='h-screen overflow-hidden bg-[#d8ccbd] p-3 text-[#2f2a25] md:p-5 dark:bg-slate-950 dark:text-white'>
@@ -184,16 +201,28 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                             <h1 className='mt-1 text-2xl font-black text-[#2f2a25] dark:text-white'>Admin Panel</h1>
                         </div>
 
-                        <form className='order-3 flex h-11 min-w-0 flex-1 items-center gap-2 rounded-2xl bg-[#eee3d4] px-4 text-sm text-[#817466] md:order-none md:max-w-xl dark:bg-slate-800 dark:text-slate-300'>
+                        <form
+                            onSubmit={handleHeaderSearch}
+                            className='order-3 flex h-11 min-w-0 flex-1 items-center gap-2 rounded-2xl bg-[#eee3d4] px-4 text-sm text-[#817466] md:order-none md:max-w-xl dark:bg-slate-800 dark:text-slate-300'>
                             <Search size={18} />
                             <input
                                 type='search'
+                                value={headerSearch}
+                                onChange={(event) => setHeaderSearch(event.target.value)}
                                 placeholder='Kitob, buyurtma yoki foydalanuvchi qidirish'
                                 className='h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
                             />
                         </form>
 
                         <div className='flex items-center gap-2'>
+                            <button
+                                type='button'
+                                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                                title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                                className='grid size-11 place-items-center rounded-2xl bg-white text-[#817466] shadow-sm transition hover:text-[#ef7f1a] dark:bg-slate-900 dark:text-slate-300 dark:hover:text-white'>
+                                {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
+                            </button>
                             <button
                                 type='button'
                                 aria-label='Hisobotlar'

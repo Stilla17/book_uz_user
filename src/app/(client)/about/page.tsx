@@ -9,7 +9,7 @@ import { BranchMap } from '@/components/map/Map';
 import { branchLocations } from '@/components/map/branches';
 import MiniCard from '@/components/shared/MiniCard';
 import { Button } from '@/components/ui/button';
-import { statistics, teamMembers, timelineEvents, values } from '@/data/about';
+import { statistics, timelineEvents, values } from '@/data/about';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -26,19 +26,16 @@ import {
     Sparkles,
     Target,
     Twitter,
-    Users,
-    Twitter as XIcon,
     Youtube
 } from 'lucide-react';
 
 export default function AboutPage() {
-    const tabs: Array<{ id: 'team' | 'values' | 'history'; label: string; icon: React.ReactNode }> = [
-        { id: 'team', label: 'Jamoa', icon: <Users size={18} /> },
-        { id: 'values', label: 'Qadriyatlar', icon: <Heart size={18} /> },
-        { id: 'history', label: 'Tarix', icon: <Clock size={18} /> }
+    const tabs: Array<{ id: 'values' | 'history'; label: string; icon: React.ReactNode }> = [
+        { id: 'history', label: 'Tarix', icon: <Clock size={18} /> },
+        { id: 'values', label: 'Qadriyatlar', icon: <Heart size={18} /> }
     ];
 
-    const [activeTab, setActiveTab] = useState<'team' | 'values' | 'history'>('team');
+    const [activeTab, setActiveTab] = useState<'history' | 'values'>('history');
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
 
     return (
@@ -124,55 +121,6 @@ export default function AboutPage() {
 
                 {/* Tab Content */}
                 <AnimatePresence mode='wait'>
-                    {/* Team Tab */}
-                    {activeTab === 'team' && (
-                        <motion.div
-                            key='team'
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
-                            className='mb-20'>
-                            <h2 className='mb-12 text-center text-3xl font-bold text-gray-900 dark:text-white'>
-                                Bizning <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>jamoa</span>
-                            </h2>
-
-                            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
-                                {teamMembers.map((member, index) => (
-                                    <motion.div
-                                        key={member.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.1 }}
-                                        whileHover={{ y: -10 }}
-                                        className='group relative'>
-                                        <div className='relative h-80 overflow-hidden rounded-2xl bg-[#ef7f1a]'>
-                                            <Image
-                                                src={member.image}
-                                                alt={member.name}
-                                                fill
-                                                className='object-cover transition-transform duration-700 group-hover:scale-110'
-                                            />
-                                            <div className='absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
-                                        </div>
-
-                                        <div className='mt-4 text-center'>
-                                            <h3 className='text-xl font-bold text-gray-900 dark:text-white'>
-                                                {member.name}
-                                            </h3>
-                                            <p className='font-medium text-[#00a0e3] dark:text-[#ef7f1a]'>
-                                                {member.position}
-                                            </p>
-                                            <p className='mt-2 line-clamp-2 text-sm text-gray-500 dark:text-gray-400'>
-                                                {member.bio}
-                                            </p>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </motion.div>
-                    )}
-
                     {/* Values Tab */}
                     {activeTab === 'values' && (
                         <motion.div

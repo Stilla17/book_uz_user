@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 
 import PublisherCard from '@/components/cards/PublisherCard';
@@ -10,14 +11,23 @@ import { motion } from 'framer-motion';
 import { Building2, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+const PREVIEW_PUBLISHERS_LIMIT = 6;
+const FETCH_PUBLISHERS_LIMIT = 100;
+
 const Publishers = () => {
     const { t } = useTranslation();
 
     const { data } = useQuery({
         queryKey: ['publishers-preview'],
-        queryFn: () => ClientService.getPublishers({ page: 1, limit: 6 })
+        queryFn: () => ClientService.getPublishers({ page: 1, limit: FETCH_PUBLISHERS_LIMIT })
     });
-    const publishers = data?.publishers ?? [];
+    const publishers = useMemo(
+        () =>
+            [...(data?.publishers ?? [])]
+                .sort((firstPublisher, secondPublisher) => secondPublisher.booksCount - firstPublisher.booksCount)
+                .slice(0, PREVIEW_PUBLISHERS_LIMIT),
+        [data?.publishers]
+    );
     const totalPublishers = data?.pagination.total ?? publishers.length;
 
     return (
@@ -60,7 +70,7 @@ const Publishers = () => {
                     })}
                 </div>
 
-                {totalPublishers > publishers.length ? (
+                {totalPublishers > PREVIEW_PUBLISHERS_LIMIT ? (
                     <div className='mt-8 flex justify-center'>
                         <Link
                             href='/publishers'

@@ -126,7 +126,7 @@ export const Navbar = () => {
         if (!query) return;
 
         setShowSearchDropdown(false);
-        router.push(`/search?q=${encodeURIComponent(query)}`);
+        router.push(`/catalog?search=${encodeURIComponent(query)}`);
     };
 
     return (
@@ -324,7 +324,7 @@ export const Navbar = () => {
                 <div className='flex items-center gap-3 max-md:hidden md:gap-5'>
                     <div className='relative'>
                         {cartDisplayCount > 0 && (
-                            <span className='absolute text-white -top-1 -right-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#f07e1a] text-[14px]'>
+                            <span className='absolute -top-1 -right-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#f07e1a] text-[14px] text-white'>
                                 {cartDisplayCount}
                             </span>
                         )}
@@ -333,7 +333,7 @@ export const Navbar = () => {
 
                     <div className='relative'>
                         {wishlistDisplayCount > 0 && (
-                            <span className='absolute text-white -top-1 right-7 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#f07e1a] text-[14px]'>
+                            <span className='absolute -top-1 right-7 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#f07e1a] text-[14px] text-white'>
                                 {wishlistDisplayCount}
                             </span>
                         )}
