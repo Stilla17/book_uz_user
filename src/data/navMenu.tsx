@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { NavItem } from '@/types/nav.types';
+import { NavItem } from '@/types';
 
 import {
     Award,
@@ -56,12 +56,6 @@ export const bottomNav: NavItem[] = [
         icon: <Gift size={14} />,
         description: "Sovg'a kartalari"
     }
-    // {
-    //     label: 'Bepul',
-    //     href: '/catalog?price=0',
-    //     icon: <Download size={14} />,
-    //     description: 'Bepul kitoblar'
-    // }
 ];
 
 export const serviceMenuItems = [

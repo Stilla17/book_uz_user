@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export type { User, AuthAction, AuthContextType, AuthState } from './auth.types';
-export type { AuthorBannerData, Banner, BannerFormData, MultiLangField, QuoteBannerData } from './banner.types';
+export type { AuthorBannerData, Banner, BannerFormData, QuoteBannerData } from './banner.types';
 export type { Book, BookCardProps, Product, Reply, Review, ReviewStats } from './book';
 export type {
     Category,
@@ -167,3 +167,43 @@ export interface PublisherItems {
     slug?: string;
     name: string;
 }
+
+export type CatalogFilters = {
+    keyword: string;
+    category: string;
+    subgenre: string;
+    author: string;
+    publisher: string;
+    language: string;
+    minPrice: string;
+    maxPrice: string;
+};
+
+export interface MultiLangField {
+    uz: string;
+    ru: string;
+    en: string;
+}
+
+export interface StoreLocation {
+    id: string;
+    city: string;
+    region: string;
+    address: string;
+    phone: string;
+    workingHours: string;
+    coordinates: string;
+    image: string;
+    isMain?: boolean;
+    books: number;
+}
+
+export type NavItem = {
+    label: string;
+    href: string;
+    icon: React.ReactNode;
+    description?: string;
+    color?: string;
+    highlight?: boolean;
+};
+

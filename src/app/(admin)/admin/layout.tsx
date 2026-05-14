@@ -1,12 +1,14 @@
 'use client';
 
-import { type FormEvent, type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
+import { useLogout } from '@/components/admin/hooks/auth-login';
 import { useTheme } from '@/context/ThemeContext';
+
 import logo from '../../../../public/images/Logo.svg';
 import {
     BarChart3,
@@ -16,6 +18,8 @@ import {
     Handshake,
     ImageIcon,
     LayoutDashboard,
+    Loader2,
+    LogOut,
     MessageSquareText,
     Moon,
     Newspaper,
@@ -23,7 +27,6 @@ import {
     PanelLeftOpen,
     PenLine,
     Quote,
-    Search,
     Settings,
     ShoppingCart,
     Sun,
@@ -111,21 +114,15 @@ const menuItems = [
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
     const pathname = usePathname();
-    const router = useRouter();
-    const searchParams = useSearchParams();
     const { theme, setTheme } = useTheme();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [headerSearch, setHeaderSearch] = useState('');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+    const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
-    useEffect(() => {
-        setHeaderSearch(pathname.startsWith('/admin/book') ? searchParams.get('search') || '' : '');
-    }, [pathname, searchParams]);
-
-    const handleHeaderSearch = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        const query = headerSearch.trim();
-        router.push(query ? `/admin/book?search=${encodeURIComponent(query)}` : '/admin/book');
+    const handleLogout = () => {
+        logout(undefined, {
+            onSettled: () => setIsLogoutModalOpen(false)
+        });
     };
 
     return (
@@ -152,18 +149,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                             </button>
                         </div>
 
-                        <nav className='no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overflow-x-hidden pb-4 pr-1'>
+                        <nav className='no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-x-hidden overflow-y-auto pr-1 pb-4'>
                             {menuItems.map(({ label, href, icon: Icon }) => (
                                 <Link
                                     key={href}
                                     href={href}
                                     title={label}
                                     aria-label={label}
-                                    className={`flex p-3 shadow-sm items-center rounded-2xl transition ${
+                                    className={`flex items-center rounded-2xl p-3 shadow-sm transition ${
                                         isSidebarOpen ? 'justify-start gap-3 px-3' : 'justify-center'
                                     } ${
                                         pathname === href || (href !== '/admin' && pathname.startsWith(href))
-                                            ? 'bg-[#ef7f1a] text-white '
+                                            ? 'bg-[#ef7f1a] text-white'
                                             : 'bg-white text-[#928675] shadow-sm hover:bg-[#fff1df] hover:text-[#ef7f1a] dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white'
                                     }`}>
                                     <Icon size={19} className='shrink-0' />
@@ -201,19 +198,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                             <h1 className='mt-1 text-2xl font-black text-[#2f2a25] dark:text-white'>Admin Panel</h1>
                         </div>
 
-                        <form
-                            onSubmit={handleHeaderSearch}
-                            className='order-3 flex h-11 min-w-0 flex-1 items-center gap-2 rounded-2xl bg-[#eee3d4] px-4 text-sm text-[#817466] md:order-none md:max-w-xl dark:bg-slate-800 dark:text-slate-300'>
-                            <Search size={18} />
-                            <input
-                                type='search'
-                                value={headerSearch}
-                                onChange={(event) => setHeaderSearch(event.target.value)}
-                                placeholder='Kitob, buyurtma yoki foydalanuvchi qidirish'
-                                className='h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
-                            />
-                        </form>
-
                         <div className='flex items-center gap-2'>
                             <button
                                 type='button'
@@ -236,9 +220,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                 <Bell size={19} />
                                 <span className='absolute top-2 right-2 size-2 rounded-full bg-[#ef7f1a]' />
                             </button>
-                            <div className='grid size-11 place-items-center rounded-2xl bg-[#7c6dc8] text-sm font-black text-white shadow-sm'>
+                            <button
+                                type='button'
+                                onClick={() => setIsLogoutModalOpen(true)}
+                                aria-label='Admin menyu'
+                                title='Chiqish'
+                                className='grid size-11 place-items-center rounded-2xl bg-[#7c6dc8] text-sm font-black text-white shadow-sm transition hover:bg-[#6959bb]'>
                                 A
-                            </div>
+                            </button>
                         </div>
                     </header>
 
@@ -247,6 +236,41 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     </main>
                 </div>
             </div>
+
+            {isLogoutModalOpen && (
+                <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm'>
+                    <div className='w-full max-w-sm rounded-[24px] bg-[#fffaf2] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
+                        <div className='mx-auto grid size-14 place-items-center rounded-2xl bg-red-50 text-red-500 dark:bg-red-500/10'>
+                            <LogOut size={24} />
+                        </div>
+
+                        <div className='mt-4 text-center'>
+                            <h2 className='text-xl font-black text-[#2f2a25] dark:text-white'>Tizimdan chiqasizmi?</h2>
+                            <p className='mt-2 text-sm leading-6 font-semibold text-[#8b7e70] dark:text-slate-400'>
+                                Admin paneldan chiqish uchun tasdiqlang.
+                            </p>
+                        </div>
+
+                        <div className='mt-6 grid grid-cols-2 gap-3'>
+                            <button
+                                type='button'
+                                disabled={isLoggingOut}
+                                onClick={() => setIsLogoutModalOpen(false)}
+                                className='h-11 rounded-2xl bg-white text-sm font-black text-[#6f6255] ring-1 ring-[#eadfce] transition hover:bg-[#f2e7d8] disabled:cursor-not-allowed disabled:opacity-70 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-800 dark:hover:bg-slate-800'>
+                                Bekor qilish
+                            </button>
+                            <button
+                                type='button'
+                                disabled={isLoggingOut}
+                                onClick={handleLogout}
+                                className='flex h-11 items-center justify-center gap-2 rounded-2xl bg-red-500 text-sm font-black text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-70'>
+                                {isLoggingOut ? <Loader2 size={17} className='animate-spin' /> : <LogOut size={17} />}
+                                Chiqish
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

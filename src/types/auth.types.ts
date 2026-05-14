@@ -7,7 +7,7 @@ export interface User {
     phone?: string;
     avatar?: string;
     telegramChatId?: string;
-    role?: 'user' | 'admin';
+    role?: 'USER' | 'ADMIN';
     createdAt?: string;
     updatedAt?: string;
     bio?: string;
@@ -30,3 +30,15 @@ export type AuthAction =
     | { type: 'AUTH_SUCCESS'; payload: User | null }
     | { type: 'AUTH_FAILURE' }
     | { type: 'LOGOUT' };
+
+export interface LoginPayload {
+    email: string;
+    password: string;
+}
+
+export interface LoginResponse {
+    success?: boolean;
+    message?: string;
+    token?: string;
+    user: User | null;
+}

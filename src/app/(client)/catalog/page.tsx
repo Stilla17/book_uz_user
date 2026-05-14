@@ -9,10 +9,9 @@ import { BookCardSkeleton } from '@/components/cards/BookCardSkeleton';
 import AsideFilter from '@/components/filter/AsideFilter';
 import PanelResults, { type CatalogViewMode } from '@/components/filter/PanelResults';
 import { Pagination } from '@/components/shared/Pagination';
-import type { CatalogFilters } from '@/data/catalog';
 import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
 import { bookService } from '@/services/book.service';
-import type { Product } from '@/types';
+import type { CatalogFilters, Product } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';

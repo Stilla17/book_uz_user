@@ -32,3 +32,11 @@ export const paymentOptions = [
         title: 'Xazna'
     }
 ];
+
+export const LANGUAGE_OPTIONS = [
+    { value: '', label: 'Barcha tillar' },
+    { value: 'uz', label: 'Ozbekcha' },
+    { value: 'kr', label: 'Kirilcha' },
+    { value: 'ru', label: 'Ruscha' },
+    { value: 'en', label: 'Inglizcha' }
+] as const;

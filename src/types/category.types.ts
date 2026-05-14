@@ -1,8 +1,4 @@
-export interface MultiLangField {
-    uz: string;
-    ru: string;
-    en: string;
-}
+import { MultiLangField } from '.';
 
 export interface SubCategory {
     _id?: string;
@@ -63,3 +59,68 @@ export type FilterSelectProps = {
     allLabel?: string;
     disabled?: boolean;
 };
+
+export interface CategoryPageProduct {
+    _id: string;
+    title: {
+        uz: string;
+        ru?: string;
+        en?: string;
+    };
+    slug: string;
+    price: number;
+    discountPrice?: number;
+    images: string[];
+    author: {
+        _id: string;
+        name: string;
+    };
+    ratingAvg: number;
+    ratingCount: number;
+    isTop: boolean;
+    isDiscount: boolean;
+    format?: 'ebook' | 'audio' | 'paper';
+    language?: 'uz' | 'ru' | 'en';
+    stock?: number;
+}
+
+export interface CategoryPageFilterState {
+    minPrice: string;
+    maxPrice: string;
+    author: string;
+    language: string;
+    format: string;
+    isTop: boolean;
+    isDiscount: boolean;
+    inStock: boolean;
+}
+
+export interface CategoryPagePagination {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+}
+
+// ----------------------------Genre for admin type--------------------------------------
+export interface Subgenre {
+    _id: string;
+    slug: string;
+    title: MultiLangField;
+    books: string[];
+    order: number;
+    isActive: boolean;
+}
+
+export interface Genre {
+    _id: string;
+    slug: string;
+    title: MultiLangField;
+    subgenres: Subgenre[];
+    order: number;
+    isActive: boolean;
+    isFeatured: boolean;
+    bookCount?: number;
+    createdAt: string;
+    updatedAt: string;
+}

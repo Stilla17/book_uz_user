@@ -355,13 +355,14 @@ export const UserService = {
 type PublisherPaginationParams = {
     page?: number;
     limit?: number;
+    search?: string;
 };
 
 type PublisherPagination = {
     page: number;
     limit: number;
     total: number;
-    totalPages: number;
+    pages: number;
 };
 
 export type PublishersResponse = {
@@ -391,7 +392,7 @@ const normalizePublishersResponse = (data: any, fallbackLimit: number): Publishe
             page: Number.isFinite(page) ? page : 1,
             limit: Number.isFinite(limit) ? limit : fallbackLimit,
             total: Number.isFinite(total) ? total : publishers.length,
-            totalPages: Number.isFinite(totalPages) ? totalPages : 1
+            pages: Number.isFinite(totalPages) ? totalPages : 1
         }
     };
 };
@@ -402,7 +403,10 @@ export const ClientService = {
         return normalizePublishersResponse(response.data.data, params?.limit ?? 12);
     },
 
-    getPublisherProducts: async (slug: string, params?: PublisherPaginationParams): Promise<PublisherProductsResponse> => {
+    getPublisherProducts: async (
+        slug: string,
+        params?: PublisherPaginationParams
+    ): Promise<PublisherProductsResponse> => {
         const response = await api.get(`/publishers/${slug}/products`, { params });
         const data = response.data.data;
         const products = Array.isArray(data?.products) ? data.products : [];
@@ -421,9 +425,9 @@ export const ClientService = {
             products,
             pagination: {
                 page: Number.isFinite(page) ? page : 1,
-                limit: Number.isFinite(limit) ? limit : params?.limit ?? 12,
+                limit: Number.isFinite(limit) ? limit : (params?.limit ?? 12),
                 total: Number.isFinite(total) ? total : products.length,
-                totalPages: Number.isFinite(totalPages) ? totalPages : 1
+                pages: Number.isFinite(totalPages) ? totalPages : 1
             }
         };
     }

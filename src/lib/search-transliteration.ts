@@ -37,8 +37,8 @@ const CYRILLIC_TO_LATIN_PAIRS: Array<[string, string]> = [
 ];
 
 const LATIN_TO_CYRILLIC_PAIRS: Array<[RegExp, string]> = [
-    [/o['‘`ʼ]/gi, 'ў'],
-    [/g['‘`ʼ]/gi, 'ғ'],
+    [/o['‘’`ʼʻ]/gi, 'ў'],
+    [/g['‘’`ʼʻ]/gi, 'ғ'],
     [/sh/gi, 'ш'],
     [/ch/gi, 'ч'],
     [/ng/gi, 'нг'],
@@ -74,7 +74,7 @@ const LATIN_TO_CYRILLIC_PAIRS: Array<[RegExp, string]> = [
 
 const CYRILLIC_PATTERN = /[а-яёғқҳў]/i;
 const LATIN_PATTERN = /[a-z]/i;
-const APOSTROPHE_PATTERN = /[‘`ʼ]/g;
+const APOSTROPHE_PATTERN = /[‘’`ʼʻ]/g;
 
 const restoreCase = (source: string, converted: string) => {
     if (source.toUpperCase() === source) return converted.toUpperCase();
@@ -85,6 +85,23 @@ const restoreCase = (source: string, converted: string) => {
 
 export const normalizeSearchQuery = (query: string) =>
     query.trim().replace(APOSTROPHE_PATTERN, "'").replace(/\s+/g, ' ');
+
+const withoutApostrophes = (query: string) => query.replace(/'/g, '');
+
+const getMissingApostropheVariants = (query: string) => {
+    const variants = new Set<string>();
+
+    for (let index = 0; index < query.length; index += 1) {
+        const letter = query[index]?.toLowerCase();
+        const nextLetter = query[index + 1];
+
+        if ((letter === 'g' || letter === 'o') && nextLetter !== "'") {
+            variants.add(`${query.slice(0, index + 1)}'${query.slice(index + 1)}`);
+        }
+    }
+
+    return Array.from(variants);
+};
 
 export const cyrillicToLatin = (query: string) =>
     CYRILLIC_TO_LATIN_PAIRS.reduce(
@@ -110,7 +127,16 @@ export const getSearchQueryVariants = (query: string) => {
 
     if (LATIN_PATTERN.test(normalizedQuery)) {
         variants.add(latinToCyrillic(normalizedQuery));
+
+        getMissingApostropheVariants(normalizedQuery).forEach((variant) => {
+            variants.add(variant);
+            variants.add(latinToCyrillic(variant));
+        });
     }
+
+    Array.from(variants).forEach((variant) => {
+        variants.add(withoutApostrophes(variant));
+    });
 
     return Array.from(variants).filter((variant) => variant.length >= 2);
 };

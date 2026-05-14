@@ -9,17 +9,6 @@ export interface BookSectionProps {
     viewAllLink?: string;
 }
 
-export interface AudioBooksSectionProps {
-    autoPlay?: boolean;
-    title?: string;
-    subtitle?: string;
-    limit?: number;
-    category?: string;
-    hit?: boolean;
-    new?: boolean;
-    showCategories?: boolean;
-}
-
 export interface CategorySectionProps {
     onCategoryClick?: (category: Category) => void;
     lang?: 'uz' | 'ru' | 'en';

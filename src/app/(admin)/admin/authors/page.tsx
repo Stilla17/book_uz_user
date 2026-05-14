@@ -1,10 +1,38 @@
 import { Award, BookOpen, Edit3, ImagePlus, PenLine, Plus, Search, Star, Trash2, Users } from 'lucide-react';
 
 const authors = [
-    { name: 'Abdulla Qodiriy', slug: 'abdulla-qodiriy', books: 18, country: "O'zbekiston", rating: '4.9', status: 'Faol' },
-    { name: 'Chingiz Aytmatov', slug: 'chingiz-aytmatov', books: 27, country: "Qirg'iziston", rating: '4.8', status: 'Faol' },
-    { name: "O'tkir Hoshimov", slug: 'otkir-hoshimov', books: 21, country: "O'zbekiston", rating: '4.9', status: 'Faol' },
-    { name: 'George Orwell', slug: 'george-orwell', books: 12, country: 'Buyuk Britaniya', rating: '4.7', status: 'Yashirilgan' }
+    {
+        name: 'Abdulla Qodiriy',
+        slug: 'abdulla-qodiriy',
+        books: 18,
+        country: "O'zbekiston",
+        rating: '4.9',
+        status: 'Faol'
+    },
+    {
+        name: 'Chingiz Aytmatov',
+        slug: 'chingiz-aytmatov',
+        books: 27,
+        country: "Qirg'iziston",
+        rating: '4.8',
+        status: 'Faol'
+    },
+    {
+        name: "O'tkir Hoshimov",
+        slug: 'otkir-hoshimov',
+        books: 21,
+        country: "O'zbekiston",
+        rating: '4.9',
+        status: 'Faol'
+    },
+    {
+        name: 'George Orwell',
+        slug: 'george-orwell',
+        books: 12,
+        country: 'Buyuk Britaniya',
+        rating: '4.7',
+        status: 'Yashirilgan'
+    }
 ];
 
 const stats = [
@@ -143,7 +171,9 @@ const AdminAuthorsPage = () => {
                         <div className='mt-5 grid aspect-square place-items-center rounded-[20px] border-2 border-dashed border-[#eadfce] bg-[#f7f0e6] text-center dark:border-slate-800 dark:bg-slate-900'>
                             <div>
                                 <Users size={30} className='mx-auto text-[#9d907e] dark:text-slate-500' />
-                                <p className='mt-2 text-sm font-black text-[#6f6255] dark:text-slate-300'>Rasm yuklash</p>
+                                <p className='mt-2 text-sm font-black text-[#6f6255] dark:text-slate-300'>
+                                    Rasm yuklash
+                                </p>
                                 <p className='mt-1 text-xs font-semibold text-[#9d907e] dark:text-slate-500'>
                                     Portret yoki avatar
                                 </p>
@@ -162,7 +192,9 @@ const AdminAuthorsPage = () => {
                         <div className='mt-5 space-y-4'>
                             {['Muallif ismi', 'Slug', 'Davlat', "Tug'ilgan yil"].map((label) => (
                                 <label key={label} className='block space-y-2'>
-                                    <span className='text-sm font-black text-[#6f6255] dark:text-slate-300'>{label}</span>
+                                    <span className='text-sm font-black text-[#6f6255] dark:text-slate-300'>
+                                        {label}
+                                    </span>
                                     <input className='h-12 w-full rounded-2xl border border-[#eadfce] bg-white px-4 text-sm font-semibold outline-none focus:border-[#ef7f1a] dark:border-slate-800 dark:bg-slate-900 dark:text-white' />
                                 </label>
                             ))}

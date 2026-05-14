@@ -1,19 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { ADMIN_BOOKS_LIMIT, useAdminBooksQuery } from '@/components/admin/hooks/queries/useAdminBooksQuery';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useDebounce } from '@/hooks/useDebounce';
-import { getSearchQueryVariants } from '@/lib/search-transliteration';
-import { bookService } from '@/services/book.service';
+import { BooksCardSkeleton, BooksTableSkeleton } from '@/components/ui/skeleton';
+import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { Product } from '@/types';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
-import { useQuery } from '@tanstack/react-query';
+import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import {
     ArrowLeft,
@@ -29,95 +29,9 @@ import {
     Trash2
 } from 'lucide-react';
 
-const BOOKS_LIMIT = 25;
-
 const formatPrice = (price?: number) => `${Number(price || 0).toLocaleString('uz-UZ')} so'm`;
 
 const getBookImage = (book: Product) => book.images?.[0] || book.image;
-
-type ProductListData = Awaited<ReturnType<typeof bookService.getAllProducts>>;
-
-const mergeProductLists = (lists: ProductListData[], limit: number): ProductListData => {
-    const seenIds = new Set<string>();
-    const products = lists
-        .flatMap((list) => list.products)
-        .filter((book) => {
-            if (seenIds.has(book._id)) return false;
-
-            seenIds.add(book._id);
-            return true;
-        })
-        .slice(0, limit);
-
-    const total = lists.reduce((sum, list) => sum + Number(list.pagination.total || 0), 0);
-    const page = lists[0]?.pagination.page ?? 1;
-
-    return {
-        products,
-        pagination: {
-            page,
-            limit,
-            total,
-            pages: Math.max(1, Math.ceil(total / Math.max(limit, 1)))
-        }
-    };
-};
-
-const BooksTableSkeleton = () => (
-    <>
-        {Array.from({ length: 7 }).map((_, index) => (
-            <tr key={index} className='border-b border-[#f0e4d3] last:border-0 dark:border-slate-900'>
-                <td className='px-4 py-4'>
-                    <div className='flex items-center gap-3'>
-                        <div className='size-14 animate-pulse rounded-2xl bg-[#f2e7d8] dark:bg-slate-900' />
-                        <div className='min-w-0 flex-1 space-y-2'>
-                            <div className='h-4 w-44 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
-                            <div className='h-3 w-28 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
-                        </div>
-                    </div>
-                </td>
-                <td className='px-4 py-4'>
-                    <div className='h-4 w-28 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
-                </td>
-                <td className='px-4 py-4'>
-                    <div className='h-4 w-24 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
-                </td>
-                <td className='px-4 py-4'>
-                    <div className='h-7 w-28 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
-                </td>
-                <td className='px-4 py-4'>
-                    <div className='h-7 w-16 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
-                </td>
-                <td className='px-4 py-4'>
-                    <div className='ml-auto h-8 w-28 animate-pulse rounded-xl bg-[#f2e7d8] dark:bg-slate-900' />
-                </td>
-            </tr>
-        ))}
-    </>
-);
-
-const BooksCardSkeleton = () => (
-    <>
-        {Array.from({ length: 5 }).map((_, index) => (
-            <article
-                key={index}
-                className='rounded-[20px] bg-white p-3 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-900 dark:ring-slate-800'>
-                <div className='flex gap-3'>
-                    <div className='size-16 shrink-0 animate-pulse rounded-2xl bg-[#f2e7d8] dark:bg-slate-800' />
-                    <div className='min-w-0 flex-1 space-y-2'>
-                        <div className='h-4 w-4/5 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-800' />
-                        <div className='h-3 w-1/2 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-800' />
-                        <div className='h-4 w-24 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-800' />
-                    </div>
-                </div>
-                <div className='mt-3 flex items-center justify-between'>
-                    <div className='h-7 w-28 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-800' />
-                    <div className='h-8 w-24 animate-pulse rounded-xl bg-[#f2e7d8] dark:bg-slate-800' />
-                </div>
-            </article>
-        ))}
-    </>
-);
 
 const getStockStatus = (stock?: number) => {
     if (!stock || stock <= 0) {
@@ -145,67 +59,31 @@ const getStockStatus = (stock?: number) => {
 const AdminBookPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [page, setPage] = useState(1);
-    const urlSearch = searchParams.get('search') || '';
-    const [searchInput, setSearchInput] = useState(urlSearch);
-    const debouncedSearch = useDebounce(searchInput, 400);
+    const urlPage = getPageFromUrl(searchParams.get('page'));
+    const [page, setPage] = useState(urlPage);
+    const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
+    const { data, isFetching, isLoading } = useAdminBooksQuery(page, debouncedSearch);
 
     useEffect(() => {
-        setSearchInput(urlSearch);
-    }, [urlSearch]);
-
-    useEffect(() => {
-        const nextSearch = debouncedSearch.trim();
-        if (nextSearch === urlSearch.trim()) return;
-
-        setPage(1);
-        router.replace(nextSearch ? `/admin/book?search=${encodeURIComponent(nextSearch)}` : '/admin/book', {
-            scroll: false
-        });
-    }, [debouncedSearch, router, urlSearch]);
-
-    const queryParams = useMemo(
-        () => ({
-            page,
-            limit: BOOKS_LIMIT,
-            keyword: debouncedSearch.trim() || undefined
-        }),
-        [debouncedSearch, page]
-    );
-
-    const { data, isFetching, isLoading } = useQuery({
-        queryKey: ['admin-books', queryParams],
-        queryFn: async () => {
-            const searchVariants = getSearchQueryVariants(debouncedSearch);
-
-            if (searchVariants.length <= 1) {
-                return bookService.getAllProducts(queryParams);
-            }
-
-            const lists = await Promise.all(
-                searchVariants.map((keyword) =>
-                    bookService.getAllProducts({
-                        ...queryParams,
-                        keyword
-                    })
-                )
-            );
-
-            return mergeProductLists(lists, BOOKS_LIMIT);
-        },
-        placeholderData: (previousData) => previousData
-    });
+        setPage(urlPage);
+    }, [urlPage]);
 
     const books = data?.products ?? [];
-    const pagination = data?.pagination ?? { page: 1, limit: BOOKS_LIMIT, total: 0, pages: 1 };
+    const pagination = data?.pagination ?? { page: 1, limit: ADMIN_BOOKS_LIMIT, total: 0, pages: 1 };
     const totalStock = books.reduce((sum, book) => sum + Number(book.stock || 0), 0);
     const activeBooks = books.filter((book) => Number(book.stock || 0) > 0).length;
     const averagePrice = books.length
         ? books.reduce((sum, book) => sum + Number(book.price || 0), 0) / books.length
         : 0;
 
-    const handleSearch = (value: string) => {
-        setSearchInput(value);
+    const updatePage = (nextPage: number) => {
+        updateUrlPage({
+            nextPage,
+            totalPages: pagination.pages,
+            searchParams,
+            replace: router.replace,
+            setPage
+        });
     };
 
     return (
@@ -269,7 +147,7 @@ const AdminBookPage = () => {
                         <Search size={18} className='shrink-0' />
                         <Input
                             value={searchInput}
-                            onChange={(event) => handleSearch(event.target.value)}
+                            onChange={(event) => setSearchInput(event.target.value)}
                             placeholder='Kitob nomi, muallif yoki ISBN'
                             className='h-full border-0 bg-transparent p-0 text-sm font-semibold shadow-none'
                         />
@@ -470,7 +348,7 @@ const AdminBookPage = () => {
                         <Button
                             variant='outline'
                             disabled={page <= 1 || isFetching}
-                            onClick={() => setPage((value) => Math.max(value - 1, 1))}
+                            onClick={() => updatePage(page - 1)}
                             className='h-10 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
                             <ArrowLeft size={17} />
                             Oldingi
@@ -478,7 +356,7 @@ const AdminBookPage = () => {
                         <Button
                             variant='outline'
                             disabled={page >= pagination.pages || isFetching}
-                            onClick={() => setPage((value) => Math.min(value + 1, pagination.pages))}
+                            onClick={() => updatePage(page + 1)}
                             className='h-10 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
                             Keyingi
                             <ArrowRight size={17} />
