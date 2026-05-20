@@ -124,3 +124,19 @@ export interface Genre {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface CreateSubgenreData {
+    slug: string;
+    title: MultiLangField;
+    order?: number;
+    isActive?: boolean;
+}
+
+export interface CreateGenreData {
+    slug: string;
+    title: MultiLangField;
+    subgenres?: CreateSubgenreData[];
+    order?: number;
+    isActive?: boolean;
+    isFeatured?: boolean;
+}

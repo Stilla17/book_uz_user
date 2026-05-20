@@ -358,7 +358,7 @@ type PublisherPaginationParams = {
     search?: string;
 };
 
-type PublisherPagination = {
+export type OtherPagination = {
     page: number;
     limit: number;
     total: number;
@@ -367,13 +367,13 @@ type PublisherPagination = {
 
 export type PublishersResponse = {
     publishers: PublisherItems[];
-    pagination: PublisherPagination;
+    pagination: OtherPagination;
 };
 
 export type PublisherProductsResponse = {
     publisher: PublisherItems | null;
     products: Product[];
-    pagination: PublisherPagination;
+    pagination: OtherPagination;
 };
 
 const normalizePublishersResponse = (data: any, fallbackLimit: number): PublishersResponse => {

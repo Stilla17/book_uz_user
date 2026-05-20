@@ -1,14 +1,15 @@
+import { CreateGenreData } from '@/types/category.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { AdminService } from '../../services/publisher.service';
+import { GenreService } from '../../services/genre.service';
 
-export const useCreatePublisher = () => {
+export const useCreateGenre = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (formData: FormData) => AdminService.addAdminPublishers(formData),
+        mutationFn: (data: CreateGenreData) => GenreService.addAdminGenre(data),
         onSuccess: async (data) => {
-            console.log('Publisher created successfully:', data);
+            console.log('Genre created successfully:', data);
             await queryClient.invalidateQueries({
                 queryKey: ['genres']
             });

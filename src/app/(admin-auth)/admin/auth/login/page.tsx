@@ -47,7 +47,7 @@ export default function AdminLoginPage() {
                                 className='ml-1 text-sm font-black text-[#6f6255] dark:text-slate-300'>
                                 Email
                             </label>
-                            <div className='flex h-13 items-center gap-3 rounded-2xl bg-[#f2e7d8] px-4 ring-1 ring-transparent transition focus-within:ring-[#ef7f1a] dark:bg-slate-900'>
+                            <div className='flex h-13 items-center gap-3 rounded-2xl bg-[#f2e7d8] px-4 ring-1 ring-transparent transition dark:bg-slate-900'>
                                 <Mail size={18} className='text-[#9d907e]' />
                                 <input
                                     id='admin-email'
@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
                                 className='ml-1 text-sm font-black text-[#6f6255] dark:text-slate-300'>
                                 Parol
                             </label>
-                            <div className='flex h-13 items-center gap-3 rounded-2xl bg-[#f2e7d8] px-4 ring-1 ring-transparent transition focus-within:ring-[#ef7f1a] dark:bg-slate-900'>
+                            <div className='flex h-13 items-center gap-3 rounded-2xl bg-[#f2e7d8] px-4 ring-1 ring-transparent transition dark:bg-slate-900'>
                                 <LockKeyhole size={18} className='text-[#9d907e]' />
                                 <input
                                     id='admin-password'

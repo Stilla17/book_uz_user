@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://backend.book.uz';
 
 type ImageValue =
     | string
@@ -16,20 +16,40 @@ const getImageValue = (image?: ImageValue): string => {
     return image;
 };
 
-export const getImageUrl = (image?: ImageValue) => {
-    const value = getImageValue(image).trim();
+const getLatestImageValue = (image?: ImageValue): string => {
+    if (!image) return '';
+    if (Array.isArray(image)) {
+        return [...image].reverse().find((item) => typeof item === 'string' && item.trim()) || '';
+    }
+    if (typeof image === 'object') {
+        return image.url || image.src || image.path || image.image || getLatestImageValue(image.images);
+    }
+
+    return image;
+};
+
+const getApiBaseUrl = () => (API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL);
+
+const buildImageUrl = (value: string) => {
     if (!value) return;
 
     if (value.startsWith('http://') || value.startsWith('https://')) return value;
     if (value.startsWith('//')) return `https:${value}`;
     if (value.startsWith('/images/')) return value;
-    if (value.startsWith('/user-api/')) return `https://backend.book.uz${value}`;
+    if (value.startsWith('/user-api')) return `${getApiBaseUrl()}${value}`;
     if (value.startsWith('/')) {
-        const baseUrl = API_BASE_URL?.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
         const imagePath = value.slice(1);
-        return `${baseUrl}/${imagePath}`;
+        return `${getApiBaseUrl()}/${imagePath}`;
     }
-    if (value.startsWith('user-api/')) return `https://backend.book.uz/${value}`;
+    if (value.startsWith('user-api')) return `${getApiBaseUrl()}/${value}`;
 
-    return `${API_BASE_URL}/${value.replace(/^\//, '')}`;
+    return `${getApiBaseUrl()}/${value.replace(/^\//, '')}`;
+};
+
+export const getImageUrl = (image?: ImageValue) => {
+    return buildImageUrl(getImageValue(image).trim());
+};
+
+export const getLatestImageUrl = (image?: ImageValue) => {
+    return buildImageUrl(getLatestImageValue(image).trim());
 };

@@ -1,8 +1,8 @@
 export type LocalizedText = string | { uz?: string; ru?: string; en?: string } | null | undefined;
 
 export type CategoryLike =
-    | { name?: string; title?: LocalizedText }
-    | Array<{ name?: string; title?: LocalizedText }>
+    | { name?: LocalizedText; title?: LocalizedText }
+    | Array<{ name?: LocalizedText; title?: LocalizedText }>
     | null
     | undefined;
 
@@ -17,7 +17,7 @@ export const getCategoryLabel = (category?: CategoryLike, fallback = '') => {
     if (!category) return fallback;
 
     const getOne = (item: Exclude<NonNullable<CategoryLike>, unknown[]>) =>
-        item.name || getLocalizedText(item.title, '');
+        getLocalizedText(item.name, '') || getLocalizedText(item.title, '');
 
     return Array.isArray(category)
         ? category.map(getOne).filter(Boolean).join(', ') || fallback
@@ -27,7 +27,7 @@ export const getCategoryLabel = (category?: CategoryLike, fallback = '') => {
 export const getAuthor = (author: unknown) => {
     if (typeof author === 'string') return author;
     if (author && typeof author === 'object' && 'name' in author) {
-        return String((author as { name: string }).name);
+        return getLocalizedText((author as { name?: LocalizedText }).name, 'Muallif nomalum');
     }
-    return 'Muallif noma’lum';
+    return 'Muallif nomalum';
 };

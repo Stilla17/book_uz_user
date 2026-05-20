@@ -11,15 +11,8 @@ import { Book } from '@/types/book';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
-import {
-    ArrowLeft,
-    BookOpen,
-    Edit3,
-    ImageIcon,
-    PackageCheck,
-    Store,
-    Trash2
-} from 'lucide-react';
+
+import { ArrowLeft, BookOpen, Edit3, ImageIcon, PackageCheck, Store, Trash2 } from 'lucide-react';
 
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
@@ -30,7 +23,7 @@ const formatPrice = (price?: number) => `${Number(price || 0).toLocaleString('uz
 const InfoItem = ({ label, value }: { label: string; value?: string | number | null }) => (
     <div className='rounded-2xl bg-[#f7f0e6] p-4 ring-1 ring-[#eadfce] dark:bg-slate-900 dark:ring-slate-800'>
         <p className='text-xs font-black tracking-wide text-[#9d907e] uppercase dark:text-slate-500'>{label}</p>
-        <p className='mt-2 break-words text-sm font-black text-[#2f2a25] dark:text-white'>{value || '-'}</p>
+        <p className='wrap-break-words mt-2 text-sm font-black text-[#2f2a25] dark:text-white'>{value || '-'}</p>
     </div>
 );
 
@@ -43,6 +36,8 @@ const AdminBookDetailPage = () => {
         queryFn: () => bookService.getBookById(slug) as Promise<DetailBook | null>,
         enabled: Boolean(slug)
     });
+
+    console.log(book);
 
     const bookView = useMemo(
         () => ({
@@ -57,12 +52,7 @@ const AdminBookDetailPage = () => {
 
     const branchStocks = book?.branchStocks?.filter((item) => Number(item.available || 0) > 0) ?? [];
     const stock = Number(book?.stock || 0);
-    const stockStatus =
-        stock <= 0
-            ? 'Tugagan'
-            : stock < 10
-              ? 'Kam qolgan'
-              : 'Mavjud';
+    const stockStatus = stock <= 0 ? 'Tugagan' : stock < 10 ? 'Kam qolgan' : 'Mavjud';
 
     if (isLoading) {
         return (
@@ -151,7 +141,10 @@ const AdminBookDetailPage = () => {
                 <div className='space-y-5'>
                     <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
                         <InfoItem label='Holat' value={stockStatus} />
-                        <InfoItem label='Reyting' value={`${Number(book.ratingAvg || book.rating || 0).toFixed(1)} / 5`} />
+                        <InfoItem
+                            label='Reyting'
+                            value={`${Number(book.ratingAvg || book.rating || 0).toFixed(1)} / 5`}
+                        />
                         <InfoItem label='Sotuvlar' value={book.sales ?? 0} />
                         <InfoItem label="Ko'rishlar" value={book.views ?? 0} />
                     </div>
@@ -161,7 +154,7 @@ const AdminBookDetailPage = () => {
                             <BookOpen size={20} className='text-[#ef7f1a]' />
                             <h3 className='text-lg font-black text-[#2f2a25] dark:text-white'>Kitob haqida</h3>
                         </div>
-                        <p className='mt-4 text-sm font-semibold leading-7 text-[#6f6255] dark:text-slate-300'>
+                        <p className='mt-4 text-sm leading-7 font-semibold text-[#6f6255] dark:text-slate-300'>
                             {bookView.description}
                         </p>
                     </div>
@@ -169,11 +162,14 @@ const AdminBookDetailPage = () => {
                     <div className='grid gap-4 md:grid-cols-2'>
                         <InfoItem label='ISBN / Barcode' value={book.barcode || book.isbn} />
                         <InfoItem label='Nashriyot' value={book.publisherName || book.publisher} />
-                        <InfoItem label='Yil' value={book.year || book.publishedYear} />
+                        <InfoItem label='Yil' value={book.year || book.publishedYear || book.details?.publishedYear} />
                         <InfoItem label='Betlar soni' value={book.numberOfPage || book.pages} />
                         <InfoItem label='Til' value={book.language?.toUpperCase()} />
                         <InfoItem label='Yozuv' value={book.contentLanguage === 'cyrillic' ? 'Kirill' : 'Lotin'} />
-                        <InfoItem label='Muqova' value={book.cover === 'paper' ? 'Yumshoq' : book.cover ? 'Qattiq' : '-'} />
+                        <InfoItem
+                            label='Muqova'
+                            value={book.cover === 'paper' ? 'Yumshoq' : book.cover ? 'Qattiq' : '-'}
+                        />
                         <InfoItem label='Format' value={book.format || 'paper'} />
                     </div>
                 </div>

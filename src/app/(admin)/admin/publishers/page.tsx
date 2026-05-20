@@ -10,7 +10,6 @@ import { usePublisherQuery } from '@/components/admin/hooks/queries/publishers';
 import { Button } from '@/components/ui/button';
 import { PublishersSkeleton } from '@/components/ui/skeleton';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
-import { getSearchQueryVariants } from '@/lib/search-transliteration';
 import { getImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
@@ -46,22 +45,6 @@ const AdminPublishersPage = () => {
         },
         { label: 'Kitoblar', value: totalBooks.toLocaleString('uz-UZ'), icon: BookOpen, color: 'bg-[#285c7f]' }
     ];
-
-    const query = searchInput.trim().toLowerCase();
-    const searchVariants = getSearchQueryVariants(searchInput).map((variant) => variant.toLowerCase());
-    const queryVariants = searchVariants.length ? searchVariants : query ? [query] : [];
-    const filterPublishers = queryVariants.length
-        ? publishers.filter((item) => {
-              const publisherText = [item.name, item.slug].filter(Boolean).join(' ');
-              const publisherVariants = [publisherText, ...getSearchQueryVariants(publisherText)].map((variant) =>
-                  variant.toLowerCase()
-              );
-
-              return publisherVariants.some((publisherVariant) =>
-                  queryVariants.some((queryVariant) => publisherVariant.includes(queryVariant))
-              );
-          })
-        : publishers;
 
     const updatePage = (nextPage: number) => {
         updateUrlPage({
@@ -123,7 +106,7 @@ const AdminPublishersPage = () => {
                             />
                         </label>
                         <span className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
-                            {filterPublishers.length} ta nashriyot ko'rsatildi
+                            {publishers.length} ta nashriyot ko'rsatildi
                         </span>
                     </div>
 
@@ -131,9 +114,9 @@ const AdminPublishersPage = () => {
                         <PublishersSkeleton />
                     ) : (
                         <div className='grid gap-3 p-4'>
-                            {filterPublishers.map((publisher) => (
+                            {publishers.map((publisher, index) => (
                                 <article
-                                    key={publisher.slug}
+                                    key={publisher._id}
                                     className='grid gap-4 rounded-4xl bg-white p-4 ring-1 ring-[#eadfce] md:grid-cols-[minmax(0,1fr)_130px_120px_auto] md:items-center dark:bg-slate-900 dark:ring-slate-800'>
                                     <div className='flex min-w-0 items-center gap-3'>
                                         {publisher.image === '' ? (
@@ -149,11 +132,8 @@ const AdminPublishersPage = () => {
                                         )}
                                         <div className='min-w-0'>
                                             <h3 className='truncate font-black text-[#2f2a25] dark:text-white'>
-                                                {publisher.name}
+                                                {index + 1}. {publisher.name}
                                             </h3>
-                                            <p className='mt-1 truncate text-sm font-bold text-[#9d907e] dark:text-slate-400'>
-                                                /{publisher.slug}
-                                            </p>
                                         </div>
                                     </div>
 

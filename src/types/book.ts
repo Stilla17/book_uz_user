@@ -1,3 +1,5 @@
+import { OtherPagination } from '@/services/api';
+
 export type LocalizedText = string | { uz?: string; ru?: string; en?: string };
 
 export interface Book {
@@ -25,7 +27,7 @@ export interface Book {
     }>;
     images?: string[];
     image?: string;
-    barcode?: string;
+    barcode?: string | number;
     discount?: number;
     isNew?: boolean;
     isHit?: boolean;
@@ -46,16 +48,18 @@ export interface Book {
         publishedYear?: number;
         pages?: number;
         language?: string;
-        isbn?: string;
+        isbn?: string | number;
         weight?: string;
         dimensions?: string;
         cover?: string;
     };
     pages?: number;
+    weight?: string;
+    dimensions?: string;
     duration?: string;
     publisher?: string;
     publishedYear?: number;
-    isbn?: string;
+    isbn?: string | number;
     views?: number;
     sales?: number;
 }
@@ -109,4 +113,41 @@ export type BookCardProps = {
     book: Book;
     slug?: string;
     onWishlistChange?: (bookId: string, isWishlisted: boolean) => void;
+};
+
+// ------------------------------Admin Book-------------------------------------
+export type AdminBooksResponse = {
+    products: Product[];
+    pagination: OtherPagination;
+};
+
+export type BookFormValues = {
+    title: {
+        uz: string;
+        ru: string;
+        en: string;
+    };
+    description: {
+        uz: string;
+        ru: string;
+        en: string;
+    };
+    isbn: string;
+    slug: string;
+    category: string;
+    subCategoryId: string;
+    author: string;
+    publisher: string;
+    language: string;
+    contentLanguage: 'latin' | 'cyrillic';
+    cover: 'hardcover' | 'paper';
+    format: 'paper' | 'ebook' | 'audio';
+    pages: number;
+    publishedYear: number;
+    weight: string;
+    dimensions: string;
+    price: number;
+    oldPrice?: number;
+    discount?: number;
+    image?: FileList;
 };

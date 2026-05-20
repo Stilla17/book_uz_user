@@ -26,6 +26,8 @@ export const useLogin = () => {
 
             if (!data.token) {
                 toast.error("Token topilmadi. Qayta urinib ko'ring");
+                router.push('/admin/auth/login');
+
                 return;
             }
 

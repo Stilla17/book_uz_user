@@ -4,18 +4,32 @@ import { NavItem } from '@/types';
 
 import {
     Award,
+    BookOpen,
+    Building2,
     CreditCard,
     FileText,
     Gift,
+    Handshake,
     Headphones,
     HelpCircle,
+    ImageIcon,
     Info,
+    LayoutDashboard,
     Mail,
+    MessageSquareText,
+    Newspaper,
+    PenLine,
     Percent,
+    Quote,
+    Settings,
     Shield,
+    ShoppingCart,
     Star,
+    Tags,
+    TicketPercent,
     TrendingUp,
-    Truck
+    Truck,
+    Users
 } from 'lucide-react';
 
 // Bottom Navigation - to'liq jonlantirilgan (8 ta)
@@ -106,5 +120,78 @@ export const serviceMenuItems = [
         label: 'serviceItems.news.label',
         href: '/news',
         description: 'serviceItems.news.description'
+    }
+];
+
+export const menuItems = [
+    {
+        label: 'Dashboard',
+        href: '/admin',
+        icon: LayoutDashboard
+    },
+    {
+        label: 'Kitoblar',
+        href: '/admin/book',
+        icon: BookOpen
+    },
+    {
+        label: 'Janrlar',
+        href: '/admin/genre',
+        icon: Tags
+    },
+    {
+        label: 'Nashriyotlar',
+        href: '/admin/publishers',
+        icon: Building2
+    },
+    {
+        label: 'Mualliflar',
+        href: '/admin/authors',
+        icon: PenLine
+    },
+    {
+        label: 'Yangiliklar',
+        href: '/admin/news',
+        icon: Newspaper
+    },
+    {
+        label: 'Banner',
+        href: '/admin/banners',
+        icon: ImageIcon
+    },
+    {
+        label: 'Promo kod',
+        href: '/admin/promo-codes',
+        icon: TicketPercent
+    },
+    {
+        label: 'Kommentariya',
+        href: '/admin/comments',
+        icon: MessageSquareText
+    },
+    {
+        label: 'Iqtibos',
+        href: '/admin/quotes',
+        icon: Quote
+    },
+    {
+        label: 'Partners',
+        href: '/admin/partners',
+        icon: Handshake
+    },
+    {
+        label: 'Buyurtmalar',
+        href: '/admin/orders',
+        icon: ShoppingCart
+    },
+    {
+        label: 'Foydalanuvchilar',
+        href: '/admin/users',
+        icon: Users
+    },
+    {
+        label: 'Sozlamalar',
+        href: '/admin/settings',
+        icon: Settings
     }
 ];

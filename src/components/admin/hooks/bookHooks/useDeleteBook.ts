@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { AdminService } from '../../services/publisher.service';
+import { BookService } from '../../services/book.service';
 
-export const useDeletePublisher = () => {
+export const useDeleteBook = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id: string) => AdminService.deleteAdminPublishers(id),
+        mutationFn: (id: string) => BookService.deleteAdminBook(id),
         onSuccess: async () => {
             await queryClient.invalidateQueries({
-                queryKey: ['publishers']
+                queryKey: ['books']
             });
         }
     });

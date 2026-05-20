@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { CatalogFilters, LANGUAGE_OPTIONS } from '@/data/catalog';
+import { LANGUAGE_OPTIONS } from '@/data';
 import { useBookFilterQuery } from '@/hooks/queries/useFilter';
+import { CatalogFilters } from '@/types';
 import type { Category } from '@/types/category.types';
 
 import { Slider } from '../ui/slider';

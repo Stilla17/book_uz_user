@@ -1,120 +1,84 @@
 'use client';
 
-import { type ChangeEvent, type ElementType, type ReactNode, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useCreatePublisher } from '@/components/admin/hooks/publisherHooks/useCreatePublisher';
 import { useUpdatePublisher } from '@/components/admin/hooks/publisherHooks/useUpdatePublisher';
 import { usePublisherDetailQuery } from '@/components/admin/hooks/queries/publishers';
+import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
+import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 import { ArrowLeft, Building2, ImagePlus, Loader, Save, Upload, X } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
-const Field = ({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) => (
-    <label className='block space-y-2'>
-        <span className='text-sm font-black text-[#6f6255] dark:text-slate-300'>{label}</span>
-        {children}
-        {hint ? <span className='block text-xs font-semibold text-[#9d907e] dark:text-slate-500'>{hint}</span> : null}
-    </label>
-);
-
-const SectionTitle = ({ icon: Icon, title }: { icon: ElementType; title: string }) => (
-    <div className='mb-4 flex items-center gap-2'>
-        <span className='grid size-10 place-items-center rounded-2xl bg-[#f2e7d8] text-[#ef7f1a] dark:bg-slate-900'>
-            <Icon size={18} />
-        </span>
-        <h3 className='text-lg font-black text-[#2f2a25] dark:text-white'>{title}</h3>
-    </div>
-);
-
-const inputClass =
-    'h-12 rounded-2xl border-[#eadfce] bg-white font-semibold text-[#2f2a25] shadow-sm placeholder:text-[#b0a391] focus-visible:ring-[#ef7f1a]/30 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500';
+type PublisherFormValues = {
+    name: string;
+    slug: string;
+};
 
 const AdminNewPublisherPage = () => {
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState('');
-    const [existingImage, setExistingImage] = useState('');
-    const [publishName, setPublishName] = useState('');
-    const [publishSlug, setPublishSlug] = useState('');
-    const [showSuccess, setShowSuccess] = useState(false);
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
+    const router = useRouter();
+    const { handleSubmit, register, reset, setValue } = useForm<PublisherFormValues>({
+        defaultValues: {
+            name: '',
+            slug: ''
+        }
+    });
 
     const isEdit = !!id;
 
-    const { mutate: createPublisher, isPending: isCreatePending, error: createError } = useCreatePublisher();
-    const { mutate: updatePublisher, isPending: isUpdatePending, error: updateError } = useUpdatePublisher();
+    const { mutate: createPublisher, isPending: isCreatePending } = useCreatePublisher();
+    const { mutate: updatePublisher, isPending: isUpdatePending } = useUpdatePublisher();
     const { data: publisherData, isLoading: isDetailLoading } = usePublisherDetailQuery(id);
+    const { imageFile, imagePreview, setImagePreview, handleImageChange, clearImagePreview } = useImagePreview();
 
-    const error = id ? updateError : createError;
     const isPending = id ? isUpdatePending : isCreatePending;
 
     useEffect(() => {
         if (publisherData) {
-            setPublishName(publisherData.name);
-            setPublishSlug(publisherData.slug || '');
+            setValue('name', publisherData.name);
+            setValue('slug', publisherData.slug || '');
             if (publisherData.image) {
                 setImagePreview(publisherData.image);
-                setExistingImage(publisherData.image);
             }
         }
-    }, [publisherData]);
+    }, [publisherData, setValue]);
 
-    useEffect(() => {
-        return () => {
-            if (imagePreview && imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
-        };
-    }, [imagePreview]);
-
-    const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        setImageFile(file);
-        setImagePreview(URL.createObjectURL(file));
-    };
-
-    const clearImagePreview = () => {
-        if (imagePreview && imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
-        setImagePreview('');
-        setImageFile(null);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!publishName.trim() || !publishSlug.trim()) {
-            return;
-        }
-
+    const onSubmit = (values: PublisherFormValues) => {
         const formData = new FormData();
         if (imageFile) formData.append('image', imageFile);
-        formData.append('name', publishName);
-        formData.append('slug', publishSlug);
+        formData.append('name', values.name);
+        formData.append('slug', values.slug);
 
         if (id) {
-            updatePublisher({ id, formData }, {
-                onSuccess: (response: unknown) => {
-                    const updated = (response as { data?: { image?: string } })?.data;
-                    if (updated?.image) {
-                        setExistingImage(updated.image);
-                        setImagePreview(updated.image);
+            updatePublisher(
+                { id, formData },
+                {
+                    onSuccess: (response: unknown) => {
+                        const updated = (response as { data?: { image?: string } })?.data;
+                        if (updated?.image) {
+                            setImagePreview(updated.image);
+                        }
+                        toast.success('Nashriyot muvaffaqiyatli yangilandi');
                     }
-                    setShowSuccess(true);
-                    setTimeout(() => setShowSuccess(false), 3000);
                 }
-            });
+            );
         } else {
             createPublisher(formData, {
                 onSuccess: () => {
-                    setPublishName('');
-                    setPublishSlug('');
+                    reset();
                     clearImagePreview();
-                    setShowSuccess(true);
-                    setTimeout(() => setShowSuccess(false), 3000);
+                    toast.success("Nashriyot muvaffaqiyatli qo'shildi");
+                    router.push('/admin/publishers');
+                    router.refresh();
                 }
             });
         }
@@ -159,19 +123,7 @@ const AdminNewPublisherPage = () => {
                 </div>
             </section>
 
-            <form id='publisher-form' onSubmit={handleSubmit} className='space-y-5'>
-                {error && (
-                    <div className='rounded-[24px] bg-red-50 p-4 text-sm font-semibold text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20'>
-                        {error.message || 'Xatolik yuz berdi'}
-                    </div>
-                )}
-
-                {showSuccess && (
-                    <div className='rounded-[24px] bg-green-50 p-4 text-sm font-semibold text-green-700 ring-1 ring-green-200 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20'>
-                        {id ? 'Nashriyot muvaffaqiyatli yangilandi!' : "Nashriyot muvaffaqiyatli qo'shildi!"}
-                    </div>
-                )}
-
+            <form id='publisher-form' onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
                 {isDetailLoading && (
                     <div className='flex items-center justify-center gap-2 rounded-[24px] bg-[#fffaf2] p-8 text-sm font-semibold text-[#8b7e70] ring-1 ring-[#eadfce] dark:bg-slate-950 dark:text-slate-400 dark:ring-slate-800'>
                         <Loader size={18} className='animate-spin' />
@@ -187,8 +139,7 @@ const AdminNewPublisherPage = () => {
                             <Input
                                 className={inputClass}
                                 placeholder='Nashryot nomi'
-                                value={publishName}
-                                onChange={(event) => setPublishName(event.target.value)}
+                                {...register('name', { required: true })}
                             />
                         </Field>
 
@@ -196,8 +147,7 @@ const AdminNewPublisherPage = () => {
                             <Input
                                 className={inputClass}
                                 placeholder='gafur-gulom'
-                                value={publishSlug}
-                                onChange={(event) => setPublishSlug(event.target.value)}
+                                {...register('slug', { required: true })}
                             />
                         </Field>
                     </div>
