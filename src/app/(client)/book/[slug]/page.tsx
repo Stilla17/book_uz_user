@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 import { useParams } from 'next/navigation';
 
@@ -10,6 +10,7 @@ import { Loading } from '@/components/shared/Loading';
 import TabPanel from '@/components/shared/TabPanel';
 import { Button } from '@/components/ui/button';
 import { useBookCart } from '@/hooks/useBookCart';
+import { useBookStats } from '@/hooks/useBookStats';
 import { useBookWishlist } from '@/hooks/useBookWishlist';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
@@ -18,7 +19,7 @@ import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
-import { Heart, Minus, PackageCheck, Plus, ShoppingCart, Star, Store } from 'lucide-react';
+import { Eye, Heart, Minus, PackageCheck, Plus, ShoppingCart, Star, Store } from 'lucide-react';
 
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
@@ -33,6 +34,13 @@ export default function BookDetailPage() {
         queryKey: ['book', slug],
         queryFn: () => bookService.getBookById(slug) as Promise<DetailBook | null>,
         enabled: !!slug
+    });
+    const viewedBookRef = useRef<string | null>(null);
+    const { viewsCount, ratingAvg, ratingCount, userRating, incrementViews, rateBook } = useBookStats({
+        bookId: book?._id,
+        initialViewsCount: book?.viewsCount ?? book?.views,
+        initialRatingAvg: book?.ratingAvg,
+        initialRatingCount: book?.ratingCount
     });
 
     console.log(book);
@@ -117,6 +125,13 @@ export default function BookDetailPage() {
         }
     };
 
+    useEffect(() => {
+        if (!book?._id || viewedBookRef.current === book._id) return;
+
+        viewedBookRef.current = book._id;
+        incrementViews();
+    }, [book?._id, incrementViews]);
+
     if (bookLoading) {
         return <Loading />;
     }
@@ -146,10 +161,37 @@ export default function BookDetailPage() {
                         <p className='mt-3 text-lg text-gray-500 dark:text-gray-400'>{bookView.author}</p>
 
                         <div className='mt-5'>
-                            <span className='inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-2 font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-100'>
-                                {Number(book?.ratingAvg || 0).toFixed(1)}
-                                <Star size={16} className='fill-yellow-400 text-yellow-400' />
-                            </span>
+                            <div className='flex items-center gap-4'>
+                                <div className='inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-100'>
+                                    <span>{Number(ratingAvg || 0).toFixed(1)}</span>
+                                    <div className='flex items-center gap-0.5'>
+                                        {[1, 2, 3, 4, 5].map((rating) => (
+                                            <button
+                                                key={rating}
+                                                type='button'
+                                                aria-label={`${rating} yulduz`}
+                                                onClick={() => rateBook(rating)}
+                                                className='text-yellow-400 transition hover:scale-110'>
+                                                <Star
+                                                    size={17}
+                                                    className={
+                                                        rating <= (userRating ?? Math.round(ratingAvg))
+                                                            ? 'fill-yellow-400'
+                                                            : 'fill-transparent'
+                                                    }
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <span className='text-xs text-slate-500 dark:text-slate-300'>
+                                        ({ratingCount})
+                                    </span>
+                                </div>
+                                <span className='flex items-center gap-2'>
+                                    <Eye size={16} className='text-gray-500' />
+                                    {viewsCount}
+                                </span>
+                            </div>
 
                             {availableBranchStocks.length ? (
                                 <div className='mt-5 space-y-3 border-t border-orange-100 pt-4 dark:border-slate-700'>
@@ -230,11 +272,6 @@ export default function BookDetailPage() {
                                     <span className='text-4xl font-black tracking-tight text-[#ef7f1a]'>
                                         {book?.price.toLocaleString()} so'm
                                     </span>
-                                    {book?.oldPrice ? (
-                                        <span className='pb-1 text-base font-semibold text-slate-400 line-through dark:text-slate-500'>
-                                            {book.oldPrice.toLocaleString()} so'm
-                                        </span>
-                                    ) : null}
                                 </div>
 
                                 <div className='flex items-center gap-1.5'>

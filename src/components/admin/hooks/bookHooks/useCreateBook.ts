@@ -19,7 +19,6 @@ export const useCreateBook = () => {
                 console.error('Book create error status:', error.response?.status);
                 return;
             }
-
             console.error('Book create error:', error);
         }
     });

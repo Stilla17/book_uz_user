@@ -8,6 +8,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCreateAuthor } from '@/components/admin/hooks/authorsHooks/useCreateAuthor';
 import { useUpdateAuthor } from '@/components/admin/hooks/authorsHooks/useUpdateAuthor';
 import { useAuthorDetailQuery } from '@/components/admin/hooks/queries/author';
+import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
+import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getImageUrl } from '@/utils/image';
@@ -15,8 +17,6 @@ import { getImageUrl } from '@/utils/image';
 import { ArrowLeft, ImagePlus, Loader, Save, ScrollText, Upload, UserRound, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { Field, inputClass, SectionTitle } from '@/components/admin/other/FiledSettingsAdmin';
-import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
 
 type AuthorFormValues = {
     name: string;
@@ -29,7 +29,6 @@ type AuthorFormValues = {
     birthDate: string;
     deathDate: string;
 };
-
 
 const slugify = (value: string) =>
     value

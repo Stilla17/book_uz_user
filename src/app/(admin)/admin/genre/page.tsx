@@ -7,14 +7,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useDeleteGenre } from '@/components/admin/hooks/genreHooks/useDeleteGenre';
 import { useGenreListQuery } from '@/components/admin/hooks/queries/genre';
+import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import { Button } from '@/components/ui/button';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
+import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { ArrowLeft, ArrowRight, BookOpen, Edit3, FolderTree, Plus, Search, Tags, Trash2 } from 'lucide-react';
-
-const ADMIN_GENRES_LIMIT = 100;
+import { BookOpen, Edit3, FolderTree, Plus, Search, Tags, Trash2 } from 'lucide-react';
 
 const AdminGenrePage = () => {
     const router = useRouter();
@@ -22,7 +22,7 @@ const AdminGenrePage = () => {
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { data, isFetching, isLoading } = useGenreListQuery(page, ADMIN_GENRES_LIMIT, debouncedSearch);
+    const { data, isFetching, isLoading } = useGenreListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate } = useDeleteGenre();
 
     useEffect(() => {
@@ -153,29 +153,12 @@ const AdminGenrePage = () => {
                     </table>
                 </div>
 
-                <div className='flex flex-col gap-3 border-t border-[#eadfce] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800'>
-                    <p className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
-                        Sahifa {pagination?.page ?? page} / {pagination?.pages ?? 1}
-                    </p>
-                    <div className='flex gap-2'>
-                        <Button
-                            variant='outline'
-                            disabled={page <= 1 || isFetching}
-                            onClick={() => updatePage(page - 1)}
-                            className='h-10 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
-                            <ArrowLeft size={17} />
-                            Oldingi
-                        </Button>
-                        <Button
-                            variant='outline'
-                            disabled={page >= (pagination?.pages ?? 1) || isFetching}
-                            onClick={() => updatePage(page + 1)}
-                            className='h-10 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
-                            Keyingi
-                            <ArrowRight size={17} />
-                        </Button>
-                    </div>
-                </div>
+                <PaginationFooter
+                    pagination={data?.pagination}
+                    page={page}
+                    updatePage={updatePage}
+                    isFetching={isFetching}
+                />
             </section>
         </div>
     );

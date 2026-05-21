@@ -2,7 +2,7 @@ import React from 'react';
 
 type Dotteds = {
     label: string;
-    value?: string;
+    value?: string | number;
 };
 
 const DottedLine = ({ label, value }: Dotteds) => {

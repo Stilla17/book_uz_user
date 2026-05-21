@@ -5,17 +5,56 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { UserBanner, userBannerService } from '@/services/userBanner.service';
+import { api } from '@/services/api';
+import { getImageUrl } from '@/utils/image';
 
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Calendar, ChevronRight, Megaphone } from 'lucide-react';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { Autoplay, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
-// Yangilik banneri uchun type
-type NewsBanner = UserBanner;
+type LocalizedText = string | { uz?: string; ru?: string; en?: string } | null | undefined;
+
+type NewsItem = {
+    _id: string;
+    title?: LocalizedText;
+    titleRu?: string;
+    titleEn?: string;
+    slug?: string;
+    excerpt?: LocalizedText;
+    description?: LocalizedText;
+    image?: string;
+    imageUrl?: string;
+    views?: number;
+    createdAt?: string;
+    publishedAt?: string;
+};
+
+const getText = (value: LocalizedText, fallback = '') => {
+    if (!value) return fallback;
+    if (typeof value === 'string') return value || fallback;
+
+    return value.uz || value.ru || value.en || fallback;
+};
+
+const normalizeNewsResponse = (data: any): NewsItem[] => {
+    const payload = data?.data ?? data;
+    const items = Array.isArray(payload?.news)
+        ? payload.news
+        : Array.isArray(payload?.items)
+          ? payload.items
+          : Array.isArray(payload)
+            ? payload
+            : [];
+
+    return items;
+};
 
 export const NewsSection = () => {
-    const [news, setNews] = useState<NewsBanner[]>([]);
+    const [news, setNews] = useState<NewsItem[]>([]);
     const [loading, setLoading] = useState(true);
 
     dayjs.locale('uz');
@@ -28,13 +67,15 @@ export const NewsSection = () => {
     const loadNews = async () => {
         try {
             setLoading(true);
-            // Bannerlardan faqat 'news' tipidagilarni olish
-            const banners = await userBannerService.getNewsBanners();
+            const response = await api.get('/news', {
+                params: {
+                    active: true,
+                    page: 1,
+                    limit: 8
+                }
+            });
 
-            // Faol va tartiblangan yangiliklar
-            const activeNews = banners.filter((banner) => banner.isActive).sort((a, b) => a.order - b.order);
-
-            setNews(activeNews);
+            setNews(normalizeNewsResponse(response.data));
         } catch (error) {
             console.error('Yangiliklar yuklanmadi:', error);
             setNews([]);
@@ -43,15 +84,8 @@ export const NewsSection = () => {
         }
     };
 
-    // Yangilik bosilganda statistikani yangilash
-    const handleNewsClick = (bannerId: string, link?: string) => {
-        userBannerService.trackClick(bannerId);
-        if (link) {
-            window.location.href = link;
-        }
-    };
-
-    const formatDate = (dateString: string) => {
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return '';
         return dayjs(dateString).format('D MMMM YYYY');
     };
 
@@ -107,61 +141,91 @@ export const NewsSection = () => {
                     </Link>
                 </div>
 
-                {/* News Grid */}
-                <div className='grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3'>
-                    {news.slice(0, 3).map((item, index) => {
+                <Swiper
+                    slidesPerView={1.12}
+                    spaceBetween={16}
+                    loop={news.length > 3}
+                    autoplay={{
+                        delay: 4500,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true
+                    }}
+                    pagination={{
+                        clickable: true,
+                        dynamicBullets: true
+                    }}
+                    modules={[Autoplay, Pagination]}
+                    breakpoints={{
+                        640: { slidesPerView: 1.8, spaceBetween: 18 },
+                        768: { slidesPerView: 2.2, spaceBetween: 20 },
+                        1024: { slidesPerView: 3, spaceBetween: 20 }
+                    }}
+                    className='news-swiper !overflow-visible pb-12'>
+                    {news.map((item, index) => {
+                        const title = getText(item.title, item.titleRu || item.titleEn || 'Yangilik');
+                        const description = getText(item.excerpt, getText(item.description));
+                        const imageUrl = getImageUrl(item.image || item.imageUrl);
+                        const href = item.slug ? `/news/${item.slug}` : '/news';
+                        const date = formatDate(item.publishedAt || item.createdAt);
+
                         return (
-                            <motion.div
-                                key={item._id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                viewport={{ once: true }}
-                                onClick={() => handleNewsClick(item._id, item.buttonLink)}
-                                className='group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all hover:shadow-lg dark:border-slate-700 dark:bg-slate-800'>
-                                {/* Floating Particles */}
-                                <motion.div className='absolute inset-0' transition={{ duration: 0.3 }} />
-
-                                {/* Image */}
-                                <div className='relative h-[180px] w-full overflow-hidden'>
-                                    <Image
-                                        src={item.imageUrl}
-                                        alt={item.title.uz}
-                                        fill
-                                        className='object-cover transition-transform duration-500 group-hover:scale-110'
-                                    />
-                                </div>
-
-                                {/* Content */}
-                                <div className='space-y-2 p-4'>
-                                    <div className='flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500'>
-                                        <div className='flex items-center gap-1'>
-                                            <Calendar size={10} className='text-gray-400 dark:text-gray-500' />
-                                            <span>{formatDate(item.createdAt)}</span>
+                            <SwiperSlide key={item._id} className='h-auto'>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.08 }}
+                                    viewport={{ once: true }}
+                                    className='h-full'>
+                                    <Link
+                                        href={href}
+                                        className='group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all hover:shadow-lg dark:border-slate-700 dark:bg-slate-800'>
+                                        <div className='relative h-[190px] w-full overflow-hidden bg-slate-100 dark:bg-slate-900'>
+                                            {imageUrl ? (
+                                                <Image
+                                                    src={imageUrl}
+                                                    alt={title}
+                                                    fill
+                                                    sizes='(max-width: 640px) 88vw, (max-width: 1024px) 45vw, 360px'
+                                                    className='object-cover transition-transform duration-500 group-hover:scale-110'
+                                                />
+                                            ) : (
+                                                <div className='grid h-full place-items-center text-[#ef7f1a]'>
+                                                    <Megaphone size={34} />
+                                                </div>
+                                            )}
                                         </div>
-                                    </div>
 
-                                    <h3 className='line-clamp-2 text-base leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
-                                        {item.title.uz}
-                                    </h3>
+                                        <div className='flex grow flex-col space-y-2 p-4'>
+                                            {date ? (
+                                                <div className='flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500'>
+                                                    <Calendar size={10} className='text-gray-400 dark:text-gray-500' />
+                                                    <span>{date}</span>
+                                                </div>
+                                            ) : null}
 
-                                    {item.description?.uz && (
-                                        <p className='line-clamp-2 text-xs text-gray-500 dark:text-gray-400'>
-                                            {item.description.uz}
-                                        </p>
-                                    )}
+                                            <h3 className='line-clamp-2 min-h-12 text-base leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
+                                                {title}
+                                            </h3>
 
-                                    <div className='pt-2'>
-                                        <span className='inline-flex items-center gap-1 text-xs font-bold text-[#ef7f1a] transition-all group-hover:gap-2 dark:text-orange-400'>
-                                            Batafsil
-                                            <ArrowUpRight size={14} />
-                                        </span>
-                                    </div>
-                                </div>
-                            </motion.div>
+                                            {description ? (
+                                                <p className='line-clamp-2 min-h-8 text-xs leading-4 text-gray-500 dark:text-gray-400'>
+                                                    {description}
+                                                </p>
+                                            ) : null}
+
+                                            <div className='mt-auto pt-2'>
+                                                <span className='inline-flex items-center gap-1 text-xs font-bold text-[#ef7f1a] transition-all group-hover:gap-2 dark:text-orange-400'>
+                                                    Batafsil
+                                                    <ArrowUpRight size={14} />
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </motion.div>
+                            </SwiperSlide>
                         );
                     })}
-                </div>
+                </Swiper>
             </div>
         </section>
     );

@@ -1,0 +1,1 @@
+export const FETCH_PAGINATION_LIMIT = 100;

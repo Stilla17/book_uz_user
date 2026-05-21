@@ -14,8 +14,7 @@ import { getImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import { ArrowLeft, ArrowRight, BookOpen, Building2, Edit3, Plus, Search, Trash2 } from 'lucide-react';
-
-const FETCH_PUBLISHERS_LIMIT = 100;
+import { FETCH_PAGINATION_LIMIT } from '@/tools';
 
 const AdminPublishersPage = () => {
     const router = useRouter();
@@ -23,7 +22,7 @@ const AdminPublishersPage = () => {
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { data, isFetching, isLoading } = usePublisherQuery(page, FETCH_PUBLISHERS_LIMIT, debouncedSearch);
+    const { data, isFetching, isLoading } = usePublisherQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate } = useDeletePublisher();
 
     useEffect(() => {

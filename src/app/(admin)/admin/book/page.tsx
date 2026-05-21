@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useDeleteBook } from '@/components/admin/hooks/bookHooks/useDeleteBook';
 import { useBookListQuery } from '@/components/admin/hooks/queries/book';
+import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
@@ -14,8 +15,9 @@ import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { getLatestImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
+import { FETCH_PAGINATION_LIMIT } from '@/tools';
 
-import { ArrowLeft, ArrowRight, BookOpen, Eye, ImageIcon, Pencil, Plus, Search, Star, Trash2 } from 'lucide-react';
+import { BookOpen, Eye, ImageIcon, Pencil, Plus, Search, Star, Trash2 } from 'lucide-react';
 
 const formatPrice = (price?: number) => `${Number(price || 0).toLocaleString('uz-UZ')} so'm`;
 
@@ -24,11 +26,6 @@ const getBookBarcode = (book: {
     isbn?: string | number;
     details?: { isbn?: string | number };
 }) => book.barcode || book.isbn || book.details?.isbn || '';
-
-const getBookPages = (book: { pages?: number; numberOfPage?: number; details?: { pages?: number } }) =>
-    book.pages || book.numberOfPage || book.details?.pages;
-
-const getBookWeight = (book: { weight?: string; details?: { weight?: string } }) => book.weight || book.details?.weight;
 
 const getStockStatus = (stock?: number) => {
     if (!stock || stock <= 0) {
@@ -53,7 +50,7 @@ const getStockStatus = (stock?: number) => {
     };
 };
 
-const ADMIN_AUTHORS_LIMIT = 100;
+
 type StockFilter = 'all' | 'low' | 'available' | 'out';
 
 const AdminBookPage = () => {
@@ -63,7 +60,7 @@ const AdminBookPage = () => {
     const [page, setPage] = useState(urlPage);
     const [stockFilter, setStockFilter] = useState<StockFilter>('all');
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { data, isFetching, isLoading } = useBookListQuery(page, ADMIN_AUTHORS_LIMIT, debouncedSearch);
+    const { data, isFetching, isLoading } = useBookListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate } = useDeleteBook();
 
     const books = data?.products ?? [];
@@ -306,29 +303,12 @@ const AdminBookPage = () => {
                     </table>
                 </div>
 
-                <div className='flex flex-col gap-3 border-t border-[#eadfce] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800'>
-                    <p className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
-                        Sahifa {pagination?.page} / {pagination?.pages}
-                    </p>
-                    <div className='flex gap-2'>
-                        <Button
-                            variant='outline'
-                            disabled={page <= 1 || isFetching}
-                            onClick={() => updatePage(page - 1)}
-                            className='h-10 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
-                            <ArrowLeft size={17} />
-                            Oldingi
-                        </Button>
-                        <Button
-                            variant='outline'
-                            onClick={() => updatePage(page + 1)}
-                            disabled={page >= (pagination?.pages ?? 1) || isFetching}
-                            className='h-10 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
-                            Keyingi
-                            <ArrowRight size={17} />
-                        </Button>
-                    </div>
-                </div>
+                <PaginationFooter
+                    pagination={data?.pagination}
+                    page={page}
+                    updatePage={updatePage}
+                    isFetching={isFetching}
+                />
             </section>
         </div>
     );

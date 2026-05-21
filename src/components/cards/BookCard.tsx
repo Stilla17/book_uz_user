@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { useBookStats } from '@/hooks/useBookStats';
 import { useBookWishlist } from '@/hooks/useBookWishlist';
 import { UserService } from '@/services/api';
 import { addCart } from '@/store/features/cartSlice';
@@ -16,7 +17,7 @@ import { getImageUrl } from '@/utils/image';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { Eye, Heart, ShoppingCart, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
@@ -34,6 +35,12 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
     const queryClient = useQueryClient();
     const dispatch = useAppDispatch();
     const isBookInCart = useAppSelector((state) => state.cart.items.some((item) => item.book._id === book._id));
+    const { viewsCount, ratingAvg } = useBookStats({
+        bookId: book._id,
+        initialViewsCount: book.viewsCount ?? book.views,
+        initialRatingAvg: book.ratingAvg,
+        initialRatingCount: book.ratingCount
+    });
 
     const addCartMutation = useMutation({
         mutationFn: async (data: { productId: string; quantity: number }) => {
@@ -146,7 +153,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                     aria-label={`${getBookTitle()} haqida batafsil`}
                     className='group relative flex h-full w-full items-center justify-center'>
                     <Image
-                        src={getImageUrl(book.image)}
+                        src={getImageUrl(book.image) || ''}
                         alt={getBookTitle()}
                         fill
                         sizes='(max-width: 480px) 70vw, (max-width: 768px) 42vw, (max-width: 1024px) 30vw, 220px'
@@ -168,22 +175,18 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
                 <div className='flex min-h-8 items-center gap-2 pt-1'>
                     <div className='inline-flex items-center gap-1 rounded-md bg-[#f3f4f6] px-2 py-1 text-[13px] font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-100'>
-                        <span> {Number(book?.rating || 0).toFixed(1)}</span>
+                        <span> {Number(ratingAvg || 0).toFixed(1)}</span>
                         <Star size={13} className='text-[#f59e0b]' fill='currentColor' />
                     </div>
-                    <span className='text-[11px] text-gray-400 dark:text-gray-500'>
-                        {book.stock ?? book.reviewsCount ?? 0} ta
+                    <span className='flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500'>
+                        <Eye size={13} />
+                        {viewsCount}
                     </span>
                 </div>
 
                 <div className='mt-auto min-h-[66px] border-t border-gray-100 pt-3 dark:border-slate-700'>
                     <div className='flex items-end justify-between'>
                         <div>
-                            {book.oldPrice && (
-                                <span className='block text-[18px] leading-none text-gray-400 line-through dark:text-gray-500'>
-                                    {book.oldPrice.toLocaleString()} so'm
-                                </span>
-                            )}
                             <motion.div
                                 className='flex items-baseline gap-1'
                                 whileHover={{ scale: 1.05 }}
