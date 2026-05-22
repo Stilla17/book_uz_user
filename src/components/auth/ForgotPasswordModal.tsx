@@ -8,6 +8,7 @@ import { AuthServiceAPI } from '@/services/api';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle, Eye, EyeOff, Key, Loader2, Lock, Mail, Send, X } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 
 interface ForgotPasswordModalProps {
@@ -16,22 +17,38 @@ interface ForgotPasswordModalProps {
 }
 
 type Step = 'EMAIL' | 'OTP' | 'NEW_PASSWORD';
+type ForgotPasswordFormValues = {
+    email: string;
+    method: 'EMAIL' | 'TELEGRAM';
+    otp: string[];
+    newPassword: string;
+    confirmPassword: string;
+};
+
+const defaultValues: ForgotPasswordFormValues = {
+    email: '',
+    method: 'EMAIL',
+    otp: ['', '', '', '', '', ''],
+    newPassword: '',
+    confirmPassword: ''
+};
 
 export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProps) {
     const router = useRouter();
 
-    // State
+    const { handleSubmit, register, reset, setValue, watch } = useForm<ForgotPasswordFormValues>({
+        defaultValues
+    });
+
     const [step, setStep] = useState<Step>('EMAIL');
-    const [email, setEmail] = useState('');
-    const [method, setMethod] = useState<'EMAIL' | 'TELEGRAM'>('EMAIL');
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
     const [timer, setTimer] = useState(60);
     const [canResend, setCanResend] = useState(false);
+    const email = watch('email');
+    const method = watch('method');
+    const otp = watch('otp');
 
     // Timer for resend
     React.useEffect(() => {
@@ -56,7 +73,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
 
         const newOtp = [...otp];
         newOtp[index] = value;
-        setOtp(newOtp);
+        setValue('otp', newOtp);
 
         // Auto-focus next input
         if (value && index < 5) {
@@ -74,21 +91,19 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
     };
 
     // Step 1: Send OTP
-    const handleSendOtp = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!email) {
+    const handleSendOtp = async (values: ForgotPasswordFormValues) => {
+        if (!values.email) {
             toast.error('Email manzilingizni kiriting');
             return;
         }
 
         try {
             setLoading(true);
-            await AuthServiceAPI.forgotPassword(email, method);
+            await AuthServiceAPI.forgotPassword(values.email, values.method);
             setStep('OTP');
             setTimer(60);
             setCanResend(false);
-            toast.success(`Kod ${method === 'EMAIL' ? 'email' : 'telegram'} manzilingizga yuborildi!`);
+            toast.success(`Kod ${values.method === 'EMAIL' ? 'email' : 'telegram'} manzilingizga yuborildi!`);
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Xatolik yuz berdi');
         } finally {
@@ -112,10 +127,8 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
     };
 
     // Step 2: Verify OTP and go to new password
-    const handleVerifyOtp = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const otpString = otp.join('');
+    const handleVerifyOtp = (values: ForgotPasswordFormValues) => {
+        const otpString = values.otp.join('');
         if (otpString.length !== 6) {
             toast.error("6 xonali kodni to'liq kiriting");
             return;
@@ -125,23 +138,21 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
     };
 
     // Step 3: Set new password
-    const handleResetPassword = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (newPassword.length < 6) {
+    const handleResetPassword = async (values: ForgotPasswordFormValues) => {
+        if (values.newPassword.length < 6) {
             toast.error("Parol kamida 6 ta belgidan iborat bo'lishi kerak");
             return;
         }
 
-        if (newPassword !== confirmPassword) {
+        if (values.newPassword !== values.confirmPassword) {
             toast.error('Parollar mos kelmadi');
             return;
         }
 
         try {
             setLoading(true);
-            const otpString = otp.join('');
-            await AuthServiceAPI.resetPassword(email, otpString, newPassword);
+            const otpString = values.otp.join('');
+            await AuthServiceAPI.resetPassword(values.email, otpString, values.newPassword);
 
             setSent(true);
             toast.success('Parol muvaffaqiyatli yangilandi!');
@@ -151,10 +162,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                 onClose();
                 setSent(false);
                 setStep('EMAIL');
-                setEmail('');
-                setOtp(['', '', '', '', '', '']);
-                setNewPassword('');
-                setConfirmPassword('');
+                reset(defaultValues);
                 router.push('/auth/login');
             }, 2000);
         } catch (error: any) {
@@ -169,10 +177,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
         onClose();
         setTimeout(() => {
             setStep('EMAIL');
-            setEmail('');
-            setOtp(['', '', '', '', '', '']);
-            setNewPassword('');
-            setConfirmPassword('');
+            reset(defaultValues);
             setSent(false);
         }, 300);
     };
@@ -234,13 +239,12 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                 </p>
                                             </div>
 
-                                            <form onSubmit={handleSendOtp} className='space-y-4'>
+                                            <form onSubmit={handleSubmit(handleSendOtp)} className='space-y-4'>
                                                 <div>
                                                     <input
                                                         type='email'
                                                         placeholder='Email manzilingiz'
-                                                        value={email}
-                                                        onChange={(e) => setEmail(e.target.value)}
+                                                        {...register('email')}
                                                         className='w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-orange-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-500 dark:focus:border-orange-400'
                                                         required
                                                     />
@@ -249,7 +253,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                 <div className='flex gap-3'>
                                                     <button
                                                         type='button'
-                                                        onClick={() => setMethod('EMAIL')}
+                                                        onClick={() => setValue('method', 'EMAIL')}
                                                         className={`flex-1 rounded-xl py-3 text-sm font-bold transition-all ${
                                                             method === 'EMAIL'
                                                                 ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
@@ -259,7 +263,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                     </button>
                                                     <button
                                                         type='button'
-                                                        onClick={() => setMethod('TELEGRAM')}
+                                                        onClick={() => setValue('method', 'TELEGRAM')}
                                                         className={`flex-1 rounded-xl py-3 text-sm font-bold transition-all ${
                                                             method === 'TELEGRAM'
                                                                 ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
@@ -301,7 +305,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                 </p>
                                             </div>
 
-                                            <form onSubmit={handleVerifyOtp} className='space-y-6'>
+                                            <form onSubmit={handleSubmit(handleVerifyOtp)} className='space-y-6'>
                                                 {/* OTP Inputs */}
                                                 <div className='flex justify-center gap-2'>
                                                     {otp.map((digit, index) => (
@@ -368,7 +372,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                 </p>
                                             </div>
 
-                                            <form onSubmit={handleResetPassword} className='space-y-4'>
+                                            <form onSubmit={handleSubmit(handleResetPassword)} className='space-y-4'>
                                                 <div className='relative'>
                                                     <Lock
                                                         className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400'
@@ -377,8 +381,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                     <input
                                                         type={showPassword ? 'text' : 'password'}
                                                         placeholder='Yangi parol'
-                                                        value={newPassword}
-                                                        onChange={(e) => setNewPassword(e.target.value)}
+                                                        {...register('newPassword')}
                                                         className='w-full rounded-2xl border border-gray-200 bg-gray-50 py-4 pr-12 pl-12 text-gray-900 transition-all outline-none focus:border-green-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:focus:border-green-400'
                                                         required
                                                     />
@@ -398,8 +401,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                     <input
                                                         type={showPassword ? 'text' : 'password'}
                                                         placeholder='Parolni takrorlang'
-                                                        value={confirmPassword}
-                                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                                        {...register('confirmPassword')}
                                                         className='w-full rounded-2xl border border-gray-200 bg-gray-50 py-4 pr-12 pl-12 text-gray-900 transition-all outline-none focus:border-green-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:focus:border-green-400'
                                                         required
                                                     />

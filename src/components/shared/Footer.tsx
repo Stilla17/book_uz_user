@@ -44,8 +44,6 @@ export const Footer = () => {
         { name: 'YouTube', href: '#', Icon: Youtube, color: 'hover:bg-red-600' }
     ];
 
-    const paymentMethods = ['Uzcard', 'Click', 'Payme', 'Humo', 'Visa', 'Mastercard'];
-
     return (
         <footer className='relative overflow-hidden bg-gradient-to-b from-slate-900 to-black text-slate-300'>
             {/* Decorative top line */}

@@ -6,6 +6,7 @@ import { BranchMap } from '@/components/map/Map';
 import { branchLocations } from '@/components/map/branches';
 
 import { Award, Book, BookHeadphones, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
+import Link from 'next/link';
 
 export const AboutSection = () => {
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
@@ -19,7 +20,7 @@ export const AboutSection = () => {
     ];
 
     return (
-        <section className='relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-16 dark:from-slate-900 dark:to-slate-900'>
+        <section className='relative overflow-hidden bg-background py-16 dark:bg-slate-900'>
             <div className='brand-grid' />
 
             <div className='relative z-10 container mx-auto max-w-[1400px] px-4'>
@@ -62,10 +63,10 @@ export const AboutSection = () => {
                         </div>
 
                         <button className='group relative mt-4 transform overflow-hidden rounded-full bg-[#ef7f1a] px-8 py-4 font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl'>
-                            <span className='relative z-10 flex items-center gap-2'>
+                            <Link href={'/about'} className='relative z-10 flex items-center gap-2'>
                                 <BookOpen size={18} />
                                 Batafsil ma'lumot
-                            </span>
+                            </Link>
                         </button>
                     </div>
 

@@ -21,22 +21,36 @@ type NewsDetailResponse = NewsItems & {
 };
 
 const NEWS_VIEWS_STORAGE_KEY = 'news_views';
+const NEWS_VIEWS_EVENT = 'news-views-change';
+
+const readNewsViews = (): Record<string, number> => {
+    if (typeof window === 'undefined') return {};
+
+    try {
+        return JSON.parse(localStorage.getItem(NEWS_VIEWS_STORAGE_KEY) || '{}');
+    } catch {
+        return {};
+    }
+};
 
 const writeNewsViews = (newsId: string, slug: string, views: number) => {
     if (typeof window === 'undefined') return;
 
     try {
-        const savedViews = JSON.parse(localStorage.getItem(NEWS_VIEWS_STORAGE_KEY) || '{}');
+        const savedViews = readNewsViews();
+        const nextViews = Math.max(views, savedViews[newsId] ?? 0, savedViews[slug] ?? 0);
         localStorage.setItem(
             NEWS_VIEWS_STORAGE_KEY,
             JSON.stringify({
                 ...savedViews,
-                [newsId]: views,
-                [slug]: views
+                [newsId]: nextViews,
+                [slug]: nextViews
             })
         );
+        window.dispatchEvent(new Event(NEWS_VIEWS_EVENT));
     } catch {
         localStorage.setItem(NEWS_VIEWS_STORAGE_KEY, JSON.stringify({ [newsId]: views, [slug]: views }));
+        window.dispatchEvent(new Event(NEWS_VIEWS_EVENT));
     }
 };
 
@@ -62,7 +76,9 @@ const NewsDetailPage = () => {
         if (!slug || !news?._id || viewedRef.current === news._id) return;
 
         viewedRef.current = news._id;
-        const nextViews = (news.views ?? 0) + 1;
+        const savedViews = readNewsViews();
+        const currentViews = Math.max(news.views ?? 0, savedViews[news._id] ?? 0, savedViews[slug] ?? 0);
+        const nextViews = currentViews + 1;
 
         api.post(`/news/${slug}/view`, {
             views: nextViews
@@ -110,7 +126,7 @@ const NewsDetailPage = () => {
     const imageUrl = getImageUrl(news.image);
 
     return (
-        <main className='min-h-screen bg-gradient-to-b from-gray-50 to-white py-10 dark:from-slate-900 dark:to-slate-800'>
+        <main className='min-h-screen bg-background py-10 dark:bg-slate-900'>
             <div className='container mx-auto max-w-4xl px-4'>
                 <button
                     type='button'

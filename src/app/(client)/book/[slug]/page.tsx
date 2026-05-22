@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useParams } from 'next/navigation';
 
@@ -29,12 +29,16 @@ type DetailBook = Book & {
 export default function BookDetailPage() {
     const params = useParams();
     const slug = params?.slug as string;
+    const [selectedQuantity, setSelectedQuantity] = useState(1);
 
     const { data: book, isLoading: bookLoading } = useQuery<DetailBook | null>({
         queryKey: ['book', slug],
         queryFn: () => bookService.getBookById(slug) as Promise<DetailBook | null>,
         enabled: !!slug
     });
+
+    console.log(book);
+
     const viewedBookRef = useRef<string | null>(null);
     const { viewsCount, ratingAvg, ratingCount, userRating, incrementViews, rateBook } = useBookStats({
         bookId: book?._id,
@@ -51,11 +55,25 @@ export default function BookDetailPage() {
     const { cartItems, addItem, updateQuantity, removeItem } = useBookCart();
     const cartItem = useMemo(() => cartItems.find((item) => item.book._id === book?._id), [book?._id, cartItems]);
     const cartQuantity = cartItem?.quantity ?? 0;
-    const stockLimit = book?.stock && book.stock > 0 ? book.stock : undefined;
     const availableBranchStocks = useMemo(
         () => book?.branchStocks?.filter((item) => (item.available ?? 0) > 0) ?? [],
         [book?.branchStocks]
     );
+    const hasBranchStocks = Boolean(book?.branchStocks?.length);
+    const availableStock = useMemo(() => {
+        if (!book) return 0;
+
+        const branchStocks = book.branchStocks ?? [];
+
+        if (branchStocks.length > 0) {
+            return branchStocks.reduce((total, item) => total + Math.max(item.available ?? 0, 0), 0);
+        }
+
+        return Math.max(book.stock ?? 0, 0);
+    }, [book]);
+    const stockLimit = availableStock > 0 ? availableStock : undefined;
+    const isBookAvailable = availableStock > 0;
+    const displayedQuantity = cartQuantity > 0 ? cartQuantity : selectedQuantity;
 
     const bookView = useMemo(
         () => ({
@@ -90,39 +108,45 @@ export default function BookDetailPage() {
             slug: book.slug,
             price: book.price,
             images: book.image ?? book.images?.[0] ?? '',
-            stock: book.stock ?? 0
+            stock: stockLimit ?? 0
         };
     };
 
     const incrementCartQuantity = async () => {
-        const cartBook = getCartBook();
-        if (!book || !cartBook) return;
+        if (!book || !isBookAvailable || !stockLimit) return;
 
-        if (stockLimit && cartQuantity >= stockLimit) return;
+        if (displayedQuantity >= stockLimit) return;
 
         if (cartQuantity > 0) {
             await updateQuantity(book._id, cartQuantity + 1);
         } else {
-            await addItem(cartBook);
+            setSelectedQuantity((quantity) => Math.min(quantity + 1, stockLimit));
         }
     };
 
     const decrementCartQuantity = async () => {
-        if (!book || cartQuantity <= 0) return;
+        if (!book || !isBookAvailable) return;
 
-        if (cartQuantity === 1) {
-            await removeItem(book._id);
-        } else {
-            await updateQuantity(book._id, cartQuantity - 1);
+        if (cartQuantity > 0) {
+            if (cartQuantity === 1) {
+                await removeItem(book._id);
+            } else {
+                await updateQuantity(book._id, cartQuantity - 1);
+            }
+
+            return;
         }
+
+        setSelectedQuantity((quantity) => Math.max(quantity - 1, 1));
     };
 
     const addBookToCart = async () => {
-        if (cartQuantity > 0) return;
+        if (!isBookAvailable || cartQuantity > 0) return;
 
-        if ((book?.stock ?? 0) > 0) {
-            await incrementCartQuantity();
-        }
+        const cartBook = getCartBook();
+        if (!cartBook) return;
+
+        await addItem(cartBook, selectedQuantity);
     };
 
     useEffect(() => {
@@ -132,12 +156,31 @@ export default function BookDetailPage() {
         incrementViews();
     }, [book?._id, incrementViews]);
 
+    useEffect(() => {
+        setSelectedQuantity(1);
+    }, [book?._id]);
+
     if (bookLoading) {
         return <Loading />;
     }
 
+    if (!book) {
+        return (
+            <div className='bg-background min-h-screen py-16 dark:bg-slate-900'>
+                <div className='container mx-auto max-w-3xl px-4 text-center'>
+                    <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 dark:border-slate-700 dark:bg-slate-800'>
+                        <h1 className='text-2xl font-black text-slate-900 dark:text-white'>Kitob topilmadi</h1>
+                        <p className='mt-3 text-slate-500 dark:text-slate-400'>
+                            Bu kitob mavjud emas yoki katalogdan olib tashlangan.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className='min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 py-6 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900'>
+        <div className='bg-background min-h-screen py-6 dark:bg-slate-900'>
             <div className='container mx-auto max-w-7xl px-4'>
                 <BreadCrumb items={breadcrumbItems} />
 
@@ -183,9 +226,7 @@ export default function BookDetailPage() {
                                             </button>
                                         ))}
                                     </div>
-                                    <span className='text-xs text-slate-500 dark:text-slate-300'>
-                                        ({ratingCount})
-                                    </span>
+                                    <span className='text-xs text-slate-500 dark:text-slate-300'>({ratingCount})</span>
                                 </div>
                                 <span className='flex items-center gap-2'>
                                     <Eye size={16} className='text-gray-500' />
@@ -241,6 +282,10 @@ export default function BookDetailPage() {
                                         })}
                                     </div>
                                 </div>
+                            ) : isBookAvailable && !hasBranchStocks ? (
+                                <div className='mt-5 rounded-lg border border-green-100 bg-green-50/70 p-3 text-sm font-semibold text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'>
+                                    {availableStock} dona mavjud
+                                </div>
                             ) : (
                                 <span className='flex items-center gap-2 text-sm text-red-500'>
                                     <span className='h-3 w-3 rounded-full bg-red-500'></span>
@@ -279,23 +324,20 @@ export default function BookDetailPage() {
                                         type='button'
                                         onClick={decrementCartQuantity}
                                         aria-label='Kamaytirish'
-                                        className='flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-[#ef7f1a] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800'>
+                                        disabled={!isBookAvailable || (cartQuantity === 0 && selectedQuantity <= 1)}
+                                        className='flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-[#ef7f1a] disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800'>
                                         <Minus size={18} />
                                     </button>
 
                                     <div className='flex h-11 min-w-16 items-center justify-center rounded-xl bg-gradient-to-b from-slate-50 to-white px-4 text-center text-lg font-black text-slate-900 ring-1 ring-slate-200 dark:from-slate-900 dark:to-slate-950 dark:text-white dark:ring-slate-700'>
-                                        {cartQuantity}
+                                        {displayedQuantity}
                                     </div>
 
                                     <button
                                         type='button'
                                         aria-label='Ko‘paytirish'
-                                        disabled={Boolean(
-                                            !book?.stock ||
-                                            book.stock <= 0 ||
-                                            (stockLimit && cartQuantity >= stockLimit)
-                                        )}
-                                        onClick={incrementCartQuantity}
+                                        disabled={!isBookAvailable || !stockLimit || displayedQuantity >= stockLimit}
+                                        onClick={isBookAvailable ? incrementCartQuantity : undefined}
                                         className='flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-[#ef7f1a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900 dark:hover:bg-orange-100'>
                                         <Plus size={18} />
                                     </button>
@@ -305,9 +347,14 @@ export default function BookDetailPage() {
                             <div className='mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]'>
                                 <Button
                                     onClick={addBookToCart}
+                                    disabled={!isBookAvailable || cartQuantity > 0}
                                     className='h-14 rounded-2xl bg-[#ef7f1a] text-base font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] dark:shadow-none'>
                                     <ShoppingCart size={20} />
-                                    {cartQuantity > 0 ? 'Savatda' : "Savatga qo'shish"}
+                                    {!isBookAvailable
+                                        ? 'Mavjud emas'
+                                        : cartQuantity > 0
+                                          ? 'Savatda'
+                                          : "Savatga qo'shish"}
                                 </Button>
                                 <Button
                                     variant='outline'

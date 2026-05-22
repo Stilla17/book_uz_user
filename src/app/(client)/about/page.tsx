@@ -39,7 +39,7 @@ export default function AboutPage() {
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
 
     return (
-        <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-50 py-12 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900'>
+        <div className='bg-background relative min-h-screen overflow-hidden py-12 dark:bg-slate-900'>
             <div className='relative z-10 container mx-auto max-w-7xl px-4'>
                 {/* Hero Section */}
                 <motion.div
@@ -84,14 +84,6 @@ export default function AboutPage() {
                             <Button className='group rounded-xl border border-[#ef7f1a]/20 bg-[#ef7f1a] px-8 py-6 text-lg font-black text-white shadow-[0_18px_44px_-26px_rgba(239,127,26,0.95)] transition-all hover:-translate-y-0.5 dark:border-orange-300/20 dark:bg-[#ef7f1a]'>
                                 <BookOpen size={20} className='mr-2' />
                                 {"Kitoblarni ko'rish"}
-                            </Button>
-                        </Link>
-                        <Link href='/contact'>
-                            <Button
-                                variant='outline'
-                                className='rounded-xl border-2 border-gray-200 px-8 py-6 text-lg dark:border-gray-700'>
-                                <Mail size={20} className='mr-2' />
-                                {"Bog'lanish"}
                             </Button>
                         </Link>
                     </motion.div>
@@ -145,8 +137,7 @@ export default function AboutPage() {
                                         whileHover={{ scale: 1.02 }}
                                         className={`rounded-2xl border`}>
                                         <div className='h-full rounded-2xl bg-white p-6 dark:bg-slate-800'>
-                                            <div
-                                                className={`mb-4 flex h-14 w-14 items-center justify-center rounded-xl border text-white`}>
+                                            <div className='mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-[#ef7f1a]/20 bg-[#ef7f1a]/10 text-[#ef7f1a] dark:border-orange-400/30 dark:bg-orange-500/20 dark:text-orange-300'>
                                                 {value.icon}
                                             </div>
                                             <h3 className='mb-2 text-xl font-bold text-gray-900 dark:text-white'>
@@ -189,7 +180,7 @@ export default function AboutPage() {
                                         {/* Year Badge */}
                                         <div className='flex justify-center md:w-1/2 md:justify-end md:pr-12'>
                                             <div
-                                                className={`rounded-2xl border p-8 text-center ${
+                                                className={`rounded-2xl border border-[#ef7f1a]/20 bg-[#ef7f1a] p-8 text-center shadow-lg shadow-orange-500/15 ${
                                                     index % 2 === 0 ? 'md:mr-12' : 'md:ml-12'
                                                 }`}>
                                                 <span className='text-4xl font-black text-white'>{event.year}</span>
@@ -205,7 +196,7 @@ export default function AboutPage() {
                                         <div className='mt-4 md:mt-0 md:w-1/2 md:pl-12'>
                                             <div className='rounded-2xl border border-gray-100 bg-white p-6 shadow-lg dark:border-slate-700 dark:bg-slate-800'>
                                                 <div className='mb-3 flex items-center gap-3'>
-                                                    <div className='flex h-10 w-10 items-center justify-center rounded-full border border-[#ef7f1a] text-white'>
+                                                    <div className='flex h-10 w-10 items-center justify-center rounded-full border border-[#ef7f1a]/20 bg-[#ef7f1a]/10 text-[#ef7f1a] dark:border-orange-400/30 dark:bg-orange-500/20 dark:text-orange-300'>
                                                         {event.icon}
                                                     </div>
                                                     <h3 className='text-xl font-bold text-gray-900 dark:text-white'>

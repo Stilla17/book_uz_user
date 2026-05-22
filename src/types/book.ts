@@ -10,6 +10,8 @@ export interface Book {
     author?: string | { _id?: string; name: string; bio?: string; image?: string; booksCount?: number };
     authorName?: string | { name: string };
     price: number;
+    oldPrice?: number;
+    discountPrice?: number;
     reviewsCount?: number;
     ratingAvg?: number;
     ratingCount?: number;
@@ -28,6 +30,10 @@ export interface Book {
     barcode?: string | number;
     discount?: number;
     isDiscount?: boolean;
+    isTop?: boolean;
+    isHit?: boolean;
+    isNew?: boolean;
+    isFree?: boolean;
     format?: 'ebook' | 'audio' | 'paper';
     isWishlisted?: boolean;
     category?: Array<{ _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }>;

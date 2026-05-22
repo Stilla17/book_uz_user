@@ -18,7 +18,11 @@ import 'swiper/css/pagination';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-type TextLike = string | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown } | null | undefined;
+type TextLike =
+    | string
+    | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown }
+    | null
+    | undefined;
 type ProductShape = Product & {
     title?: TextLike;
     author?: string | { name?: unknown };
@@ -37,101 +41,6 @@ export const BookSection = ({
     const nextRef = useRef<HTMLButtonElement>(null);
 
     const { t } = useTranslation();
-
-    const mockBooks: Book[] = [
-        {
-            _id: '1',
-            slug: 'sariq-devni-minib',
-            title: 'Sariq devni minib',
-            author: "Xudoyberdi To'xtaboyev",
-            price: 45000,
-            oldPrice: 60000,
-            rating: 4.9,
-            discount: 25,
-            isHit: true,
-            format: 'paper',
-            image: 'https://backend.book.uz/user-api/img/img-file-5a14f0417dee3390eddd4478f513e9ad.JPG'
-        },
-        {
-            _id: '2',
-            slug: 'yulduzli-tunlar',
-            title: 'Yulduzli tunlar',
-            author: 'Pirimqul Qodirov',
-            price: 55000,
-            rating: 5.0,
-            isNew: true,
-            format: 'ebook',
-            image: 'https://backend.book.uz/user-api/img/img-file-213a5f767d557777e7f781ded5e28b20.jpg'
-        },
-        {
-            _id: '3',
-            slug: 'stiv-jobs',
-            title: 'Stiv Jobs',
-            author: 'Uolter Ayzekson',
-            price: 89000,
-            oldPrice: 110000,
-            rating: 4.8,
-            isHit: true,
-            format: 'paper',
-            image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1887'
-        },
-        {
-            _id: '4',
-            slug: 'boy-ota-kambagal-ota',
-            title: "Boy ota, kambag'al ota",
-            author: 'Robert Kiyosaki',
-            price: 35000,
-            rating: 4.7,
-            isNew: true,
-            format: 'ebook',
-            image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=1824'
-        },
-        {
-            _id: '5',
-            slug: 'atomic-habits',
-            title: 'Atomic Habits',
-            author: 'James Clear',
-            price: 42000,
-            rating: 4.9,
-            format: 'audio',
-            isFree: true,
-            image: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=1888'
-        },
-        {
-            _id: '6',
-            slug: 'zukko-bolajon',
-            title: 'Zukko bolajon',
-            author: 'Ertaklar olami',
-            price: 25000,
-            rating: 4.5,
-            isNew: true,
-            format: 'ebook',
-            image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1948'
-        },
-        {
-            _id: '7',
-            slug: 'kichik-shahzoda',
-            title: 'Kichik shahzoda',
-            author: 'Antuan de Sent-Ekzyuperi',
-            price: 32000,
-            oldPrice: 45000,
-            rating: 4.9,
-            discount: 29,
-            format: 'paper',
-            image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887'
-        },
-        {
-            _id: '8',
-            slug: 'shaytanat',
-            title: 'Shaytanat',
-            author: 'Tohir Malik',
-            price: 68000,
-            rating: 4.9,
-            isHit: true,
-            format: 'paper',
-            image: 'https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?q=80&w=1935'
-        }
-    ];
 
     const getText = (value: TextLike, fallback: string): string => {
         if (!value) return fallback;
@@ -224,7 +133,7 @@ export const BookSection = ({
         };
     }, [books, type]);
 
-    const displayBooks = books && books.length > 0 ? books : fetchedBooks.length > 0 ? fetchedBooks : mockBooks;
+    const displayBooks: Book[] = books && books.length > 0 ? books : fetchedBooks;
 
     // Section icon and color based on type
     const getSectionConfig = () => {
@@ -250,13 +159,6 @@ export const BookSection = ({
                     bgColor: 'bg-[#ef7f1a]/10 dark:bg-orange-500/20',
                     borderColor: 'border-[#ef7f1a]/20 dark:border-orange-500/30'
                 };
-            case 'audio':
-                return {
-                    icon: <Headphones size={24} className='text-[#ef7f1a] dark:text-orange-400' />,
-                    color: 'text-[#ef7f1a] dark:text-orange-400',
-                    bgColor: 'bg-[#ef7f1a]/10 dark:bg-orange-500/20',
-                    borderColor: 'border-[#ef7f1a]/20 dark:border-orange-500/30'
-                };
             case 'author':
                 return {
                     icon: <Award size={24} className='text-[#ef7f1a] dark:text-orange-400' />,
@@ -277,13 +179,8 @@ export const BookSection = ({
     const config = getSectionConfig();
 
     return (
-        <motion.section
-            className='relative overflow-hidden bg-white py-12 dark:bg-slate-900'
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.6 }}>
-            {/* Animated Background Elements */}
+        <section
+            className='bg-background relative overflow-hidden py-12 dark:bg-slate-900'>
 
             {/* <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" /> */}
             <div className='brand-overlay' />
@@ -375,6 +272,6 @@ export const BookSection = ({
                     </Swiper>
                 </div>
             </div>
-        </motion.section>
+        </section>
     );
 };

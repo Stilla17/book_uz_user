@@ -88,8 +88,8 @@ const PublisherBooksPage = () => {
     const publisher = data?.publisher;
     const products = data?.products ?? [];
     const books = useMemo(() => products.map(mapProductToCardBook), [products]);
-    const pagination = data?.pagination ?? { page, limit: PAGE_LIMIT, total: 0, totalPages: 1 };
-    const totalPages = Math.max(1, pagination.totalPages);
+    const pagination = data?.pagination ?? { page, limit: PAGE_LIMIT, total: 0, pages: 1 };
+    const totalPages = Math.max(1, pagination.pages);
     const currentPage = Math.min(page, totalPages);
 
     const handlePageChange = (nextPage: number) => {
@@ -98,7 +98,7 @@ const PublisherBooksPage = () => {
     };
 
     return (
-        <main className='min-h-screen bg-gradient-to-b from-white to-slate-50 py-6 dark:from-slate-900 dark:to-slate-950'>
+        <main className='bg-background min-h-screen py-6 dark:bg-slate-900'>
             <div className='container mx-auto px-4'>
                 <BreadCrumb
                     items={[

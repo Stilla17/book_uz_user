@@ -9,31 +9,12 @@ import { UserBanner, userBannerService } from '@/services/userBanner.service';
 
 import { motion } from 'framer-motion';
 import {
-    Award,
-    BookOpen,
     ChevronLeft,
     ChevronRight,
-    Cloud,
-    Coffee,
-    Compass,
-    Crown,
-    Diamond,
-    Feather,
-    Flame,
-    Flower2,
-    Gem,
-    Headphones,
-    Heart,
-    Leaf,
-    Moon,
     Pause,
     Play,
     Quote,
     Sparkles,
-    Star,
-    Sun,
-    TrendingUp,
-    Zap
 } from 'lucide-react';
 // Swiper CSS
 import 'swiper/css';
@@ -112,7 +93,7 @@ export const AuthorQuoteSection = ({
 
     if (loading) {
         return (
-            <section className='relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-16 dark:from-slate-900 dark:to-slate-800'>
+            <section className='relative overflow-hidden bg-background py-16 dark:bg-slate-900'>
                 <div className='relative z-10 container mx-auto px-4'>
                     <div className='mb-8 h-8 w-64 animate-pulse rounded-full bg-gradient-to-r from-[#00a0e3]/20 to-[#ef7f1a]/20 dark:from-blue-600/20 dark:to-orange-600/20'></div>
                     <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
@@ -140,7 +121,7 @@ export const AuthorQuoteSection = ({
     ];
 
     return (
-        <section className='relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-16 dark:from-slate-900 dark:to-slate-900'>
+        <section className='relative overflow-hidden bg-background py-16 dark:bg-slate-900'>
             {/* Animated Background Elements */}
             <div className='brand-grid' />
 

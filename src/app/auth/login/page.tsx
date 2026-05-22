@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-hot-toast";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
-import Image from "next/image";
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
@@ -33,7 +32,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 dark:bg-slate-900">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-3xl" />

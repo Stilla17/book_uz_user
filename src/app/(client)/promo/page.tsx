@@ -324,7 +324,7 @@ export default function PromoPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-background dark:bg-slate-900">
         <div className="text-center">
           <div className="relative">
             <div className="w-24 h-24 border-4 border-[#005CB9]/20 border-t-[#005CB9] rounded-full animate-spin mx-auto mb-6" />
@@ -338,7 +338,7 @@ export default function PromoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-background py-12 dark:bg-slate-900">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating Icons */}

@@ -31,7 +31,7 @@ const Publishers = () => {
     const totalPublishers = data?.pagination.total ?? publishers.length;
 
     return (
-        <section className='relative overflow-hidden bg-gradient-to-b from-white to-slate-50 py-16 dark:from-slate-900 dark:to-slate-950'>
+        <section className='relative overflow-hidden bg-background py-16 dark:bg-slate-900'>
             <div className='brand-grid pointer-events-none absolute inset-0 opacity-80' />
 
             <div className='relative z-10 container mx-auto px-4'>

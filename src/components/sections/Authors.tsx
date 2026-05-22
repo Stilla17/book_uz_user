@@ -1,18 +1,16 @@
 'use client';
 
-import { useMemo } from 'react';
-
 import Link from 'next/link';
 
 import { api } from '@/services/api';
 import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
+
 import { BookOpenText } from 'lucide-react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-
 
 type AuthorItem = {
     _id: string;
@@ -27,7 +25,8 @@ type AuthorsResponse = {
     authors?: AuthorItem[];
 };
 
-const AUTHORS_LIMIT = 100;
+const AUTHORS_LIMIT = 3000;
+const TOP_AUTHORS_LIMIT = 20;
 const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
 
 const getAuthorBooksCount = (author: AuthorItem) => author.booksCount ?? author.bookCount ?? 0;
@@ -44,20 +43,14 @@ const Authors = () => {
         }
     });
 
-    const authors = useMemo(
-        () =>
-            [...(data?.authors ?? [])]
-                .sort(
-                    (firstAuthor, secondAuthor) => getAuthorBooksCount(secondAuthor) - getAuthorBooksCount(firstAuthor)
-                )
-                .slice(0, 16),
-        [data?.authors]
-    );
+    const authors = [...(data?.authors ?? [])]
+        .sort((a, b) => (b.booksCount ?? b.bookCount ?? 0) - (a.booksCount ?? a.bookCount ?? 0))
+        .slice(0, TOP_AUTHORS_LIMIT);
 
     if (!isLoading && authors.length === 0) return null;
 
     return (
-        <section className='bg-[#f7f7f7] py-12 dark:bg-slate-950'>
+        <section className='bg-background py-12 dark:bg-slate-950'>
             <div className='container mx-auto px-4'>
                 <div className='relative mb-8 flex items-center justify-center'>
                     <h2 className='text-center text-3xl font-black tracking-tight text-slate-950 md:text-4xl dark:text-white'>
@@ -97,11 +90,11 @@ const Authors = () => {
                                 <Link
                                     href={`/catalog?author=${encodeURIComponent(authorItem._id)}`}
                                     className='flex h-26.5 items-center overflow-hidden rounded-xl bg-white shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] transition hover:-translate-y-1 hover:shadow-[0_22px_55px_-30px_rgba(15,23,42,0.75)] dark:bg-slate-900'>
-                                    <div className='h-26.6 w-25 flex-none overflow-hidden rounded-xl '>
+                                    <div className='h-26.6 w-25 flex-none overflow-hidden rounded-xl'>
                                         <img
-                                            src={getImageUrl(authorItem.image, AUTHOR_FALLBACK_IMAGE)}
+                                            src={getImageUrl(authorItem.image) || AUTHOR_FALLBACK_IMAGE}
                                             alt={authorItem.name}
-                                            className='h-full w-full object-contain transition duration-500 rounded-full'
+                                            className='h-full w-full rounded-full object-contain transition duration-500'
                                         />
                                     </div>
 

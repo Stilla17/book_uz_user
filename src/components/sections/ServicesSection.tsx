@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import Link from 'next/link';
 
@@ -11,7 +11,6 @@ import {
     Award,
     BookHeadphones,
     ChevronRight,
-    Clock,
     Cloud,
     Coffee,
     Compass,
@@ -107,27 +106,6 @@ export const ServicesSection = ({
         return src.filter((s) => s.isActive !== false);
     }, [adminServices]);
 
-    // Floating icons array
-    const floatingIcons = [
-        Sparkles,
-        Star,
-        Heart,
-        Crown,
-        Zap,
-        Award,
-        Gem,
-        Flower2,
-        Sun,
-        Moon,
-        Cloud,
-        Coffee,
-        Compass,
-        Truck,
-        Headphones,
-        ShieldCheck,
-        CreditCard
-    ];
-
     // Badge ranglarini aniqlash (dark mode qo'shilgan)
     const getBadgeStyle = (badge: string) => {
         if (badge.includes('24'))
@@ -140,54 +118,8 @@ export const ServicesSection = ({
     };
 
     return (
-        <section className='relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-14 dark:from-slate-900 dark:to-slate-800'>
-            {/* Animated Background Elements */}
-            <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-                {/* Floating Icons */}
-                {[...Array(15)].map((_, i) => {
-                    const IconComponent = floatingIcons[i % floatingIcons.length];
-                    const randomTop = Math.random() * 100;
-                    const randomLeft = Math.random() * 100;
-                    const randomFontSize = Math.random() * 30 + 15;
-
-                    return (
-                        <motion.div
-                            key={i}
-                            className='absolute text-[#00a0e3]/10 dark:text-[#ef7f1a]/10'
-                            style={{
-                                top: `${randomTop}%`,
-                                left: `${randomLeft}%`,
-                                fontSize: `${randomFontSize}px`
-                            }}
-                            animate={{
-                                y: [0, -20, 20, 0],
-                                x: [0, 20, -20, 0],
-                                rotate: [0, 180, 360, 0],
-                                opacity: [0.1, 0.2, 0.15, 0.1]
-                            }}
-                            transition={{
-                                duration: Math.random() * 15 + 10,
-                                repeat: Infinity,
-                                delay: Math.random() * 5
-                            }}>
-                            <IconComponent />
-                        </motion.div>
-                    );
-                })}
-
-                {/* Gradient Orbs with Parallax */}
-                <motion.div
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute top-20 left-20 h-96 w-96 rounded-full bg-[#00a0e3]/5 blur-3xl'
-                />
-                <motion.div
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute right-20 bottom-20 h-96 w-96 rounded-full bg-[#ef7f1a]/5 blur-3xl'
-                />
-
-                {/* Grid Pattern */}
-                <div className='brand-grid' />
-            </div>
+        <section className='bg-background relative overflow-hidden py-14 dark:bg-slate-900'>
+            <div className='brand-grid' />
 
             <div className='relative z-10 container mx-auto px-4'>
                 {/* Header */}
@@ -198,7 +130,6 @@ export const ServicesSection = ({
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}>
                     <div>
-                        
                         <h2 className='text-2xl font-black tracking-tight md:text-3xl'>
                             <span className='text-[#00a0e3] dark:text-blue-400'>{title.split(' ')[0]}</span>
                             <span className='text-[#ef7f1a] dark:text-orange-400'>

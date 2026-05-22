@@ -56,7 +56,7 @@ const NewsPage = () => {
     const [searchInput, setSearchInput] = useState('');
     const debouncedSearch = useDebounce(searchInput, 400).trim();
 
-    const { data, isLoading, isFetching } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ['public-news', page, debouncedSearch],
         queryFn: () => getPublicNews(page, debouncedSearch),
         placeholderData: (previousData) => previousData
@@ -74,7 +74,7 @@ const NewsPage = () => {
 
     if (isLoading) {
         return (
-            <div className='flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800'>
+            <div className='flex min-h-screen items-center justify-center bg-background dark:bg-slate-900'>
                 <div className='text-center'>
                     <div className='relative'>
                         <div className='mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-[#00a0e3]/20 border-t-[#00a0e3]' />
@@ -90,7 +90,7 @@ const NewsPage = () => {
     }
 
     return (
-        <main className='min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 dark:from-slate-900 dark:to-slate-800'>
+        <main className='min-h-screen bg-background py-12 dark:bg-slate-900'>
             <div className='container mx-auto max-w-7xl px-4'>
                 <section className='mb-10 text-center'>
                     <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#00a0e3]/10 to-[#ef7f1a]/10 px-4 py-2 dark:from-blue-600/20 dark:to-orange-600/20'>

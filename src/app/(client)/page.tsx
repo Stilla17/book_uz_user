@@ -18,7 +18,7 @@ const Page = () => {
     const { t } = useTranslation();
 
     return (
-        <div className='flex flex-col bg-white dark:bg-slate-900'>
+        <div className='bg-background flex flex-col dark:bg-slate-900'>
             {/* Hero Section */}
             <Hero />
 
@@ -51,6 +51,9 @@ const Page = () => {
             {/* Nashryotlar */}
             <Publishers />
 
+            {/* News Section */}
+            <NewsSection />
+
             {/* Author Quote */}
             <AuthorQuoteSection />
 
@@ -65,9 +68,6 @@ const Page = () => {
 
             {/* Download App Section */}
             <DownloadAppSection />
-
-            {/* News Section */}
-            <NewsSection />
         </div>
     );
 };

@@ -1,16 +1,14 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import Image from 'next/image';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll } from 'framer-motion';
 import {
     Apple,
     Award,
     BookOpen,
-    ChevronRight,
-    Cloud,
     Coffee,
     Compass,
     Crown,
@@ -21,7 +19,6 @@ import {
     Moon,
     Music,
     PlayCircle,
-    ShieldCheck,
     Sparkles,
     Star,
     Sun,
@@ -32,10 +29,6 @@ type Particle = { top: string; left: string; duration: number; delay: number; si
 
 export const DownloadAppSection = () => {
     const sectionRef = useRef<HTMLDivElement>(null);
-    const { scrollYProgress } = useScroll({
-        target: sectionRef,
-        offset: ['start end', 'end start']
-    });
 
     const features = [
         { icon: <Headphones size={16} />, title: 'Oflayn rejim', desc: 'Internetisiz tinglang' },
@@ -50,58 +43,8 @@ export const DownloadAppSection = () => {
         { name: 'Malika S.', rating: 5, text: 'Juda qulay' }
     ];
 
-    // Floating icons array
-    const floatingIcons = [Sparkles, Gem, Crown, Flower2, Sun, Moon, Coffee, Compass, Heart, Star, Award, Music];
-
     return (
-        <section
-            ref={sectionRef}
-            className='relative overflow-hidden bg-gradient-to-b from-slate-900 to-black py-16 dark:from-slate-900 dark:to-black'>
-            {/* Animated Background Elements */}
-            <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-                {/* Floating Icons */}
-                {[...Array(15)].map((_, i) => {
-                    const IconComponent = floatingIcons[i % floatingIcons.length];
-                    const randomTop = Math.random() * 100;
-                    const randomLeft = Math.random() * 100;
-                    const randomFontSize = Math.random() * 30 + 15;
-
-                    return (
-                        <motion.div
-                            key={i}
-                            className='absolute text-[#00a0e3]/10 dark:text-[#ef7f1a]/10'
-                            style={{
-                                top: `${randomTop}%`,
-                                left: `${randomLeft}%`,
-                                fontSize: `${randomFontSize}px`
-                            }}
-                            animate={{
-                                y: [0, -20, 20, 0],
-                                x: [0, 20, -20, 0],
-                                rotate: [0, 180, 360, 0],
-                                opacity: [0.1, 0.2, 0.15, 0.1]
-                            }}
-                            transition={{
-                                duration: Math.random() * 15 + 10,
-                                repeat: Infinity,
-                                delay: Math.random() * 5
-                            }}>
-                            <IconComponent />
-                        </motion.div>
-                    );
-                })}
-
-                {/* Gradient Orbs with Parallax */}
-                <motion.div
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute top-20 left-20 h-96 w-96 rounded-full bg-[#00a0e3]/5 blur-3xl'
-                />
-                <motion.div
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='absolute right-20 bottom-20 h-96 w-96 rounded-full bg-[#ef7f1a]/5 blur-3xl'
-                />
-            </div>
-
+        <section ref={sectionRef} className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>
             {/* Original Background */}
             <div className='absolute inset-0'>
                 <div className='absolute top-0 left-0 h-[400px] w-[400px] animate-pulse rounded-full bg-[#00a0e3]/10 blur-[100px] dark:bg-blue-600/10' />
@@ -251,9 +194,6 @@ export const DownloadAppSection = () => {
                                     {/* Dynamic Island */}
                                     <div className='absolute top-1 left-1/2 h-4 w-16 -translate-x-1/2 rounded-full bg-slate-900 dark:bg-slate-800' />
                                 </div>
-
-                                {/* Glow */}
-                                <div className='absolute -inset-2 -z-10 rounded-[3rem] bg-gradient-to-r from-[#00a0e3]/30 to-[#ef7f1a]/30 blur-xl dark:from-blue-600/30 dark:to-orange-600/30' />
                             </div>
                         </motion.div>
                     </div>

@@ -42,7 +42,7 @@ export default function MyBooksPage() {
 
     return (
         <main className='min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-white'>
-            <section className='border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'>
+            <section className='border-b border-slate-200 bg-background dark:border-slate-800 dark:bg-slate-900'>
                 <div className='mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8'>
                     <div className='flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between'>
                         <div>

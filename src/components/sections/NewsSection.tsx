@@ -10,7 +10,7 @@ import { getImageUrl } from '@/utils/image';
 
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Calendar, ChevronRight, Megaphone } from 'lucide-react';
+import { ArrowUpRight, Calendar, ChevronRight, Eye, Megaphone } from 'lucide-react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Autoplay, Pagination } from 'swiper/modules';
@@ -29,9 +29,14 @@ type NewsItem = {
     image?: string;
     imageUrl?: string;
     views?: number;
+    viewsCount?: number;
+    viewCount?: number;
     createdAt?: string;
     publishedAt?: string;
 };
+
+const NEWS_VIEWS_STORAGE_KEY = 'news_views';
+const NEWS_VIEWS_EVENT = 'news-views-change';
 
 const getText = (value: LocalizedText, fallback = '') => {
     if (!value) return fallback;
@@ -56,12 +61,32 @@ const normalizeNewsResponse = (data: any): NewsItem[] => {
 export const NewsSection = () => {
     const [news, setNews] = useState<NewsItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [savedViews, setSavedViews] = useState<Record<string, number>>({});
 
     dayjs.locale('uz');
 
     // Yangiliklarni yuklash
     useEffect(() => {
         loadNews();
+    }, []);
+
+    useEffect(() => {
+        const loadSavedViews = () => {
+            try {
+                setSavedViews(JSON.parse(localStorage.getItem(NEWS_VIEWS_STORAGE_KEY) || '{}'));
+            } catch {
+                setSavedViews({});
+            }
+        };
+
+        loadSavedViews();
+        window.addEventListener('storage', loadSavedViews);
+        window.addEventListener(NEWS_VIEWS_EVENT, loadSavedViews);
+
+        return () => {
+            window.removeEventListener('storage', loadSavedViews);
+            window.removeEventListener(NEWS_VIEWS_EVENT, loadSavedViews);
+        };
     }, []);
 
     const loadNews = async () => {
@@ -89,9 +114,16 @@ export const NewsSection = () => {
         return dayjs(dateString).format('D MMMM YYYY');
     };
 
+    const getNewsViews = (item: NewsItem) => {
+        const apiViews = item.views ?? item.viewsCount ?? item.viewCount ?? 0;
+        const localViews = Math.max(savedViews[item._id] ?? 0, item.slug ? (savedViews[item.slug] ?? 0) : 0);
+
+        return Math.max(apiViews, localViews);
+    };
+
     if (loading) {
         return (
-            <section className='bg-gradient-to-b from-white to-gray-50 py-16 dark:from-slate-900 dark:to-slate-800'>
+            <section className='bg-background py-16 dark:bg-slate-900'>
                 <div className='container mx-auto px-4'>
                     <div className='flex h-64 items-center justify-center'>
                         <div className='h-12 w-12 animate-spin rounded-full border-4 border-[#00a0e3]/20 border-t-[#00a0e3]' />
@@ -106,14 +138,14 @@ export const NewsSection = () => {
     }
 
     return (
-        <section className='relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-16 dark:from-slate-900 dark:to-slate-800'>
+        <section className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>
             {/* Animated Background Elements */}
             <div className='pointer-events-none absolute inset-0 overflow-hidden'>
                 {/* Grid Pattern */}
                 <div className='brand-grid' />
             </div>
 
-            <div className='relative z-10 container mx-auto max-w-6xl px-4'>
+            <div className='max-w-8xl relative z-10 container mx-auto px-4'>
                 {/* Section Header */}
                 <div className='mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end'>
                     <div className='space-y-2'>
@@ -142,7 +174,7 @@ export const NewsSection = () => {
                 </div>
 
                 <Swiper
-                    slidesPerView={1.12}
+                    slidesPerView={4}
                     spaceBetween={16}
                     loop={news.length > 3}
                     autoplay={{
@@ -156,9 +188,10 @@ export const NewsSection = () => {
                     }}
                     modules={[Autoplay, Pagination]}
                     breakpoints={{
-                        640: { slidesPerView: 1.8, spaceBetween: 18 },
-                        768: { slidesPerView: 2.2, spaceBetween: 20 },
-                        1024: { slidesPerView: 3, spaceBetween: 20 }
+                        0: { slidesPerView: 1.1, spaceBetween: 14 },
+                        640: { slidesPerView: 2, spaceBetween: 18 },
+                        768: { slidesPerView: 3, spaceBetween: 20 },
+                        1024: { slidesPerView: 4, spaceBetween: 20 }
                     }}
                     className='news-swiper !overflow-visible pb-12'>
                     {news.map((item, index) => {
@@ -197,9 +230,18 @@ export const NewsSection = () => {
 
                                         <div className='flex grow flex-col space-y-2 p-4'>
                                             {date ? (
-                                                <div className='flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500'>
-                                                    <Calendar size={10} className='text-gray-400 dark:text-gray-500' />
-                                                    <span>{date}</span>
+                                                <div className='flex items-center gap-3 text-[10px] text-gray-400 dark:text-gray-500'>
+                                                    <span className='flex items-center gap-1'>
+                                                        <Calendar
+                                                            size={10}
+                                                            className='text-gray-400 dark:text-gray-500'
+                                                        />
+                                                        {date}
+                                                    </span>
+                                                    <span className='flex items-center gap-1'>
+                                                        <Eye size={10} className='text-gray-400 dark:text-gray-500' />
+                                                        {getNewsViews(item)}
+                                                    </span>
                                                 </div>
                                             ) : null}
 
