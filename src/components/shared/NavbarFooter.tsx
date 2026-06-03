@@ -9,7 +9,7 @@ const NavbarFooter: React.FC = () => {
     const { getBgColor, getBorderColor } = useThemeStyles();
     return (
         <div className={`border-t ${getBorderColor()} ${getBgColor('card')}`}>
-            <div className='no-scrollbar container mx-auto flex h-12 items-center justify-center gap-4 overflow-x-auto px-4 md:justify-start md:gap-6'>
+            <div className='no-scrollbar container mx-auto flex h-12 items-center justify-center gap-4 overflow-x-auto px-4 md:justify-between md:gap-6'>
                 {bottomNav.map((item) => (
                     <Link
                         key={item.label}

@@ -150,17 +150,21 @@ export const Navbar = () => {
                     <Link href='/' className='group flex items-center gap-2 max-md:hidden'>
                         <Image src='/images/Logo.svg' alt='Logo' width={80} height={80} />
                     </Link>
+                </div>
 
-                    {/* CATALOG (desktop) */}
-                    <div className='hidden lg:block'>
+                {/* O'rta qism - SEARCH */}
+                <form className='relative mx-auto max-w-2xl flex-1 max-sm:hidden' onSubmit={submitSearch}>
+                    <div className='absolute top-1/2 left-1.5 z-20 hidden -translate-y-1/2 items-center lg:flex'>
                         <DropdownMenu open={isCatalogOpen} onOpenChange={setIsCatalogOpen}>
-                            {/* Name Button */}
                             <DropdownMenuTrigger asChild>
-                                <Button className='flex h-11 items-center gap-2 rounded-xl border border-transparent bg-[#f07e1a] px-5 font-extrabold text-white transition-all hover:bg-[#fc953b] hover:text-white md:h-12'>
-                                    <Menu size={20} />
+                                <Button
+                                    type='button'
+                                    variant='ghost'
+                                    className='h-9 rounded-xl px-3 text-sm font-extrabold text-slate-700 hover:bg-slate-100 hover:text-[#f07e1a] md:h-10 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-orange-400'>
+                                    <Menu size={16} />
                                     <span>{t('catalog')}</span>
                                     <ChevronDown
-                                        size={16}
+                                        size={14}
                                         className={`transition-transform ${isCatalogOpen ? 'rotate-180' : ''}`}
                                     />
                                 </Button>
@@ -168,131 +172,81 @@ export const Navbar = () => {
 
                             <DropdownMenuContent
                                 align='start'
-                                className={`mt-2 max-h-[80vh] w-225 overflow-y-auto p-6 ${getBgColor('card')} border ${getBorderColor()} rounded-2xl shadow-2xl`}>
-                                {/* Kategoriyalar bo'limi */}
-                                <div className='mb-6'>
-                                    <div className='mb-4 flex items-center justify-between'>
-                                        <h3 className={`font-black ${getTextColor()} flex items-center gap-2 text-lg`}>
-                                            <Grid3x3 size={20} className='text-[#00a0e3] dark:text-blue-400' />
+                                className={`mt-2 max-h-[68vh] w-[min(820px,calc(100vw-48px))] overflow-y-auto p-4 ${getBgColor('card')} border ${getBorderColor()} rounded-2xl shadow-2xl`}>
+                                <div className='mb-4'>
+                                    <div className='mb-3 flex items-center justify-between gap-4'>
+                                        <h3
+                                            className={`font-black ${getTextColor()} flex items-center gap-2 text-base`}>
+                                            <span className='flex size-8 items-center justify-center rounded-lg bg-[#00a0e3]/10 text-[#00a0e3] dark:bg-blue-400/10 dark:text-blue-400'>
+                                                <Grid3x3 size={17} />
+                                            </span>
                                             {t('catalog')}
                                         </h3>
                                         <Link
                                             href='/catalog'
                                             onClick={() => setIsCatalogOpen(false)}
-                                            className='flex items-center gap-1 text-sm font-bold text-[#00a0e3] transition-colors hover:text-[#FF8A00] dark:text-blue-400 dark:hover:text-orange-400'>
+                                            className='flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-[#00a0e3] transition-colors hover:bg-[#00a0e3]/10 hover:text-[#FF8A00] dark:text-blue-400 dark:hover:bg-blue-400/10 dark:hover:text-orange-400'>
                                             {t('allView')}
-                                            <ChevronDown size={14} className='rotate-270' />
+                                            <ChevronDown size={13} className='rotate-270' />
                                         </Link>
                                     </div>
 
-                                    <div className='grid grid-cols-3 gap-3'>
+                                    <div className='grid grid-cols-2 gap-2 xl:grid-cols-3'>
                                         {categories.map((category) => (
                                             <div
                                                 key={category._id}
-                                                className={`flex items-center gap-3 rounded-xl border border-transparent p-3 transition-all`}>
-                                                <div className='flex-1'>
+                                                className={`group rounded-xl border p-3 transition-all hover:-translate-y-0.5 hover:border-[#00a0e3]/30 hover:bg-[#00a0e3]/5 hover:shadow-sm ${getBorderColor()}`}>
+                                                <div className='min-w-0'>
                                                     <Link
                                                         href={getCatalogCategoryHref(category)}
                                                         onClick={() => setIsCatalogOpen(false)}
-                                                        className={`block font-bold ${getTextColor()} hover:text-[#FF8A00] dark:hover:text-[#FF8A00]`}>
+                                                        className={`block truncate text-sm font-black ${getTextColor()} transition-colors group-hover:text-[#f07e1a] dark:group-hover:text-orange-400`}>
                                                         {getLocalizedCategoryName(category, i18n.language)}
                                                     </Link>
 
-                                                    {category.subgenres?.map((sub, index) => (
-                                                        <Link
-                                                            key={index}
-                                                            href={getCatalogSubgenreHref(category, sub)}
-                                                            onClick={() => setIsCatalogOpen(false)}
-                                                            className={`block text-[14px] text-gray-400 hover:text-[#FF8A00] dark:text-slate-500 dark:hover:text-[#FF8A00]`}>
-                                                            {getLocalizedTitle(sub.title, i18n.language)}
-                                                        </Link>
-                                                    ))}
+                                                    {!!category.subgenres?.length && (
+                                                        <div className='mt-2 flex flex-wrap gap-1.5'>
+                                                            {category.subgenres.slice(0, 3).map((sub, index) => (
+                                                                <Link
+                                                                    key={index}
+                                                                    href={getCatalogSubgenreHref(category, sub)}
+                                                                    onClick={() => setIsCatalogOpen(false)}
+                                                                    className='max-w-full truncate rounded-md bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-500 transition-colors hover:bg-[#f07e1a]/10 hover:text-[#f07e1a] dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-orange-400/10 dark:hover:text-orange-400'>
+                                                                    {getLocalizedTitle(sub.title, i18n.language)}
+                                                                </Link>
+                                                            ))}
+                                                            {category.subgenres.length > 3 && (
+                                                                <span className='rounded-md px-2 py-1 text-[11px] font-bold text-slate-400 dark:text-slate-500'>
+                                                                    +{category.subgenres.length - 3}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
 
-                                <DropdownMenuSeparator className={`my-6 ${getBorderColor()}`} />
+                                <DropdownMenuSeparator className={`my-4 ${getBorderColor()}`} />
 
-                                {/* Tezkor havolalar */}
-                                <div className='grid grid-cols-4 gap-3'>
+                                <div className='grid grid-cols-4 gap-2'>
                                     {bottomNav.slice(0, 4).map((item) => (
                                         <Link
                                             key={item.label}
                                             href={item.href}
                                             onClick={() => setIsCatalogOpen(false)}
-                                            className={`flex items-center gap-2 rounded-xl border bg-slate-50 p-3 dark:bg-slate-900 ${getBorderColor()} transition-all hover:border-transparent hover:bg-[#005CB9] hover:text-white dark:hover:bg-blue-600`}>
+                                            className={`flex items-center justify-center gap-2 rounded-xl border bg-slate-50 px-3 py-2 text-center dark:bg-slate-900 ${getBorderColor()} transition-all hover:border-transparent hover:bg-[#005CB9] hover:text-white dark:hover:bg-blue-600`}>
                                             <span className={item.color}>{item.icon}</span>
-                                            <span className='text-sm font-semibold'>{item.label}</span>
+                                            <span className='truncate text-xs font-bold'>{item.label}</span>
                                         </Link>
                                     ))}
                                 </div>
                             </DropdownMenuContent>
                         </DropdownMenu>
+
+                        <span className='mx-1 h-7 w-px bg-slate-300 dark:bg-slate-700' />
                     </div>
-
-                    {/* SERVICES (desktop) */}
-                    <div className='hidden lg:block'>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    className={`flex h-11 items-center gap-2 rounded-xl border border-transparent bg-[#f07e1a] px-5 font-extrabold text-white transition-all hover:bg-[#fc953b] hover:text-white md:h-12`}>
-                                    <Info size={20} />
-                                    <span>{t('services')}</span>
-                                    <ChevronDown size={16} />
-                                </Button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent
-                                align='start'
-                                className={`mt-2 max-h-[80vh] w-87.5 overflow-y-auto p-4 ${getBgColor('card')} border ${getBorderColor()} rounded-2xl shadow-2xl`}>
-                                <div className='grid grid-cols-2 gap-2'>
-                                    {serviceMenuItems.map((item, index) => (
-                                        <Link
-                                            key={index}
-                                            href={item.href}
-                                            onClick={() => setIsCatalogOpen(false)}
-                                            className={`group flex flex-col items-start rounded-xl p-3 transition-all hover:bg-[#005CB9]/5 dark:hover:bg-blue-500/10`}>
-                                            <div className='flex w-full items-center gap-2'>
-                                                <div
-                                                    className={`rounded-lg bg-gray-100 p-2 text-[#00a0e3] transition-all group-hover:bg-[#005CB9] group-hover:text-white dark:bg-slate-900 dark:text-blue-400 dark:group-hover:bg-blue-600`}>
-                                                    {item.icon}
-                                                </div>
-                                                <div className='flex-1'>
-                                                    <p
-                                                        className={`text-sm font-extrabold ${getTextColor()} group-hover:text-[#005CB9] dark:group-hover:text-blue-400`}>
-                                                        {/* {item.label} */}
-                                                        {t(item.label)}
-                                                    </p>
-                                                    <p className='text-[10px] text-gray-400 dark:text-slate-500'>
-                                                        {t(item.description)}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-
-                                <DropdownMenuSeparator className={`my-4 ${getBorderColor()}`} />
-
-                                <div
-                                    className={`rounded-xl bg-gradient-to-r from-[#005CB9]/5 to-[#FF8A00]/5 p-2 dark:from-blue-500/10 dark:to-orange-500/10`}>
-                                    <Link
-                                        href='/services'
-                                        onClick={() => setIsCatalogOpen(false)}
-                                        className='flex items-center justify-between p-2 text-sm font-extrabold text-[#005CB9] transition-colors hover:text-[#FF8A00] dark:text-blue-400 dark:hover:text-orange-400'>
-                                        <span>{t('servicesAll')}</span>
-                                        <ChevronDown size={16} className='-rotate-90' />
-                                    </Link>
-                                </div>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                </div>
-
-                {/* O'rta qism - SEARCH */}
-                <form className='relative mx-auto max-w-2xl flex-1 max-sm:hidden' onSubmit={submitSearch}>
                     <Input
                         placeholder={t('searchPlaceholder')}
                         value={searchQuery}
@@ -301,11 +255,11 @@ export const Navbar = () => {
                             setShowSearchDropdown(e.target.value.trim().length >= 2);
                         }}
                         onFocus={() => setShowSearchDropdown(searchQuery.trim().length >= 2)}
-                        className={`h-11 w-full rounded-xl pr-24 md:h-12 md:pr-28 ${getBgColor('muted')} border-2 ${getBorderColor()} focus:border-[#f07e1a] focus-visible:ring-0 dark:focus:border-[#f07e1a]`}
+                        className={`h-11 w-full rounded-2xl pr-24 pl-4 md:h-12 md:pr-28 lg:pl-48 ${getBgColor('muted')} border ${getBorderColor()} shadow-sm focus:border-[#f07e1a] focus-visible:ring-0 dark:focus:border-[#f07e1a]`}
                     />
                     <Button
                         type='submit'
-                        className='absolute top-1/2 right-1.5 flex h-9 -translate-y-1/2 cursor-pointer items-center gap-2 rounded-lg bg-[#f07e1a] px-4 font-extrabold text-white hover:bg-[#f07e1ab9] md:h-10'>
+                        className='absolute top-1/2 right-1.5 flex h-9 -translate-y-1/2 cursor-pointer items-center gap-2 rounded-xl bg-[#f07e1a] px-4 font-extrabold text-white shadow-sm hover:bg-[#fc953b] md:h-10'>
                         <Search size={18} />
                         <span className='hidden sm:inline'>{t('search')}</span>
                     </Button>

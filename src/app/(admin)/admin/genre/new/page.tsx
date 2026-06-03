@@ -2,17 +2,17 @@
 
 import { useEffect } from 'react';
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useCreateGenre } from '@/components/admin/hooks/genreHooks/useCreateGenre';
 import { useUpdateGenre } from '@/components/admin/hooks/genreHooks/useUpdateGenre';
 import { useDetailQuery, useGenreQuery } from '@/components/admin/hooks/queries/genre';
 import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
+import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-import { ArrowLeft, FolderTree, Globe2, Plus, Save, Trash2 } from 'lucide-react';
+import { FolderTree, Globe2, Plus, Trash2 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -167,40 +167,18 @@ const AdminNewGenrePage = () => {
     };
     return (
         <div className='space-y-5'>
-            <section className='flex flex-col gap-4 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:flex-row md:items-center md:justify-between md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
-                <div className='min-w-0'>
-                    <Link
-                        href='/admin/genre'
-                        className='inline-flex items-center gap-2 text-sm font-black text-[#9d907e] transition hover:text-[#ef7f1a] dark:text-slate-400 dark:hover:text-white'>
-                        <ArrowLeft size={17} />
-                        Barcha janrlar
-                    </Link>
-                    <h2 className='mt-3 text-2xl font-black text-[#2f2a25] dark:text-white'>
-                        {id ? 'Janrni yangilash' : "Yangi janr qo'shish"}
-                    </h2>
-                    <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
-                        {id
-                            ? " Katalog janr nomlarini yangilang va o'zgarishlarni saqlang."
-                            : " Katalog uchun janr nomi, slug, ko'rinish holati va subjanrlarni kiriting."}
-                    </p>
-                </div>
-
-                <div className='flex gap-2'>
-                    <Button
-                        asChild
-                        variant='outline'
-                        className='h-11 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
-                        <Link href='/admin/genre'>Bekor qilish</Link>
-                    </Button>
-                    <Button
-                        type='submit'
-                        form='genre-form'
-                        className='h-11 rounded-2xl bg-[#ef7f1a] px-5 font-black text-white hover:bg-orange-600'>
-                        <Save size={18} />
-                        {isPending ? 'Saqlanmoqda...' : editId ? 'Yangilash' : 'Saqlash'}
-                    </Button>
-                </div>
-            </section>
+            <HeadSectionEdit
+                title='Janr'
+                href='/admin/genre'
+                form='genre'
+                backLabel='Barcha janrlar'
+                isEdit={!!editId}
+                createTitle="Yangi janr qo'shish"
+                editTitle='Janrni yangilash'
+                createDescription="Katalog uchun janr nomi, slug, ko'rinish holati va subjanrlarni kiriting."
+                editDescription="Katalog janr nomlarini yangilang va o'zgarishlarni saqlang."
+                isPending={isPending}
+            />
 
             <form id='genre-form' onSubmit={handleSubmit(onSubmit)}>
                 <div className='space-y-5'>

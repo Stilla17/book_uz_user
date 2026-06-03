@@ -86,3 +86,48 @@ export const BooksCardSkeleton = () => (
         ))}
     </>
 );
+
+export const AdminCommentsSkeleton = () => (
+    <>
+        {Array.from({ length: 4 }).map((_, index) => (
+            <article
+                key={index}
+                className='rounded-[22px] bg-white p-4 ring-1 ring-[#eadfce] dark:bg-slate-900 dark:ring-slate-800'>
+                <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+                    <div className='min-w-0 flex-1 space-y-3'>
+                        <div className='flex flex-wrap items-center gap-2'>
+                            <div className='h-6 w-24 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-950' />
+                            <div className='h-6 w-28 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-950' />
+                        </div>
+                        <div className='h-5 w-3/4 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-950' />
+                    </div>
+
+                    <div className='flex items-center gap-1'>
+                        {Array.from({ length: 5 }).map((_, starIndex) => (
+                            <div
+                                key={starIndex}
+                                className='size-4 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-950'
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                <div className='mt-4 space-y-2 rounded-2xl bg-[#fffaf2] p-4 dark:bg-slate-950'>
+                    <div className='h-4 w-full animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
+                    <div className='h-4 w-5/6 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
+                    <div className='h-4 w-2/3 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
+                </div>
+
+                <div className='mt-4 flex flex-col gap-3 border-t border-[#f0e4d3] pt-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800'>
+                    <div className='h-4 w-32 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-950' />
+
+                    <div className='flex items-center justify-end gap-2'>
+                        <div className='size-8 animate-pulse rounded-xl bg-[#f2e7d8] dark:bg-slate-950' />
+                        <div className='size-8 animate-pulse rounded-xl bg-[#f2e7d8] dark:bg-slate-950' />
+                        <div className='size-8 animate-pulse rounded-xl bg-[#f2e7d8] dark:bg-slate-950' />
+                    </div>
+                </div>
+            </article>
+        ))}
+    </>
+);

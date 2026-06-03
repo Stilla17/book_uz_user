@@ -8,14 +8,15 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDeleteBook } from '@/components/admin/hooks/bookHooks/useDeleteBook';
 import { useBookListQuery } from '@/components/admin/hooks/queries/book';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
+import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { getLatestImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
-import { FETCH_PAGINATION_LIMIT } from '@/tools';
 
 import { BookOpen, Eye, ImageIcon, Pencil, Plus, Search, Star, Trash2 } from 'lucide-react';
 
@@ -49,7 +50,6 @@ const getStockStatus = (stock?: number) => {
             'bg-emerald-50 text-emerald-700 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20'
     };
 };
-
 
 type StockFilter = 'all' | 'low' | 'available' | 'out';
 
@@ -129,23 +129,11 @@ const AdminBookPage = () => {
 
     return (
         <div className='space-y-5'>
-            <section className='flex flex-col gap-4 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:flex-row md:items-center md:justify-between md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
-                <div>
-                    <h2 className='mt-1 text-2xl font-black text-[#2f2a25] dark:text-white'>Barcha kitoblar</h2>
-                    <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
-                        Ombordagi kitoblar, narxlar va mavjudlik holatini boshqarish uchun umumiy ro'yxat.
-                    </p>
-                </div>
-
-                <Button
-                    asChild
-                    className='h-11 rounded-2xl bg-[#ef7f1a] px-5 font-black text-white hover:bg-orange-600'>
-                    <Link href='/admin/book/new'>
-                        <Plus size={18} />
-                        Yangi kitob
-                    </Link>
-                </Button>
-            </section>
+            <HeadSection
+                title='Kitoblar'
+                text="Barcha kitoblar, narxlar va mavjudlik holatini boshqarish uchun umumiy ro'yxat."
+                href='book'
+            />
 
             <section className='grid gap-4 md:grid-cols-3'>
                 {stats.map(({ label, value, icon: Icon, color }) => (

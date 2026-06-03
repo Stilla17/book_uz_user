@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDeleteGenre } from '@/components/admin/hooks/genreHooks/useDeleteGenre';
 import { useGenreListQuery } from '@/components/admin/hooks/queries/genre';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
@@ -52,21 +53,11 @@ const AdminGenrePage = () => {
 
     return (
         <div className='space-y-5'>
-            <section className='flex flex-col gap-4 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:flex-row md:items-center md:justify-between md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
-                <div>
-                    <h2 className='mt-1 text-2xl font-black text-[#2f2a25] dark:text-white'>Janrlar</h2>
-                    <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
-                        Kitoblarni katalog bo'yicha tartiblash uchun janr va subjanrlar boshqaruvi.
-                    </p>
-                </div>
-
-                <Button className='h-11 rounded-2xl bg-[#ef7f1a] px-5 text-sm font-black text-nowrap text-white transition hover:bg-orange-600'>
-                    <Link href='/admin/genre/new' className='inline-flex items-center justify-center gap-2'>
-                        <Plus size={18} />
-                        Yangi janr
-                    </Link>
-                </Button>
-            </section>
+            <HeadSection
+                title='Janrlar'
+                text="Kitoblarni katalog bo'yicha tartiblash uchun janr va subjanrlar boshqaruvi."
+                href='genre'
+            />
 
             <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
                 {stats.map(({ label, value, icon: Icon, color }) => (

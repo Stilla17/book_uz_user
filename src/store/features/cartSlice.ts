@@ -8,6 +8,10 @@ export type CartBook = {
     price: number;
     images: string | string[];
     stock: number;
+    publisher?: string | { _id?: string; id?: string };
+    details?: {
+        publisher?: string | { _id?: string; id?: string };
+    };
 };
 
 export type CartItem = {

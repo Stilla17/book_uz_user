@@ -30,6 +30,10 @@ export const paymentOptions = [
     {
         icon: './images/xazna_logo.png',
         title: 'Xazna'
+    },
+    {
+        icon: '',
+        title: 'Naqd'
     }
 ];
 

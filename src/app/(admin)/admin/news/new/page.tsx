@@ -2,17 +2,16 @@
 
 import { useEffect } from 'react';
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useCreateNews } from '@/components/admin/hooks/newsHooks/useCreateNews';
 import { useUpdateNews } from '@/components/admin/hooks/newsHooks/useUpdateNews';
 import { useNewsDetailQuery } from '@/components/admin/hooks/queries/news';
 import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
-import { Button } from '@/components/ui/button';
+import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { getImageUrl } from '@/utils/image';
 
-import { CalendarDays, FileText, ImagePlus, Languages, Link2, Loader, Save, X } from 'lucide-react';
+import { CalendarDays, FileText, ImagePlus, Languages, Link2, Loader, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -159,35 +158,18 @@ const AdminNewsNewPage = () => {
 
     return (
         <div className='space-y-5'>
-            <section className='flex flex-col gap-4 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:flex-row md:items-center md:justify-between md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
-                <div>
-                    <h2 className='text-2xl font-black text-[#2f2a25] dark:text-white'>
-                        {isEdit ? 'Yangilikni tahrirlash' : 'Yangi yangilik'}
-                    </h2>
-                    <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
-                        {isEdit
-                            ? "Yangilik ma'lumotlarini yangilang va o'zgarishlarni saqlang."
-                            : "Sayt uchun yangi maqola, e'lon yoki yangilik ma'lumotlarini kiriting."}
-                    </p>
-                </div>
-
-                <div className='flex items-center gap-3 pt-4'>
-                    <Button
-                        asChild
-                        variant='outline'
-                        className='h-11 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
-                        <Link href='/admin/news'>Bekor qilish</Link>
-                    </Button>
-                    <Button
-                        type='submit'
-                        form='news-form'
-                        disabled={isPending}
-                        className='h-11 rounded-2xl bg-[#ef7f1a] px-6 font-black text-white hover:bg-orange-600 disabled:opacity-50'>
-                        <Save size={18} />
-                        {isPending ? 'Saqlanmoqda...' : isEdit ? 'Yangilash' : 'Saqlash'}
-                    </Button>
-                </div>
-            </section>
+            <HeadSectionEdit
+                title='Yangilik'
+                href='/admin/news'
+                form='news'
+                backLabel='Barcha yangiliklar'
+                isEdit={isEdit}
+                createTitle='Yangi yangilik'
+                editTitle='Yangilikni tahrirlash'
+                createDescription="Sayt uchun yangi maqola, e'lon yoki yangilik ma'lumotlarini kiriting."
+                editDescription="Yangilik ma'lumotlarini yangilang va o'zgarishlarni saqlang."
+                isPending={isPending}
+            />
 
             <section className='grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]'>
                 <form

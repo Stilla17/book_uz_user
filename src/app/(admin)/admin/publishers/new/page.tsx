@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useCreatePublisher } from '@/components/admin/hooks/publisherHooks/useCreatePublisher';
@@ -10,10 +9,10 @@ import { useUpdatePublisher } from '@/components/admin/hooks/publisherHooks/useU
 import { usePublisherDetailQuery } from '@/components/admin/hooks/queries/publishers';
 import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
 import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
-import { Button } from '@/components/ui/button';
+import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { Input } from '@/components/ui/input';
 
-import { ArrowLeft, Building2, ImagePlus, Loader, Save, Upload, X } from 'lucide-react';
+import { Building2, ImagePlus, Loader, Upload, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -86,42 +85,18 @@ const AdminNewPublisherPage = () => {
 
     return (
         <div className='space-y-5'>
-            <section className='flex flex-col gap-4 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:flex-row md:items-center md:justify-between md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
-                <div className='min-w-0'>
-                    <Link
-                        href='/admin/publishers'
-                        className='inline-flex items-center gap-2 text-sm font-black text-[#9d907e] transition hover:text-[#ef7f1a] dark:text-slate-400 dark:hover:text-white'>
-                        <ArrowLeft size={17} />
-                        Barcha nashriyotlar
-                    </Link>
-                    <h2 className='mt-3 text-2xl font-black text-[#2f2a25] dark:text-white'>
-                        {id ? 'Nashriyotni tahrirlash' : "Yangi nashriyot qo'shish"}
-                    </h2>
-                    <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
-                        {id
-                            ? "Nashriyot ma'lumotlarini yangilang va o'zgarishlarni saqlang."
-                            : "Nashriyot profili uchun nom, slug, aloqa ma'lumotlari va katalogdagi ko'rinishini kiriting."}
-                    </p>
-                </div>
-
-                <div className='flex gap-2'>
-                    <Button
-                        asChild
-                        variant='outline'
-                        className='h-11 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'
-                        disabled={isPending}>
-                        <Link href='/admin/publishers'>Bekor qilish</Link>
-                    </Button>
-                    <Button
-                        type='submit'
-                        form='publisher-form'
-                        disabled={isPending}
-                        className='h-11 rounded-2xl bg-[#ef7f1a] px-5 font-black text-white hover:bg-orange-600 disabled:opacity-50'>
-                        <Save size={18} />
-                        {isPending ? 'Saqlanmoqda...' : isEdit ? 'Yangilash' : 'Saqlash'}
-                    </Button>
-                </div>
-            </section>
+            <HeadSectionEdit
+                title='Nashriyot'
+                href='/admin/publishers'
+                form='publisher'
+                backLabel='Barcha nashriyotlar'
+                isEdit={isEdit}
+                createTitle="Yangi nashriyot qo'shish"
+                editTitle='Nashriyotni tahrirlash'
+                createDescription="Nashriyot profili uchun nom, slug, aloqa ma'lumotlari va katalogdagi ko'rinishini kiriting."
+                editDescription="Nashriyot ma'lumotlarini yangilang va o'zgarishlarni saqlang."
+                isPending={isPending}
+            />
 
             <form id='publisher-form' onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
                 {isDetailLoading && (

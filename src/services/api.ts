@@ -197,6 +197,11 @@ export const UserService = {
         return response.data;
     },
 
+    createPaymePayment: async (orderId: string) => {
+        const response = await api.post('/payme/create-order', { orderId });
+        return response.data;
+    },
+
     getOrders: async () => {
         const response = await api.get('/orders');
         return response.data.data;

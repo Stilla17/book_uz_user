@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDeleteNews } from '@/components/admin/hooks/newsHooks/useDeleteNews';
 import { useNewsListQuery } from '@/components/admin/hooks/queries/news';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
@@ -61,23 +62,11 @@ const AdminNewsPage = () => {
 
     return (
         <div className='space-y-5'>
-            <section className='flex flex-col gap-4 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:flex-row md:items-center md:justify-between md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
-                <div>
-                    <h2 className='mt-1 text-2xl font-black text-[#2f2a25] dark:text-white'>Yangiliklar</h2>
-                    <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
-                        Saytdagi maqolalar, e'lonlar va yangilik kontentlarini boshqarish sahifasi.
-                    </p>
-                </div>
-
-                <Button
-                    asChild
-                    className='h-11 rounded-2xl bg-[#ef7f1a] px-5 font-black text-white hover:bg-orange-600'>
-                    <Link href='/admin/news/new'>
-                        <Plus size={18} />
-                        Yangi yangilik
-                    </Link>
-                </Button>
-            </section>
+            <HeadSection
+                title='Yangiliklar'
+                text=" Saytdagi maqolalar, e'lonlar va yangilik kontentlarini boshqarish sahifasi."
+                href='news'
+            />
 
             <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
                 {stats.map(({ label, value, icon: Icon, color }) => (

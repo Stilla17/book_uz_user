@@ -53,7 +53,7 @@ const mockServices: ServiceItem[] = [
         title: 'Yetkazib berish',
         desc: 'Toshkent bo‘ylab tez, viloyatlarga esa ishonchli yetkazamiz.',
         icon: 'delivery',
-        href: '/delivery',
+        href: '/checkout',
         isActive: true
     },
     {
@@ -61,7 +61,7 @@ const mockServices: ServiceItem[] = [
         title: '24/7 Support',
         desc: 'Telegram/Chat orqali doim aloqadamiz. Savol bo‘lsa yozing.',
         icon: 'support',
-        href: '/support',
+        href: '/about',
         isActive: true
     },
     {
@@ -69,7 +69,7 @@ const mockServices: ServiceItem[] = [
         title: 'Audiokitoblar',
         desc: 'Ilovada tinglang: yo‘lda, sportda, uyda — qulay format.',
         icon: 'audiobooks',
-        href: '/audiobooks',
+        href: '/catalog',
         isActive: true
     },
     {
@@ -77,7 +77,7 @@ const mockServices: ServiceItem[] = [
         title: 'Kafolat & Ishonch',
         desc: 'Buyurtma xavfsizligi, qaytarish qoidalari va nazorat tizimi.',
         icon: 'secure',
-        href: '/guarantee',
+        href: '/about',
         isActive: true
     },
     {
@@ -85,7 +85,7 @@ const mockServices: ServiceItem[] = [
         title: 'Qulay to‘lovlar',
         desc: 'Click/Payme/Uzum/Bank kartalar — hammasi bor.',
         icon: 'payment',
-        href: '/payments',
+        href: '/checkout',
         isActive: true
     }
 ];

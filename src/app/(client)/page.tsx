@@ -1,10 +1,8 @@
 'use client';
 
 import { AboutSection } from '@/components/sections/AboutSection';
-import { AuthorQuoteSection } from '@/components/sections/AuthorQuoteSection';
 import Authors from '@/components/sections/Authors';
 import { BookSection } from '@/components/sections/BookSection';
-import { CategorySection } from '@/components/sections/Categories';
 import { DownloadAppSection } from '@/components/sections/DownloadAppSection';
 import { Hero } from '@/components/sections/Hero';
 import { NewsSection } from '@/components/sections/NewsSection';
@@ -21,9 +19,6 @@ const Page = () => {
         <div className='bg-background flex flex-col dark:bg-slate-900'>
             {/* Hero Section */}
             <Hero />
-
-            {/* Kategoriyalar - Hero bilan yonma-yon */}
-            <CategorySection />
 
             {/* Yangi kelgan kitoblar */}
             <BookSection
@@ -53,9 +48,6 @@ const Page = () => {
 
             {/* News Section */}
             <NewsSection />
-
-            {/* Author Quote */}
-            <AuthorQuoteSection />
 
             {/* About Section */}
             <AboutSection />

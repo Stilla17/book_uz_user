@@ -16,10 +16,10 @@ const NavbarHeader = () => {
                     </div>
 
                     <a
-                        href='tel:+998901234567'
+                        href='tel:+998712300050'
                         className='flex items-center gap-2 text-white/85 transition-colors hover:text-[#FF8A00] max-sm:hidden dark:hover:text-orange-400'>
                         <Phone size={14} />
-                        <span className='font-extrabold'>+998(90) 123-45-67</span>
+                        <span className='font-extrabold'>+998(71) 230-00-50</span>
                     </a>
 
                     <NavbarControls />

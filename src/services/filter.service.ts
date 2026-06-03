@@ -24,21 +24,53 @@ const getEntityList = (data: FilterEntity[] | { authors?: FilterEntity[]; publis
     return data[key] ?? [];
 };
 
-export const filterService = {
-    async getAllFilters(): Promise<BookFilterResponse> {
-        const [categoriesRes, authorRes, publisherRes] = await Promise.all([
-            api.get('/categories', { params: { all: true } }),
-            api.get('/authors', { params: { limit: 1000 } }),
-            api.get('/publishers')
-        ]);
+const getTotalPages = (data: unknown) => {
+    if (!data || Array.isArray(data) || typeof data !== 'object') return 1;
 
-        const authorData = getResponseData<FilterEntity[] | { authors?: FilterEntity[] }>(authorRes, {});
-        const publisherData = getResponseData<FilterEntity[] | { publishers?: FilterEntity[] }>(publisherRes, {});
+    const pageData = data as { pagination?: { pages?: number; totalPages?: number } };
+    const totalPages = Number(pageData.pagination?.pages ?? pageData.pagination?.totalPages ?? 1);
+
+    return Number.isFinite(totalPages) && totalPages > 0 ? totalPages : 1;
+};
+
+const getAllEntityPages = async (path: string, key: 'authors' | 'publishers', limit: number) => {
+    const firstResponse = await api.get(path, { params: { page: 1, limit } });
+    const firstData = getResponseData<FilterEntity[] | { authors?: FilterEntity[]; publishers?: FilterEntity[] }>(
+        firstResponse,
+        {}
+    );
+    const firstItems = getEntityList(firstData, key);
+    const totalPages = getTotalPages(firstData);
+
+    if (totalPages <= 1) return firstItems;
+
+    const otherResponses = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, index) => api.get(path, { params: { page: index + 2, limit } }))
+    );
+
+    return otherResponses.reduce<FilterEntity[]>((items, response) => {
+        const data = getResponseData<FilterEntity[] | { authors?: FilterEntity[]; publishers?: FilterEntity[] }>(
+            response,
+            {}
+        );
+
+        return [...items, ...getEntityList(data, key)];
+    }, firstItems);
+};
+
+export const filterService = {
+    async getAllFilters(params: { limit?: number } = {}): Promise<BookFilterResponse> {
+        const limit = params.limit ?? 200;
+        const [categoriesRes, authors, publishers] = await Promise.all([
+            api.get('/categories', { params: { all: true } }),
+            getAllEntityPages('/authors', 'authors', limit),
+            getAllEntityPages('/publishers', 'publishers', limit)
+        ]);
 
         return {
             categories: getResponseData<Category[]>(categoriesRes, []),
-            authors: getEntityList(authorData, 'authors'),
-            publishers: getEntityList(publisherData, 'publishers')
+            authors,
+            publishers
         };
     }
 };

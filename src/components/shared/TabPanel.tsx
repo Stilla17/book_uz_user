@@ -5,6 +5,7 @@ import { UserService } from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
 
 import FormComment from './FormComment';
+import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 
 type BookComment = {
@@ -15,6 +16,7 @@ type BookComment = {
     comment?: string;
     content?: string;
     message?: string;
+    status?: string;
     createdAt?: string;
     updatedAt?: string;
     user?:
@@ -94,16 +96,8 @@ const getCommentText = (comment: BookComment) =>
 const getCommentInitial = (name: string) => name.trim().charAt(0).toUpperCase() || 'F';
 
 const formatCommentDate = (date?: string) => {
-    if (!date) return 'Yangi izoh';
-
-    const parsedDate = new Date(date);
-    if (Number.isNaN(parsedDate.getTime())) return 'Yangi izoh';
-
-    return parsedDate.toLocaleDateString('uz-UZ', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    });
+    const parsedDate = dayjs(date);
+    return parsedDate.isValid() ? parsedDate.format('DD MMM YYYY HH:mm') : 'Yangi izoh';
 };
 
 const TabPanel = ({
@@ -123,7 +117,9 @@ const TabPanel = ({
         enabled: !!bookId
     });
 
-    const comments = getCommentList(commentsData);
+    const comments = getCommentList(commentsData).filter(
+        (comment) => !comment.status || ['approved', 'aproved'].includes(comment.status)
+    );
     const totalComments = commentsData ? comments.length : reviewsCount || 0;
 
     return (

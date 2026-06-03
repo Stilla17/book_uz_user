@@ -10,6 +10,8 @@ interface CheckoutState {
     address: string;
     deliveryMethod: string;
     paymentMethod: string;
+    promoCode: string;
+    promoDiscount: number;
 }
 
 const initialState: CheckoutState = {
@@ -20,7 +22,9 @@ const initialState: CheckoutState = {
     district: '',
     address: '',
     deliveryMethod: 'Pochta orqali',
-    paymentMethod: 'Payme'
+    paymentMethod: 'Payme',
+    promoCode: '',
+    promoDiscount: 0
 };
 
 export const checkoutSlice = createSlice({
@@ -30,10 +34,18 @@ export const checkoutSlice = createSlice({
         updateField: (state, action: PayloadAction<Partial<CheckoutState>>) => {
             return { ...state, ...action.payload };
         },
+        setPromo: (state, action: PayloadAction<{ code: string; discount: number }>) => {
+            state.promoCode = action.payload.code;
+            state.promoDiscount = action.payload.discount;
+        },
+        clearPromo: (state) => {
+            state.promoCode = '';
+            state.promoDiscount = 0;
+        },
         resetCheckout: () => initialState
     }
 });
 
-export const { updateField, resetCheckout } = checkoutSlice.actions;
+export const { updateField, resetCheckout, setPromo, clearPromo } = checkoutSlice.actions;
 
 export default checkoutSlice.reducer;

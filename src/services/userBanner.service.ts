@@ -3,7 +3,8 @@ import { api } from './api';
 
 export interface UserBanner {
   _id: string;
-  title: {
+  name?: string;
+  title?: {
     uz: string;
     ru: string;
     en: string;
@@ -20,6 +21,7 @@ export interface UserBanner {
   };
   type: 'hero' | 'author' | 'quote' | 'news';
   imageUrl: string;
+  link?: string;
   buttonText?: {
     uz: string;
     ru: string;

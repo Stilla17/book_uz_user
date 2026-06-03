@@ -154,31 +154,6 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                 </div>
                             </div>
 
-                            {/* Xizmatlar bo'limi (Mobile) */}
-                            <div className='space-y-2'>
-                                <div className={`text-sm font-extrabold ${getTextColor()}`}>{t('services')}</div>
-                                <div className='grid grid-cols-2 gap-2'>
-                                    {serviceMenuItems.slice(0, 6).map((item, index) => (
-                                        <Link
-                                            key={index}
-                                            href={item.href}
-                                            onClick={() => setMobileOpen(false)}
-                                            className={`flex flex-col items-center gap-1 p-2 ${getBgColor('card')} border ${getBorderColor()} rounded-lg transition-colors hover:border-[#005CB9] dark:hover:border-blue-400`}>
-                                            <div className='text-[#005CB9] dark:text-blue-400'>{item.icon}</div>
-                                            <span className={`text-center text-[10px] font-bold ${getTextColor()}`}>
-                                                {t(item.label)}
-                                            </span>
-                                        </Link>
-                                    ))}
-                                </div>
-                                <Link
-                                    href='/services'
-                                    onClick={() => setMobileOpen(false)}
-                                    className={`mt-2 block text-center text-xs font-bold text-[#005CB9] hover:underline dark:text-blue-400`}>
-                                    {t('servicesAll')} →
-                                </Link>
-                            </div>
-
                             {/* Mobile kategoriyalar */}
                             <div className='space-y-2'>
                                 <div className='flex items-center justify-between'>
@@ -190,31 +165,6 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                         Barchasi
                                     </Link>
                                 </div>
-                                {/* <div className='grid grid-cols-2 gap-2'>
-                                            {categories.map((category) => (
-                                                <Link
-                                                    key={category._id}
-                                                    href={`/category/${category.slug}`}
-                                                    onClick={() => setMobileOpen(false)}
-                                                    className={`flex items-center gap-2 p-2 ${getBgColor('card')} border ${getBorderColor()} rounded-lg transition-colors hover:border-[#005CB9] dark:hover:border-blue-400`}>
-                                                    <div className='flex-1'>
-                                                        <p className={`text-xs font-bold`}>
-                                                            {getLocalizedCategoryName(category)}
-                                                        </p>
-                                                        {category.subCategories?.map((sub, index) => (
-                                                            <p
-                                                                key={index}
-                                                                className={`text-[10px] text-gray-400 dark:text-slate-500`}>
-                                                                {getLocalizedTitle(sub.title)}
-                                                            </p>
-                                                        ))}
-                                                        <p className='text-[8px] text-gray-400 dark:text-slate-500'>
-                                                            {category.bookCount ?? 0} ta
-                                                        </p>
-                                                    </div>
-                                                </Link>
-                                            ))}
-                                        </div> */}
                             </div>
 
                             <a

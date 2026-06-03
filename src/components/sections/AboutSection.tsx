@@ -2,25 +2,34 @@
 
 import React, { useState } from 'react';
 
+import Link from 'next/link';
+
+import { useBranchUserQuery } from '@/components/admin/hooks/queries/branch';
 import { BranchMap } from '@/components/map/Map';
-import { branchLocations } from '@/components/map/branches';
 
 import { Award, Book, BookHeadphones, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
-import Link from 'next/link';
 
 export const AboutSection = () => {
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
+    const { data: apiBranches = [] } = useBranchUserQuery();
+
+    const branches = apiBranches
+        .map((branch) => ({
+            name: branch.branchName ?? branch.name ?? 'Filial',
+            coords: [Number(branch.latitude), Number(branch.longitude)] as [number, number]
+        }))
+        .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1]));
 
     const stats = [
         { icon: <Book size={24} />, label: 'Kitoblar', value: '50,000+' },
         { icon: <BookOpen size={24} />, label: 'Nashryotlar soni', value: '10+' },
-        { icon: <Building2 size={24} />, label: 'Filyallar soni', value: '10+' },
+        { icon: <Building2 size={24} />, label: 'Filyallar soni', value: `${branches.length}+` },
         { icon: <Truck size={24} />, label: 'Yetkazib berish', value: '24/7' },
         { icon: <BookHeadphones size={24} />, label: 'Audio kitoblar', value: '10K+' }
     ];
 
     return (
-        <section className='relative overflow-hidden bg-background py-16 dark:bg-slate-900'>
+        <section className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>
             <div className='brand-grid' />
 
             <div className='relative z-10 container mx-auto max-w-[1400px] px-4'>
@@ -74,7 +83,7 @@ export const AboutSection = () => {
                         <div className='relative overflow-hidden rounded-[2rem] border border-[#00a0e3]/20 bg-white/80 p-5 shadow-xl backdrop-blur-sm dark:border-[#00a0e3]/30 dark:bg-slate-800/70'>
                             <div className='mb-4 flex items-center justify-between'>
                                 <h3 className='text-xl font-black text-gray-900 dark:text-white'>
-                                    {branchLocations.length} ta filial xaritada
+                                    {branches.length} ta filial xaritada
                                 </h3>
                                 <span className='rounded-full bg-[#ef7f1a]/10 px-3 py-1 text-xs font-bold text-[#ef7f1a] dark:bg-orange-500/20 dark:text-orange-300'>
                                     O'zbekiston
@@ -82,11 +91,17 @@ export const AboutSection = () => {
                             </div>
 
                             <div className='h-90 w-full overflow-hidden rounded-2xl'>
-                                <BranchMap focusRequest={focusRequest} />
+                                {branches.length ? (
+                                    <BranchMap focusRequest={focusRequest} branches={branches} />
+                                ) : (
+                                    <div className='grid h-full place-items-center bg-gray-100 text-center text-sm font-bold text-gray-500 dark:bg-slate-900 dark:text-slate-400'>
+                                        Hozircha filiallar mavjud emas
+                                    </div>
+                                )}
                             </div>
 
                             <div className='mt-4 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3'>
-                                {branchLocations.map((branch) => (
+                                {branches.map((branch) => (
                                     <button
                                         type='button'
                                         key={`legend-${branch.name}`}

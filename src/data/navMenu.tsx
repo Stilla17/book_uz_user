@@ -16,6 +16,7 @@ import {
     Info,
     LayoutDashboard,
     Mail,
+    MapPinned,
     MessageSquareText,
     Newspaper,
     PenLine,
@@ -66,7 +67,7 @@ export const bottomNav: NavItem[] = [
     },
     {
         label: "Sovg'a",
-        href: '/gift-cards',
+        href: '/promo',
         icon: <Gift size={14} />,
         description: "Sovg'a kartalari"
     }
@@ -82,37 +83,37 @@ export const serviceMenuItems = [
     {
         icon: <Truck size={16} />,
         label: 'serviceItems.delivery.label',
-        href: '/delivery',
+        href: '/checkout',
         description: 'serviceItems.delivery.description'
     },
     {
         icon: <CreditCard size={16} />,
         label: 'serviceItems.payment.label',
-        href: '/payment',
+        href: '/checkout',
         description: 'serviceItems.payment.description'
     },
     {
         icon: <Shield size={16} />,
         label: 'serviceItems.guarantee.label',
-        href: '/guarantee',
+        href: '/about',
         description: 'serviceItems.guarantee.description'
     },
     {
         icon: <Headphones size={16} />,
         label: 'serviceItems.contact.label',
-        href: '/contact',
+        href: '/about',
         description: 'serviceItems.contact.description'
     },
     {
         icon: <HelpCircle size={16} />,
         label: 'serviceItems.faq.label',
-        href: '/faq',
+        href: '/about',
         description: 'serviceItems.faq.description'
     },
     {
         icon: <FileText size={16} />,
         label: 'serviceItems.terms.label',
-        href: '/terms',
+        href: '/about',
         description: 'serviceItems.terms.description'
     },
     {
@@ -155,13 +156,18 @@ export const menuItems = [
         icon: Newspaper
     },
     {
+        label: 'Filyallar',
+        href: '/admin/branches',
+        icon: MapPinned
+    },
+    {
         label: 'Banner',
         href: '/admin/banners',
         icon: ImageIcon
     },
     {
         label: 'Promo kod',
-        href: '/admin/promo-codes',
+        href: '/admin/promo',
         icon: TicketPercent
     },
     {

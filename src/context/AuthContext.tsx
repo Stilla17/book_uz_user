@@ -178,8 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 } else {
                     dispatch({ type: 'AUTH_FAILURE' });
                 }
-            } catch (error) {
-                console.log('Sessiya mavjud emas (Login talab etiladi)');
+            } catch {
                 dispatch({ type: 'AUTH_FAILURE' });
             }
         };

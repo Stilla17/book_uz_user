@@ -22,11 +22,13 @@ export interface QuoteBannerData {
 
 export interface Banner {
     _id: string;
-    title: MultiLangField;
+    name?: string;
+    title?: MultiLangField;
     subtitle?: MultiLangField;
     description?: MultiLangField;
     type: 'hero' | 'author' | 'quote' | 'news';
     imageUrl: string;
+    link?: string;
     buttonText?: MultiLangField;
     buttonLink?: string;
     backgroundColor?: string;
@@ -44,13 +46,15 @@ export interface Banner {
 }
 
 export interface BannerFormData {
-    title: MultiLangField;
+    name?: string;
+    title?: MultiLangField;
     subtitle?: MultiLangField;
     description?: MultiLangField;
     type: 'hero' | 'author' | 'quote' | 'news';
     image?: File | string;
     buttonText?: MultiLangField;
     buttonLink?: string;
+    link?: string;
     backgroundColor?: string;
     textColor?: string;
     badge?: MultiLangField;

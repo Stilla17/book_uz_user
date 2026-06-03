@@ -84,6 +84,8 @@ export interface Order {
     user: string;
     items: OrderItem[];
     totalAmount: number;
+    discountAmount?: number;
+    couponCode?: string;
     status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
     shippingAddress: {
         fullName: string;
@@ -122,16 +124,24 @@ export interface Wishlist {
 export interface Coupon {
     _id: string;
     code: string;
-    discountPercentage: number;
-    discountAmount?: number;
+    type: CouponType;
+    value: number;
+    discountPercentage?: number;
+    applicableProducts?: string[];
+    applicablePublishers?: string[];
     minOrderAmount?: number;
     maxDiscount?: number;
     startDate: string;
     endDate: string;
+    usageLimit: number;
+    usedCount: number;
     isActive: boolean;
-    description: string;
-    descriptionRu: string;
-    descriptionEn: string;
+    isExpired?: boolean;
+    isStarted?: boolean;
+    isValidByDate?: boolean;
+    expiryDate?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type Theme = 'light' | 'dark';
@@ -149,6 +159,7 @@ export interface OrderPayload {
     items: Array<{ product: string; quantity: number; priceAtTime: number }>;
     guestName?: string;
     description?: string;
+    couponCode?: string;
     totalAmount: number;
     shippingAddress: {
         city: string;
@@ -207,3 +218,61 @@ export type NavItem = {
     highlight?: boolean;
 };
 
+export type Branch = {
+    _id: string;
+    branchName?: string;
+    name?: string;
+    latitude: number;
+    longitude?: number;
+};
+
+export type BranchFormData = {
+    branchName: string;
+    latitude: number;
+    longitude: number;
+};
+
+export type PromoTargetType = 'book' | 'publisher';
+export type CouponType = 'PERCENT' | 'FIXED';
+export type PromoDiscountType = 'percentage' | 'amount';
+
+export type PromoFormValues = {
+    code: string;
+    discountType: PromoDiscountType;
+    discountValue: number;
+    targetType: PromoTargetType;
+    bookIds: string[];
+    publisherIds: string[];
+    startDate: string;
+    endDate: string;
+    usageLimit?: number;
+    isActive: boolean;
+};
+
+export interface CreatePromoPayload {
+    code: string;
+    type: CouponType;
+    value: number;
+    discountPercentage?: number;
+    applicableProducts?: string[];
+    applicablePublishers?: string[];
+    startDate: string;
+    endDate: string;
+    usageLimit?: number;
+    isActive?: boolean;
+}
+
+export interface getPromosResponse {
+    _id: string;
+    code: string;
+    type: CouponType;
+    value: number;
+    discountPercentage?: number;
+    applicableProducts?: string[];
+    applicablePublishers?: string[];
+    startDate: string;
+    endDate: string;
+    usageLimit?: number;
+    usedCount: number;
+    isActive: boolean;
+}

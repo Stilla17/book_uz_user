@@ -199,9 +199,9 @@ export default function RegisterPage() {
 
         {/* Terms */}
         <p className="mt-6 text-xs text-center text-gray-400 dark:text-gray-500">{' Ro\'yxatdan o\'tish orqali siz'}{" "}
-          <Link href="/terms" className="text-blue-500 dark:text-blue-400 hover:underline">Foydalanish shartlari</Link>
+          <Link href="/about" className="text-blue-500 dark:text-blue-400 hover:underline">Foydalanish shartlari</Link>
           {" "}va{" "}
-          <Link href="/privacy" className="text-orange-500 dark:text-orange-400 hover:underline">Maxfiylik siyosati</Link>
+          <Link href="/about" className="text-orange-500 dark:text-orange-400 hover:underline">Maxfiylik siyosati</Link>
           {" "}ga rozilik bildirasiz.
         </p>
       </motion.div>

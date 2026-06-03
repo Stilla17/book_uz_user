@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo } from 'react';
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useCreateBook } from '@/components/admin/hooks/bookHooks/useCreateBook';
@@ -11,7 +10,7 @@ import { useBookDetailQuery } from '@/components/admin/hooks/queries/book';
 import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
 import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
 import SearchableSelect, { type SearchableOption } from '@/components/admin/other/SearchableSelect';
-import { Button } from '@/components/ui/button';
+import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { filterService } from '@/services/filter.service';
@@ -19,7 +18,7 @@ import { Book, BookFormValues } from '@/types/book';
 import { getLatestImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
-import { ArrowLeft, BookOpen, FileText, ImagePlus, Loader, Save, Sparkles, Upload, X } from 'lucide-react';
+import { BookOpen, FileText, ImagePlus, Loader, Sparkles, Upload, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -320,42 +319,18 @@ const AdminNewBookPage = () => {
 
     return (
         <div className='no-scrollbar h-[calc(100vh-150px)] space-y-4 overflow-y-auto pr-1 pb-4'>
-            <section className='flex flex-col gap-4 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:flex-row md:items-center md:justify-between md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
-                <div className='min-w-0'>
-                    <Link
-                        href='/admin/book'
-                        className='inline-flex items-center gap-2 text-sm font-black text-[#9d907e] transition hover:text-[#ef7f1a] dark:text-slate-400 dark:hover:text-white'>
-                        <ArrowLeft size={17} />
-                        Barcha kitoblar
-                    </Link>
-                    <h2 className='mt-3 text-2xl font-black text-[#2f2a25] dark:text-white'>
-                        {isEdit ? 'Kitobni tahrirlash' : "Yangi kitob qo'shish"}
-                    </h2>
-                    <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
-                        {isEdit
-                            ? "Kitob ma'lumotlarini yangilang va o'zgarishlarni saqlang."
-                            : "Kitob kartochkasi uchun asosiy ma'lumotlar, narx, zaxira va katalog parametrlarini kiriting."}
-                    </p>
-                </div>
-
-                <div className='flex gap-2'>
-                    <Button
-                        asChild
-                        variant='outline'
-                        className='h-11 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'
-                        disabled={isPending}>
-                        <Link href='/admin/book'>Bekor qilish</Link>
-                    </Button>
-                    <Button
-                        type='submit'
-                        form='book-form'
-                        disabled={isPending}
-                        className='h-11 rounded-2xl bg-[#ef7f1a] px-5 font-black text-white hover:bg-orange-600 disabled:opacity-50'>
-                        <Save size={18} />
-                        {isPending ? 'Saqlanmoqda...' : isEdit ? 'Yangilash' : 'Saqlash'}
-                    </Button>
-                </div>
-            </section>
+            <HeadSectionEdit
+                title='Kitob'
+                href='/admin/book'
+                form='book'
+                backLabel='Barcha kitoblar'
+                isEdit={isEdit}
+                createTitle="Yangi kitob qo'shish"
+                editTitle='Kitobni tahrirlash'
+                createDescription="Kitob kartochkasi uchun asosiy ma'lumotlar, narx, zaxira va katalog parametrlarini kiriting."
+                editDescription="Kitob ma'lumotlarini yangilang va o'zgarishlarni saqlang."
+                isPending={isPending}
+            />
 
             <form
                 id='book-form'

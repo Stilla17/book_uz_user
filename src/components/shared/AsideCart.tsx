@@ -1,21 +1,66 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Link from 'next/link';
+
+import { calculatePromoDiscount } from '@/helpers/promoDiscount';
+import { PromoServiceUser } from '@/services/promo.service';
+import type { CartItem } from '@/store/features/cartSlice';
+import { clearPromo, setPromo } from '@/store/features/checkoutSlice';
+import { useAppDispatch } from '@/store/hooks';
+import { Coupon } from '@/types';
+import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '../ui/button';
 import { motion } from 'framer-motion';
 import { BadgePercent, CreditCard, ShieldCheck, Truck } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
 type AsideCartProps = {
+    cartItems: CartItem[];
     totalPrice: number;
     totalQuantity: number;
 };
 
+interface PromoForm {
+    promoCode: string;
+}
+
 const formatPrice = (price: number) => `${price.toLocaleString()} so'm`;
 
-const AsideCart = ({ totalPrice, totalQuantity }: AsideCartProps) => {
+const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => {
+    const { register, handleSubmit } = useForm<PromoForm>();
+    const [matchedPromo, setMatchedPromo] = useState<Coupon | null>(null);
+    const [discountAmount, setDiscountAmount] = useState(0);
+    const dispatch = useAppDispatch();
     const deliveryPrice = totalQuantity > 0 ? 20000 : 0;
-    const paymentTotal = totalPrice + deliveryPrice;
+    const paymentTotal = Math.max(0, totalPrice + deliveryPrice - discountAmount);
+
+    const { data: promos = [] } = useQuery<Coupon[]>({
+        queryKey: ['user-promos'],
+        queryFn: () => PromoServiceUser.getPromos()
+    });
+
+    const onSumbit = (values: PromoForm) => {
+        const promo = promos.find((promo) => promo.code.toLowerCase() === values.promoCode.trim().toLowerCase());
+        if (!promo) {
+            setMatchedPromo(null);
+            setDiscountAmount(0);
+            dispatch(clearPromo());
+            return;
+        }
+        const discount = calculatePromoDiscount(promo, cartItems);
+
+        if (discount <= 0) {
+            setMatchedPromo(null);
+            setDiscountAmount(0);
+            dispatch(clearPromo());
+            return;
+        }
+
+        setMatchedPromo(promo);
+        setDiscountAmount(discount);
+        dispatch(setPromo({ code: promo.code, discount }));
+    };
 
     return (
         <motion.aside
@@ -33,7 +78,13 @@ const AsideCart = ({ totalPrice, totalQuantity }: AsideCartProps) => {
                     </div>
                     <div className='flex items-center justify-between text-sm text-slate-500 dark:text-slate-400'>
                         <span>Chegirma</span>
-                        <span className='font-semibold text-emerald-600'>0 so'm</span>
+                        <span className='font-semibold text-emerald-600'>
+                            {matchedPromo && discountAmount > 0
+                                ? matchedPromo.type === 'PERCENT'
+                                    ? `${matchedPromo.value}% (-${discountAmount.toLocaleString('uz-UZ')} so'm)`
+                                    : `-${discountAmount.toLocaleString('uz-UZ')} so'm`
+                                : "0 so'm"}
+                        </span>
                     </div>
                     <div className='flex items-center justify-between text-sm text-slate-500 dark:text-slate-400'>
                         <span>Yetkazib berish</span>
@@ -62,16 +113,17 @@ const AsideCart = ({ totalPrice, totalQuantity }: AsideCartProps) => {
                         <BadgePercent size={16} className='text-[#ef7f1a]' />
                         Promo kod
                     </div>
-                    <div className='mt-3 flex gap-2'>
+                    <form onSubmit={handleSubmit(onSumbit)} className='mt-3 flex gap-2'>
                         <input
                             type='text'
                             placeholder='Masalan: BOOKUZ10'
                             className='h-12 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 text-sm transition outline-none placeholder:text-slate-400 focus:border-[#ef7f1a] dark:border-slate-800 dark:bg-slate-900 dark:text-white'
+                            {...register('promoCode')}
                         />
                         <Button className='h-12 rounded-xl bg-slate-900 px-5 text-white hover:bg-[#ef7f1a] dark:bg-white dark:text-slate-900'>
                             Qo'llash
                         </Button>
-                    </div>
+                    </form>
                 </div>
                 <div className='mt-4 space-y-3 rounded-xl bg-slate-50 p-4 dark:bg-slate-950'>
                     <div className='flex items-start gap-3'>

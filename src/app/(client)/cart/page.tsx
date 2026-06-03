@@ -159,7 +159,7 @@ export default function CartPage() {
                         )}
                     </motion.section>
 
-                    <AsideCart totalPrice={totalPrice} totalQuantity={totalQuantity} />
+                    <AsideCart cartItems={cartItems} totalPrice={totalPrice} totalQuantity={totalQuantity} />
                 </div>
             </div>
         </div>

@@ -6,108 +6,48 @@ import { useRouter } from 'next/navigation';
 
 import AsideCheckout from '@/components/shared/AsideCheckout';
 import { deliveryOptions, paymentOptions } from '@/data';
+import {
+    type DistrictItem,
+    type RegionItem,
+    buildOrderPayload,
+    getLocationName,
+    getOrderId,
+    getPaymentRedirectUrl,
+    isOnlinePayment,
+    isValidUzPhone,
+    resolvePaymentRedirectUrl,
+    validateCheckout
+} from '@/helpers/checkout';
 import { useAuth } from '@/hooks/useAuth';
 import { useBookCart } from '@/hooks/useBookCart';
 import { useCreateOrder } from '@/hooks/useCreateOrder';
 import { UserService } from '@/services/api';
 import { resetCheckout, updateField } from '@/store/features/checkoutSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import type { OrderPayload } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { CheckCircle2, CreditCard, Home, LockKeyhole, MapPin, Phone, ShieldCheck, Truck, User } from 'lucide-react';
+import {
+    Banknote,
+    CheckCircle2,
+    CreditCard,
+    Home,
+    LockKeyhole,
+    MapPin,
+    Phone,
+    ShieldCheck,
+    Truck,
+    User
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { IMaskInput } from 'react-imask';
-
-interface LocationName {
-    uz?: string;
-    ru?: string;
-    en?: string;
-}
-
-interface RegionItem {
-    id: string;
-    externalId?: number;
-    name?: LocationName;
-    districtsCount?: number;
-}
-
-interface DistrictItem {
-    id: string;
-    externalId?: number;
-    name?: LocationName;
-    order?: number;
-    region?: {
-        id?: string;
-        name?: LocationName;
-    };
-}
-
-const getLocationName = (item?: { name?: LocationName }) =>
-    item?.name?.uz || item?.name?.ru || item?.name?.en || "Noma'lum";
-
-const isValidUzPhone = (value: string) => /^\+998\s\d{2}\s\d{3}\s\d{2}\s\d{2}$/.test(value);
-const DELIVERY_COST = 20000;
-
-const getDeliveryType = (deliveryTitle: string): OrderPayload['deliveryType'] => {
-    if (deliveryTitle === 'Pochta orqali') return 'POST';
-    if (deliveryTitle === "Do'kondan olib ketish") return 'PICKUP';
-
-    return 'DELIVERY';
-};
-
-const getPaymentType = (paymentTitle: string): OrderPayload['paymentType'] => {
-    const normalizedPayment = paymentTitle.toUpperCase();
-
-    if (normalizedPayment === 'CLICK') return 'CLICK';
-    if (normalizedPayment === 'XAZNA') return 'XAZNA';
-    if (normalizedPayment === 'PAYME') return 'PAYME';
-
-    return 'CASH';
-};
-
-const getCartProductId = (product: unknown) => {
-    if (typeof product === 'string') return product;
-    if (!product || typeof product !== 'object') return '';
-
-    const book = product as { _id?: string; id?: string };
-
-    return book._id || book.id || '';
-};
-
-const redirectUrlKeys = new Set(['redirectUrl', 'paymentUrl', 'paymeUrl', 'clickUrl', 'url']);
-
-const getPaymentRedirectUrl = (response: unknown): string => {
-    const visited = new WeakSet<object>();
-
-    const findUrl = (value: unknown): string => {
-        if (!value || typeof value !== 'object') return '';
-        if (visited.has(value)) return '';
-
-        visited.add(value);
-
-        for (const [key, nestedValue] of Object.entries(value)) {
-            if (redirectUrlKeys.has(key) && typeof nestedValue === 'string' && /^https?:\/\//.test(nestedValue)) {
-                return nestedValue;
-            }
-
-            const nestedUrl = findUrl(nestedValue);
-
-            if (nestedUrl) return nestedUrl;
-        }
-
-        return '';
-    };
-
-    return findUrl(response);
-};
-
-const isOnlinePayment = (paymentTitle: string) => ['Click', 'Payme', 'Xazna'].includes(paymentTitle);
 
 const CheckoutPage = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const checkout = useAppSelector((state) => state.checkout);
+    const promoDiscount = checkout.promoDiscount;
+    const promoCode = checkout.promoCode;
+
     const { user } = useAuth();
     const { cartItems, totalPrice, clearItems } = useBookCart();
     const createOrder = useCreateOrder();
@@ -166,76 +106,51 @@ const CheckoutPage = () => {
     const phoneError = phoneTouched && phone.length > 0 && !isValidUzPhone(phone);
 
     const handleSubmitOrder = async () => {
-        if (!cartItems.length) {
-            toast.error("Savat bo'sh");
-            return;
-        }
-
         setPhoneTouched(true);
 
-        if (!checkout.clientName.trim()) {
-            toast.error('Ism familiyani kiriting');
-            return;
-        }
-
-        if (!isValidUzPhone(phone)) {
-            toast.error("Telefon raqamni to'g'ri kiriting");
-            return;
-        }
-
-        if (!selectedRegionItem || !selectedDistrictItem) {
-            toast.error('Viloyat va tumanni tanlang');
-            return;
-        }
-
-        if (!checkout.address.trim()) {
-            toast.error("Ko'cha, uy va xonadonni kiriting");
-            return;
-        }
-
-        if (selectedPayment !== 'Click' && selectedPayment !== 'Payme' && selectedPayment !== 'Xazna') {
-            toast.error("To'lov usulini tanlang");
-            return;
-        }
-
         const userId = user?._id || user?.id;
+        const validationMessage = validateCheckout({
+            cartItems,
+            checkout,
+            phone,
+            selectedRegionItem,
+            selectedDistrictItem,
+            selectedPayment,
+            paymentTitles: paymentOptions.map((option) => option.title)
+        });
 
-        const orderItems = cartItems.map((item) => ({
-            product: getCartProductId(item.book),
-            quantity: item.quantity,
-            priceAtTime: item.book.price
-        }));
-
-        if (orderItems.some((item) => !item.product)) {
-            toast.error("Savatdagi mahsulot ID si topilmadi. Savatni yangilab qayta urinib ko'ring");
+        if (validationMessage) {
+            toast.error(validationMessage);
             return;
         }
-
-        const payload: OrderPayload = {
-            ...(userId ? { user: userId } : {}),
-            items: orderItems,
-            totalAmount: totalPrice + DELIVERY_COST,
-            guestName: checkout.clientName.trim(),
-            description: checkout.description.trim(),
-            shippingAddress: {
-                city: getLocationName(selectedRegionItem),
-                region: getLocationName(selectedDistrictItem),
-                street: checkout.address.trim(),
-                phone
-            },
-            deliveryType: getDeliveryType(selectedDelivery),
-            paymentType: getPaymentType(selectedPayment)
-        };
 
         try {
+            const payload = buildOrderPayload({
+                cartItems,
+                totalPrice,
+                userId,
+                checkout,
+                phone,
+                selectedRegionItem: selectedRegionItem!,
+                selectedDistrictItem: selectedDistrictItem!,
+                selectedDelivery,
+                selectedPayment
+            });
             const response = await createOrder.mutateAsync(payload);
-            const orderId = response?.data?._id || response?.data?.id || response?._id || response?.id;
-            let paymentRedirectUrl = getPaymentRedirectUrl(response);
+            const orderId = getOrderId(response);
+            let paymentRedirectUrl = await resolvePaymentRedirectUrl({
+                response,
+                selectedPayment,
+                orderId,
+                createClickPayment: UserService.createClickPayment,
+                createPaymePayment: UserService.createPaymePayment
+            });
 
-            if (!paymentRedirectUrl && selectedPayment === 'Click' && orderId) {
-                const clickResponse = await UserService.createClickPayment(orderId);
-
-                paymentRedirectUrl = getPaymentRedirectUrl(clickResponse);
+            if (!paymentRedirectUrl && selectedPayment === 'Payme' && orderId) {
+                const paymeResponse = await UserService.createPaymePayment(orderId);
+                console.log('🔍 Payme Response:', paymeResponse);
+                paymentRedirectUrl = getPaymentRedirectUrl(paymeResponse);
+                console.log('💳 Payment Redirect URL:', paymentRedirectUrl);
             }
 
             if (!isOnlinePayment(selectedPayment)) {
@@ -477,7 +392,7 @@ const CheckoutPage = () => {
                                 </div>
                             </div>
 
-                            <div className='mt-5 grid gap-3 md:grid-cols-3'>
+                            <div className='mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
                                 {deliveryOptions.map((option) => {
                                     const isActive = selectedDelivery === option.title;
                                     const Icon = option.icon;
@@ -535,7 +450,7 @@ const CheckoutPage = () => {
                                 </div>
                             </div>
 
-                            <div className='mt-5 grid gap-3 md:grid-cols-3'>
+                            <div className='mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
                                 {paymentOptions.map((option) => {
                                     const isActive = selectedPayment === option.title;
                                     const logoSrc = option.icon.replace('./', '/');
@@ -550,19 +465,26 @@ const CheckoutPage = () => {
                                             }}
                                             className={`relative flex h-16 items-center justify-center rounded-xl border px-4 transition ${
                                                 isActive
-                                                    ? 'border-[#ef7f1a] bg-orange-50 ring-4 ring-orange-100 dark:bg-orange-950/20 dark:ring-orange-950/40'
-                                                    : 'border-slate-200 bg-slate-50 hover:border-orange-200 hover:bg-orange-50/60 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900'
+                                                    ? 'border-[#ef7f1a] bg-slate-950 ring-4 ring-orange-100 dark:bg-orange-950/20 dark:ring-orange-950/40'
+                                                    : 'border-slate-200 bg-slate-950 hover:border-orange-200 hover:bg-slate-900 dark:border-slate-800'
                                             }`}>
                                             {isActive ? (
                                                 <span className='absolute top-2 right-2 flex size-5 items-center justify-center rounded-full bg-[#ef7f1a] text-white'>
                                                     <CheckCircle2 className='size-3.5' />
                                                 </span>
                                             ) : null}
-                                            <img
-                                                src={logoSrc}
-                                                alt={option.title}
-                                                className='max-h-7 max-w-24 object-contain'
-                                            />
+                                            {option.title === 'Naqd' ? (
+                                                <span className='flex items-center gap-2 text-sm font-black text-white'>
+                                                    <Banknote className='size-6 text-[#ef7f1a]' />
+                                                    Naqd
+                                                </span>
+                                            ) : (
+                                                <img
+                                                    src={logoSrc}
+                                                    alt={option.title}
+                                                    className='max-h-7 max-w-24 object-contain'
+                                                />
+                                            )}
                                         </button>
                                     );
                                 })}
@@ -574,6 +496,8 @@ const CheckoutPage = () => {
                         disabled={!cartItems.length}
                         isSubmitting={createOrder.isPending}
                         onConfirm={handleSubmitOrder}
+                        promoDiscount={promoDiscount}
+                        promoCode={promoCode}
                     />
                 </div>
             </div>

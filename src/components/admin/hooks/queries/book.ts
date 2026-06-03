@@ -4,11 +4,28 @@ import { useQuery } from '@tanstack/react-query';
 import { BookService } from '../../services/book.service';
 
 export const useBookQuery = () => {
-    return useQuery<AdminBooksResponse>({
+    return useQuery<Book[]>({
         queryKey: ['books'],
         queryFn: async () => {
-            const data = await BookService.getAdminBook({ page: 1, limit: 100 });
-            return data.products ?? [];
+            const limit = 200;
+            const firstPage = await BookService.getAdminBook({ page: 1, limit });
+            const firstPageProducts = firstPage.products ?? [];
+            const totalPages = Number(firstPage.pagination?.pages ?? 1);
+
+            if (!Number.isFinite(totalPages) || totalPages <= 1) {
+                return firstPageProducts;
+            }
+
+            const otherPages = await Promise.all(
+                Array.from({ length: totalPages - 1 }, (_, index) =>
+                    BookService.getAdminBook({ page: index + 2, limit })
+                )
+            );
+
+            return otherPages.reduce<Book[]>(
+                (products, pageData) => [...products, ...(pageData.products ?? [])],
+                firstPageProducts
+            );
         }
     });
 };

@@ -4,7 +4,10 @@ import { useEffect, useRef } from 'react';
 
 import L from 'leaflet';
 
-import { branchLocations } from './branches';
+export type BranchLocation = {
+    name: string;
+    coords: [number, number];
+};
 
 type FocusRequest = {
     name: string;
@@ -13,9 +16,10 @@ type FocusRequest = {
 
 type BranchMapProps = {
     focusRequest?: FocusRequest | null;
+    branches?: BranchLocation[];
 };
 
-export const BranchMap = ({ focusRequest }: BranchMapProps) => {
+export const BranchMap = ({ focusRequest, branches = [] }: BranchMapProps) => {
     const mapContainerRef = useRef<HTMLDivElement | null>(null);
     const mapRef = useRef<L.Map | null>(null);
     const markersRef = useRef<Record<string, L.Marker>>({});
@@ -41,7 +45,7 @@ export const BranchMap = ({ focusRequest }: BranchMapProps) => {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        const markerLayers = branchLocations.map((branch) => {
+        const markerLayers = branches.map((branch) => {
             const marker = L.marker(branch.coords, { icon: branchPinIcon }).addTo(map);
             markersRef.current[branch.name] = marker;
 
@@ -52,17 +56,19 @@ export const BranchMap = ({ focusRequest }: BranchMapProps) => {
             return marker;
         });
 
-        const group = L.featureGroup(markerLayers);
-        map.fitBounds(group.getBounds().pad(0.25));
+        if (markerLayers.length) {
+            const group = L.featureGroup(markerLayers);
+            map.fitBounds(group.getBounds().pad(0.25));
+        }
 
         return () => {
             markersRef.current = {};
             mapRef.current = null;
             map.remove();
         };
-    }, []);
+    }, [branches]);
 
-    useEffect(() => {   
+    useEffect(() => {
         if (!focusRequest) return;
 
         const map = mapRef.current;

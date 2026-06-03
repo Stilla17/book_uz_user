@@ -10,6 +10,8 @@ interface AsideCheckoutProps {
     disabled?: boolean;
     isSubmitting?: boolean;
     onConfirm?: () => void;
+    promoCode?: string;
+    promoDiscount?: number;
 }
 
 const getTitle = (title: string | { uz?: string; ru?: string; en?: string }) => {
@@ -18,12 +20,19 @@ const getTitle = (title: string | { uz?: string; ru?: string; en?: string }) => 
     return title.uz || title.ru || title.en || "Noma'lum kitob";
 };
 
-const AsideCheckout = ({ disabled = false, isSubmitting = false, onConfirm }: AsideCheckoutProps) => {
+const AsideCheckout = ({
+    disabled = false,
+    isSubmitting = false,
+    onConfirm,
+    promoCode,
+    promoDiscount = 0
+}: AsideCheckoutProps) => {
     const { cartItems, totalPrice, totalQuantity } = useBookCart();
     const formattedItems = (item: number) => {
         if (typeof item === 'number') return item.toLocaleString('ru-RU');
     };
     const deliveryCost = 20000;
+    const paymentTotal = Math.max(0, totalPrice + deliveryCost - promoDiscount);
 
     return (
         <aside className='h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:top-24 dark:border-slate-800 dark:bg-slate-900'>
@@ -82,17 +91,21 @@ const AsideCheckout = ({ disabled = false, isSubmitting = false, onConfirm }: As
                         {formattedItems(deliveryCost)} so'm
                     </span>
                 </div>
-                {/* <div className='flex items-center justify-between gap-3 text-emerald-600 dark:text-emerald-300'>
-                    <span>Chegirma</span>
-                    <span className='font-bold'>-10 000 so'm</span>
-                </div> */}
+                {promoDiscount > 0 && (
+                    <div className='flex items-center justify-between text-sm text-slate-500 dark:text-slate-400'>
+                        <span>Promokod {promoCode ? `(${promoCode})` : ''}</span>
+                        <span className='font-semibold text-emerald-600'>
+                            -{promoDiscount.toLocaleString('uz-UZ')} so'm
+                        </span>
+                    </div>
+                )}
             </div>
 
             <div className='mt-5 rounded-xl bg-slate-950 p-4 text-white dark:bg-white dark:text-slate-950'>
                 <div className='flex items-end justify-between gap-3'>
                     <span className='text-sm opacity-70'>Jami to'lov</span>
                     <span className='text-right text-2xl font-black text-[#ef7f1a]'>
-                        {formattedItems(totalPrice + deliveryCost)} so'm
+                        {formattedItems(paymentTotal)} so'm
                     </span>
                 </div>
             </div>

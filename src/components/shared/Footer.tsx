@@ -13,27 +13,22 @@ export const Footer = () => {
     const footerLinks = {
         platform: [
             { name: 'Asosiy', href: '/' },
-            { name: 'Kitoblar', href: '/books' },
-            { name: 'Audio kitoblar', href: '/audio' },
-            { name: 'Yangi kelganlar', href: '/new' },
-            { name: 'Chegirmalar', href: '/sale' },
-            { name: 'Bestsellerlar', href: '/bestsellers' }
+            { name: 'Kitoblar', href: '/catalog' },
+            { name: 'Yangi kelganlar', href: '/catalog?sort=-createdAt' },
+            { name: 'Chegirmalar', href: '/catalog?isDiscount=true' },
+            { name: 'Bestsellerlar', href: '/catalog?sort=-ratingAvg' }
         ],
         support: [
-            { name: 'Yordam markazi', href: '/help' },
-            { name: "To'lov usullari", href: '/payment' },
-            { name: 'Yetkazib berish', href: '/shipping' },
-            { name: 'Qaytarish shartlari', href: '/returns' },
-            { name: 'Maxfiylik siyosati', href: '/privacy' },
-            { name: 'Foydalanish shartlari', href: '/terms' }
+            { name: "To'lov usullari", href: '/checkout' },
+            { name: 'Yetkazib berish', href: '/checkout' },
+            { name: 'Maxfiylik siyosati', href: '/about' },
+            { name: 'Foydalanish shartlari', href: '/about' }
         ],
         company: [
             { name: 'Biz haqimizda', href: '/about' },
-            { name: 'Vakansiyalar', href: '/jobs' },
-            { name: 'Hamkorlik', href: '/partnership' },
-            { name: 'Blog', href: '/blog' },
-            { name: 'Aloqa', href: '/contact' },
-            { name: 'Reklama', href: '/advertising' }
+            { name: 'Yangiliklar', href: '/news' },
+            { name: 'Nashriyotlar', href: '/publishers' },
+            { name: 'Promokod', href: '/promo' }
         ]
     };
 
@@ -198,11 +193,11 @@ export const Footer = () => {
                     </p>
 
                     <div className='flex items-center gap-3'>
-                        <Link href='/privacy' className='text-slate-500 transition-colors hover:text-[#005CB9]'>
+                        <Link href='/about' className='text-slate-500 transition-colors hover:text-[#005CB9]'>
                             Maxfiylik
                         </Link>
                         <span className='h-1 w-1 rounded-full bg-slate-600' />
-                        <Link href='/terms' className='text-slate-500 transition-colors hover:text-[#FF8A00]'>
+                        <Link href='/about' className='text-slate-500 transition-colors hover:text-[#FF8A00]'>
                             Shartlar
                         </Link>
 

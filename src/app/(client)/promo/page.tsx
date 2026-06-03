@@ -721,7 +721,7 @@ export default function PromoPage() {
         >
           <p className="text-gray-500 dark:text-gray-400">
             Promokodlar haqida savollaringiz bormi?{" "}
-            <Link href="/faq" className="text-[#005CB9] hover:text-[#FF8A00] font-bold">{' FAQ bo\'limiga o\'tish '}</Link>
+            <Link href="/about" className="text-[#005CB9] hover:text-[#FF8A00] font-bold">{' Biz haqimizda bo\'limiga o\'tish '}</Link>
           </p>
         </motion.div>
       </div>
