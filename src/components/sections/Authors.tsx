@@ -89,7 +89,7 @@ const Authors = () => {
                             <SwiperSlide key={authorItem._id}>
                                 <Link
                                     href={`/catalog?author=${encodeURIComponent(authorItem._id)}`}
-                                    className='flex h-26.5 items-center overflow-hidden rounded-xl bg-white shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] transition hover:-translate-y-1 hover:shadow-[0_22px_55px_-30px_rgba(15,23,42,0.75)] dark:bg-slate-900'>
+                                    className='flex h-26.5 items-center overflow-hidden rounded-xl bg-white transition hover:-translate-y-1 hover:shadow-sm dark:bg-slate-900'>
                                     <div className='h-26.6 w-25 flex-none overflow-hidden rounded-xl'>
                                         <img
                                             src={getImageUrl(authorItem.image) || AUTHOR_FALLBACK_IMAGE}

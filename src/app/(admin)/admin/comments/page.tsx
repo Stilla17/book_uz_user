@@ -185,7 +185,7 @@ const AdminCommentPage = () => {
                                             </span>
                                         </td>
                                         <td className='px-4 py-4'>
-                                            <span className='whitespace-nowrap text-xs font-bold text-[#9d907e] dark:text-slate-500'>
+                                            <span className='text-xs font-bold whitespace-nowrap text-[#9d907e] dark:text-slate-500'>
                                                 {dayjs(comment.createdAt).format('DD.MM.YYYY HH:mm')}
                                             </span>
                                         </td>

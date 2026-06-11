@@ -1,42 +1,43 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import PublisherCard from '@/components/cards/PublisherCard';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import { Pagination } from '@/components/shared/Pagination';
 import { ClientService } from '@/services/api';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Building2 } from 'lucide-react';
 
 const PUBLISHERS_PER_PAGE = 12;
-const FETCH_PUBLISHERS_LIMIT = 100;
 
 const PublishersPage = () => {
     const [page, setPage] = useState(1);
+    const queryClient = useQueryClient();
 
-    const { data, isLoading } = useQuery({
-        queryKey: ['publishers', FETCH_PUBLISHERS_LIMIT],
-        queryFn: () => ClientService.getPublishers({ page: 1, limit: FETCH_PUBLISHERS_LIMIT })
+    const { data, isLoading, isFetching } = useQuery({
+        queryKey: ['publishers', page, PUBLISHERS_PER_PAGE],
+        queryFn: () => ClientService.getPublishers({ page, limit: PUBLISHERS_PER_PAGE }),
+        placeholderData: (previousData) => previousData,
+        staleTime: 5 * 60 * 1000
     });
 
-    const sortedPublishers = useMemo(
-        () =>
-            [...(data?.publishers ?? [])].sort(
-                (firstPublisher, secondPublisher) => secondPublisher.booksCount - firstPublisher.booksCount
-            ),
-        [data?.publishers]
-    );
-    const totalPublishers = data?.pagination.total ?? sortedPublishers.length;
-    const totalPages = Math.max(1, Math.ceil(sortedPublishers.length / PUBLISHERS_PER_PAGE));
+    const publishers = data?.publishers ?? [];
+    const totalPublishers = data?.pagination.total ?? publishers.length;
+    const totalPages = Math.max(1, data?.pagination.pages ?? 1);
     const currentPage = Math.min(page, totalPages);
-    const publishers = useMemo(() => {
-        const startIndex = (currentPage - 1) * PUBLISHERS_PER_PAGE;
 
-        return sortedPublishers.slice(startIndex, startIndex + PUBLISHERS_PER_PAGE);
-    }, [currentPage, sortedPublishers]);
+    useEffect(() => {
+        if (!data || page >= totalPages) return;
+
+        queryClient.prefetchQuery({
+            queryKey: ['publishers', page + 1, PUBLISHERS_PER_PAGE],
+            queryFn: () => ClientService.getPublishers({ page: page + 1, limit: PUBLISHERS_PER_PAGE }),
+            staleTime: 5 * 60 * 1000
+        });
+    }, [data, page, queryClient, totalPages]);
 
     const handlePageChange = (nextPage: number) => {
         setPage(nextPage);
@@ -44,7 +45,7 @@ const PublishersPage = () => {
     };
 
     return (
-        <main className='min-h-screen bg-background py-6 dark:bg-slate-900'>
+        <main className='bg-background min-h-screen py-6 dark:bg-slate-900'>
             <div className='container mx-auto px-4'>
                 <BreadCrumb
                     items={[
@@ -88,7 +89,10 @@ const PublishersPage = () => {
                             </span>
                         </div>
 
-                        <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+                        <div
+                            className={`grid gap-4 transition-opacity md:grid-cols-2 xl:grid-cols-3 ${
+                                isFetching ? 'opacity-60' : 'opacity-100'
+                            }`}>
                             {publishers.map((publisher) => (
                                 <PublisherCard key={publisher._id} publisher={publisher} />
                             ))}

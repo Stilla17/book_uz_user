@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import PublisherCard from '@/components/cards/PublisherCard';
 import { ClientService } from '@/services/api';
+import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
@@ -13,14 +14,12 @@ import { Building2, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const PREVIEW_PUBLISHERS_LIMIT = 6;
-const FETCH_PUBLISHERS_LIMIT = 100;
-
 const Publishers = () => {
     const { t } = useTranslation();
 
     const { data } = useQuery({
         queryKey: ['publishers-preview'],
-        queryFn: () => ClientService.getPublishers({ page: 1, limit: FETCH_PUBLISHERS_LIMIT })
+        queryFn: () => ClientService.getPublishers({ page: 1, limit: FETCH_PAGINATION_LIMIT })
     });
     const publishers = useMemo(
         () =>
@@ -42,20 +41,14 @@ const Publishers = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
                     className='mb-10 flex flex-col items-center gap-4 md:flex-row md:justify-between'>
-                    <div className='max-w-2xl'>
-                        <div className='mb-4 inline-flex items-center gap-2 rounded-full border border-[#ef7f1a]/20 bg-[#ef7f1a]/10 px-4 py-2 text-xs font-black tracking-[0.18em] text-[#ef7f1a] uppercase dark:border-orange-400/20 dark:bg-orange-400/10 dark:text-orange-300'>
-                            <Building2 size={14} />
-                            {t('publish.title')}
-                        </div>
+                    <div className='max-w-2xl flex gap-4'>
+                        <span className={`h-9 w-1 shrink-0 rounded-full bg-[#ef7f1a]/30`} />
                         <h2 className='text-3xl font-black tracking-tight text-slate-900 md:text-4xl dark:text-white'>
                             {t('publish.label')}
                         </h2>
-                        <p className='mt-3 max-w-xl text-sm leading-6 text-slate-600 md:text-base dark:text-slate-300'>
-                            {t('publish.desc')}
-                        </p>
                     </div>
                     {totalPublishers > PREVIEW_PUBLISHERS_LIMIT ? (
-                        <div className='mt-8 flex justify-center'>
+                        <div className='flex justify-center'>
                             <Link
                                 href='/publishers'
                                 className='group flex items-center rounded-full bg-[#ef7f1a]/10 px-5 py-2.5 text-sm font-bold text-[#ef7f1a] transition-all hover:shadow-md md:text-base dark:bg-orange-500/20 dark:text-orange-400'>

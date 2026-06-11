@@ -1,7 +1,7 @@
 export interface User {
     _id?: string;
     id: string;
-    email: string;
+    email?: string;
     name?: string;
     wishlist?: unknown[];
     phone?: string;
@@ -21,7 +21,9 @@ export interface AuthState {
 
 export interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<void>;
-    register: (userData: unknown) => Promise<void>;
+    sendPhoneOtp: (data: PhoneOtpRequest) => Promise<void>;
+    verifyPhoneOtp: (data: PhoneOtpVerifyRequest) => Promise<void>;
+    refreshUser: () => Promise<User | null>;
     logout: () => Promise<void>;
 }
 
@@ -34,6 +36,16 @@ export type AuthAction =
 export interface LoginPayload {
     email: string;
     password: string;
+}
+
+export interface PhoneOtpRequest {
+    name: string;
+    phone: string;
+}
+
+export interface PhoneOtpVerifyRequest {
+    phone: string;
+    otp: string;
 }
 
 export interface LoginResponse {

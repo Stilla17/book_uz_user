@@ -6,50 +6,36 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { useBookStats } from '@/hooks/useBookStats';
-import { useBookWishlist } from '@/hooks/useBookWishlist';
-import { UserService } from '@/services/api';
+import { getAuthorName, getBookTitle } from '@/helpers/bookCard';
+import { useAddCartMutation } from '@/hooks/bookCardHooks/useCardQuery';
+import { useBookStats } from '@/hooks/bookHooks/useBookStats';
+import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
+import { bookService } from '@/services/book.service';
 import { addCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { type BookCardProps } from '@/types/book';
 import { addGuestCart } from '@/utils/cartStorage';
 import { getImageUrl } from '@/utils/image';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { motion } from 'framer-motion';
-import { Eye, Heart, ShoppingCart, Star } from 'lucide-react';
+import { BookOpen, Eye, Heart, ShoppingCart, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 export type { Book } from '@/types/book';
 
-type TextLike =
-    | string
-    | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown }
-    | null
-    | undefined;
-
 export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
     const { t } = useTranslation();
-    const router = useRouter();
     const queryClient = useQueryClient();
+    const router = useRouter();
     const dispatch = useAppDispatch();
+    const addCartMutation = useAddCartMutation();
     const isBookInCart = useAppSelector((state) => state.cart.items.some((item) => item.book._id === book._id));
     const { viewsCount, ratingAvg } = useBookStats({
         bookId: book._id,
         initialViewsCount: book.viewsCount ?? book.views,
         initialRatingAvg: book.ratingAvg,
         initialRatingCount: book.ratingCount
-    });
-
-    const addCartMutation = useMutation({
-        mutationFn: async (data: { productId: string; quantity: number }) => {
-            await UserService.addToCart(data);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['cart'] });
-            toast.success('savatga qoshildi');
-        }
     });
 
     const { isBookmarked, favoriteLoading, toggleFavorite, user } = useBookWishlist(book, { onWishlistChange });
@@ -96,29 +82,17 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
         toggleFavorite();
     };
 
-    const getText = (value: TextLike, fallback: string): string => {
-        if (!value) return fallback;
-        if (typeof value === 'string') return value || fallback;
-        if (typeof value.uz === 'string') return value.uz;
-        if (typeof value.ru === 'string') return value.ru;
-        if (typeof value.en === 'string') return value.en;
-        if (typeof value.name === 'string') return value.name;
-        if (typeof value.title === 'string') return value.title;
-
-        return fallback;
-    };
-
-    const getBookTitle = () => {
-        return getText(book.title, "Noma'lum kitob");
-    };
-
-    const getAuthorName = () => {
-        if (typeof book.author === 'string') return book.author;
-
-        return getText(book.author?.name ? { name: book.author.name } : book.author, "Noma'lum muallif");
-    };
-
     const bookHref = `/book/${slug ?? book.slug ?? book._id}`;
+    const bookImageUrl = getImageUrl(book.image ?? book.images);
+    const prefetchBook = () => {
+        const bookSlug = slug ?? book.slug ?? book._id;
+
+        queryClient.prefetchQuery({
+            queryKey: ['book', bookSlug],
+            queryFn: () => bookService.getBookById(bookSlug),
+            staleTime: 5 * 60 * 1000
+        });
+    };
 
     const openBookDetails = (event: MouseEvent<HTMLDivElement>) => {
         const target = event.target as HTMLElement;
@@ -128,20 +102,17 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
     };
 
     return (
-        <motion.div
-            className='group relative flex h-full min-h-[522px] cursor-pointer flex-col rounded-xl border border-gray-100 bg-white px-3 pb-3 transition-all duration-300 hover:border-[#00a0e3]/20 hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:border-[#ef7f1a]/30'
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+        <div
+            className='group relative mt-24 flex min-h-100 cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-4 pt-44 pb-4 dark:border-slate-700 dark:bg-slate-800'
             onClick={openBookDetails}>
-            <div className='relative mb-3 flex h-80 w-full items-center justify-center overflow-hidden rounded-2xl'>
+            <div className='absolute -top-20 left-1/2 h-64 w-[70%] -translate-x-1/2'>
                 <button
                     type='button'
                     aria-label='Bookmark'
-                    className={`absolute top-3 right-3 z-10 rounded-full p-2 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-110 ${
+                    className={`absolute -top-2 -right-3 z-20 rounded-full border border-white/70 p-2.5 shadow-lg backdrop-blur-md ${
                         isBookmarked
                             ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
-                            : 'bg-white/90 text-gray-600 hover:bg-[#ef7f1a] hover:text-white dark:bg-slate-800/90 dark:text-gray-300 dark:hover:bg-orange-600'
+                            : 'bg-white/90 text-gray-600 hover:bg-[#ef7f1a] hover:text-white dark:border-slate-700 dark:bg-slate-800/90 dark:text-gray-300 dark:hover:bg-orange-600'
                     }`}
                     disabled={favoriteLoading}
                     onClick={handleWishlist}>
@@ -150,68 +121,71 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
                 <Link
                     href={bookHref}
-                    aria-label={`${getBookTitle()} haqida batafsil`}
-                    className='group relative flex h-full w-full items-center justify-center'>
-                    <Image
-                        src={getImageUrl(book.image) || ''}
-                        alt={getBookTitle()}
-                        fill
-                        sizes='(max-width: 480px) 70vw, (max-width: 768px) 42vw, (max-width: 1024px) 30vw, 220px'
-                        className='object-contain p-0.5 transition-transform duration-700 group-hover:scale-105'
-                    />
+                    onMouseEnter={prefetchBook}
+                    onFocus={prefetchBook}
+                    aria-label={`${getBookTitle(book)} haqida batafsil`}
+                    className='relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-slate-100 shadow-[0_22px_35px_-18px_rgba(15,23,42,0.65)] dark:border-slate-700 dark:bg-slate-900'>
+                    {bookImageUrl ? (
+                        <Image
+                            src={bookImageUrl}
+                            alt={getBookTitle(book)}
+                            fill
+                            sizes='(max-width: 480px) 70vw, (max-width: 768px) 42vw, (max-width: 1024px) 30vw, 220px'
+                            className='object-cover'
+                        />
+                    ) : (
+                        <div className='flex size-full flex-col items-center justify-center gap-3 bg-slate-50 text-slate-400 dark:bg-slate-900 dark:text-slate-500'>
+                            <BookOpen size={48} strokeWidth={1.5} />
+                            <span className='text-xs font-semibold'>Rasm mavjud emas</span>
+                        </div>
+                    )}
                 </Link>
             </div>
 
-            <div className='flex grow flex-col space-y-2'>
-                <Link href={bookHref} className='block'>
-                    <h3 className='line-clamp-2 min-h-[48px] text-[18px] leading-snug font-bold text-gray-900 transition-colors group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
-                        {getBookTitle()}
+            <div className='flex grow flex-col space-y-3'>
+                <Link href={bookHref} onMouseEnter={prefetchBook} onFocus={prefetchBook} className='block'>
+                    <h3 className='mt-8 line-clamp-2 min-h-[48px] text-[18px] leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
+                        {getBookTitle(book)}
                     </h3>
 
                     <p className='line-clamp-1 flex min-h-5 items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
-                        {getAuthorName()}
+                        {getAuthorName(book)}
                     </p>
                 </Link>
 
-                <div className='flex min-h-8 items-center gap-2 pt-1'>
-                    <div className='inline-flex items-center gap-1 rounded-md bg-[#f3f4f6] px-2 py-1 text-[13px] font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-100'>
+                <div className='flex min-h-8 items-center gap-2'>
+                    <div className='inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[13px] font-bold text-slate-700 dark:bg-amber-500/10 dark:text-slate-100'>
                         <span> {Number(ratingAvg || 0).toFixed(1)}</span>
                         <Star size={13} className='text-[#f59e0b]' fill='currentColor' />
                     </div>
-                    <span className='flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500'>
+                    <span className='flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-gray-500 dark:bg-slate-700 dark:text-gray-400'>
                         <Eye size={13} />
                         {viewsCount}
                     </span>
                 </div>
 
-                <div className='mt-auto min-h-[66px] border-t border-gray-100 pt-3 dark:border-slate-700'>
+                <div className='mt-auto min-h-[66px] border-t border-dashed border-gray-200 pt-3 dark:border-slate-700'>
                     <div className='flex items-end justify-between'>
                         <div>
-                            <motion.div
-                                className='flex items-baseline gap-1'
-                                whileHover={{ scale: 1.05 }}
-                                transition={{ type: 'spring', stiffness: 400 }}>
+                            <div className='flex items-baseline gap-1'>
                                 <span className='text-[18px] font-black text-[#ef7f1a] dark:text-blue-400'>
                                     {(book.price || 0).toLocaleString()}
                                 </span>
                                 <span className='font-medium text-gray-500 dark:text-gray-400'>so'm</span>
-                            </motion.div>
+                            </div>
                         </div>
 
-                        <motion.button
+                        <button
                             type='button'
-                            className='flex transform items-center gap-1 rounded-xl bg-[#ef7f1a] p-2.5 text-white shadow-md transition-all hover:shadow-lg active:scale-90'
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            // disabled={addCartMutation.isPending}
+                            className='flex items-center gap-1 rounded-full bg-[#ef7f1a] p-2.5 text-white shadow-[0_10px_22px_-10px_rgba(239,127,26,0.9)] hover:bg-[#df7012] hover:shadow-lg'
                             disabled={Boolean(!book?.stock || book.stock <= 0 || addCartMutation.isPending)}
                             onClick={handleAddToCart}>
                             <ShoppingCart size={18} />
                             <span className='hidden font-medium md:inline'>{t('booksSection.basket')}</span>
-                        </motion.button>
+                        </button>
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 };

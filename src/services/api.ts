@@ -11,8 +11,15 @@ export const api = axios.create({
 // Access tokenni saqlash uchun o'zgaruvchi
 let accessToken: string | null = null;
 
+const getAccessTokenFromResponse = (response: any): string | null =>
+    response?.data?.data?.accessToken ??
+    response?.data?.accessToken ??
+    response?.data?.data?.token ??
+    response?.data?.token ??
+    null;
+
 // Access tokenni o'rnatish funksiyasi
-export const setAccessToken = (token: string) => {
+export const setAccessToken = (token: string | null) => {
     accessToken = token;
 };
 
@@ -88,8 +95,13 @@ api.interceptors.response.use(
                 );
 
                 // Yangi accessToken ni saqlash
-                if (refreshResponse.data?.data?.accessToken) {
-                    accessToken = refreshResponse.data.data.accessToken;
+                const refreshedAccessToken = getAccessTokenFromResponse(refreshResponse);
+                if (!refreshedAccessToken) {
+                    throw new Error('Refresh javobida access token topilmadi');
+                }
+
+                if (refreshedAccessToken) {
+                    accessToken = refreshedAccessToken;
                     console.log('✅ Yangi accessToken olindi');
                 }
 
@@ -97,6 +109,7 @@ api.interceptors.response.use(
                 processQueue(null, accessToken);
 
                 // Asl so'rovni yangi token bilan qayta jo'natish
+                originalRequest.headers = originalRequest.headers ?? {};
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError: any) {
@@ -106,14 +119,6 @@ api.interceptors.response.use(
                 processQueue(refreshError, null);
                 accessToken = null;
 
-                // Faqat kerak bo'lganda redirect qilish
-                if (
-                    typeof window !== 'undefined' &&
-                    !window.location.pathname.includes('/auth/login') &&
-                    !window.location.pathname.includes('/auth/register')
-                ) {
-                    window.location.href = '/auth/login';
-                }
                 throw refreshError;
             }
         }
@@ -122,25 +127,29 @@ api.interceptors.response.use(
 );
 
 export const AuthServiceAPI = {
-    register: async (data: any) => {
-        const response = await api.post('/auth/register', data);
-        if (response.data?.data?.accessToken) {
-            accessToken = response.data.data.accessToken;
-        }
-        return response.data;
-    },
     login: async (credentials: any) => {
         const response = await api.post('/auth/login', credentials);
-        if (response.data?.data?.accessToken) {
-            accessToken = response.data.data.accessToken;
-        }
+        accessToken = getAccessTokenFromResponse(response);
+        return response.data;
+    },
+    sendPhoneOtp: async (data: { phone: string; name: string }) => {
+        const response = await api.post('/auth/phone/send-otp', data);
+        return response.data;
+    },
+    verifyPhoneOtp: async (data: { phone: string; otp: string; wishlist?: unknown[] }) => {
+        const response = await api.post('/auth/phone/verify-otp', data);
+        accessToken = getAccessTokenFromResponse(response);
         return response.data;
     },
     refresh: async () => {
         const response = await api.post('/auth/refresh');
-        if (response.data?.data?.accessToken) {
-            accessToken = response.data.data.accessToken;
+        const refreshedAccessToken = getAccessTokenFromResponse(response);
+
+        if (!refreshedAccessToken) {
+            throw new Error('Refresh javobida access token topilmadi');
         }
+
+        accessToken = refreshedAccessToken;
         return response.data;
     },
     logout: async () => {
@@ -166,11 +175,13 @@ const getOrderProductId = (product: any) => {
 
 export const UserService = {
     getProfile: async () => {
-        const response = await api.get('/profile');
+        const response = await api.get('/users/profile');
         return response.data;
     },
     updateProfile: async (data: any) => {
-        const response = await api.patch('/profile', data);
+        const response = await api.patch('/users/profile', data, {
+            headers: data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : undefined
+        });
         return response.data;
     },
     updatePassword: async (data: any) => {

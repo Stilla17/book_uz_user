@@ -8,14 +8,8 @@ import { useRouter } from 'next/navigation';
 
 import { SearchDropdown } from '@/components/search/SearchDropdown';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { bottomNav, serviceMenuItems } from '@/data/navMenu';
 import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
 import { useAuth } from '@/hooks/useAuth';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
@@ -33,7 +27,7 @@ import NavIcon from './NavIcon';
 import NavbarFooter from './NavbarFooter';
 import NavbarHeader from './NavbarHeader';
 import UserDropdown from './UserDropdown';
-import { BookOpen, ChevronDown, Grid3x3, Info, Menu, Search, ShoppingCart, User } from 'lucide-react';
+import { BookOpen, ChevronDown, Grid3x3, Menu, Search, ShoppingCart, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // Kategoriya interfeysi
@@ -226,21 +220,6 @@ export const Navbar = () => {
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-
-                                <DropdownMenuSeparator className={`my-4 ${getBorderColor()}`} />
-
-                                <div className='grid grid-cols-4 gap-2'>
-                                    {bottomNav.slice(0, 4).map((item) => (
-                                        <Link
-                                            key={item.label}
-                                            href={item.href}
-                                            onClick={() => setIsCatalogOpen(false)}
-                                            className={`flex items-center justify-center gap-2 rounded-xl border bg-slate-50 px-3 py-2 text-center dark:bg-slate-900 ${getBorderColor()} transition-all hover:border-transparent hover:bg-[#005CB9] hover:text-white dark:hover:bg-blue-600`}>
-                                            <span className={item.color}>{item.icon}</span>
-                                            <span className='truncate text-xs font-bold'>{item.label}</span>
-                                        </Link>
-                                    ))}
                                 </div>
                             </DropdownMenuContent>
                         </DropdownMenu>

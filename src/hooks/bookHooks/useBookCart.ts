@@ -75,11 +75,11 @@ const clampQuantity = (quantity: number, stock?: number) => {
     return minQuantity;
 };
 
-export const useBookCart = () => {
+export const useBookCart = ({ loadOnMount = true }: { loadOnMount?: boolean } = {}) => {
     const { isAuthenticated, isLoading: authLoading } = useAuth();
     const dispatch = useAppDispatch();
     const cartItems = useAppSelector((state) => state.cart.items);
-    const [loadingCart, setLoadingCart] = useState(true);
+    const [loadingCart, setLoadingCart] = useState(loadOnMount);
 
     const loadCart = useCallback(async () => {
         if (authLoading) return;
@@ -106,8 +106,10 @@ export const useBookCart = () => {
     }, [authLoading, dispatch, isAuthenticated]);
 
     useEffect(() => {
+        if (!loadOnMount) return;
+
         loadCart();
-    }, [loadCart]);
+    }, [loadCart, loadOnMount]);
 
     const addItem = async (book: CartBook, quantity = 1) => {
         const existingItem = cartItems.find((item) => item.book._id === book._id);

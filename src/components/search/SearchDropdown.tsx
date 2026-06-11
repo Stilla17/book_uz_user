@@ -153,7 +153,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                 {results!.authors.map((author) => (
                                     <Link
                                         key={author._id}
-                                        href={`/author/${author.slug}`}
+                                        href={`/catalog?author=${encodeURIComponent(author._id)}`}
                                         onClick={handleItemClick}
                                         className='group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50'>
                                         <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#005CB9]/10 to-[#FF8A00]/10'>

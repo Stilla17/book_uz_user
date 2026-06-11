@@ -1,203 +1,152 @@
 'use client';
 
-import { useRef } from 'react';
+import { Apple, BookOpen, Headphones, Music, Pause, PlayCircle, Sparkles, Zap } from 'lucide-react';
 
-import Image from 'next/image';
-
-import { motion, useScroll } from 'framer-motion';
-import {
-    Apple,
-    Award,
-    BookOpen,
-    Coffee,
-    Compass,
-    Crown,
-    Flower2,
-    Gem,
-    Headphones,
-    Heart,
-    Moon,
-    Music,
-    PlayCircle,
-    Sparkles,
-    Star,
-    Sun,
-    Zap
-} from 'lucide-react';
-
-type Particle = { top: string; left: string; duration: number; delay: number; size: number };
+const features = [
+    { icon: Headphones, title: 'Oflayn rejim' },
+    { icon: Zap, title: 'Tez yuklash' },
+    { icon: Music, title: 'Audio kitoblar' },
+    { icon: BookOpen, title: 'Elektron kitoblar' }
+];
 
 export const DownloadAppSection = () => {
-    const sectionRef = useRef<HTMLDivElement>(null);
-
-    const features = [
-        { icon: <Headphones size={16} />, title: 'Oflayn rejim', desc: 'Internetisiz tinglang' },
-        { icon: <Zap size={16} />, title: 'Tez yuklash', desc: '2x tezroq' },
-        { icon: <Music size={16} />, title: 'Audio kitoblar', desc: '500+ audio' },
-        { icon: <BookOpen size={16} />, title: 'Elektron kitoblar', desc: '10K+ kitoblar' }
-    ];
-
-    const reviews = [
-        { name: 'Dilnoza K.', rating: 5, text: 'Eng yaxshi ilova!' },
-        { name: 'Bobur A.', rating: 5, text: 'Audio kitoblar ajoyib' },
-        { name: 'Malika S.', rating: 5, text: 'Juda qulay' }
-    ];
-
     return (
-        <section ref={sectionRef} className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>
-            {/* Original Background */}
-            <div className='absolute inset-0'>
-                <div className='absolute top-0 left-0 h-[400px] w-[400px] animate-pulse rounded-full bg-[#00a0e3]/10 blur-[100px] dark:bg-blue-600/10' />
-                <div className='absolute right-0 bottom-0 h-[400px] w-[400px] animate-pulse rounded-full bg-[#ef7f1a]/10 blur-[100px] delay-1000 dark:bg-orange-600/10' />
-            </div>
+        <section className='bg-background py-14 dark:bg-slate-900'>
+            <div className='brand-grid' />
 
-            <div className='relative z-10 container mx-auto max-w-6xl px-4'>
-                <motion.div
-                    className='relative overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 shadow-2xl md:p-10 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900'
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}>
-                    {/* Decorative lines */}
-                    <div className='absolute top-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#00a0e3] to-transparent dark:via-blue-600' />
-                    <div className='absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#ef7f1a] to-transparent dark:via-orange-600' />
+            <div className='container mx-auto max-w-6xl px-4'>
+                <div className='relative overflow-hidden rounded-[2rem] bg-[#0c1629] text-white'>
+                    <div className='absolute -top-32 right-20 size-80 rounded-full bg-[#22345d]/70' />
+                    <div className='absolute -bottom-36 left-1/3 size-64 rounded-full bg-[#1a294b]/80' />
 
-                    {/* Floating Particles */}
-                    <motion.div className='absolute inset-0' transition={{ duration: 0.3 }} />
+                    <div className='grid items-center gap-10 px-6 py-10 md:px-10 lg:grid-cols-[1fr_360px] lg:py-12'>
+                        <div className='relative z-10'>
+                            <div className='mb-5 inline-flex items-center gap-2 rounded-full border border-[#2d5faa] bg-[#13264a] px-3 py-1.5 text-xs text-blue-300'>
+                                <BookOpen size={14} />
+                                O'zbekiston №1 kutubxonasi
+                            </div>
 
-                    <div className='grid grid-cols-1 items-center gap-8 lg:grid-cols-2'>
-                        {/* Left Content */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            className='space-y-6'>
-                            <h2 className='text-3xl leading-tight font-black text-white md:text-4xl dark:text-white'>
-                                <span className='text-[#00a0e3] dark:text-blue-400'>Kutubxonangiz</span>
-                                <br />
-                                <span className='text-[#ef7f1a] dark:text-orange-400'>endi cho'ntagingizda</span>
+                            <h2 className='max-w-xl text-3xl leading-tight font-bold md:text-4xl'>
+                                Kutubxonangiz doim <span className='text-[#4f7cff]'>yoningizda</span>
                             </h2>
 
-                            <p className='max-w-md text-sm text-slate-400 dark:text-slate-400'>
-                                Ilovani yuklab oling va sevimli asarlaringizni istalgan joyda, internetisiz ham
-                                tinglang. 50,000+ kitob va audio kitoblar.
+                            <p className='mt-4 max-w-lg text-sm leading-6 text-blue-200/75 md:text-base'>
+                                Kitoblarni o'qing, audio kitoblarni tinglang va sevimli asarlaringizni oflayn saqlang.
                             </p>
 
-                            {/* Feature Grid */}
-                            <div className='grid grid-cols-2 gap-2'>
-                                {features.map((item, i) => (
-                                    <motion.div
-                                        key={i}
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        whileInView={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 0.3 + i * 0.03 }}
-                                        className='rounded-lg border border-white/5 bg-white/5 p-2 backdrop-blur-sm dark:border-slate-700 dark:bg-white/5'>
-                                        <div className='flex items-center gap-2'>
-                                            <div
-                                                className={`${i % 2 === 0 ? 'text-[#00a0e3] dark:text-blue-400' : 'text-[#ef7f1a] dark:text-orange-400'}`}>
-                                                {item.icon}
-                                            </div>
-                                            <div>
-                                                <p className='text-xs font-bold text-white dark:text-white'>
-                                                    {item.title}
-                                                </p>
-                                                <p className='text-[8px] text-slate-400 dark:text-slate-400'>
-                                                    {item.desc}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </motion.div>
+                            <div className='mt-7 grid max-w-lg grid-cols-2 gap-3'>
+                                {features.map(({ icon: Icon, title }) => (
+                                    <div
+                                        key={title}
+                                        className='flex items-center gap-3 rounded-xl border border-[#2b3e63] bg-[#132039] p-3 text-sm font-medium text-blue-50'>
+                                        <span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#1d3157]'>
+                                            <Icon size={17} className='text-[#4f7cff]' />
+                                        </span>
+                                        <span>{title}</span>
+                                    </div>
                                 ))}
                             </div>
 
-                            {/* Download Buttons */}
-                            <div className='flex flex-wrap gap-3 pt-2'>
-                                <motion.button
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className='group relative flex items-center gap-2 overflow-hidden rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg dark:bg-slate-800 dark:text-white'>
-                                    <div className='absolute inset-0 bg-[#ef7f1a] opacity-0 transition-opacity group-hover:opacity-100 dark:bg-[#ef7f1a]' />
-                                    <Apple
-                                        size={20}
-                                        className='relative z-10 group-hover:text-white dark:group-hover:text-white'
-                                    />
-                                    <div className='relative z-10 text-left group-hover:text-white'>
-                                        <p className='text-[8px] uppercase opacity-60'>Download on</p>
-                                        <p className='text-sm'>App Store</p>
-                                    </div>
-                                </motion.button>
+                            <div className='mt-7 flex flex-wrap gap-3'>
+                                <button
+                                    type='button'
+                                    className='flex items-center gap-3 rounded-xl border border-slate-500/60 px-4 py-2.5 text-left text-white'>
+                                    <Apple size={22} />
+                                    <span>
+                                        <span className='block text-[9px] leading-none opacity-70'>
+                                            Download on the
+                                        </span>
+                                        <span className='text-sm font-semibold'>App Store</span>
+                                    </span>
+                                </button>
 
-                                <motion.button
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className='group relative flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-900 shadow-lg dark:border-slate-600 dark:bg-slate-700 dark:text-white'>
-                                    <div className='absolute inset-0 bg-[#ef7f1a] opacity-0 transition-opacity group-hover:opacity-100 dark:bg-[#ef7f1a]' />
-                                    <PlayCircle
-                                        size={20}
-                                        className='relative z-10 group-hover:text-white dark:group-hover:text-white'
-                                    />
-                                    <div className='relative z-10 text-left group-hover:text-white'>
-                                        <p className='text-[8px] uppercase opacity-60'>Get it on</p>
-                                        <p className='text-sm'>Google Play</p>
-                                    </div>
-                                </motion.button>
+                                <button
+                                    type='button'
+                                    className='flex items-center gap-3 rounded-xl border border-[#354d78] bg-[#121f37] px-4 py-2.5 text-left text-white'>
+                                    <PlayCircle size={22} />
+                                    <span>
+                                        <span className='block text-[9px] leading-none opacity-70'>Get it on</span>
+                                        <span className='text-sm font-semibold'>Google Play</span>
+                                    </span>
+                                </button>
                             </div>
-                        </motion.div>
+                        </div>
 
-                        {/* Right - Phone Mockup */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.3 }}
-                            className='relative flex justify-center'>
-                            {/* Phone */}
-                            <div className='relative h-[450px] w-[220px] md:h-[520px] md:w-[260px]'>
-                                {/* Phone Frame */}
-                                <div className='relative h-full w-full overflow-hidden rounded-[2.5rem] border-[6px] border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 shadow-xl dark:border-slate-600 dark:from-slate-800 dark:to-slate-900'>
-                                    {/* Screen */}
-                                    <div className='absolute inset-0'>
-                                        <Image
-                                            src='https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=2070'
-                                            alt='App UI'
-                                            fill
-                                            className='object-cover opacity-80 dark:opacity-70'
-                                        />
+                        <div className='relative z-10 flex justify-center lg:justify-end'>
+                            <div className='relative w-full max-w-[300px] pt-8 pb-3'>
+                                <div className='absolute top-0 -right-5 z-20 rounded-full border border-[#385383] bg-[#132442] px-3 py-1.5 text-xs text-blue-200 shadow-lg'>
+                                    <span className='mr-1 text-emerald-400'>●</span> +2,400 kitob
+                                </div>
+
+                                <div className='relative rounded-[2.8rem] border-[7px] border-[#07101f] bg-[#172744] px-4 pt-8 pb-6 shadow-2xl ring-1 ring-[#3a527c]'>
+                                    <div className='absolute top-2 left-1/2 h-5 w-24 -translate-x-1/2 rounded-full bg-[#07101f]'>
+                                        <span className='absolute top-1/2 left-1/2 h-1 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-700' />
                                     </div>
 
-                                    {/* App UI Overlay */}
-                                    <div className='absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent dark:from-slate-900 dark:via-transparent'>
-                                        <div className='absolute right-3 bottom-4 left-3'>
-                                            <div className='rounded-lg border border-white/20 bg-white/10 p-2 backdrop-blur-md dark:border-slate-700 dark:bg-white/5'>
-                                                <div className='flex items-center gap-2'>
-                                                    <div className='flex h-6 w-6 items-center justify-center rounded-lg bg-[#00a0e3] dark:bg-blue-600'>
-                                                        <Headphones size={12} className='text-white' />
-                                                    </div>
-                                                    <div className='flex-1'>
-                                                        <p className='text-[10px] font-bold text-white dark:text-white'>
-                                                            Atomic Habits
-                                                        </p>
-                                                        <p className='text-[6px] text-slate-300 dark:text-slate-400'>
-                                                            6h 24min
-                                                        </p>
-                                                    </div>
-                                                    <PlayCircle
-                                                        size={16}
-                                                        className='text-[#ef7f1a] dark:text-orange-400'
-                                                    />
+                                    <div className='flex items-center justify-between'>
+                                        <div>
+                                            <p className='text-xs text-blue-300/60'>Mening kutubxonam</p>
+                                            <p className='mt-0.5 text-sm font-semibold text-white'>
+                                                Bugun nima o'qiymiz?
+                                            </p>
+                                        </div>
+                                        <div className='flex size-9 items-center justify-center rounded-full bg-[#243a63] text-amber-400'>
+                                            <Sparkles size={17} />
+                                        </div>
+                                    </div>
+
+                                    <div className='mt-5 flex h-32 items-end justify-center gap-1.5 px-1'>
+                                        <div className='h-20 w-7 rounded-t-lg bg-[#00a0e3] px-1 py-2 [writing-mode:vertical-rl]'></div>
+                                        <div className='h-32 w-8 rounded-t-lg bg-[#ef7f1a] px-1 py-2 [writing-mode:vertical-rl]'></div>
+                                        <div className='h-24 w-8 rounded-t-lg bg-slate-500 px-1 py-2 [writing-mode:vertical-rl]'></div>
+                                        <div className='h-16 w-7 rounded-t-lg bg-amber-400 px-1 py-2 [writing-mode:vertical-rl]'></div>
+                                        <div className='h-24 w-8 rounded-t-lg bg-emerald-500 px-1 py-2 [writing-mode:vertical-rl]'></div>
+                                    </div>
+
+                                    <div className='h-2 rounded-full bg-[#5b4722] shadow-[0_4px_0_#332814]' />
+
+                                    <div className='mt-4 rounded-2xl border border-[#31486f] bg-[#111e35] p-3 text-white'>
+                                        <div className='flex items-center gap-3'>
+                                            <button
+                                                type='button'
+                                                aria-label='Audio kitobni pauza qilish'
+                                                className='flex size-10 shrink-0 items-center justify-center rounded-full bg-[#ef7f1a]'>
+                                                <Pause size={17} fill='currentColor' />
+                                            </button>
+                                            <div className='min-w-0 flex-1'>
+                                                <div className='flex items-center justify-between gap-2'>
+                                                    <p className='truncate text-sm font-semibold'>Atomic Habits</p>
+                                                    <Headphones size={15} className='text-[#00a0e3]' />
+                                                </div>
+                                                <div className='mt-2 h-1.5 overflow-hidden rounded-full bg-white/15'>
+                                                    <div className='h-full w-[64%] rounded-full bg-[#00a0e3]' />
+                                                </div>
+                                                <div className='mt-1 flex justify-between text-[9px] text-white/45'>
+                                                    <span>4:08</span>
+                                                    <span>6:24</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Dynamic Island */}
-                                    <div className='absolute top-1 left-1/2 h-4 w-16 -translate-x-1/2 rounded-full bg-slate-900 dark:bg-slate-800' />
+                                    <div className='mt-3 flex items-center justify-between rounded-xl bg-[#213454] px-3 py-2.5'>
+                                        <div className='flex items-center gap-2 text-sm text-blue-100'>
+                                            <BookOpen size={16} className='text-[#00a0e3]' />
+                                            <span>Haftalik maqsad</span>
+                                        </div>
+                                        <span className='text-sm font-bold text-[#ef7f1a]'>4 / 5</span>
+                                    </div>
+
+                                    <div className='absolute bottom-2 left-1/2 h-1 w-20 -translate-x-1/2 rounded-full bg-white/25' />
+                                </div>
+
+                                <div className='absolute -right-10 bottom-20 z-20 rounded-xl border border-[#34517e] bg-[#172b4c] px-3 py-2 text-xs font-semibold text-blue-100 shadow-xl'>
+                                    <span className='mr-1.5 text-amber-400'>★</span> 4.9 reyting
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

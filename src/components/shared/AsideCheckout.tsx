@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { useBookCart } from '@/hooks/useBookCart';
+import { getDeliveryCost } from '@/helpers/checkout';
+import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { getImageUrl } from '@/utils/image';
 
 import { Button } from '../ui/button';
@@ -12,6 +13,7 @@ interface AsideCheckoutProps {
     onConfirm?: () => void;
     promoCode?: string;
     promoDiscount?: number;
+    selectedDelivery: string;
 }
 
 const getTitle = (title: string | { uz?: string; ru?: string; en?: string }) => {
@@ -25,13 +27,14 @@ const AsideCheckout = ({
     isSubmitting = false,
     onConfirm,
     promoCode,
-    promoDiscount = 0
+    promoDiscount = 0,
+    selectedDelivery
 }: AsideCheckoutProps) => {
     const { cartItems, totalPrice, totalQuantity } = useBookCart();
     const formattedItems = (item: number) => {
         if (typeof item === 'number') return item.toLocaleString('ru-RU');
     };
-    const deliveryCost = 20000;
+    const deliveryCost = getDeliveryCost(selectedDelivery);
     const paymentTotal = Math.max(0, totalPrice + deliveryCost - promoDiscount);
 
     return (
@@ -88,7 +91,7 @@ const AsideCheckout = ({
                 <div className='flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400'>
                     <span>Yetkazib berish</span>
                     <span className='font-bold text-slate-800 dark:text-slate-200'>
-                        {formattedItems(deliveryCost)} so'm
+                        {deliveryCost === 0 ? 'Bepul' : `${formattedItems(deliveryCost)} so'm`}
                     </span>
                 </div>
                 {promoDiscount > 0 && (

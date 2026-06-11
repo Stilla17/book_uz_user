@@ -2,27 +2,40 @@ import React from 'react';
 
 import Link from 'next/link';
 
-import { bottomNav } from '@/data/navMenu';
+import { bottomNav, mainNav } from '@/data/navMenu';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 
 const NavbarFooter: React.FC = () => {
     const { getBgColor, getBorderColor } = useThemeStyles();
+
     return (
         <div className={`border-t ${getBorderColor()} ${getBgColor('card')}`}>
-            <div className='no-scrollbar container mx-auto flex h-12 items-center justify-center gap-4 overflow-x-auto px-4 md:justify-between md:gap-6'>
-                {bottomNav.map((item) => (
-                    <Link
-                        key={item.label}
-                        href={item.href}
-                        className={`group relative flex items-center gap-1.5 text-xs font-extrabold whitespace-nowrap text-[#475266] transition-all hover:opacity-80 md:text-sm dark:text-white`}
-                        title={item.description}>
-                        <span className='text-[#e67600]'>{item.icon}</span>
-                        {item.label}
+            <div className='no-scrollbar container mx-auto flex h-11 items-center gap-5 overflow-x-auto px-4 xl:justify-between'>
+                <nav className='flex shrink-0 items-center gap-4 lg:gap-5'>
+                    {mainNav.map((item) => (
+                        <Link
+                            key={item.label}
+                            href={item.href}
+                            className='text-xs font-semibold whitespace-nowrap text-[#475266] transition-colors hover:text-[#e67600] dark:text-white dark:hover:text-[#e67600]'>
+                            {item.label}
+                        </Link>
+                    ))}
+                </nav>
+                
+                <span className='h-5 w-px shrink-0 bg-slate-200 dark:bg-slate-700' />
 
-                        {/* Hover tooltip */}
-                        <span className='pointer-events-none absolute -bottom-3.5 left-1/2 z-50 w-full -translate-x-1/2 transform rounded bg-[#e67600] px-2 py-0.5 text-[10px] whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-[#e67600]' />
-                    </Link>
-                ))}
+                <nav className='flex shrink-0 items-center gap-3 lg:gap-4'>
+                    {bottomNav.map((item) => (
+                        <Link
+                            key={item.label}
+                            href={item.href}
+                            className='flex items-center gap-1 text-xs font-bold whitespace-nowrap text-[#475266] transition-colors hover:text-[#e67600] dark:text-white dark:hover:text-[#e67600]'
+                            title={item.description}>
+                            <span className='text-[#e67600]'>{item.icon}</span>
+                            {item.label}
+                        </Link>
+                    ))}
+                </nav>
             </div>
         </div>
     );

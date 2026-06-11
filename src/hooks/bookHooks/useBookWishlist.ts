@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import { useAuth } from './useAuth';
 import { toggleWishlist, type WishlistBook } from '@/store/features/wishlistSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { Book } from '@/types/book';
 import { handleToggleFavorite } from '@/utils/wishlist';
 import { isBookInGuestWishlist } from '@/utils/wishlistStorage';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../useAuth';
 
 type UseBookWishlistOptions = {
     queryKeys?: unknown[][];

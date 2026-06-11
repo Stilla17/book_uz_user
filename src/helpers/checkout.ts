@@ -1,5 +1,5 @@
-import type { OrderPayload } from '@/types';
 import type { CartItem } from '@/store/features/cartSlice';
+import type { OrderPayload } from '@/types';
 
 export interface LocationName {
     uz?: string;
@@ -111,7 +111,7 @@ const getOrderItems = (cartItems: CartItem[]) =>
     cartItems.map((item) => ({
         product: getCartProductId(item.book),
         quantity: item.quantity,
-        priceAtTime: item.book.price,
+        priceAtTime: item.book.price
     }));
 
 export const validateCheckout = ({
@@ -121,7 +121,7 @@ export const validateCheckout = ({
     selectedRegionItem,
     selectedDistrictItem,
     selectedPayment,
-    paymentTitles,
+    paymentTitles
 }: ValidateCheckoutParams) => {
     if (!cartItems.length) return "Savat bo'sh";
     if (!checkout.clientName.trim()) return 'Ism familiyani kiriting';
@@ -148,6 +148,9 @@ type BuildOrderPayloadParams = {
     selectedPayment: string;
 };
 
+export const getDeliveryCost = (selectedDelivery: string) =>
+    getDeliveryType(selectedDelivery) === 'PICKUP' ? 0 : DELIVERY_COST;
+
 export const buildOrderPayload = ({
     cartItems,
     totalPrice,
@@ -157,11 +160,14 @@ export const buildOrderPayload = ({
     selectedRegionItem,
     selectedDistrictItem,
     selectedDelivery,
-    selectedPayment,
+    selectedPayment
 }: BuildOrderPayloadParams): OrderPayload => ({
     ...(userId ? { user: userId } : {}),
     items: getOrderItems(cartItems),
-    totalAmount: Math.max(0, totalPrice + DELIVERY_COST - (checkout.promoDiscount || 0)),
+    totalAmount: Math.max(
+        0,
+        totalPrice + getDeliveryCost(selectedDelivery) - (checkout.promoDiscount || 0)
+    ),
     guestName: checkout.clientName.trim(),
     description: checkout.description.trim(),
     couponCode: checkout.promoCode || undefined,
@@ -169,10 +175,10 @@ export const buildOrderPayload = ({
         city: getLocationName(selectedRegionItem),
         region: getLocationName(selectedDistrictItem),
         street: checkout.address.trim(),
-        phone,
+        phone
     },
     deliveryType: getDeliveryType(selectedDelivery),
-    paymentType: getPaymentType(selectedPayment),
+    paymentType: getPaymentType(selectedPayment)
 });
 
 type ResolvePaymentRedirectParams = {
@@ -188,7 +194,7 @@ export const resolvePaymentRedirectUrl = async ({
     selectedPayment,
     orderId,
     createClickPayment,
-    createPaymePayment,
+    createPaymePayment
 }: ResolvePaymentRedirectParams) => {
     let paymentRedirectUrl = getPaymentRedirectUrl(response);
 

@@ -1,12 +1,43 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import MiniCard from '@/components/shared/MiniCard';
 import { faqs, supportStats } from '@/data/support';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronRight, Clock, Mail, MessageCircle, Phone } from 'lucide-react';
+
+const contact = [
+    {
+        icon: <Phone size={18} />,
+        title: 'Telefon',
+        val: '+998 71 200-99-99',
+        sub: "Bepul qo'ng'iroq",
+        color: 'blue'
+    },
+    {
+        icon: <Mail size={18} />,
+        title: 'Email',
+        val: 'support@book.uz',
+        sub: '24/7',
+        color: 'orange'
+    },
+    {
+        icon: <MessageCircle size={18} />,
+        title: 'Telegram',
+        val: '@bookuz_bot',
+        sub: 'Online',
+        color: 'blue'
+    },
+    {
+        icon: <Clock size={18} />,
+        title: 'Ish vaqti',
+        val: '09:00 - 22:00',
+        sub: 'Dushanba-Yakshanba',
+        color: 'orange'
+    }
+];
 
 export const SupportSection = () => {
     const [activeTab, setActiveTab] = useState<'faq' | 'contact' | 'chat'>('faq');
@@ -109,36 +140,7 @@ export const SupportSection = () => {
                                 className='grid grid-cols-1 gap-3 md:grid-cols-2'
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}>
-                                {[
-                                    {
-                                        icon: <Phone size={18} />,
-                                        title: 'Telefon',
-                                        val: '+998 71 200-99-99',
-                                        sub: "Bepul qo'ng'iroq",
-                                        color: 'blue'
-                                    },
-                                    {
-                                        icon: <Mail size={18} />,
-                                        title: 'Email',
-                                        val: 'support@book.uz',
-                                        sub: '24/7',
-                                        color: 'orange'
-                                    },
-                                    {
-                                        icon: <MessageCircle size={18} />,
-                                        title: 'Telegram',
-                                        val: '@bookuz_bot',
-                                        sub: 'Online',
-                                        color: 'blue'
-                                    },
-                                    {
-                                        icon: <Clock size={18} />,
-                                        title: 'Ish vaqti',
-                                        val: '09:00 - 22:00',
-                                        sub: 'Dushanba-Yakshanba',
-                                        color: 'orange'
-                                    }
-                                ].map((c, i) => (
+                                {contact.map((c, i) => (
                                     <div
                                         key={i}
                                         className='group rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-[#00a0e3]/20 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-500/30'>

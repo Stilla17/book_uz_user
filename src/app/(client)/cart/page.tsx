@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import AsideCart from '@/components/shared/AsideCart';
 import QuantityControl from '@/components/shared/QuantityControl';
-import { useBookCart } from '@/hooks/useBookCart';
+import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { setLoading } from '@/store/features/globalSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { getImageUrl } from '@/utils/image';

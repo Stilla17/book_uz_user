@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { getText } from '@/helpers/bookCard';
+import { NewsItem, formatDate, normalizeNewsResponse } from '@/helpers/newsSection';
 import { api } from '@/services/api';
 import { getImageUrl } from '@/utils/image';
 
@@ -16,47 +18,8 @@ import 'swiper/css/pagination';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-type LocalizedText = string | { uz?: string; ru?: string; en?: string } | null | undefined;
-
-type NewsItem = {
-    _id: string;
-    title?: LocalizedText;
-    titleRu?: string;
-    titleEn?: string;
-    slug?: string;
-    excerpt?: LocalizedText;
-    description?: LocalizedText;
-    image?: string;
-    imageUrl?: string;
-    views?: number;
-    viewsCount?: number;
-    viewCount?: number;
-    createdAt?: string;
-    publishedAt?: string;
-};
-
 const NEWS_VIEWS_STORAGE_KEY = 'news_views';
 const NEWS_VIEWS_EVENT = 'news-views-change';
-
-const getText = (value: LocalizedText, fallback = '') => {
-    if (!value) return fallback;
-    if (typeof value === 'string') return value || fallback;
-
-    return value.uz || value.ru || value.en || fallback;
-};
-
-const normalizeNewsResponse = (data: any): NewsItem[] => {
-    const payload = data?.data ?? data;
-    const items = Array.isArray(payload?.news)
-        ? payload.news
-        : Array.isArray(payload?.items)
-          ? payload.items
-          : Array.isArray(payload)
-            ? payload
-            : [];
-
-    return items;
-};
 
 export const NewsSection = () => {
     const [news, setNews] = useState<NewsItem[]>([]);
@@ -109,11 +72,6 @@ export const NewsSection = () => {
         }
     };
 
-    const formatDate = (dateString?: string) => {
-        if (!dateString) return '';
-        return dayjs(dateString).format('D MMMM YYYY');
-    };
-
     const getNewsViews = (item: NewsItem) => {
         const apiViews = item.views ?? item.viewsCount ?? item.viewCount ?? 0;
         const localViews = Math.max(savedViews[item._id] ?? 0, item.slug ? (savedViews[item.slug] ?? 0) : 0);
@@ -139,27 +97,18 @@ export const NewsSection = () => {
 
     return (
         <section className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>
-            {/* Animated Background Elements */}
-            <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-                {/* Grid Pattern */}
-                <div className='brand-grid' />
-            </div>
+            <div className='brand-grid' />
 
             <div className='max-w-8xl relative z-10 container mx-auto px-4'>
                 {/* Section Header */}
                 <div className='mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end'>
-                    <div className='space-y-2'>
-                        <div className='inline-flex items-center gap-2 rounded-full border border-[#ef7f1a] bg-[#ef7f1a]/15 px-4 py-2'>
-                            <Megaphone size={16} className='text-[#ef7f1a] dark:text-orange-400' />
-                            <span className='text-xs font-bold text-[#ef7f1a] dark:text-white'>BLOG & YANGILIKLAR</span>
-                        </div>
+                    <div className='space-y-2 flex gap-4'>
+                        <span className={`h-9 w-1 shrink-0 rounded-full bg-[#ef7f1a]/30`} />
+
                         <h2 className='text-2xl font-black md:text-3xl'>
                             <span className='text-[#00a0e3] dark:text-blue-400'>Platforma</span>{' '}
                             <span className='text-[#ef7f1a] dark:text-orange-400'>yangiliklari</span>
                         </h2>
-                        <p className='text-sm text-gray-500 dark:text-gray-400'>
-                            Eng so'nggi yangiliklar va aksiyalardan xabardor bo'ling
-                        </p>
                     </div>
 
                     <Link
@@ -189,14 +138,14 @@ export const NewsSection = () => {
                     modules={[Autoplay, Pagination]}
                     breakpoints={{
                         0: { slidesPerView: 1.1, spaceBetween: 14 },
-                        640: { slidesPerView: 2, spaceBetween: 18 },
-                        768: { slidesPerView: 3, spaceBetween: 20 },
-                        1024: { slidesPerView: 4, spaceBetween: 20 }
+                        640: { slidesPerView: 3, spaceBetween: 18 },
+                        768: { slidesPerView: 4, spaceBetween: 20 },
+                        1024: { slidesPerView: 5, spaceBetween: 20 }
                     }}
                     className='news-swiper !overflow-visible pb-12'>
                     {news.map((item, index) => {
                         const title = getText(item.title, item.titleRu || item.titleEn || 'Yangilik');
-                        const description = getText(item.excerpt, getText(item.description));
+                        const description = getText(item.excerpt, getText(item.description, ''));
                         const imageUrl = getImageUrl(item.image || item.imageUrl);
                         const href = item.slug ? `/news/${item.slug}` : '/news';
                         const date = formatDate(item.publishedAt || item.createdAt);

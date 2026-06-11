@@ -53,7 +53,6 @@ const mockServices: ServiceItem[] = [
         title: 'Yetkazib berish',
         desc: 'Toshkent bo‘ylab tez, viloyatlarga esa ishonchli yetkazamiz.',
         icon: 'delivery',
-        href: '/checkout',
         isActive: true
     },
     {
@@ -61,7 +60,6 @@ const mockServices: ServiceItem[] = [
         title: '24/7 Support',
         desc: 'Telegram/Chat orqali doim aloqadamiz. Savol bo‘lsa yozing.',
         icon: 'support',
-        href: '/about',
         isActive: true
     },
     {
@@ -69,7 +67,6 @@ const mockServices: ServiceItem[] = [
         title: 'Audiokitoblar',
         desc: 'Ilovada tinglang: yo‘lda, sportda, uyda — qulay format.',
         icon: 'audiobooks',
-        href: '/catalog',
         isActive: true
     },
     {
@@ -77,7 +74,6 @@ const mockServices: ServiceItem[] = [
         title: 'Kafolat & Ishonch',
         desc: 'Buyurtma xavfsizligi, qaytarish qoidalari va nazorat tizimi.',
         icon: 'secure',
-        href: '/about',
         isActive: true
     },
     {
@@ -85,7 +81,6 @@ const mockServices: ServiceItem[] = [
         title: 'Qulay to‘lovlar',
         desc: 'Click/Payme/Uzum/Bank kartalar — hammasi bor.',
         icon: 'payment',
-        href: '/checkout',
         isActive: true
     }
 ];
@@ -99,8 +94,6 @@ export const ServicesSection = ({
     title?: string;
     subtitle?: string;
 }) => {
-    const reduceMotion = useReducedMotion();
-
     const services = useMemo(() => {
         const src = adminServices?.length ? adminServices : mockServices;
         return src.filter((s) => s.isActive !== false);
@@ -139,13 +132,6 @@ export const ServicesSection = ({
                         </h2>
                         <p className='mt-1 text-sm text-gray-500 md:text-base dark:text-gray-400'>{subtitle}</p>
                     </div>
-
-                    <Link
-                        href='/services'
-                        className='group hidden items-center gap-1 text-sm font-extrabold text-[#00a0e3] transition-all hover:text-[#ef7f1a] md:inline-flex dark:text-blue-400 dark:hover:text-orange-400'>
-                        Hammasi
-                        <ChevronRight size={18} className='transition-transform group-hover:translate-x-1' />
-                    </Link>
                 </motion.div>
 
                 {/* Cards Grid */}
@@ -154,22 +140,8 @@ export const ServicesSection = ({
                         const Icon = iconMap[item.icon];
 
                         return (
-                            <motion.div
-                                key={item.id}
-                                initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-                                whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
-                                viewport={{ once: true, amount: 0.35 }}
-                                transition={{ duration: 0.4, delay: idx * 0.1 }}
-                                className='group relative'>
-                                <Link
-                                    href={item.href || '#'}
-                                    className='relative block h-full overflow-hidden rounded-3xl border-2 border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:hover:shadow-2xl dark:hover:shadow-[#00a0e3]/20'>
-                                    {/* Background gradient on hover */}
-                                    <div className='absolute inset-0 bg-gradient-to-br from-[#00a0e3]/5 via-transparent to-[#ef7f1a]/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-blue-600/10 dark:via-transparent dark:to-orange-600/10' />
-
-                                    {/* Floating Particles */}
-                                    <motion.div className='absolute inset-0' transition={{ duration: 0.3 }} />
-
+                            <motion.div key={item.id} className='group relative'>
+                                <div className='relative block h-full overflow-hidden rounded-3xl border-2 border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-xl dark:border-slate-700 dark:bg-slate-800'>
                                     {/* Decorative corner */}
                                     <div className='absolute top-0 right-0 h-20 w-20 translate-x-6 -translate-y-6 transform rounded-bl-full bg-gradient-to-br from-[#00a0e3]/10 to-[#ef7f1a]/10 transition-transform duration-500 group-hover:translate-x-4 group-hover:-translate-y-4 dark:from-blue-600/20 dark:to-orange-600/20' />
 
@@ -178,10 +150,7 @@ export const ServicesSection = ({
                                         <div
                                             className={cn(
                                                 'flex h-14 w-14 items-center justify-center rounded-2xl border-2 transition-all duration-300',
-                                                'bg-white group-hover:scale-110 dark:bg-slate-800',
-                                                idx % 2 === 0
-                                                    ? 'border-[#00a0e3]/20 group-hover:border-[#00a0e3] group-hover:bg-[#00a0e3]/5 dark:border-blue-500/30 dark:group-hover:border-blue-600 dark:group-hover:bg-blue-600/20'
-                                                    : 'border-[#ef7f1a]/20 group-hover:border-[#ef7f1a] group-hover:bg-[#ef7f1a]/5 dark:border-orange-500/30 dark:group-hover:border-orange-600 dark:group-hover:bg-orange-600/20'
+                                                'bg-white group-hover:scale-110 dark:bg-slate-800'
                                             )}>
                                             <Icon
                                                 className={cn(
@@ -220,41 +189,11 @@ export const ServicesSection = ({
                                             {item.desc}
                                         </p>
                                     </div>
-
-                                    {/* CTA */}
-                                    <div
-                                        className={cn(
-                                            'relative z-10 mt-5 inline-flex items-center gap-1 text-sm font-extrabold transition-all',
-                                            idx % 2 === 0
-                                                ? 'text-[#00a0e3] group-hover:text-[#00a0e3] dark:text-blue-400 dark:group-hover:text-blue-400'
-                                                : 'text-[#ef7f1a] group-hover:text-[#ef7f1a] dark:text-orange-400 dark:group-hover:text-orange-400'
-                                        )}>
-                                        Batafsil
-                                        <ChevronRight
-                                            size={16}
-                                            className='transition-transform group-hover:translate-x-1'
-                                        />
-                                    </div>
-                                </Link>
+                                </div>
                             </motion.div>
                         );
                     })}
                 </div>
-
-                {/* Mobile CTA */}
-                <motion.div
-                    className='mt-8 flex justify-center md:hidden'
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 }}>
-                    <Link
-                        href='/services'
-                        className='inline-flex transform items-center gap-2 rounded-full bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] px-6 py-3 font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl dark:from-blue-600 dark:to-orange-600'>
-                        Hammasini ko'rish
-                        <ChevronRight size={18} />
-                    </Link>
-                </motion.div>
             </div>
         </section>
     );

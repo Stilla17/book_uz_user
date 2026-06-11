@@ -18,7 +18,7 @@ import { getImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
-import { CalendarDays, Edit3, Eye, Newspaper, Plus, Search, Trash2 } from 'lucide-react';
+import { CalendarDays, Edit3, Eye, Newspaper, Search, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const AdminNewsPage = () => {
@@ -30,7 +30,6 @@ const AdminNewsPage = () => {
     const { data, isFetching, isLoading } = useNewsListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate: deleteNews, isPending: isDeletePending } = useDeleteNews();
 
-    console.log(data);
     const news = data?.news ?? [];
     const pagination = data?.pagination;
     const stats = [{ label: 'Jami yangiliklar', value: news.length, icon: Newspaper, color: 'bg-[#ef7f1a]' }];

@@ -16,6 +16,8 @@ interface ForgotPasswordModalProps {
     onClose: () => void;
 }
 
+const OTP_LENGTH = 4;
+
 type Step = 'EMAIL' | 'OTP' | 'NEW_PASSWORD';
 type ForgotPasswordFormValues = {
     email: string;
@@ -28,7 +30,7 @@ type ForgotPasswordFormValues = {
 const defaultValues: ForgotPasswordFormValues = {
     email: '',
     method: 'EMAIL',
-    otp: ['', '', '', '', '', ''],
+    otp: Array(OTP_LENGTH).fill(''),
     newPassword: '',
     confirmPassword: ''
 };
@@ -76,7 +78,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
         setValue('otp', newOtp);
 
         // Auto-focus next input
-        if (value && index < 5) {
+        if (value && index < OTP_LENGTH - 1) {
             const nextInput = document.getElementById(`otp-${index + 1}`);
             nextInput?.focus();
         }
@@ -129,8 +131,8 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
     // Step 2: Verify OTP and go to new password
     const handleVerifyOtp = (values: ForgotPasswordFormValues) => {
         const otpString = values.otp.join('');
-        if (otpString.length !== 6) {
-            toast.error("6 xonali kodni to'liq kiriting");
+        if (otpString.length !== OTP_LENGTH) {
+            toast.error(`${OTP_LENGTH} xonali kodni to'liq kiriting`);
             return;
         }
 
@@ -235,7 +237,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                     Parolni tiklash
                                                 </h3>
                                                 <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                                                    Email manzilingizni kiriting, biz sizga 6 xonali kod yuboramiz.
+                                                    Email manzilingizni kiriting, biz sizga {OTP_LENGTH} xonali kod yuboramiz.
                                                 </p>
                                             </div>
 
@@ -301,7 +303,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
                                                     Kodni tasdiqlang
                                                 </h3>
                                                 <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                                                    {email} manziliga 6 xonali kod yubordik
+                                                    {email} manziliga {OTP_LENGTH} xonali kod yubordik
                                                 </p>
                                             </div>
 

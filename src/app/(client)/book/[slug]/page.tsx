@@ -4,14 +4,16 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useParams } from 'next/navigation';
 
+import { BookCard } from '@/components/cards/BookCard';
+import { BookCardSkeleton } from '@/components/cards/BookCardSkeleton';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import DottedLine from '@/components/shared/DottedLine';
 import { Loading } from '@/components/shared/Loading';
 import TabPanel from '@/components/shared/TabPanel';
 import { Button } from '@/components/ui/button';
-import { useBookCart } from '@/hooks/useBookCart';
-import { useBookStats } from '@/hooks/useBookStats';
-import { useBookWishlist } from '@/hooks/useBookWishlist';
+import { useBookCart } from '@/hooks/bookHooks/useBookCart';
+import { useBookStats } from '@/hooks/bookHooks/useBookStats';
+import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
@@ -20,9 +22,24 @@ import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Eye, Heart, Minus, PackageCheck, Plus, ShoppingCart, Star, Store } from 'lucide-react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { Autoplay, Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
+};
+
+const getAuthorId = (book?: DetailBook | null) => {
+    if (!book) return '';
+    if (book.author && typeof book.author === 'object') return book.author._id ?? '';
+
+    const authorName = book.authorName as { _id?: string } | string | undefined;
+    if (authorName && typeof authorName === 'object') return authorName._id ?? '';
+    if (typeof book.author === 'string' && /^[a-f\d]{24}$/i.test(book.author)) return book.author;
+
+    return '';
 };
 
 // ==================== MAIN COMPONENT ====================
@@ -34,10 +51,20 @@ export default function BookDetailPage() {
     const { data: book, isLoading: bookLoading } = useQuery<DetailBook | null>({
         queryKey: ['book', slug],
         queryFn: () => bookService.getBookById(slug) as Promise<DetailBook | null>,
-        enabled: !!slug
+        enabled: !!slug,
+        staleTime: 5 * 60 * 1000
     });
-
-    console.log(book);
+    const authorId = getAuthorId(book);
+    const { data: authorBooksData, isLoading: authorBooksLoading } = useQuery({
+        queryKey: ['author-recommendations', authorId, book?._id],
+        queryFn: () => bookService.getProductsByAuthor(authorId, { page: 1, limit: 12 }),
+        enabled: Boolean(authorId && book?._id),
+        staleTime: 5 * 60 * 1000
+    });
+    const authorBooks = useMemo(
+        () => (authorBooksData?.products ?? []).filter((item) => item._id !== book?._id),
+        [authorBooksData?.products, book?._id]
+    );
 
     const viewedBookRef = useRef<string | null>(null);
     const { viewsCount, ratingAvg, ratingCount, userRating, incrementViews, rateBook } = useBookStats({
@@ -47,12 +74,10 @@ export default function BookDetailPage() {
         initialRatingCount: book?.ratingCount
     });
 
-    console.log(book);
-
     const { isBookmarked, favoriteLoading, toggleFavorite } = useBookWishlist(book ?? undefined, {
         queryKeys: [['book', slug]]
     });
-    const { cartItems, addItem, updateQuantity, removeItem } = useBookCart();
+    const { cartItems, addItem, updateQuantity, removeItem } = useBookCart({ loadOnMount: false });
     const cartItem = useMemo(() => cartItems.find((item) => item.book._id === book?._id), [book?._id, cartItems]);
     const cartQuantity = cartItem?.quantity ?? 0;
     const availableBranchStocks = useMemo(
@@ -380,6 +405,50 @@ export default function BookDetailPage() {
                     year={book?.year}
                     reviewsCount={book?.reviewsCount}
                 />
+
+                {(authorBooksLoading || authorBooks.length > 0) && (
+                    <section className='mt-10'>
+                        <h2 className='text-2xl font-black text-slate-900 dark:text-white'>
+                            Muallifning boshqa kitoblari
+                        </h2>
+
+                        {authorBooksLoading ? (
+                            <div className='mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                                {Array.from({ length: 4 }).map((_, index) => (
+                                    <BookCardSkeleton key={index} />
+                                ))}
+                            </div>
+                        ) : authorBooks.length > 4 ? (
+                            <Swiper
+                                modules={[Navigation, Autoplay]}
+                                navigation
+                                autoplay={{
+                                    delay: 3000,
+                                    disableOnInteraction: false
+                                }}
+                                spaceBetween={16}
+                                slidesPerView={1.1}
+                                breakpoints={{
+                                    640: { slidesPerView: 2 },
+                                    1024: { slidesPerView: 3 },
+                                    1280: { slidesPerView: 4 }
+                                }}
+                                className='mt-5'>
+                                {authorBooks.map((authorBook) => (
+                                    <SwiperSlide key={authorBook._id} className='h-auto'>
+                                        <BookCard book={authorBook} slug={authorBook.slug} />
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
+                        ) : (
+                            <div className='mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                                {authorBooks.map((authorBook) => (
+                                    <BookCard key={authorBook._id} book={authorBook} slug={authorBook.slug} />
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                )}
             </div>
         </div>
     );

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import AsideCheckout from '@/components/shared/AsideCheckout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { deliveryOptions, paymentOptions } from '@/data';
 import {
     type DistrictItem,
@@ -18,9 +19,9 @@ import {
     resolvePaymentRedirectUrl,
     validateCheckout
 } from '@/helpers/checkout';
+import { useBookCart } from '@/hooks/bookHooks/useBookCart';
+import { useCreateOrder } from '@/hooks/orderHooks/useCreateOrder';
 import { useAuth } from '@/hooks/useAuth';
-import { useBookCart } from '@/hooks/useBookCart';
-import { useCreateOrder } from '@/hooks/useCreateOrder';
 import { UserService } from '@/services/api';
 import { resetCheckout, updateField } from '@/store/features/checkoutSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -38,8 +39,14 @@ import {
     Truck,
     User
 } from 'lucide-react';
+import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { IMaskInput } from 'react-imask';
+
+type CheckoutFormValues = {
+    clientName: string;
+    clientPhone: string;
+};
 
 const CheckoutPage = () => {
     const router = useRouter();
@@ -51,9 +58,14 @@ const CheckoutPage = () => {
     const { user } = useAuth();
     const { cartItems, totalPrice, clearItems } = useBookCart();
     const createOrder = useCreateOrder();
+    const { control, getValues, handleSubmit, register, setValue, watch } = useForm<CheckoutFormValues>({
+        defaultValues: {
+            clientName: checkout.clientName,
+            clientPhone: checkout.clientPhone
+        }
+    });
     const [selectedRegion, setSelectedRegion] = useState('');
     const [selectedDistrict, setSelectedDistrict] = useState('');
-    const [phone, setPhone] = useState(checkout.clientPhone);
     const [phoneTouched, setPhoneTouched] = useState(false);
     const [selectedPayment, setSelectedPayment] = useState(
         checkout.paymentMethod || paymentOptions[0]?.title || 'Payme'
@@ -61,6 +73,30 @@ const CheckoutPage = () => {
     const [selectedDelivery, setSelectedDelivery] = useState(
         checkout.deliveryMethod || deliveryOptions[0]?.title || 'Kuryer'
     );
+    const phone = watch('clientPhone');
+
+    useEffect(() => {
+        if (!user) return;
+
+        const currentValues = getValues();
+        const nextValues: Partial<CheckoutFormValues> = {};
+
+        if (!currentValues.clientName.trim() && user.name) {
+            nextValues.clientName = user.name;
+            setValue('clientName', user.name);
+        }
+
+        if (!currentValues.clientPhone.trim() && user.phone) {
+            const phone = user.phone.replace(/\D/g, '');
+
+            nextValues.clientPhone = phone;
+            setValue('clientPhone', phone);
+        }
+
+        if (Object.keys(nextValues).length) {
+            dispatch(updateField(nextValues));
+        }
+    }, [dispatch, getValues, setValue, user]);
 
     const {
         data: regions,
@@ -105,14 +141,18 @@ const CheckoutPage = () => {
 
     const phoneError = phoneTouched && phone.length > 0 && !isValidUzPhone(phone);
 
-    const handleSubmitOrder = async () => {
+    const handleSubmitOrder = async (formValues: CheckoutFormValues) => {
         setPhoneTouched(true);
 
         const userId = user?._id || user?.id;
+        const checkoutValues = {
+            ...checkout,
+            clientName: formValues.clientName
+        };
         const validationMessage = validateCheckout({
             cartItems,
-            checkout,
-            phone,
+            checkout: checkoutValues,
+            phone: formValues.clientPhone,
             selectedRegionItem,
             selectedDistrictItem,
             selectedPayment,
@@ -129,8 +169,8 @@ const CheckoutPage = () => {
                 cartItems,
                 totalPrice,
                 userId,
-                checkout,
-                phone,
+                checkout: checkoutValues,
+                phone: formValues.clientPhone,
                 selectedRegionItem: selectedRegionItem!,
                 selectedDistrictItem: selectedDistrictItem!,
                 selectedDelivery,
@@ -227,10 +267,10 @@ const CheckoutPage = () => {
                                         <User className='size-5 text-slate-400' />
                                         <input
                                             type='text'
-                                            value={checkout.clientName}
-                                            onChange={(event) =>
-                                                dispatch(updateField({ clientName: event.target.value }))
-                                            }
+                                            {...register('clientName', {
+                                                onChange: (event) =>
+                                                    dispatch(updateField({ clientName: event.target.value }))
+                                            })}
                                             placeholder='Masalan: Aziz Karimov'
                                             className='w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white'
                                         />
@@ -248,20 +288,30 @@ const CheckoutPage = () => {
                                                 : 'border-slate-200 focus-within:border-[#ef7f1a] focus-within:ring-orange-100 dark:border-slate-800 dark:focus-within:ring-orange-950/40'
                                         }`}>
                                         <Phone className='size-5 text-slate-400' />
-                                        <IMaskInput
-                                            mask='+{998} 00 000 00 00'
-                                            value={phone}
-                                            unmask={false}
-                                            onBlur={() => setPhoneTouched(true)}
-                                            onAccept={(value) => {
-                                                const nextPhone = String(value);
+                                        <Controller
+                                            name='clientPhone'
+                                            control={control}
+                                            render={({ field }) => (
+                                                <IMaskInput
+                                                    mask='+{998} 00 000 00 00'
+                                                    value={field.value}
+                                                    unmask={false}
+                                                    inputRef={field.ref}
+                                                    onBlur={() => {
+                                                        field.onBlur();
+                                                        setPhoneTouched(true);
+                                                    }}
+                                                    onAccept={(value) => {
+                                                        const nextPhone = String(value);
 
-                                                setPhone(nextPhone);
-                                                dispatch(updateField({ clientPhone: nextPhone }));
-                                            }}
-                                            placeholder='+998 __ ___ __ __'
-                                            aria-invalid={phoneError}
-                                            className='w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white'
+                                                        field.onChange(nextPhone);
+                                                        dispatch(updateField({ clientPhone: nextPhone }));
+                                                    }}
+                                                    placeholder='+998 __ ___ __ __'
+                                                    aria-invalid={phoneError}
+                                                    className='w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white'
+                                                />
+                                            )}
                                         />
                                     </div>
                                     {phoneError ? (
@@ -297,53 +347,69 @@ const CheckoutPage = () => {
                                     <span className='mb-2 block text-sm font-bold text-slate-700 dark:text-slate-200'>
                                         Shahar
                                     </span>
-                                    <select
+
+                                    <Select
                                         value={selectedRegion}
                                         disabled={regionsLoading || Boolean(regionsError)}
-                                        onChange={(event) => handleRegionChange(event.target.value)}
-                                        className='h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition outline-none focus:border-[#ef7f1a] focus:ring-4 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:ring-orange-950/40'>
-                                        <option value=''>
-                                            {regionsLoading
-                                                ? 'Viloyatlar yuklanmoqda...'
-                                                : regionsError
-                                                  ? 'Viloyatlar yuklanmadi'
-                                                  : 'Viloyatni tanlang'}
-                                        </option>
-                                        {(regions || []).map((region) => (
-                                            <option key={region.id} value={region.id}>
-                                                {getLocationName(region)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        onValueChange={handleRegionChange}>
+                                        <SelectTrigger className='h-12 w-full border-slate-200 bg-slate-50 font-semibold dark:border-slate-800 dark:bg-slate-950'>
+                                            <SelectValue
+                                                placeholder={
+                                                    regionsLoading
+                                                        ? 'Viloyatlar yuklanmoqda...'
+                                                        : regionsError
+                                                          ? 'Viloyatlar yuklanmadi'
+                                                          : 'Viloyatni tanlang'
+                                                }
+                                            />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            {(regions || []).map((region) => (
+                                                <SelectItem key={region.id} value={region.id}>
+                                                    {getLocationName(region)}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </label>
 
                                 <label className='block'>
                                     <span className='mb-2 block text-sm font-bold text-slate-700 dark:text-slate-200'>
                                         Tuman
                                     </span>
-                                    <select
+
+                                    <Select
                                         value={selectedDistrict}
                                         disabled={!selectedRegion || districtsLoading || Boolean(districtsError)}
-                                        onChange={(event) => {
-                                            setSelectedDistrict(event.target.value);
-                                            dispatch(updateField({ district: event.target.value }));
-                                        }}
-                                        className='h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition outline-none focus:border-[#ef7f1a] focus:ring-4 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:ring-orange-950/40'>
-                                        <option value=''>
-                                            {districtsLoading
-                                                ? 'Tumanlar yuklanmoqda...'
-                                                : districtsError
-                                                  ? 'Tumanlar yuklanmadi'
-                                                  : selectedRegion
-                                                    ? 'Tumanni tanlang'
-                                                    : 'Avval viloyatni tanlang'}
-                                        </option>
-                                        {filteredDistricts.map((district) => (
-                                            <option key={`${district.id}-${district.externalId}`} value={district.id}>
-                                                {getLocationName(district)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        onValueChange={(value) => {
+                                            setSelectedDistrict(value);
+                                            dispatch(updateField({ district: value }));
+                                        }}>
+                                        <SelectTrigger className='h-12 w-full border-slate-200 bg-slate-50 font-semibold dark:border-slate-800 dark:bg-slate-950'>
+                                            <SelectValue
+                                                placeholder={
+                                                    districtsLoading
+                                                        ? 'Tumanlar yuklanmoqda...'
+                                                        : districtsError
+                                                          ? 'Tumanlar yuklanmadi'
+                                                          : selectedRegion
+                                                            ? 'Tumanni tanlang'
+                                                            : 'Avval viloyatni tanlang'
+                                                }
+                                            />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            {filteredDistricts.map((district) => (
+                                                <SelectItem
+                                                    key={`${district.id}-${district.externalId}`}
+                                                    value={district.id}>
+                                                    {getLocationName(district)}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </label>
 
                                 <label className='block md:col-span-2'>
@@ -495,9 +561,10 @@ const CheckoutPage = () => {
                     <AsideCheckout
                         disabled={!cartItems.length}
                         isSubmitting={createOrder.isPending}
-                        onConfirm={handleSubmitOrder}
+                        onConfirm={handleSubmit(handleSubmitOrder)}
                         promoDiscount={promoDiscount}
                         promoCode={promoCode}
+                        selectedDelivery={selectedDelivery}
                     />
                 </div>
             </div>

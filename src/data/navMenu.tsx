@@ -21,7 +21,6 @@ import {
     Newspaper,
     PenLine,
     Percent,
-    Quote,
     Settings,
     Shield,
     ShoppingCart,
@@ -64,13 +63,15 @@ export const bottomNav: NavItem[] = [
         href: '/catalog?isTop=true',
         icon: <Award size={14} />,
         description: 'Eng yaxshi kitoblar'
-    },
-    {
-        label: "Sovg'a",
-        href: '/promo',
-        icon: <Gift size={14} />,
-        description: "Sovg'a kartalari"
     }
+];
+
+export const mainNav = [
+    { label: 'Kitoblar', href: '/catalog' },
+    { label: 'Mualliflar', href: '/authors' },
+    { label: 'Nashriyotlar', href: '/publishers' },
+    { label: 'Yangiliklar', href: '/news' },
+    { label: 'Biz haqimizda', href: '/about' }
 ];
 
 export const serviceMenuItems = [
@@ -174,11 +175,6 @@ export const menuItems = [
         label: 'Kommentariya',
         href: '/admin/comments',
         icon: MessageSquareText
-    },
-    {
-        label: 'Iqtibos',
-        href: '/admin/quotes',
-        icon: Quote
     },
     {
         label: 'Partners',

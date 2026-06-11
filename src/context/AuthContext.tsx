@@ -6,7 +6,14 @@ import { AuthServiceAPI, UserService } from '@/services/api';
 import { type CartItem, setCart } from '@/store/features/cartSlice';
 import { type WishlistBook, setWishlist } from '@/store/features/wishlistSlice';
 import { useAppDispatch } from '@/store/hooks';
-import type { AuthAction, AuthContextType, AuthState } from '@/types/auth.types';
+import type {
+    AuthAction,
+    AuthContextType,
+    AuthState,
+    PhoneOtpRequest,
+    PhoneOtpVerifyRequest,
+    User
+} from '@/types/auth.types';
 import { clearGuestCart, getCartFromLocalStotage } from '@/utils/cartStorage';
 import { clearGuestWishlist, getWishlistFromLocalStorage } from '@/utils/wishlistStorage';
 
@@ -43,6 +50,11 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 };
 
 const getResponseData = (response: any) => response?.data?.data ?? response?.data ?? response;
+
+const getUserData = (response: any): User | null => {
+    const data = getResponseData(response);
+    return data?.user ?? data ?? null;
+};
 
 const getArrayData = (response: any) => {
     const data = getResponseData(response);
@@ -199,10 +211,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const register = async (userData: any) => {
+    const refreshUser = async () => {
+        try {
+            const response = await UserService.getProfile();
+            const user = getUserData(response);
+            dispatch({ type: 'AUTH_SUCCESS', payload: user });
+            return user;
+        } catch (error) {
+            console.error('Profilni yangilashda xatolik:', error);
+            return null;
+        }
+    };
+
+    const sendPhoneOtp = async ({ phone, name }: PhoneOtpRequest) => {
         dispatch({ type: 'AUTH_START' });
         try {
-            const res = await AuthServiceAPI.register(userData);
+            await AuthServiceAPI.sendPhoneOtp({ phone, name });
+            dispatch({ type: 'AUTH_SUCCESS', payload: state.user });
+        } catch (error: any) {
+            dispatch({ type: 'AUTH_FAILURE' });
+            throw error;
+        }
+    };
+
+    const verifyPhoneOtp = async ({ phone, otp }: PhoneOtpVerifyRequest) => {
+        dispatch({ type: 'AUTH_START' });
+        try {
+            const wishlist = getWishlistFromLocalStorage();
+            const res = await AuthServiceAPI.verifyPhoneOtp({
+                phone,
+                otp,
+                wishlist: wishlist.map((book) => book._id).filter(Boolean)
+            });
+
             if (res.success && res.data) {
                 await syncGuestData();
                 dispatch({ type: 'AUTH_SUCCESS', payload: res.data.user });
@@ -223,5 +264,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    return <AuthContext.Provider value={{ ...state, login, register, logout }}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={{ ...state, login, sendPhoneOtp, verifyPhoneOtp, refreshUser, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

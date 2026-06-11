@@ -21,25 +21,13 @@ const Page = () => {
             <Hero />
 
             {/* Yangi kelgan kitoblar */}
-            <BookSection
-                title={t('booksSection.newArrivals')}
-                subtitle={t('booksSection.newArrivalsSubtitle')}
-                type='new'
-            />
+            <BookSection title={t('booksSection.newArrivals')} type='new' />
 
             {/* Hafta xitlari */}
-            <BookSection
-                title={t('booksSection.bestWeek')}
-                subtitle={t('booksSection.bestWeekSubtitle')}
-                type='popular'
-            />
+            <BookSection title={t('booksSection.bestWeek')} type='popular' />
 
             {/* Sizga yoqishi mumkin */}
-            <BookSection
-                title={t('booksSection.bestMonth')}
-                subtitle={t('booksSection.bestMonthSubtitle')}
-                type='default'
-            />
+            <BookSection title={t('booksSection.bestMonth')} type='default' />
 
             <Authors />
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,7 +13,7 @@ import { api } from '@/services/api';
 import type { NewsItems, NewsResponse } from '@/types/news';
 import { getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import dayjs from 'dayjs';
 import { ArrowUpRight, Calendar, Eye, Megaphone, Newspaper, Search, X } from 'lucide-react';
@@ -54,16 +54,28 @@ const getPublicNews = async (page: number, search: string): Promise<NewsResponse
 const NewsPage = () => {
     const [page, setPage] = useState(1);
     const [searchInput, setSearchInput] = useState('');
+    const queryClient = useQueryClient();
     const debouncedSearch = useDebounce(searchInput, 400).trim();
 
     const { data, isLoading } = useQuery({
         queryKey: ['public-news', page, debouncedSearch],
         queryFn: () => getPublicNews(page, debouncedSearch),
-        placeholderData: (previousData) => previousData
+        placeholderData: (previousData) => previousData,
+        staleTime: 5 * 60 * 1000
     });
 
     const news = data?.news ?? [];
     const pagination = data?.pagination ?? { page: 1, limit: PAGE_LIMIT, total: 0, pages: 1 };
+
+    useEffect(() => {
+        if (!data || page >= pagination.pages) return;
+
+        queryClient.prefetchQuery({
+            queryKey: ['public-news', page + 1, debouncedSearch],
+            queryFn: () => getPublicNews(page + 1, debouncedSearch),
+            staleTime: 5 * 60 * 1000
+        });
+    }, [data, debouncedSearch, page, pagination.pages, queryClient]);
 
     const handleSearch = (value: string) => {
         setSearchInput(value);
@@ -74,7 +86,7 @@ const NewsPage = () => {
 
     if (isLoading) {
         return (
-            <div className='flex min-h-screen items-center justify-center bg-background dark:bg-slate-900'>
+            <div className='bg-background flex min-h-screen items-center justify-center dark:bg-slate-900'>
                 <div className='text-center'>
                     <div className='relative'>
                         <div className='mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-[#00a0e3]/20 border-t-[#00a0e3]' />
@@ -90,7 +102,7 @@ const NewsPage = () => {
     }
 
     return (
-        <main className='min-h-screen bg-background py-12 dark:bg-slate-900'>
+        <main className='bg-background min-h-screen py-12 dark:bg-slate-900'>
             <div className='container mx-auto max-w-7xl px-4'>
                 <section className='mb-10 text-center'>
                     <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#00a0e3]/10 to-[#ef7f1a]/10 px-4 py-2 dark:from-blue-600/20 dark:to-orange-600/20'>

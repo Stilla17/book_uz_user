@@ -2,6 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
+import {
+    ProductShape,
+    TextLike,
+    getRequestParams,
+    getSectionConfig,
+    getText,
+    mapProductToBook
+} from '@/helpers/bookSection';
 import { bookService } from '@/services/book.service';
 import type { Product } from '@/types';
 import type { Book } from '@/types/book';
@@ -18,16 +26,6 @@ import 'swiper/css/pagination';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-type TextLike =
-    | string
-    | { uz?: unknown; ru?: unknown; en?: unknown; name?: unknown; title?: unknown }
-    | null
-    | undefined;
-type ProductShape = Product & {
-    title?: TextLike;
-    author?: string | { name?: unknown };
-};
-
 export const BookSection = ({
     title,
     subtitle,
@@ -41,60 +39,6 @@ export const BookSection = ({
     const nextRef = useRef<HTMLButtonElement>(null);
 
     const { t } = useTranslation();
-
-    const getText = (value: TextLike, fallback: string): string => {
-        if (!value) return fallback;
-        if (typeof value === 'string') return value || fallback;
-        if (typeof value.uz === 'string') return value.uz;
-        if (typeof value.ru === 'string') return value.ru;
-        if (typeof value.en === 'string') return value.en;
-        if (typeof value.name === 'string') return value.name;
-        if (typeof value.title === 'string') return value.title;
-
-        return fallback;
-    };
-
-    const getAuthorName = (author: ProductShape['author']) => {
-        if (!author) return "Noma'lum muallif";
-        if (typeof author === 'string') return author;
-
-        return getText({ name: author.name }, "Noma'lum muallif");
-    };
-
-    const mapProductToBook = (product: Product): Book => {
-        const productShape = product as ProductShape;
-        const price = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
-        const oldPrice = product.discountPrice && product.discountPrice > 0 ? product.price : undefined;
-        const discount = oldPrice && oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : undefined;
-
-        return {
-            _id: product._id,
-            slug: product.slug,
-            title: getText(productShape.title, "Noma'lum kitob"),
-            author: getAuthorName(productShape.author),
-            price,
-            oldPrice,
-            rating: product.ratingAvg || 0,
-            ratingAvg: product.ratingAvg || 0,
-            ratingCount: product.ratingCount || 0,
-            reviewsCount: product.ratingCount || 0,
-            views: product.views,
-            viewsCount: product.viewsCount,
-            stock: product.stock,
-            image: product.images?.[0],
-            discount,
-            isHit: product.isTop,
-            isNew: type === 'new',
-            format: product.format
-        };
-    };
-
-    const getRequestParams = () => ({
-        limit: 8,
-        ...(type === 'popular' && { isTop: true }),
-        ...(type === 'discount' && { isDiscount: true }),
-        ...(type === 'audio' && { format: 'audio' })
-    });
 
     useEffect(() => {
         let ignore = false;
@@ -110,9 +54,9 @@ export const BookSection = ({
             setLoading(true);
 
             try {
-                const response = await bookService.getAllProducts(getRequestParams());
+                const response = await bookService.getAllProducts(getRequestParams(type));
                 if (!ignore) {
-                    setFetchedBooks(response.products.map(mapProductToBook));
+                    setFetchedBooks(response.products.map((product) => mapProductToBook(product, type)));
                 }
             } catch (error) {
                 console.error('BookSection kitoblari yuklanmadi:', error);
@@ -135,53 +79,10 @@ export const BookSection = ({
 
     const displayBooks: Book[] = books && books.length > 0 ? books : fetchedBooks;
 
-    // Section icon and color based on type
-    const getSectionConfig = () => {
-        switch (type) {
-            case 'new':
-                return {
-                    icon: <Sparkles size={24} className='text-[#ef7f1a] dark:text-orange-400' />,
-                    color: 'text-[#ef7f1a] dark:text-orange-400',
-                    bgColor: 'bg-[#ef7f1a]/10 dark:bg-orange-500/20',
-                    borderColor: 'border-[#ef7f1a]/20 dark:border-orange-500/30'
-                };
-            case 'popular':
-                return {
-                    icon: <TrendingUp size={24} className='text-[#ef7f1a] dark:text-orange-400' />,
-                    color: 'text-[#ef7f1a] dark:text-orange-400',
-                    bgColor: 'bg-[#ef7f1a]/10 dark:bg-orange-500/20',
-                    borderColor: 'border-[#ef7f1a]/20 dark:border-orange-500/30'
-                };
-            case 'discount':
-                return {
-                    icon: <Flame size={24} className='text-[#ef7f1a] dark:text-orange-400' />,
-                    color: 'text-[#ef7f1a] dark:text-orange-400',
-                    bgColor: 'bg-[#ef7f1a]/10 dark:bg-orange-500/20',
-                    borderColor: 'border-[#ef7f1a]/20 dark:border-orange-500/30'
-                };
-            case 'author':
-                return {
-                    icon: <Award size={24} className='text-[#ef7f1a] dark:text-orange-400' />,
-                    color: 'text-[#ef7f1a] dark:text-orange-400',
-                    bgColor: 'bg-[#ef7f1a]/10 dark:bg-orange-500/20',
-                    borderColor: 'border-[#ef7f1a]/20 dark:border-orange-500/30'
-                };
-            default:
-                return {
-                    icon: <BookOpen size={24} className='text-[#ef7f1a] dark:text-orange-400' />,
-                    color: 'text-[#ef7f1a] dark:text-orange-400',
-                    bgColor: 'bg-[#ef7f1a]/10 dark:bg-orange-500/20',
-                    borderColor: 'border-[#ef7f1a]/20 dark:border-orange-500/30'
-                };
-        }
-    };
-
-    const config = getSectionConfig();
+    const config = getSectionConfig(type);
 
     return (
-        <section
-            className='bg-background relative overflow-hidden py-12 dark:bg-slate-900'>
-
+        <section className='bg-background relative overflow-hidden py-6 dark:bg-slate-900'>
             {/* <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" /> */}
             <div className='brand-overlay' />
 
@@ -193,27 +94,21 @@ export const BookSection = ({
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}>
-                    <div className='flex items-start gap-3'>
-                        <div className={`rounded-2xl p-3 ${config.bgColor} ${config.borderColor} border`}>
-                            {config.icon}
-                        </div>
-                        <div>
-                            <div className='mb-1 flex items-center gap-2'>
-                                <h2
-                                    className={`text-2xl font-black md:text-3xl ${config.color} tracking-tight uppercase`}>
+                    <div className='flex items-center gap-3'>
+                        <span className={`h-9 w-1 shrink-0 rounded-full ${config.bgColor}`} />
+
+                        <div className='min-w-0'>
+                            <div className='flex flex-wrap items-center gap-2'>
+                                <h2 className={`text-2xl font-semibold tracking-tight md:text-3xl ${config.color}`}>
                                     {title}
                                 </h2>
+
                                 {type === 'discount' && (
-                                    <span className='animate-pulse rounded-full bg-[#ef7f1a] px-2 py-1 text-xs font-bold text-white dark:bg-orange-600'>
+                                    <span className='rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-orange-600 dark:border-orange-900/60 dark:bg-orange-950/40 dark:text-orange-400'>
                                         Chegirma
                                     </span>
                                 )}
                             </div>
-                            {subtitle && (
-                                <p className='flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400'>
-                                    {subtitle}
-                                </p>
-                            )}
                         </div>
                     </div>
 

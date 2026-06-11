@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import { BookCard } from '@/components/cards/BookCard';
 import { Button } from '@/components/ui/button';
-import { useWishlistBooks } from '@/hooks/useWishlistBooks';
+import { useWishlistBooks } from '@/hooks/bookHooks/useWishlistBooks';
 import { setLoading } from '@/store/features/globalSlice';
 import { useAppDispatch } from '@/store/hooks';
 
