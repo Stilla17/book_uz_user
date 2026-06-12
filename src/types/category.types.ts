@@ -5,6 +5,8 @@ export interface SubCategory {
     title: MultiLangField;
     slug: string;
     bookCount?: number;
+    books?: string[];
+    name?: string;
 }
 
 export interface Category {

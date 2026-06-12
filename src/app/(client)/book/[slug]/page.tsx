@@ -4,11 +4,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useParams } from 'next/navigation';
 
-import { BookCard } from '@/components/cards/BookCard';
-import { BookCardSkeleton } from '@/components/cards/BookCardSkeleton';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import DottedLine from '@/components/shared/DottedLine';
 import { Loading } from '@/components/shared/Loading';
+import Rekomendation from '@/components/shared/Rekomendation';
 import TabPanel from '@/components/shared/TabPanel';
 import { Button } from '@/components/ui/button';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
@@ -22,24 +21,12 @@ import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Eye, Heart, Minus, PackageCheck, Plus, ShoppingCart, Star, Store } from 'lucide-react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import { Autoplay, Navigation } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
 
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
-};
-
-const getAuthorId = (book?: DetailBook | null) => {
-    if (!book) return '';
-    if (book.author && typeof book.author === 'object') return book.author._id ?? '';
-
-    const authorName = book.authorName as { _id?: string } | string | undefined;
-    if (authorName && typeof authorName === 'object') return authorName._id ?? '';
-    if (typeof book.author === 'string' && /^[a-f\d]{24}$/i.test(book.author)) return book.author;
-
-    return '';
+    subCategoryId?: string | { _id?: string };
+    subCategory?: string | { _id?: string };
+    subgenre?: string | { _id?: string };
 };
 
 // ==================== MAIN COMPONENT ====================
@@ -54,17 +41,6 @@ export default function BookDetailPage() {
         enabled: !!slug,
         staleTime: 5 * 60 * 1000
     });
-    const authorId = getAuthorId(book);
-    const { data: authorBooksData, isLoading: authorBooksLoading } = useQuery({
-        queryKey: ['author-recommendations', authorId, book?._id],
-        queryFn: () => bookService.getProductsByAuthor(authorId, { page: 1, limit: 12 }),
-        enabled: Boolean(authorId && book?._id),
-        staleTime: 5 * 60 * 1000
-    });
-    const authorBooks = useMemo(
-        () => (authorBooksData?.products ?? []).filter((item) => item._id !== book?._id),
-        [authorBooksData?.products, book?._id]
-    );
 
     const viewedBookRef = useRef<string | null>(null);
     const { viewsCount, ratingAvg, ratingCount, userRating, incrementViews, rateBook } = useBookStats({
@@ -406,49 +382,7 @@ export default function BookDetailPage() {
                     reviewsCount={book?.reviewsCount}
                 />
 
-                {(authorBooksLoading || authorBooks.length > 0) && (
-                    <section className='mt-10'>
-                        <h2 className='text-2xl font-black text-slate-900 dark:text-white'>
-                            Muallifning boshqa kitoblari
-                        </h2>
-
-                        {authorBooksLoading ? (
-                            <div className='mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                                {Array.from({ length: 4 }).map((_, index) => (
-                                    <BookCardSkeleton key={index} />
-                                ))}
-                            </div>
-                        ) : authorBooks.length > 4 ? (
-                            <Swiper
-                                modules={[Navigation, Autoplay]}
-                                navigation
-                                autoplay={{
-                                    delay: 3000,
-                                    disableOnInteraction: false
-                                }}
-                                spaceBetween={16}
-                                slidesPerView={1.1}
-                                breakpoints={{
-                                    640: { slidesPerView: 2 },
-                                    1024: { slidesPerView: 3 },
-                                    1280: { slidesPerView: 4 }
-                                }}
-                                className='mt-5'>
-                                {authorBooks.map((authorBook) => (
-                                    <SwiperSlide key={authorBook._id} className='h-auto'>
-                                        <BookCard book={authorBook} slug={authorBook.slug} />
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        ) : (
-                            <div className='mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                                {authorBooks.map((authorBook) => (
-                                    <BookCard key={authorBook._id} book={authorBook} slug={authorBook.slug} />
-                                ))}
-                            </div>
-                        )}
-                    </section>
-                )}
+                <Rekomendation book={book} />
             </div>
         </div>
     );

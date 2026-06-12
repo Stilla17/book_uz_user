@@ -21,11 +21,6 @@ export const DownloadAppSection = () => {
 
                     <div className='grid items-center gap-10 px-6 py-10 md:px-10 lg:grid-cols-[1fr_360px] lg:py-12'>
                         <div className='relative z-10'>
-                            <div className='mb-5 inline-flex items-center gap-2 rounded-full border border-[#2d5faa] bg-[#13264a] px-3 py-1.5 text-xs text-blue-300'>
-                                <BookOpen size={14} />
-                                O'zbekiston №1 kutubxonasi
-                            </div>
-
                             <h2 className='max-w-xl text-3xl leading-tight font-bold md:text-4xl'>
                                 Kutubxonangiz doim <span className='text-[#4f7cff]'>yoningizda</span>
                             </h2>

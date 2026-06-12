@@ -6,12 +6,34 @@ import Link from 'next/link';
 
 import { useBranchUserQuery } from '@/components/admin/hooks/queries/branch';
 import { BranchMap } from '@/components/map/Map';
+import { ClientService } from '@/services/api';
+import { bookService } from '@/services/book.service';
+import { useQuery } from '@tanstack/react-query';
 
 import { Award, Book, BookHeadphones, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
 
 export const AboutSection = () => {
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
     const { data: apiBranches = [] } = useBranchUserQuery();
+    const { data: book } = useQuery({
+        queryKey: ['books-count'],
+        queryFn: () =>
+            bookService.getAllProducts({
+                page: 1,
+                limit: 1
+            })
+    });
+    const { data: publishersData } = useQuery({
+        queryKey: ['publishers-count'],
+        queryFn: () =>
+            ClientService.getPublishers({
+                page: 1,
+                limit: 1
+            })
+    });
+
+    const publishersCount = publishersData?.pagination?.total ?? 0;
+    const booksCount = book?.pagination?.total ?? 0;
 
     const branches = apiBranches
         .map((branch) => ({
@@ -21,8 +43,8 @@ export const AboutSection = () => {
         .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1]));
 
     const stats = [
-        { icon: <Book size={24} />, label: 'Kitoblar', value: '50,000+' },
-        { icon: <BookOpen size={24} />, label: 'Nashryotlar soni', value: '10+' },
+        { icon: <Book size={24} />, label: 'Kitoblar', value: `${booksCount.toLocaleString()}+` },
+        { icon: <BookOpen size={24} />, label: 'Nashryotlar soni', value: `${publishersCount}+` },
         { icon: <Building2 size={24} />, label: 'Filyallar soni', value: `${branches.length}+` },
         { icon: <Truck size={24} />, label: 'Yetkazib berish', value: '24/7' },
         { icon: <BookHeadphones size={24} />, label: 'Audio kitoblar', value: '10K+' }

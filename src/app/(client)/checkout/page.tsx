@@ -226,7 +226,6 @@ const CheckoutPage = () => {
             <div className='container mx-auto max-w-7xl px-4'>
                 <div className='mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-slate-800'>
                     <div>
-                        <p className='text-sm font-bold text-[#ef7f1a]'>Checkout</p>
                         <h1 className='mt-2 text-2xl font-black text-slate-950 sm:text-3xl dark:text-white'>
                             Buyurtmani rasmiylashtirish
                         </h1>

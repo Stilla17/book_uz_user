@@ -30,7 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     return (
         <html lang='uz' suppressHydrationWarning>
             <body
-                className={`${lato.className} ${lato.variable} min-h-screen bg-background font-sans text-gray-900 antialiased transition-colors duration-300 dark:bg-slate-900 dark:text-white`}>
+                className={`${lato.className} ${lato.variable} bg-background min-h-screen font-sans text-gray-900 antialiased transition-colors duration-300 dark:bg-slate-900 dark:text-white`}>
                 <ProviderRedux>
                     <NextThemeProvider attribute='class' defaultTheme='light' enableSystem={false}>
                         <QueryProvider>
