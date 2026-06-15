@@ -103,7 +103,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
     return (
         <div
-            className='group relative mt-24 flex min-h-100 cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-4 pt-44 pb-4 dark:border-slate-700 dark:bg-slate-800'
+            className='group relative mt-24 flex min-h-90 cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-4 pt-44 pb-4 dark:border-slate-700 dark:bg-slate-800'
             onClick={openBookDetails}>
             <div className='absolute -top-20 left-1/2 h-64 w-[70%] -translate-x-1/2'>
                 <button
@@ -142,18 +142,18 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                 </Link>
             </div>
 
-            <div className='flex grow flex-col space-y-3'>
+            <div className='flex grow flex-col'>
                 <Link href={bookHref} onMouseEnter={prefetchBook} onFocus={prefetchBook} className='block'>
-                    <h3 className='mt-8 line-clamp-2 min-h-[48px] text-[18px] leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
+                    <h3 className='mt-8 mb-2 line-clamp-2 text-[18px] leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
                         {getBookTitle(book)}
                     </h3>
 
-                    <p className='line-clamp-1 flex min-h-5 items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
+                    <p className='mb-2 line-clamp-1 flex items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
                         {getAuthorName(book)}
                     </p>
                 </Link>
 
-                <div className='flex min-h-8 items-center gap-2'>
+                <div className='flex items-center gap-2'>
                     <div className='inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[13px] font-bold text-slate-700 dark:bg-amber-500/10 dark:text-slate-100'>
                         <span> {Number(ratingAvg || 0).toFixed(1)}</span>
                         <Star size={13} className='text-[#f59e0b]' fill='currentColor' />
@@ -164,7 +164,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                     </span>
                 </div>
 
-                <div className='mt-auto min-h-[66px] border-t border-dashed border-gray-200 pt-3 dark:border-slate-700'>
+                <div className='mt-2 border-t border-dashed border-gray-200 pt-2 dark:border-slate-700'>
                     <div className='flex items-end justify-between'>
                         <div>
                             <div className='flex items-baseline gap-1'>

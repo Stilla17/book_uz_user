@@ -28,7 +28,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 export const BookSection = ({
     title,
-    subtitle,
     books,
     type = 'default',
     viewAllLink = '/catalog'
