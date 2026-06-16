@@ -2,16 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import {
-    ProductShape,
-    TextLike,
-    getRequestParams,
-    getSectionConfig,
-    getText,
-    mapProductToBook
-} from '@/helpers/bookSection';
+import { getRequestParams, getSectionConfig, mapProductToBook } from '@/helpers/bookSection';
 import { bookService } from '@/services/book.service';
-import type { Product } from '@/types';
 import type { Book } from '@/types/book';
 import type { BookSectionProps } from '@/types/section.types';
 

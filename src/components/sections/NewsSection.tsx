@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { getText } from '@/helpers/bookCard';
 import { NewsItem, formatDate, normalizeNewsResponse } from '@/helpers/newsSection';
+import { getText } from '@/utils/book-formatters';
 import { api } from '@/services/api';
 import { getImageUrl } from '@/utils/image';
 

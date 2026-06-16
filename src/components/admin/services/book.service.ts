@@ -7,7 +7,9 @@ export const BookService = {
     },
 
     addAdminBook: async (book: FormData) => {
-        const response = await api.post('/admin/products', book);
+        const response = await api.post('/admin/products', book, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         return response.data;
     },
 

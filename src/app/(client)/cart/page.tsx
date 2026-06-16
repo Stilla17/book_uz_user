@@ -9,15 +9,12 @@ import QuantityControl from '@/components/shared/QuantityControl';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { setLoading } from '@/store/features/globalSlice';
 import { useAppDispatch } from '@/store/hooks';
+import { getText } from '@/utils/book-formatters';
+import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 
 import { motion } from 'framer-motion';
 import { ArrowLeft, ShoppingBag, Trash2 } from 'lucide-react';
-
-const getTitle = (title: string | { uz?: string; ru?: string; en?: string }) => {
-    if (typeof title === 'string') return title;
-    return title.uz || title.ru || title.en || "Noma'lum kitob";
-};
 
 export default function CartPage() {
     const dispatch = useAppDispatch();
@@ -105,7 +102,7 @@ export default function CartPage() {
                                         <div className='mx-auto flex h-44 w-full max-w-36 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-4 md:mx-0 dark:bg-slate-950'>
                                             <img
                                                 src={getImageUrl(item.book.images)}
-                                                alt={getTitle(item.book.title)}
+                                                alt={getText(item.book.title, "Noma'lum kitob")}
                                                 className='h-full w-full object-contain'
                                             />
                                         </div>
@@ -114,7 +111,7 @@ export default function CartPage() {
                                             <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
                                                 <div className='min-w-0'>
                                                     <h2 className='text-xl leading-7 font-black text-slate-900 dark:text-white'>
-                                                        {getTitle(item.book.title)}
+                                                        {getText(item.book.title, "Noma'lum kitob")}
                                                     </h2>
                                                     <p className='mt-2 text-sm font-semibold text-slate-500 dark:text-slate-400'>
                                                         Omborda: {item.book.stock || 0} ta
@@ -123,7 +120,7 @@ export default function CartPage() {
 
                                                 <div className='rounded-xl bg-slate-50 px-4 py-3 text-left lg:text-right dark:bg-slate-950'>
                                                     <p className='text-xl font-black text-[#ef7f1a]'>
-                                                        {item.book.price.toLocaleString()} so'm
+                                                        {formatPrice(item.book.price)}
                                                     </p>
                                                 </div>
                                             </div>

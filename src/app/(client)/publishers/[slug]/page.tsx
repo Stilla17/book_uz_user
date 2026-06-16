@@ -8,8 +8,8 @@ import { BookCard } from '@/components/cards/BookCard';
 import { BookCardSkeleton } from '@/components/cards/BookCardSkeleton';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import { Pagination } from '@/components/shared/Pagination';
-import { mapProductToCardBook } from '@/helpers/publishers';
 import { ClientService } from '@/services/api';
+import { mapProductToCardBook } from '@/utils/book-formatters';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';

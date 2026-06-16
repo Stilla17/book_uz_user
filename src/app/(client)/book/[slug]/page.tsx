@@ -16,6 +16,7 @@ import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
+import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
@@ -316,7 +317,7 @@ export default function BookDetailPage() {
                             <div className='flex flex-col gap-4 lg:flex-row lg:items-center'>
                                 <div className='mt-2 flex items-end gap-3'>
                                     <span className='text-4xl font-black tracking-tight text-[#ef7f1a]'>
-                                        {book?.price.toLocaleString()} so'm
+                                        {formatPrice(book?.price)}
                                     </span>
                                 </div>
 

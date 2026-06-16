@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { getAuthorName, getBookTitle } from '@/helpers/bookCard';
 import { useAddCartMutation } from '@/hooks/bookCardHooks/useCardQuery';
 import { useBookStats } from '@/hooks/bookHooks/useBookStats';
 import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
@@ -14,7 +13,9 @@ import { bookService } from '@/services/book.service';
 import { addCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { type BookCardProps } from '@/types/book';
+import { getBookAuthorName, getBookTitle } from '@/utils/book-formatters';
 import { addGuestCart } from '@/utils/cartStorage';
+import { formatPriceNumber } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -103,35 +104,34 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
     return (
         <div
-            className='group relative mt-24 flex min-h-90 cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-4 pt-44 pb-4 dark:border-slate-700 dark:bg-slate-800'
+            className='group relative mt-24 flex min-h-100 cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-4 pt-44 pb-4 dark:border-slate-700 dark:bg-slate-800'
             onClick={openBookDetails}>
+            <button
+                type='button'
+                aria-label='Bookmark'
+                className={`absolute top-0 right-0 z-30 rounded-full border border-white/70 p-2.5 shadow-lg backdrop-blur-md ${
+                    isBookmarked
+                        ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
+                        : 'bg-white/90 text-gray-600 hover:bg-[#ef7f1a] hover:text-white dark:border-slate-700 dark:bg-slate-800/90 dark:text-gray-300 dark:hover:bg-orange-600'
+                }`}
+                disabled={favoriteLoading}
+                onClick={handleWishlist}>
+                <Heart size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
+            </button>
             <div className='absolute -top-20 left-1/2 h-64 w-[70%] -translate-x-1/2'>
-                <button
-                    type='button'
-                    aria-label='Bookmark'
-                    className={`absolute -top-2 -right-3 z-20 rounded-full border border-white/70 p-2.5 shadow-lg backdrop-blur-md ${
-                        isBookmarked
-                            ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
-                            : 'bg-white/90 text-gray-600 hover:bg-[#ef7f1a] hover:text-white dark:border-slate-700 dark:bg-slate-800/90 dark:text-gray-300 dark:hover:bg-orange-600'
-                    }`}
-                    disabled={favoriteLoading}
-                    onClick={handleWishlist}>
-                    <Heart size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
-                </button>
-
                 <Link
                     href={bookHref}
                     onMouseEnter={prefetchBook}
                     onFocus={prefetchBook}
                     aria-label={`${getBookTitle(book)} haqida batafsil`}
-                    className='relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-slate-100 shadow-[0_22px_35px_-18px_rgba(15,23,42,0.65)] dark:border-slate-700 dark:bg-slate-900'>
+                    className='relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] dark:border-slate-700 dark:bg-slate-900'>
                     {bookImageUrl ? (
                         <Image
                             src={bookImageUrl}
                             alt={getBookTitle(book)}
                             fill
-                            sizes='(max-width: 480px) 70vw, (max-width: 768px) 42vw, (max-width: 1024px) 30vw, 220px'
-                            className='object-cover'
+                            sizes='(max-width: 470px) 70vw, (max-width: 768px) 42vw, (max-width: 1024px) 30vw, 220px'
+                            className='object-contain'
                         />
                     ) : (
                         <div className='flex size-full flex-col items-center justify-center gap-3 bg-slate-50 text-slate-400 dark:bg-slate-900 dark:text-slate-500'>
@@ -144,12 +144,12 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
             <div className='flex grow flex-col'>
                 <Link href={bookHref} onMouseEnter={prefetchBook} onFocus={prefetchBook} className='block'>
-                    <h3 className='mt-8 mb-2 line-clamp-2 text-[18px] leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
+                    <h3 className='mt-4 mb-2 line-clamp-2 text-[18px] leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
                         {getBookTitle(book)}
                     </h3>
 
                     <p className='mb-2 line-clamp-1 flex items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
-                        {getAuthorName(book)}
+                        {getBookAuthorName(book)}
                     </p>
                 </Link>
 
@@ -169,7 +169,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                         <div>
                             <div className='flex items-baseline gap-1'>
                                 <span className='text-[18px] font-black text-[#ef7f1a] dark:text-blue-400'>
-                                    {(book.price || 0).toLocaleString()}
+                                    {formatPriceNumber(book.price)}
                                 </span>
                                 <span className='font-medium text-gray-500 dark:text-gray-400'>so'm</span>
                             </div>

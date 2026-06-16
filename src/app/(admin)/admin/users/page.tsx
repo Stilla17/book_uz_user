@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAdminUsersQuery } from '@/components/admin/hooks/queries/users';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import HeadSection from '@/components/admin/sections/HeadSection';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
@@ -118,12 +119,11 @@ const AdminUsersPage = () => {
 
     return (
         <div className='space-y-5'>
-            <section className='rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
-                <h1 className='text-2xl font-black text-[#2f2a25] dark:text-white'>Foydalanuvchilar</h1>
-                <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
-                    Book.uz foydalanuvchilari va amoCRM kontaktlarini bitta joyda ko'rish.
-                </p>
-            </section>
+            <HeadSection
+                title='Foydalanuvchilar'
+                text="Book.uz foydalanuvchilari va amoCRM kontaktlarini bitta joyda ko'rish."
+                href='users'
+            />
 
             <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
                 {stats.map(({ label, value, icon: Icon, color }) => (

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
+import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
@@ -17,8 +18,6 @@ import { ArrowLeft, BookOpen, Edit3, ImageIcon, PackageCheck, Store, Trash2 } fr
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
 };
-
-const formatPrice = (price?: number) => `${Number(price || 0).toLocaleString('uz-UZ')} so'm`;
 
 const InfoItem = ({ label, value }: { label: string; value?: string | number | null }) => (
     <div className='rounded-2xl bg-[#f7f0e6] p-4 ring-1 ring-[#eadfce] dark:bg-slate-900 dark:ring-slate-800'>

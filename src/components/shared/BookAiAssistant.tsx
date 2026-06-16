@@ -147,7 +147,7 @@ export const BookAiAssistant = () => {
                                         </span>
                                     )}
                                     <p
-                                        className={`max-w-[84%] rounded-2xl px-3 py-2.5 text-xs leading-4.5 shadow-sm ${
+                                        className={`max-w-[84%] whitespace-pre-line rounded-2xl px-3 py-2.5 text-xs leading-4.5 shadow-sm ${
                                             message.role === 'user'
                                                 ? 'rounded-br-md bg-[#ef7f1a] text-white'
                                                 : 'rounded-bl-md border border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200'

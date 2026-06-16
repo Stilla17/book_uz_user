@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,46 +12,15 @@ import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
+import { StockFilter, getBookBarcodes, getStockStatus } from '@/helpers/admin/newBook';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
+import { formatPrice } from '@/utils/currency';
 import { getLatestImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { BookOpen, Eye, ImageIcon, Pencil, Plus, Search, Star, Trash2 } from 'lucide-react';
-
-const formatPrice = (price?: number) => `${Number(price || 0).toLocaleString('uz-UZ')} so'm`;
-
-const getBookBarcode = (book: {
-    barcode?: string | number;
-    isbn?: string | number;
-    details?: { isbn?: string | number };
-}) => book.barcode || book.isbn || book.details?.isbn || '';
-
-const getStockStatus = (stock?: number) => {
-    if (!stock || stock <= 0) {
-        return {
-            label: 'Tugagan',
-            className: 'bg-red-50 text-red-600 ring-red-100 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20'
-        };
-    }
-
-    if (stock < 10) {
-        return {
-            label: 'Kam qolgan',
-            className:
-                'bg-amber-50 text-amber-700 ring-amber-100 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20'
-        };
-    }
-
-    return {
-        label: 'Mavjud',
-        className:
-            'bg-emerald-50 text-emerald-700 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20'
-    };
-};
-
-type StockFilter = 'all' | 'low' | 'available' | 'out';
+import { BookOpen, Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
 
 const AdminBookPage = () => {
     const router = useRouter();
@@ -61,9 +30,16 @@ const AdminBookPage = () => {
     const [stockFilter, setStockFilter] = useState<StockFilter>('all');
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
     const { data, isFetching, isLoading } = useBookListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
+
+    const totalBooksLimit = Number(data?.pagination?.total || FETCH_PAGINATION_LIMIT);
+
+    const { data: allBooksData } = useBookListQuery(1, totalBooksLimit, debouncedSearch);
     const { mutate } = useDeleteBook();
 
     const books = data?.products ?? [];
+    const allBooks = allBooksData?.products ?? [];
+    console.log(allBooks);
+
     const filteredBooks = books.filter((book) => {
         const stock = Number(book.stock || 0);
 
@@ -79,6 +55,22 @@ const AdminBookPage = () => {
         setPage(urlPage);
     }, [urlPage]);
 
+    const stockCounts = useMemo(
+        () =>
+            allBooks.reduce(
+                (counts, book) => {
+                    const stock = Number(book.stock || 0);
+                    stock <= 0 ? (counts.out += 1) : stock < 10 ? (counts.low += 1) : (counts.available += 1);
+                    return counts;
+                },
+                {
+                    low: 0,
+                    available: 0,
+                    out: 0
+                }
+            ),
+        [allBooks]
+    );
     const stats = [
         {
             label: 'Jami kitoblar',
@@ -101,12 +93,14 @@ const AdminBookPage = () => {
     const stockFilterButtons: Array<{
         value: StockFilter;
         label: string;
+        count: number;
         className: string;
         activeClassName: string;
     }> = [
         {
             value: 'low',
             label: 'Kam',
+            count: stockCounts.low,
             className:
                 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300',
             activeClassName: 'ring-2 ring-amber-400'
@@ -114,6 +108,7 @@ const AdminBookPage = () => {
         {
             value: 'available',
             label: 'Mavjud',
+            count: stockCounts.available,
             className:
                 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300',
             activeClassName: 'ring-2 ring-emerald-400'
@@ -121,6 +116,7 @@ const AdminBookPage = () => {
         {
             value: 'out',
             label: 'Tugagan',
+            count: stockCounts.out,
             className:
                 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300',
             activeClassName: 'ring-2 ring-red-400'
@@ -175,6 +171,9 @@ const AdminBookPage = () => {
                                         stockFilter === filter.value ? filter.activeClassName : ''
                                     }`}>
                                     {filter.label}
+                                    <span className='ml-2 rounded-full bg-white/70 px-2 py-0.5 text-[11px] font-black dark:bg-slate-950/50'>
+                                        {filter.count}
+                                    </span>
                                 </Button>
                             ))}
                         </div>
@@ -204,7 +203,7 @@ const AdminBookPage = () => {
                                 filteredBooks.map((book, index) => {
                                     const status = getStockStatus(book.stock);
                                     const imageUrl = getLatestImageUrl(book.images) || getLatestImageUrl(book.image);
-                                    const barcode = getBookBarcode(book);
+                                    const barcode = getBookBarcodes(book);
                                     return (
                                         <tr
                                             key={book._id}

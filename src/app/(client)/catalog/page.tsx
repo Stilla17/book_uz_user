@@ -9,10 +9,11 @@ import { BookCardSkeleton } from '@/components/cards/BookCardSkeleton';
 import AsideFilter from '@/components/filter/AsideFilter';
 import PanelResults, { type CatalogViewMode } from '@/components/filter/PanelResults';
 import { Pagination } from '@/components/shared/Pagination';
-import { buildQueryString, getLanguageParams, mapProductToCardBook, parseFilters, parsePage } from '@/helpers/catalog';
+import { buildQueryString, getLanguageParams, parseFilters, parsePage } from '@/helpers/catalog';
 import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
 import { bookService } from '@/services/book.service';
 import type { CatalogFilters } from '@/types';
+import { mapProductToCardBook } from '@/utils/book-formatters';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
@@ -61,6 +62,7 @@ export default function CatalogPage() {
         () => ({
             page,
             limit: PAGE_LIMIT,
+            sort: '-createdAt',
             ...(filters.keyword && { keyword: filters.keyword }),
             ...(selectedCategory?._id && { category: selectedCategory._id }),
             ...(!selectedCategory && filters.category && { category: filters.category }),

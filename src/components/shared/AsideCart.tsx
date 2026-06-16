@@ -8,6 +8,7 @@ import type { CartItem } from '@/store/features/cartSlice';
 import { clearPromo, setPromo } from '@/store/features/checkoutSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { Coupon } from '@/types';
+import { formatPrice } from '@/utils/currency';
 import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '../ui/button';
@@ -24,8 +25,6 @@ type AsideCartProps = {
 interface PromoForm {
     promoCode: string;
 }
-
-const formatPrice = (price: number) => `${price.toLocaleString()} so'm`;
 
 const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => {
     const { register, handleSubmit } = useForm<PromoForm>();
@@ -81,8 +80,8 @@ const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => 
                         <span className='font-semibold text-emerald-600'>
                             {matchedPromo && discountAmount > 0
                                 ? matchedPromo.type === 'PERCENT'
-                                    ? `${matchedPromo.value}% (-${discountAmount.toLocaleString('uz-UZ')} so'm)`
-                                    : `-${discountAmount.toLocaleString('uz-UZ')} so'm`
+                                    ? `${matchedPromo.value}% (-${formatPrice(discountAmount)})`
+                                    : `-${formatPrice(discountAmount)}`
                                 : "0 so'm"}
                         </span>
                     </div>

@@ -2,6 +2,8 @@ import React from 'react';
 
 import { getDeliveryCost } from '@/helpers/checkout';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
+import { getText } from '@/utils/book-formatters';
+import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 
 import { Button } from '../ui/button';
@@ -16,12 +18,6 @@ interface AsideCheckoutProps {
     selectedDelivery: string;
 }
 
-const getTitle = (title: string | { uz?: string; ru?: string; en?: string }) => {
-    if (typeof title === 'string') return title;
-
-    return title.uz || title.ru || title.en || "Noma'lum kitob";
-};
-
 const AsideCheckout = ({
     disabled = false,
     isSubmitting = false,
@@ -31,9 +27,6 @@ const AsideCheckout = ({
     selectedDelivery
 }: AsideCheckoutProps) => {
     const { cartItems, totalPrice, totalQuantity } = useBookCart();
-    const formattedItems = (item: number) => {
-        if (typeof item === 'number') return item.toLocaleString('ru-RU');
-    };
     const deliveryCost = getDeliveryCost(selectedDelivery);
     const paymentTotal = Math.max(0, totalPrice + deliveryCost - promoDiscount);
 
@@ -55,20 +48,20 @@ const AsideCheckout = ({
                             <div className='flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-2 shadow-sm dark:bg-slate-900'>
                                 <img
                                     src={getImageUrl(item.book.images)}
-                                    alt={getTitle(item.book.title)}
+                                    alt={getText(item.book.title, "Noma'lum kitob")}
                                     className='h-full w-full object-contain'
                                 />
                             </div>
                             <div className='min-w-0 flex-1'>
                                 <p className='line-clamp-2 leading-5 font-black text-slate-950 dark:text-white'>
-                                    {getTitle(item.book.title)}
+                                    {getText(item.book.title, "Noma'lum kitob")}
                                 </p>
                                 <div className='mt-2 flex items-center justify-between gap-3'>
                                     <span className='rounded-full bg-white px-2 py-1 text-xs font-bold text-slate-500 dark:bg-slate-900 dark:text-slate-400'>
                                         x{item.quantity}
                                     </span>
                                     <span className='text-sm font-black text-[#ef7f1a]'>
-                                        {formattedItems(item.book.price)} so'm
+                                        {formatPrice(item.book.price)}
                                     </span>
                                 </div>
                             </div>
@@ -85,20 +78,20 @@ const AsideCheckout = ({
                 <div className='flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400'>
                     <span>Narx</span>
                     <span className='font-bold text-slate-800 dark:text-slate-200'>
-                        {formattedItems(totalPrice)} so'm
+                        {formatPrice(totalPrice)}
                     </span>
                 </div>
                 <div className='flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400'>
                     <span>Yetkazib berish</span>
                     <span className='font-bold text-slate-800 dark:text-slate-200'>
-                        {deliveryCost === 0 ? 'Bepul' : `${formattedItems(deliveryCost)} so'm`}
+                        {deliveryCost === 0 ? 'Bepul' : formatPrice(deliveryCost)}
                     </span>
                 </div>
                 {promoDiscount > 0 && (
                     <div className='flex items-center justify-between text-sm text-slate-500 dark:text-slate-400'>
                         <span>Promokod {promoCode ? `(${promoCode})` : ''}</span>
                         <span className='font-semibold text-emerald-600'>
-                            -{promoDiscount.toLocaleString('uz-UZ')} so'm
+                            -{formatPrice(promoDiscount)}
                         </span>
                     </div>
                 )}
@@ -108,7 +101,7 @@ const AsideCheckout = ({
                 <div className='flex items-end justify-between gap-3'>
                     <span className='text-sm opacity-70'>Jami to'lov</span>
                     <span className='text-right text-2xl font-black text-[#ef7f1a]'>
-                        {formattedItems(paymentTotal)} so'm
+                        {formatPrice(paymentTotal)}
                     </span>
                 </div>
             </div>

@@ -10,18 +10,13 @@ import { useSearchSuggestionsQuery } from '@/hooks/queries/useSearchSuggestionsQ
 import { useDebounce } from '@/hooks/useDebounce';
 import { getCatalogCategoryHref } from '@/lib/catalog-links';
 import type { SearchDropdownProps, SearchProduct } from '@/types/search.types';
+import { getText } from '@/utils/book-formatters';
+import { formatPrice } from '@/utils/currency';
+import { getImageUrl } from '@/utils/image';
 
 import { BookOpen, ChevronRight, Grid3x3, Loader2, Search, User, X } from 'lucide-react';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://backend.book.uz/user-api/';
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887';
-
-const getImageUrl = (image?: string) => {
-    if (!image) return FALLBACK_IMAGE;
-    if (image.startsWith('http://') || image.startsWith('https://')) return image;
-
-    return `${API_BASE_URL.replace(/\/$/, '')}/${image.replace(/^\//, '')}`;
-};
 
 export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchDropdownProps) => {
     const router = useRouter();
@@ -68,9 +63,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
         if (onClose) onClose();
     };
 
-    const getProductTitle = (product: SearchProduct): string => {
-        return product.title.uz || product.title.ru || product.title.en || "Noma'lum";
-    };
+    const getProductTitle = (product: SearchProduct): string => getText(product.title, "Noma'lum");
 
     if (!showResults || debouncedQuery.length < 2) {
         return null;
@@ -100,7 +93,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                         className='group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50'>
                                         <div className='relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-lg'>
                                             <Image
-                                                src={getImageUrl(product.images?.[0])}
+                                                src={getImageUrl(product.images?.[0]) || FALLBACK_IMAGE}
                                                 alt={getProductTitle(product)}
                                                 fill
                                                 className='object-cover'
@@ -111,7 +104,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                                 {getProductTitle(product)}
                                             </p>
                                             <p className='text-xs text-gray-500'>
-                                                {product.price.toLocaleString()} so'm
+                                                {formatPrice(product.price)}
                                             </p>
                                         </div>
                                     </Link>

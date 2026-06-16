@@ -15,8 +15,8 @@ export const useCreateBook = () => {
         },
         onError: (error: unknown) => {
             if (error instanceof AxiosError) {
-                console.error('Book create error response:', error.response?.data);
-                console.error('Book create error status:', error.response?.status);
+                console.error('Book create error response:', error.response?.data ?? error.message);
+                console.error('Book create error status:', error.response?.status ?? 'NO_RESPONSE');
                 return;
             }
             console.error('Book create error:', error);

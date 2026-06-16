@@ -1,4 +1,5 @@
 import { api } from './api';
+import { api as adminApi } from '@/components/admin/services/api';
 import type { Category } from '@/types/category.types';
 
 type FilterEntity = {
@@ -14,6 +15,8 @@ export type BookFilterResponse = {
     publishers: FilterEntity[];
 };
 
+type CategoryListResponse = Category[] | { categories?: Category[]; items?: Category[]; docs?: Category[] };
+
 const getResponseData = <T>(response: { data?: { data?: T } }, fallback: T): T => {
     return response.data?.data ?? fallback;
 };
@@ -22,6 +25,12 @@ const getEntityList = (data: FilterEntity[] | { authors?: FilterEntity[]; publis
     if (Array.isArray(data)) return data;
 
     return data[key] ?? [];
+};
+
+const getCategoryList = (data: CategoryListResponse) => {
+    if (Array.isArray(data)) return data;
+
+    return data.categories ?? data.items ?? data.docs ?? [];
 };
 
 const getTotalPages = (data: unknown) => {
@@ -59,16 +68,28 @@ const getAllEntityPages = async (path: string, key: 'authors' | 'publishers', li
 };
 
 export const filterService = {
-    async getAllFilters(params: { limit?: number } = {}): Promise<BookFilterResponse> {
+    async getAllFilters(params: { limit?: number; adminCategories?: boolean } = {}): Promise<BookFilterResponse> {
         const limit = params.limit ?? 200;
+        const categoriesRequest =
+            params.adminCategories
+                ? adminApi
+                      .get('/admin/categories', {
+                          params: { page: 1, limit }
+                      })
+                      .catch((error) => {
+                          console.error('Admin categories failed, public fallback used:', error?.response?.status || error?.message);
+                          return api.get('/categories', { params: { all: true } });
+                      })
+                : api.get('/categories', { params: { all: true } });
+
         const [categoriesRes, authors, publishers] = await Promise.all([
-            api.get('/categories', { params: { all: true } }),
+            categoriesRequest,
             getAllEntityPages('/authors', 'authors', limit),
             getAllEntityPages('/publishers', 'publishers', limit)
         ]);
 
         return {
-            categories: getResponseData<Category[]>(categoriesRes, []),
+            categories: getCategoryList(getResponseData<CategoryListResponse>(categoriesRes, [])),
             authors,
             publishers
         };

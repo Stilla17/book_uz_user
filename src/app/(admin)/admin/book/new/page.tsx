@@ -13,74 +13,22 @@ import SearchableSelect, { type SearchableOption } from '@/components/admin/othe
 import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    getBookBarcode,
+    getBookCategoryId,
+    getBookSubCategoryId,
+    getCategorySubCategories,
+    getRelationId,
+    getSubCategoryValue
+} from '@/helpers/admin/newBook';
 import { filterService } from '@/services/filter.service';
-import { Book, BookFormValues } from '@/types/book';
+import { BookFormValues } from '@/types/book';
 import { getLatestImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
 import { BookOpen, FileText, ImagePlus, Loader, Sparkles, Upload, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-
-const getRelationId = (value: unknown) => {
-    if (typeof value === 'string') return value;
-    if (value && typeof value === 'object' && '_id' in value) {
-        return String((value as { _id?: string })._id || '');
-    }
-
-    return '';
-};
-
-const getBookSubCategoryId = (book: Book) => {
-    const maybeBook = book as Book & {
-        subCategoryId?: string | { _id?: string };
-        subCategory?: string | { _id?: string };
-        subgenre?: string | { _id?: string };
-    };
-
-    return (
-        getRelationId(maybeBook.subCategoryId) ||
-        getRelationId(maybeBook.subCategory) ||
-        getRelationId(maybeBook.subgenre)
-    );
-};
-
-const getBookCategoryId = (book: Book) => {
-    const maybeBook = book as Book & {
-        category?: Array<{ _id?: string }> | string | { _id?: string };
-    };
-
-    if (Array.isArray(maybeBook.category)) {
-        return maybeBook.category[0]?._id || '';
-    }
-
-    return getRelationId(maybeBook.category);
-};
-
-const getTextValue = (value: unknown) => {
-    if (value === null || value === undefined) return '';
-    if (typeof value === 'string') return value;
-    if (typeof value === 'number') return String(value);
-
-    return '';
-};
-
-const getBookBarcode = (book: Book) => {
-    const maybeBook = book as Book & {
-        code?: string | number;
-        sku?: string | number;
-        article?: string | number;
-    };
-
-    return (
-        getTextValue(maybeBook.barcode) ||
-        getTextValue(maybeBook.isbn) ||
-        getTextValue(maybeBook.details?.isbn) ||
-        getTextValue(maybeBook.code) ||
-        getTextValue(maybeBook.sku) ||
-        getTextValue(maybeBook.article)
-    );
-};
 
 const AdminNewBookPage = () => {
     const { handleSubmit, register, setValue, watch, reset } = useForm<BookFormValues>({
@@ -167,8 +115,8 @@ const AdminNewBookPage = () => {
     }, [bookData, setImagePreview, setValue]);
 
     const { data: filters, isLoading } = useQuery({
-        queryKey: ['admin-book-form-filters'],
-        queryFn: () => filterService.getAllFilters()
+        queryKey: ['admin-book-form-filters', 'admin-categories-with-subgenre-ids'],
+        queryFn: () => filterService.getAllFilters({ adminCategories: true })
     });
 
     useEffect(() => {
@@ -207,20 +155,24 @@ const AdminNewBookPage = () => {
     const contentLanguage = watch('contentLanguage');
     const cover = watch('cover');
     const format = watch('format');
-    const selectedCategory = categories.find((category) => category._id === categoryId);
+    const selectedCategory = categories.find((category) => category._id === categoryId || category.slug === categoryId);
     const subCategoryOptions = useMemo<SearchableOption[]>(
         () =>
-            [...(selectedCategory?.subCategories ?? []), ...(selectedCategory?.subgenres ?? [])]
-                .filter((subCategory) => Boolean(subCategory._id))
+            getCategorySubCategories(selectedCategory)
                 .map((subCategory) => ({
-                    value: subCategory._id!,
+                    value: getSubCategoryValue(subCategory),
                     label:
                         subCategory.title?.uz ||
                         subCategory.title?.ru ||
                         subCategory.title?.en ||
+                        subCategory.name ||
                         subCategory.slug ||
                         'Subkategoriya'
-                })),
+                }))
+                .filter(
+                    (option, index, options) =>
+                        Boolean(option.value) && options.findIndex((item) => item.value === option.value) === index
+                ),
         [selectedCategory]
     );
 
@@ -268,6 +220,8 @@ const AdminNewBookPage = () => {
         appendText(formData, 'slug', values.slug);
         formData.append('category', values.category);
         formData.append('subCategoryId', values.subCategoryId);
+        formData.append('subCategory', values.subCategoryId);
+        formData.append('subgenre', values.subCategoryId);
         formData.append('author', values.author);
         formData.append('publisher', values.publisher);
         formData.append('language', values.language);

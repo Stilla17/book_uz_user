@@ -9,6 +9,7 @@ import { NewsSection } from '@/components/sections/NewsSection';
 import Publishers from '@/components/sections/Publishers';
 import { ServicesSection } from '@/components/sections/ServicesSection';
 import { SupportSection } from '@/components/sections/SupportSection';
+import { TopSalesSection } from '@/components/sections/TopSalesSection';
 
 import { useTranslation } from 'react-i18next';
 
@@ -23,11 +24,11 @@ const Page = () => {
             {/* Yangi kelgan kitoblar */}
             <BookSection title={t('booksSection.newArrivals')} type='new' />
 
-            {/* Hafta xitlari */}
-            <BookSection title={t('booksSection.bestWeek')} type='popular' />
+            {/* Haftalik MoySklad top sotuvlar */}
+            <TopSalesSection period='week' title='Haftaning top 10 kitobi' />
 
-            {/* Sizga yoqishi mumkin */}
-            <BookSection title={t('booksSection.bestMonth')} type='default' />
+            {/* Oylik MoySklad top sotuvlar */}
+            <TopSalesSection period='month' title='Oyning top 10 kitobi' />
 
             <Authors />
 

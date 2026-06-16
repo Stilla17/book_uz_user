@@ -62,6 +62,7 @@ export interface Book {
     views?: number;
     viewsCount?: number;
     sales?: number;
+    soldQuantity?: number;
 }
 
 export type Product = Book;
