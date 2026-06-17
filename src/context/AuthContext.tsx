@@ -2,7 +2,7 @@
 
 import React, { type ReactNode, createContext, useEffect, useReducer } from 'react';
 
-import { AuthServiceAPI, UserService } from '@/services/api';
+import { AuthServiceAPI, UserService, hasAuthSession, setAuthSession } from '@/services/api';
 import { type CartItem, setCart } from '@/store/features/cartSlice';
 import { type WishlistBook, setWishlist } from '@/store/features/wishlistSlice';
 import { useAppDispatch } from '@/store/hooks';
@@ -182,6 +182,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const initAuth = async () => {
             dispatch({ type: 'AUTH_START' });
+
+            if (!hasAuthSession()) {
+                dispatch({ type: 'AUTH_FAILURE' });
+                return;
+            }
+
             try {
                 const res = await AuthServiceAPI.refresh();
                 if (res && res.success && res.data) {
@@ -191,6 +197,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     dispatch({ type: 'AUTH_FAILURE' });
                 }
             } catch {
+                setAuthSession(false);
                 dispatch({ type: 'AUTH_FAILURE' });
             }
         };

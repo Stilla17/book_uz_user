@@ -59,7 +59,6 @@ export const Hero = () => {
         <section className='group relative w-full overflow-hidden'>
             <Swiper
                 modules={[Autoplay, Pagination, Navigation, EffectFade]}
-                effect='fade'
                 spaceBetween={0}
                 slidesPerView={1}
                 autoplay={{

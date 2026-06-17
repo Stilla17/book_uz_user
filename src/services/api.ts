@@ -2,7 +2,15 @@ import { CreateCommentPayload, OrderPayload, Product, PublisherItems } from '@/t
 
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const AUTH_SESSION_KEY = 'bookuz:auth-session';
+
+export const hasAuthSession = () => typeof window !== 'undefined' && localStorage.getItem(AUTH_SESSION_KEY) === 'true';
+
+export const setAuthSession = (value: boolean) => {
+    if (typeof window === 'undefined') return;
+    value ? localStorage.setItem(AUTH_SESSION_KEY, 'true') : localStorage.removeItem(AUTH_SESSION_KEY);
+};
 
 export const api = axios.create({
     baseURL: API_BASE_URL,
@@ -132,6 +140,7 @@ export const AuthServiceAPI = {
     login: async (credentials: any) => {
         const response = await api.post('/auth/login', credentials);
         accessToken = getAccessTokenFromResponse(response);
+        setAuthSession(true);
         return response.data;
     },
     sendPhoneOtp: async (data: { phone: string; name: string }) => {
@@ -141,6 +150,7 @@ export const AuthServiceAPI = {
     verifyPhoneOtp: async (data: { phone: string; otp: string; wishlist?: unknown[] }) => {
         const response = await api.post('/auth/phone/verify-otp', data);
         accessToken = getAccessTokenFromResponse(response);
+        setAuthSession(true);
         return response.data;
     },
     refresh: async () => {
@@ -157,6 +167,7 @@ export const AuthServiceAPI = {
     logout: async () => {
         const response = await api.post('/auth/logout');
         accessToken = null;
+        setAuthSession(false);
         return response.data;
     },
     forgotPassword: async (email: string, method: 'EMAIL' | 'TELEGRAM') => {

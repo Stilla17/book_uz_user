@@ -236,12 +236,12 @@ export const Navbar = () => {
                         onFocus={() => setShowSearchDropdown(searchQuery.trim().length >= 2)}
                         className={`h-11 w-full rounded-2xl pr-24 pl-4 md:h-12 md:pr-28 lg:pl-48 ${getBgColor('muted')} border ${getBorderColor()} shadow-sm focus:border-[#f07e1a] focus-visible:ring-0 dark:focus:border-[#f07e1a]`}
                     />
-                    <Button
+                    {/* <Button
                         type='submit'
                         className='absolute top-1/2 right-1.5 flex h-9 -translate-y-1/2 cursor-pointer items-center gap-2 rounded-xl bg-[#f07e1a] px-4 font-extrabold text-white shadow-sm hover:bg-[#fc953b] md:h-10'>
                         <Search size={18} />
                         <span className='hidden sm:inline'>{t('search')}</span>
-                    </Button>
+                    </Button> */}
 
                     {/* Search Dropdown */}
                     {showSearchDropdown && (

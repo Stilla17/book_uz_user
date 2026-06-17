@@ -15,12 +15,16 @@ export const BannerService = {
     },
 
     addBanner: async (bannerData: FormData) => {
-        const response = await api.post('/admin/banners', bannerData);
+        const response = await api.post('/admin/banners', bannerData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         return response.data;
     },
 
     updateBanner: async (id: string, bannerData: FormData) => {
-        const response = await api.put(`/admin/banners/${id}`, bannerData);
+        const response = await api.patch(`/admin/banners/${id}`, bannerData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         return response.data;
     },
 

@@ -1,7 +1,5 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-
 import Link from 'next/link';
 
 import { useDeleteBanner } from '@/components/admin/hooks/bannerHooks/useDeleteBanner';
@@ -11,34 +9,14 @@ import { getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
 
 import dayjs from 'dayjs';
-import { CalendarDays, Edit3, Eye, ImageIcon, MonitorSmartphone, Search, ToggleRight, Trash2 } from 'lucide-react';
+import { CalendarDays, Edit3, ImageIcon, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const AdminBannerPage = () => {
-    const [search, setSearch] = useState('');
     const { data: banners = [], isLoading } = useBannerQuery();
     const { mutate: deleteBanner, isPending: isDeletePending } = useDeleteBanner();
 
-    const filteredBanners = useMemo(() => {
-        const keyword = search.trim().toLowerCase();
-        if (!keyword) return banners;
-
-        return banners.filter((banner) => {
-            const title = (banner.name || getLocalizedText(banner.title)).toLowerCase();
-            const subtitle = getLocalizedText(banner.subtitle).toLowerCase();
-            const type = banner.type?.toLowerCase() ?? '';
-            return title.includes(keyword) || subtitle.includes(keyword) || type.includes(keyword);
-        });
-    }, [banners, search]);
-
-    const activeBanners = banners.filter((banner) => banner.isActive).length;
-    const placements = new Set(banners.map((banner) => banner.type).filter(Boolean)).size;
-
-    const stats = [
-        { label: 'Jami bannerlar', value: banners.length, icon: ImageIcon, color: 'bg-[#ef7f1a]' },
-        { label: 'Faol bannerlar', value: activeBanners, icon: ToggleRight, color: 'bg-[#285c7f]' },
-        { label: 'Joylashuvlar', value: placements, icon: MonitorSmartphone, color: 'bg-[#7c6dc8]' }
-    ];
+    const stats = [{ label: 'Jami bannerlar', value: banners.length, icon: ImageIcon, color: 'bg-[#ef7f1a]' }];
 
     const handleDelete = (id: string) => {
         deleteBanner(id, {
@@ -71,30 +49,13 @@ const AdminBannerPage = () => {
             </section>
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>
-                    <label className='flex h-11 min-w-0 items-center gap-2 rounded-2xl bg-[#f2e7d8] px-4 text-[#817466] md:max-w-sm md:flex-1 dark:bg-slate-900 dark:text-slate-300'>
-                        <Search size={18} />
-                        <input
-                            type='search'
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            placeholder='Banner nomi yoki joylashuv qidirish'
-                            className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
-                        />
-                    </label>
-
-                    <span className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
-                        {filteredBanners.length} ta banner ko'rsatildi
-                    </span>
-                </div>
-
                 <div className='grid gap-4 p-4 xl:grid-cols-2'>
                     {isLoading ? (
                         <div className='rounded-[22px] bg-white p-6 text-sm font-bold text-[#8b7e70] ring-1 ring-[#eadfce] dark:bg-slate-900 dark:text-slate-400 dark:ring-slate-800'>
                             Bannerlar yuklanmoqda...
                         </div>
-                    ) : filteredBanners.length ? (
-                        filteredBanners.map((banner, index) => (
+                    ) : banners.length ? (
+                        banners.map((banner, index) => (
                             <article
                                 key={banner._id}
                                 className='overflow-hidden rounded-[22px] bg-white ring-1 ring-[#eadfce] dark:bg-slate-900 dark:ring-slate-800'>
