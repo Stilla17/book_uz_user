@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+import { mainNav } from '@/data/navMenu';
+
 import { motion } from 'framer-motion';
 import { ArrowUp, Facebook, Instagram, Mail, MapPin, Phone, Send, Youtube } from 'lucide-react';
 
@@ -11,32 +13,29 @@ export const Footer = () => {
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
     const footerLinks = {
-        platform: [
-            { name: 'Asosiy', href: '/' },
-            { name: 'Kitoblar', href: '/catalog' },
-            { name: 'Yangi kelganlar', href: '/catalog?sort=-createdAt' },
-            { name: 'Chegirmalar', href: '/catalog?isDiscount=true' },
-            { name: 'Bestsellerlar', href: '/catalog?sort=-ratingAvg' }
-        ],
         support: [
             { name: "To'lov usullari", href: '/checkout' },
             { name: 'Yetkazib berish', href: '/checkout' },
             { name: 'Maxfiylik siyosati', href: '/about' },
             { name: 'Foydalanish shartlari', href: '/about' }
-        ],
-        company: [
-            { name: 'Biz haqimizda', href: '/about' },
-            { name: 'Yangiliklar', href: '/news' },
-            { name: 'Nashriyotlar', href: '/publishers' },
-            { name: 'Promokod', href: '/promo' }
         ]
     };
 
     const socials = [
-        { name: 'Instagram', href: '#', Icon: Instagram, color: 'hover:bg-pink-600' },
-        { name: 'Telegram', href: '#', Icon: Send, color: 'hover:bg-blue-500' },
-        { name: 'Facebook', href: '#', Icon: Facebook, color: 'hover:bg-blue-600' },
-        { name: 'YouTube', href: '#', Icon: Youtube, color: 'hover:bg-red-600' }
+        {
+            name: 'Instagram',
+            href: 'https://www.instagram.com/bookuzbekistan/',
+            Icon: Instagram,
+            color: 'hover:bg-pink-600'
+        },
+        { name: 'Telegram', href: 'https://t.me/bookuzbekistan', Icon: Send, color: 'hover:bg-blue-500' },
+        {
+            name: 'Facebook',
+            href: 'https://www.facebook.com/bookuzbekistan',
+            Icon: Facebook,
+            color: 'hover:bg-blue-600'
+        },
+        { name: 'YouTube', href: 'https://www.youtube.com/@bookuzbekistan', Icon: Youtube, color: 'hover:bg-red-600' }
     ];
 
     return (
@@ -68,30 +67,9 @@ export const Footer = () => {
                         </Link>
 
                         <p className='max-w-sm text-xs leading-relaxed text-slate-400'>
-                            O'zbekistondagi eng katta raqamli kutubxona. 50,000+ elektron va audio kitoblar. O'qing,
+                            O'zbekistondagi eng katta raqamli kutubxona. 50 000 + elektron va audio kitoblar. O'qing,
                             tinglang, kashf eting.
                         </p>
-
-                        {/* Newsletter */}
-                        <div className='space-y-2'>
-                            <h4 className='text-xs font-bold tracking-wider text-white uppercase'>
-                                Yangiliklarga obuna bo'ling
-                            </h4>
-                            <form
-                                onSubmit={(e) => e.preventDefault()}
-                                className='flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-1'>
-                                <input
-                                    type='email'
-                                    placeholder='Email'
-                                    className='w-full bg-transparent px-2 py-1.5 text-xs text-white outline-none placeholder:text-slate-500'
-                                />
-                                <button
-                                    type='submit'
-                                    className='shrink-0 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-black transition-all hover:shadow-lg'>
-                                    <Send size={12} />
-                                </button>
-                            </form>
-                        </div>
 
                         {/* Social */}
                         <div className='pt-1'>
@@ -120,12 +98,12 @@ export const Footer = () => {
                             Platforma
                         </h4>
                         <ul className='space-y-1.5'>
-                            {footerLinks.platform.map((link) => (
-                                <li key={link.name}>
+                            {mainNav.map((link) => (
+                                <li key={link.href}>
                                     <Link
                                         href={link.href}
                                         className='text-xs text-slate-400 transition-colors hover:text-[#005CB9]'>
-                                        {link.name}
+                                        {link.label}
                                     </Link>
                                 </li>
                             ))}
@@ -192,23 +170,13 @@ export const Footer = () => {
                         himoyalangan.
                     </p>
 
-                    <div className='flex items-center gap-3'>
-                        <Link href='/about' className='text-slate-500 transition-colors hover:text-[#005CB9]'>
-                            Maxfiylik
-                        </Link>
-                        <span className='h-1 w-1 rounded-full bg-slate-600' />
-                        <Link href='/about' className='text-slate-500 transition-colors hover:text-[#FF8A00]'>
-                            Shartlar
-                        </Link>
-
-                        {/* Scroll top */}
-                        <button
-                            onClick={scrollToTop}
-                            className='fixed right-5 bottom-5 z-50 grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-1 hover:shadow-lg'
-                            aria-label='Scroll to top'>
-                            <ArrowUp size={14} />
-                        </button>
-                    </div>
+                    {/* Scroll top */}
+                    <button
+                        onClick={scrollToTop}
+                        className='fixed right-5 bottom-5 z-50 grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-1 hover:shadow-lg'
+                        aria-label='Scroll to top'>
+                        <ArrowUp size={14} />
+                    </button>
                 </div>
             </div>
         </footer>

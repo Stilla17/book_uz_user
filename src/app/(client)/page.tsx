@@ -3,7 +3,6 @@
 import { AboutSection } from '@/components/sections/AboutSection';
 import Authors from '@/components/sections/Authors';
 import { BookSection } from '@/components/sections/BookSection';
-import { DownloadAppSection } from '@/components/sections/DownloadAppSection';
 import { Hero } from '@/components/sections/Hero';
 import { NewsSection } from '@/components/sections/NewsSection';
 import Publishers from '@/components/sections/Publishers';
@@ -46,9 +45,6 @@ const Page = () => {
 
             {/* Support Section */}
             <SupportSection />
-
-            {/* Download App Section */}
-            <DownloadAppSection />
         </div>
     );
 };

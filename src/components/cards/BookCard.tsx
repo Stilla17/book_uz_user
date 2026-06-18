@@ -106,18 +106,6 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
         <div
             className='group relative mt-24 flex min-h-100 cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-4 pt-44 pb-4 dark:border-slate-700 dark:bg-slate-800'
             onClick={openBookDetails}>
-            <button
-                type='button'
-                aria-label='Bookmark'
-                className={`absolute top-0 right-0 z-30 rounded-full border border-white/70 p-2.5 shadow-lg backdrop-blur-md ${
-                    isBookmarked
-                        ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
-                        : 'bg-white/90 text-gray-600 hover:bg-[#ef7f1a] hover:text-white dark:border-slate-700 dark:bg-slate-800/90 dark:text-gray-300 dark:hover:bg-orange-600'
-                }`}
-                disabled={favoriteLoading}
-                onClick={handleWishlist}>
-                <Heart size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
-            </button>
             <div className='absolute -top-20 left-1/2 h-64 w-[70%] -translate-x-1/2'>
                 <Link
                     href={bookHref}
@@ -143,15 +131,33 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
             </div>
 
             <div className='flex grow flex-col'>
-                <Link href={bookHref} onMouseEnter={prefetchBook} onFocus={prefetchBook} className='block'>
-                    <h3 className='mt-4 mb-2 line-clamp-2 text-[18px] leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
-                        {getBookTitle(book)}
-                    </h3>
+                <div className='flex items-start justify-between gap-3'>
+                    <Link
+                        href={bookHref}
+                        onMouseEnter={prefetchBook}
+                        onFocus={prefetchBook}
+                        className='block min-w-0 flex-1'>
+                        <h3 className='mt-4 mb-2 line-clamp-2 min-h-14 text-[18px] leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
+                            {getBookTitle(book)}
+                        </h3>
 
-                    <p className='mb-2 line-clamp-1 flex items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
-                        {getBookAuthorName(book)}
-                    </p>
-                </Link>
+                        <p className='mb-2 line-clamp-1 flex min-h-5 items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
+                            {getBookAuthorName(book)}
+                        </p>
+                    </Link>
+                    <button
+                        type='button'
+                        aria-label='Bookmark'
+                        className={`mt-5 shrink-0 ${
+                            isBookmarked
+                                ? 'text-[#ef7f1a] dark:text-orange-400'
+                                : 'text-gray-600 hover:text-[#ef7f1a] dark:text-gray-300 dark:hover:text-orange-400'
+                        }`}
+                        disabled={favoriteLoading}
+                        onClick={handleWishlist}>
+                        <Heart size={18} fill={isBookmarked ? 'currentColor' : 'none'} />
+                    </button>
+                </div>
 
                 <div className='flex items-center gap-2'>
                     <div className='inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[13px] font-bold text-slate-700 dark:bg-amber-500/10 dark:text-slate-100'>
@@ -164,7 +170,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                     </span>
                 </div>
 
-                <div className='mt-2 border-t border-dashed border-gray-200 pt-2 dark:border-slate-700'>
+                <div className='mt-auto border-t border-dashed border-gray-200 pt-4 dark:border-slate-700'>
                     <div className='flex items-end justify-between'>
                         <div>
                             <div className='flex items-baseline gap-1'>

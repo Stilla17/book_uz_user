@@ -168,7 +168,7 @@ export default function BookDetailPage() {
 
     if (!book) {
         return (
-            <div className='bg-background min-h-screen py-16 dark:bg-slate-900'>
+            <div className='min-h-screen py-16 dark:bg-slate-900'>
                 <div className='container mx-auto max-w-3xl px-4 text-center'>
                     <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 dark:border-slate-700 dark:bg-slate-800'>
                         <h1 className='text-2xl font-black text-slate-900 dark:text-white'>Kitob topilmadi</h1>
@@ -182,7 +182,7 @@ export default function BookDetailPage() {
     }
 
     return (
-        <div className='bg-background min-h-screen py-6 dark:bg-slate-900'>
+        <div className='min-h-screen py-6 dark:bg-slate-900'>
             <div className='container mx-auto max-w-7xl px-4'>
                 <BreadCrumb items={breadcrumbItems} />
 

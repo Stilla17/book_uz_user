@@ -61,8 +61,8 @@ const AdminOrdersPage = () => {
 
         return (
             order._id.toLowerCase().includes(value) ||
-            order.guestName.toLowerCase().includes(value) ||
-            order.shippingAddress.phone?.includes(value)
+            (order.guestName ?? '').toLowerCase().includes(value) ||
+            order.shippingAddress?.phone?.includes(value)
         );
     });
 
@@ -166,71 +166,81 @@ const AdminOrdersPage = () => {
                             {isLoading ? (
                                 <BooksTableSkeleton />
                             ) : (
-                                filteredOrders?.map((order, index) => (
-                                    <tr
-                                        key={order._id}
-                                        className='border-b border-[#f0e4d3] bg-white transition last:border-0 hover:bg-[#fffaf2] dark:border-slate-900 dark:bg-slate-950 dark:hover:bg-slate-900'>
-                                        <td className='p-0'>
-                                            <Link
-                                                href={`/admin/orders/slug?id=${order._id}`}
-                                                aria-label={`${order._id} buyurtmasini ko'rish`}
-                                                className='block px-4 py-4'>
-                                                <p className='font-black text-[#2f2a25] dark:text-white'>{index + 1}</p>
-                                            </Link>
-                                        </td>
-                                        <td className='p-0'>
-                                            <Link
-                                                href={`/admin/orders/slug?id=${order._id}`}
-                                                className='block px-4 py-4'>
-                                                <p className='font-black text-[#2f2a25] dark:text-white'>
-                                                    {order.guestName}
-                                                </p>
-                                            </Link>
-                                        </td>
-                                        <td className='p-0'>
-                                            <Link
-                                                href={`/admin/orders/slug?id=${order._id}`}
-                                                className='block px-4 py-4'>
-                                                <p className='mt-1 text-xs font-bold text-[#9d907e] dark:text-slate-500'>
-                                                    {dayjs(order.createdAt).format('DD.MM.YYYY | HH:mm')}
-                                                </p>
-                                            </Link>
-                                        </td>
-                                        <td className='p-0'>
-                                            <Link
-                                                href={`/admin/orders/slug?id=${order._id}`}
-                                                className='block px-4 py-4 font-black whitespace-nowrap text-[#2f2a25] dark:text-white'>
-                                                <p className='mt-1 text-xs font-bold text-[#9d907e] dark:text-slate-500'>
-                                                    {order.shippingAddress.phone}
-                                                </p>
-                                            </Link>
-                                        </td>
-                                        <td className='p-0'>
-                                            <Link
-                                                href={`/admin/orders/slug?id=${order._id}`}
-                                                className='block px-4 py-4 font-black whitespace-nowrap text-[#2f2a25] dark:text-white'>
-                                                {order.totalAmount}
-                                            </Link>
-                                        </td>
-                                        <td className='p-0'>
-                                            <Link
-                                                href={`/admin/orders/slug?id=${order._id}`}
-                                                className='block px-4 py-4 text-sm font-bold text-[#6f6255] dark:text-slate-300'>
-                                                {order.paymentType}
-                                            </Link>
-                                        </td>
-                                        <td className='p-0'>
-                                            <Link
-                                                href={`/admin/orders/slug?id=${order._id}`}
-                                                className='block px-4 py-4'>
-                                                <span
-                                                    className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${orderStatusConfig[order.status].className}`}>
-                                                    {orderStatusConfig[order.status].label}
-                                                </span>
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))
+                                filteredOrders?.map((order, index) => {
+                                    const statusConfig = orderStatusConfig[order.status] ?? {
+                                        label: order.status || "Noma'lum",
+                                        className:
+                                            'bg-slate-50 text-slate-700 ring-slate-100 dark:bg-slate-500/10 dark:text-slate-300 dark:ring-slate-500/20'
+                                    };
+
+                                    return (
+                                        <tr
+                                            key={order._id}
+                                            className='border-b border-[#f0e4d3] bg-white transition last:border-0 hover:bg-[#fffaf2] dark:border-slate-900 dark:bg-slate-950 dark:hover:bg-slate-900'>
+                                            <td className='p-0'>
+                                                <Link
+                                                    href={`/admin/orders/slug?id=${order._id}`}
+                                                    aria-label={`${order._id} buyurtmasini ko'rish`}
+                                                    className='block px-4 py-4'>
+                                                    <p className='font-black text-[#2f2a25] dark:text-white'>
+                                                        {index + 1}
+                                                    </p>
+                                                </Link>
+                                            </td>
+                                            <td className='p-0'>
+                                                <Link
+                                                    href={`/admin/orders/slug?id=${order._id}`}
+                                                    className='block px-4 py-4'>
+                                                    <p className='font-black text-[#2f2a25] dark:text-white'>
+                                                        {order.guestName}
+                                                    </p>
+                                                </Link>
+                                            </td>
+                                            <td className='p-0'>
+                                                <Link
+                                                    href={`/admin/orders/slug?id=${order._id}`}
+                                                    className='block px-4 py-4'>
+                                                    <p className='mt-1 text-xs font-bold text-[#9d907e] dark:text-slate-500'>
+                                                        {dayjs(order.createdAt).format('DD.MM.YYYY | HH:mm')}
+                                                    </p>
+                                                </Link>
+                                            </td>
+                                            <td className='p-0'>
+                                                <Link
+                                                    href={`/admin/orders/slug?id=${order._id}`}
+                                                    className='block px-4 py-4 font-black whitespace-nowrap text-[#2f2a25] dark:text-white'>
+                                                    <p className='mt-1 text-xs font-bold text-[#9d907e] dark:text-slate-500'>
+                                                        {order.shippingAddress?.phone}
+                                                    </p>
+                                                </Link>
+                                            </td>
+                                            <td className='p-0'>
+                                                <Link
+                                                    href={`/admin/orders/slug?id=${order._id}`}
+                                                    className='block px-4 py-4 font-black whitespace-nowrap text-[#2f2a25] dark:text-white'>
+                                                    {order.totalAmount}
+                                                </Link>
+                                            </td>
+                                            <td className='p-0'>
+                                                <Link
+                                                    href={`/admin/orders/slug?id=${order._id}`}
+                                                    className='block px-4 py-4 text-sm font-bold text-[#6f6255] dark:text-slate-300'>
+                                                    {order.paymentType}
+                                                </Link>
+                                            </td>
+                                            <td className='p-0'>
+                                                <Link
+                                                    href={`/admin/orders/slug?id=${order._id}`}
+                                                    className='block px-4 py-4'>
+                                                    <span
+                                                        className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${statusConfig.className}`}>
+                                                        {statusConfig.label}
+                                                    </span>
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             )}
                         </tbody>
                     </table>

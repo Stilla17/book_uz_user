@@ -45,7 +45,7 @@ const PublishersPage = () => {
     };
 
     return (
-        <main className='bg-background min-h-screen py-6 dark:bg-slate-900'>
+        <main className='min-h-screen py-6 dark:bg-slate-900'>
             <div className='container mx-auto px-4'>
                 <BreadCrumb
                     items={[

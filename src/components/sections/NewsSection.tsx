@@ -97,7 +97,6 @@ export const NewsSection = () => {
 
     return (
         <section className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>
-            <div className='brand-grid' />
 
             <div className='max-w-8xl relative z-10 container mx-auto px-4'>
                 {/* Section Header */}

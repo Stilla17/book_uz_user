@@ -81,6 +81,16 @@ export const bookService = {
         }
     },
 
+    async getNewArrivals(): Promise<Product[]> {
+        try {
+            const response = await api.get('/products/new-arrivals');
+            return Array.isArray(response.data?.data) ? response.data.data : [];
+        } catch (error) {
+            console.error('Error fetching new arrivals:', error);
+            return [];
+        }
+    },
+
     // Muallif ID bo'yicha kitoblarni olish
     async getBooksByAuthor(authorId: string, limit = 10): Promise<{ books: Book[] }> {
         try {

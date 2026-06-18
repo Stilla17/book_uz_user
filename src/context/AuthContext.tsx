@@ -10,6 +10,7 @@ import type {
     AuthAction,
     AuthContextType,
     AuthState,
+    PhoneLoginRequest,
     PhoneOtpRequest,
     PhoneOtpVerifyRequest,
     User
@@ -218,6 +219,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const loginWithPhone = async ({ phone, name }: PhoneLoginRequest) => {
+        dispatch({ type: 'AUTH_START' });
+        try {
+            const wishlist = getWishlistFromLocalStorage();
+            const res = await AuthServiceAPI.loginWithPhone({
+                phone,
+                name,
+                wishlist: wishlist.map((book) => book._id).filter(Boolean)
+            });
+
+            if (res.success && res.data) {
+                await syncGuestData();
+                dispatch({ type: 'AUTH_SUCCESS', payload: res.data.user });
+            }
+        } catch (error: any) {
+            dispatch({ type: 'AUTH_FAILURE' });
+            throw error;
+        }
+    };
+
     const refreshUser = async () => {
         try {
             const response = await UserService.getProfile();
@@ -272,7 +293,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ ...state, login, sendPhoneOtp, verifyPhoneOtp, refreshUser, logout }}>
+        <AuthContext.Provider
+            value={{ ...state, login, loginWithPhone, sendPhoneOtp, verifyPhoneOtp, refreshUser, logout }}>
             {children}
         </AuthContext.Provider>
     );

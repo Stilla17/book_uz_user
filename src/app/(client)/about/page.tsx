@@ -9,6 +9,7 @@ import { BranchMap } from '@/components/map/Map';
 import MiniCard from '@/components/shared/MiniCard';
 import { Button } from '@/components/ui/button';
 import { statistics, timelineEvents, values } from '@/data/about';
+import { useBookCount } from '@/hooks/bookHooks/useBookCount';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -33,7 +34,6 @@ export default function AboutPage() {
         { id: 'history', label: 'Tarix', icon: <Clock size={18} /> },
         { id: 'values', label: 'Qadriyatlar', icon: <Heart size={18} /> }
     ];
-
     const [activeTab, setActiveTab] = useState<'history' | 'values'>('history');
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
     const { data: apiBranches = [] } = useBranchUserQuery();
@@ -43,9 +43,28 @@ export default function AboutPage() {
             coords: [Number(branch.latitude), Number(branch.longitude)] as [number, number]
         }))
         .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1]));
+    const { data: book } = useBookCount();
+    const booksCount = book?.pagination?.total ?? 0;
+    const aboutStatistics = statistics.map((item) => {
+        if (item.label === 'Kitoblar') {
+            return {
+                ...item,
+                value: `${booksCount}+`
+            };
+        }
+
+        if (item.label === 'Filiallar') {
+            return {
+                ...item,
+                value: `${branches.length}+`
+            };
+        }
+
+        return item;
+    });
 
     return (
-        <div className='bg-background relative min-h-screen overflow-hidden py-12 dark:bg-slate-900'>
+        <div className='relative min-h-screen overflow-hidden py-12 dark:bg-slate-900'>
             <div className='relative z-10 container mx-auto max-w-7xl px-4'>
                 {/* Hero Section */}
                 <motion.div
@@ -76,8 +95,8 @@ export default function AboutPage() {
                     </motion.h1>
 
                     <p className='mx-auto max-w-3xl text-xl text-gray-500 dark:text-gray-400'>
-                        {"BOOK.UZ - O'zbekistonning eng katta raqamli kutubxonasi. Biz 50,000+ kitob va 10,000+ audio"}
-                        {" kitoblar bilan sizga eng yaxshi o'qish tajribasini taqdim etamiz."}
+                        BOOK.UZ — O'zbekistonning eng katta raqamli kutubxonasi. Biz {booksCount} + kitoblar bilan sizga
+                        eng yaxshi o'qish tajribasini taqdim etamiz.
                     </p>
 
                     {/* CTA Buttons with new colors */}
@@ -96,7 +115,7 @@ export default function AboutPage() {
                 </motion.div>
 
                 {/* Statistics Grid */}
-                <MiniCard items={statistics} />
+                <MiniCard items={aboutStatistics} />
 
                 {/* Tabs with new colors */}
                 <div className='mb-8'>
@@ -227,21 +246,21 @@ export default function AboutPage() {
                     className='mb-20 grid grid-cols-1 gap-6 md:grid-cols-2'>
                     <div className='rounded-2xl border p-8'>
                         <Target size={40} className='mb-4 text-[#00a0e3]' />
-                        <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>Bizning missiyamiz</h3>
+                        <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>Bizning vazifamiz</h3>
                         <p className='text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
-                            {"O'zbekistonda kitobxonlik madaniyatini rivojlantirish va har bir insonga sifatli"}
-                            {' kitoblarni qulay narxlarda taqdim etish. Biz orqali millionlab odamlar bilim olish va'}
-                            {" zavqlanish imkoniyatiga ega bo'ladi."}
+                            O'zbekistonda kitobxonlik madaniyatini rivojlantirish va har bir insonga sifatli kitoblarni
+                            qulay narxlarda taqdim etish. Biz orqali millionlab odamlar bilim olish va zavqlanish
+                            imkoniyatiga ega bo'ladi.
                         </p>
                     </div>
 
                     <div className='rounded-2xl border p-8'>
                         <Eye size={40} className='mb-4 text-[#ef7f1a]' />
-                        <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>Bizning vizyonimiz</h3>
+                        <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>Bizning maqsadimiz</h3>
                         <p className='text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
                             Markaziy Osiyodagi eng yirik raqamli kutubxonaga aylanish va 5 yil ichida 10 milliondan
-                            {"ortiq foydalanuvchiga xizmat ko'rsatish. Innovatsion texnologiyalar orqali kitob"}
-                            {" o'qishni yanada qulay va maroqli qilish."}
+                            ortiq foydalanuvchiga xizmat ko'rsatish. Innovatsion texnologiyalar orqali kitob o'qishni
+                            yanada qulay va maroqli qilish.
                         </p>
                     </div>
                 </motion.div>

@@ -29,15 +29,9 @@ export const TopSalesSection = ({ period, title }: TopSalesSectionProps) => {
         <section className='bg-background py-6 dark:bg-slate-900'>
             <div className='container mx-auto px-4'>
                 <div className='mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
-                    <div>
-                        <div className='mb-3 inline-flex items-center gap-2 rounded-full bg-[#ef7f1a]/10 px-3 py-1.5 text-xs font-black text-[#ef7f1a] dark:bg-orange-500/20 dark:text-orange-300'>
-                            <Icon size={15} />
-                            MoySklad sotuv statistikasi
-                        </div>
-                        <h2 className='text-2xl font-semibold tracking-tight text-[#ef7f1a] md:text-3xl dark:text-orange-400'>
-                            {title}
-                        </h2>
-                    </div>
+                    <h2 className='text-2xl font-semibold tracking-tight text-[#ef7f1a] md:text-3xl dark:text-orange-400'>
+                        {title}
+                    </h2>
 
                     <span className='inline-flex h-11 w-fit items-center gap-2 rounded-2xl border border-orange-100 bg-white px-4 text-sm font-black text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200'>
                         <Icon size={16} />
@@ -84,7 +78,6 @@ export const TopSalesSection = ({ period, title }: TopSalesSectionProps) => {
                                       <div className='relative'>
                                           <span className='absolute top-1 left-3 z-20 rounded-full bg-[#ef7f1a] px-3 py-1 text-xs font-black text-white shadow-md'>
                                               #{index + 1}
-                                              {book.soldQuantity ? ` - ${book.soldQuantity} ta` : ''}
                                           </span>
                                           <BookCard book={book} />
                                       </div>

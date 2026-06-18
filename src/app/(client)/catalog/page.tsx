@@ -154,7 +154,7 @@ export default function CatalogPage() {
     }
 
     return (
-        <div className='min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(0,160,227,0.16),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(239,127,26,0.14),_transparent_30%),linear-gradient(180deg,_#fffaf5_0%,_#ffffff_40%,_#f7fbfe_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(0,160,227,0.12),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(239,127,26,0.10),_transparent_30%),linear-gradient(180deg,_#0f172a_0%,_#111827_45%,_#0b1220_100%)]'>
+        <div className='min-h-screen'>
             <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
                 <div className='mt-6 grid gap-6 lg:grid-cols-[290px_minmax(0,1fr)]'>
                     <AsideFilter filters={filters} onChange={applyFilters} onClear={clearFilters} />

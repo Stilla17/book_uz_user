@@ -3,11 +3,11 @@ import { Statistic, TeamMember, TimelineEvent } from '@/types/about';
 import {
     BookOpen,
     Crown,
-    Download,
     Eye,
     Globe,
     Headphones,
     Heart,
+    LocationEdit,
     Rocket,
     Shield,
     Star,
@@ -16,51 +16,36 @@ import {
 } from 'lucide-react';
 
 // Statistics data with new colors
+
 export const statistics: Statistic[] = [
     {
         icon: <BookOpen size={28} />,
-        value: '50,000+',
+        value: '',
         label: 'Kitoblar',
         labelRu: 'Книги',
         labelEn: 'Books',
         color: 'from-[#00a0e3] to-[#4dc3ff]'
     },
-    // {
-    //     icon: <Headphones size={28} />,
-    //     value: '10,000+',
-    //     label: 'Audio kitoblar',
-    //     labelRu: 'Аудиокниги',
-    //     labelEn: 'Audiobooks',
-    //     color: 'from-[#ef7f1a] to-[#ff9f4d]'
-    // },
     {
         icon: <Users size={28} />,
-        value: '1M+',
+        value: '15 000+',
         label: 'Foydalanuvchilar',
         labelRu: 'Пользователи',
         labelEn: 'Users',
-        color: 'from-[#00a0e3] to-[#ef7f1a]'
-    },
-    {
-        icon: <Download size={28} />,
-        value: '5M+',
-        label: 'Yuklab olishlar',
-        labelRu: 'Загрузки',
-        labelEn: 'Downloads',
-        color: 'from-[#4dc3ff] to-[#00a0e3]'
+        color: 'bg-[#ef7f1a]'
     },
     {
         icon: <Star size={28} />,
-        value: '4.8',
+        value: '5',
         label: "O'rtacha reyting",
         labelRu: 'Средний рейтинг',
         labelEn: 'Average rating',
         color: 'from-[#ef7f1a] to-[#ff9f4d]'
     },
     {
-        icon: <Globe size={28} />,
+        icon: <LocationEdit size={28} />,
         value: '15',
-        label: 'Mamlakatlar',
+        label: 'Filiallar',
         labelRu: 'Страны',
         labelEn: 'Countries',
         color: 'from-[#00a0e3] to-[#4dc3ff]'

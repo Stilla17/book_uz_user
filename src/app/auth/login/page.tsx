@@ -23,6 +23,8 @@ const normalizePhone = (value: string) => {
     return value.trim();
 };
 
+const isValidUzPhone = (value: string) => /^\+998\d{9}$/.test(value);
+
 export default function LoginPage() {
     const { sendPhoneOtp, verifyPhoneOtp, isLoading } = useAuth();
     const router = useRouter();
@@ -39,7 +41,12 @@ export default function LoginPage() {
 
     const requestOtp = async () => {
         if (name.trim().length < 2) {
-            toast.error("Ism kamida 2 ta belgidan iborat bo'lishi kerak");
+            toast.error("Ism familya kamida 2 ta belgidan iborat bo'lishi kerak");
+            return;
+        }
+
+        if (!isValidUzPhone(normalizedPhone)) {
+            toast.error("Telefon raqamni to'liq kiriting");
             return;
         }
 
@@ -77,7 +84,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className='bg-background flex min-h-screen items-center justify-center px-4 py-12 dark:bg-slate-900'>
+        <div className='flex min-h-screen items-center justify-center px-4 py-12 dark:bg-slate-900'>
             <div className='absolute inset-0 overflow-hidden'>
                 <div className='absolute -top-40 -right-40 h-80 w-80 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-600/5' />
                 <div className='absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-orange-500/10 blur-3xl dark:bg-orange-600/5' />
@@ -102,7 +109,7 @@ export default function LoginPage() {
                     <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
                         {otpSent
                             ? `${normalizedPhone} raqamiga yuborilgan kodni kiriting`
-                            : 'Ism va telefon raqam orqali kiring'}
+                            : 'Ism familya va telefon raqam orqali kiring'}
                     </p>
                 </div>
 
@@ -110,7 +117,7 @@ export default function LoginPage() {
                     <form onSubmit={handleSendOtp} className='space-y-5'>
                         <div className='space-y-2'>
                             <label className='ml-1 text-sm font-bold text-gray-600 dark:text-gray-400'>
-                                Ism Familyangiz
+                                Ism familya
                             </label>
                             <div className='group relative'>
                                 <User
@@ -120,7 +127,7 @@ export default function LoginPage() {
                                 <input
                                     required
                                     type='text'
-                                    placeholder='Ism Familyangiz'
+                                    placeholder='Ism familyangiz'
                                     className='w-full rounded-2xl border border-gray-200 bg-gray-50 py-4 pr-4 pl-12 text-gray-900 transition-all outline-none placeholder:text-gray-400 focus:border-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-400'
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}

@@ -23,9 +23,15 @@ type AuthorItem = {
 
 type AuthorsResponse = {
     authors?: AuthorItem[];
+    pagination?: {
+        total?: number;
+        page?: number;
+        pages?: number;
+        limit?: number;
+    };
 };
 
-const AUTHORS_LIMIT = 3000;
+const AUTHORS_PAGE_LIMIT = 100;
 const TOP_AUTHORS_LIMIT = 20;
 const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
 
@@ -33,18 +39,41 @@ const getAuthorBooksCount = (author: AuthorItem) => author.booksCount ?? author.
 
 const Authors = () => {
     const { data, isLoading } = useQuery({
-        queryKey: ['authors-preview', AUTHORS_LIMIT],
+        queryKey: ['authors-preview', 'all-pages', AUTHORS_PAGE_LIMIT],
         queryFn: async () => {
-            const response = await api.get('/authors', {
-                params: { page: 1, limit: AUTHORS_LIMIT }
+            const firstResponse = await api.get('/authors', {
+                params: { page: 1, limit: AUTHORS_PAGE_LIMIT }
             });
+            const firstData = firstResponse.data?.data as AuthorsResponse;
+            const totalPages = firstData?.pagination?.pages ?? 1;
 
-            return response.data?.data as AuthorsResponse;
+            if (totalPages <= 1) return firstData;
+
+            const restResponses = await Promise.all(
+                Array.from({ length: totalPages - 1 }, (_, index) =>
+                    api.get('/authors', {
+                        params: { page: index + 2, limit: AUTHORS_PAGE_LIMIT }
+                    })
+                )
+            );
+
+            const authors = [
+                ...(firstData?.authors ?? []),
+                ...restResponses.flatMap((response) => {
+                    const data = response.data?.data as AuthorsResponse;
+                    return data?.authors ?? [];
+                })
+            ];
+
+            return {
+                ...firstData,
+                authors
+            };
         }
     });
 
     const authors = [...(data?.authors ?? [])]
-        .sort((a, b) => (b.booksCount ?? b.bookCount ?? 0) - (a.booksCount ?? a.bookCount ?? 0))
+        .sort((a, b) => getAuthorBooksCount(b) - getAuthorBooksCount(a))
         .slice(0, TOP_AUTHORS_LIMIT);
 
     if (!isLoading && authors.length === 0) return null;
@@ -52,8 +81,9 @@ const Authors = () => {
     return (
         <section className='bg-background py-12 dark:bg-slate-950'>
             <div className='container mx-auto px-4'>
-                <div className='relative mb-8 flex items-center justify-center'>
-                    <h2 className='text-center text-3xl font-black tracking-tight text-slate-950 md:text-4xl dark:text-white'>
+                <div className='flex max-w-2xl gap-4'>
+                    <span className='h-9 w-1 shrink-0 rounded-full bg-[#ef7f1a]/30'></span>
+                    <h2 className='mb-12 text-2xl font-black tracking-tight text-slate-950 md:text-3xl dark:text-white'>
                         Mualliflar
                     </h2>
                 </div>

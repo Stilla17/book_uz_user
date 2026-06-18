@@ -6,8 +6,8 @@ import Link from 'next/link';
 
 import { useBranchUserQuery } from '@/components/admin/hooks/queries/branch';
 import { BranchMap } from '@/components/map/Map';
+import { useBookCount } from '@/hooks/bookHooks/useBookCount';
 import { ClientService } from '@/services/api';
-import { bookService } from '@/services/book.service';
 import { useQuery } from '@tanstack/react-query';
 
 import { Award, Book, BookHeadphones, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
@@ -15,14 +15,7 @@ import { Award, Book, BookHeadphones, BookOpen, Building2, MapPin, Truck } from 
 export const AboutSection = () => {
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
     const { data: apiBranches = [] } = useBranchUserQuery();
-    const { data: book } = useQuery({
-        queryKey: ['books-count'],
-        queryFn: () =>
-            bookService.getAllProducts({
-                page: 1,
-                limit: 1
-            })
-    });
+    const { data: book } = useBookCount();
     const { data: publishersData } = useQuery({
         queryKey: ['publishers-count'],
         queryFn: () =>
@@ -46,14 +39,11 @@ export const AboutSection = () => {
         { icon: <Book size={24} />, label: 'Kitoblar', value: `${booksCount.toLocaleString()}+` },
         { icon: <BookOpen size={24} />, label: 'Nashryotlar soni', value: `${publishersCount}+` },
         { icon: <Building2 size={24} />, label: 'Filyallar soni', value: `${branches.length}+` },
-        { icon: <Truck size={24} />, label: 'Yetkazib berish', value: '24/7' },
-        { icon: <BookHeadphones size={24} />, label: 'Audio kitoblar', value: '10K+' }
+        { icon: <Truck size={24} />, label: 'Yetkazib berish', value: '24/7' }
     ];
 
     return (
         <section className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>
-            <div className='brand-grid' />
-
             <div className='relative z-10 container mx-auto max-w-[1400px] px-4'>
                 <div className='flex flex-col items-center gap-12 lg:flex-row lg:gap-16'>
                     <div className='space-y-6 lg:w-1/2'>
@@ -69,9 +59,9 @@ export const AboutSection = () => {
                         </h2>
 
                         <p className='max-w-xl text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
-                            Biz 2020-yildan buyon kitobxonlar uchun eng sara asarlarni yetkazib kelmoqdamiz. Maqsadimiz
-                            - har bir xonadonga{' '}
-                            <span className='font-bold text-[#00a0e3] dark:text-blue-400'>ilm nuri</span> kirib
+                            Biz 2018-yildan buyon kitobxonlar uchun eng sara kitoblarni yetkazib kelmoqdamiz. Maqsadimiz
+                            — har bir xonadonga 
+                            <span className='font-bold text-[#00a0e3] dark:text-blue-400'>ilm nuri</span> kirib
                             borishini ta'minlash va mutolaa madaniyatini yuksaltirishdir.
                         </p>
 

@@ -147,6 +147,12 @@ export const AuthServiceAPI = {
         const response = await api.post('/auth/phone/send-otp', data);
         return response.data;
     },
+    loginWithPhone: async (data: { phone: string; name: string; wishlist?: unknown[] }) => {
+        const response = await api.post('/auth/phone/login', data);
+        accessToken = getAccessTokenFromResponse(response);
+        setAuthSession(true);
+        return response.data;
+    },
     verifyPhoneOtp: async (data: { phone: string; otp: string; wishlist?: unknown[] }) => {
         const response = await api.post('/auth/phone/verify-otp', data);
         accessToken = getAccessTokenFromResponse(response);

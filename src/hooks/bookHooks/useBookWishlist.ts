@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 
-import { toggleWishlist, type WishlistBook } from '@/store/features/wishlistSlice';
-import { useAppDispatch } from '@/store/hooks';
+import { type WishlistBook, toggleWishlist } from '@/store/features/wishlistSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Book } from '@/types/book';
 import { handleToggleFavorite } from '@/utils/wishlist';
 import { isBookInGuestWishlist } from '@/utils/wishlistStorage';
 import { useQueryClient } from '@tanstack/react-query';
+
 import { useAuth } from '../useAuth';
+import toast from 'react-hot-toast';
 
 type UseBookWishlistOptions = {
     queryKeys?: unknown[][];
@@ -28,21 +30,14 @@ export const useBookWishlist = (book?: Book, options?: UseBookWishlistOptions) =
 
     const { user } = useAuth();
     const dispatch = useAppDispatch();
+    const wishlistItems = useAppSelector((state) => state.wishlist.items);
     const queryClient = useQueryClient();
 
     useEffect(() => {
         if (!book?._id) return;
+        const isInReduxWishlist = wishlistItems.some((item) => item._id === book._id);
 
-        const isInUserWishlist = user?.wishlist?.some((item) => {
-            if (typeof item === 'string') return item === book._id;
-            if (item && typeof item === 'object' && '_id' in item) {
-                return item._id === book._id;
-            }
-
-            return false;
-        });
-
-        setIsBookmarked(Boolean(book.isWishlisted || isInUserWishlist || isBookInGuestWishlist(book._id)));
+        setIsBookmarked(Boolean(isInReduxWishlist || (!user && isBookInGuestWishlist(book._id))));
     }, [book?._id, book?.isWishlisted, user?.wishlist]);
 
     const toggleFavorite = async () => {
@@ -63,6 +58,12 @@ export const useBookWishlist = (book?: Book, options?: UseBookWishlistOptions) =
                 queryClient.invalidateQueries({ queryKey: ['wishlist'] }),
                 ...(options?.queryKeys ?? []).map((queryKey) => queryClient.invalidateQueries({ queryKey }))
             ]);
+
+            if (nextBookmarked) {
+                toast.success('Mening kitoblarimga qoshildi');
+            } else {
+                toast.success('Mening kitoblarimdan olib tashlandi');
+            }
         } catch (error) {
             setIsBookmarked(previousBookmarked);
             options?.onWishlistChange?.(book._id, previousBookmarked);

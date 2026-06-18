@@ -27,12 +27,13 @@ import NavIcon from './NavIcon';
 import NavbarFooter from './NavbarFooter';
 import NavbarHeader from './NavbarHeader';
 import UserDropdown from './UserDropdown';
-import { BookOpen, ChevronDown, Grid3x3, Menu, Search, ShoppingCart, User } from 'lucide-react';
+import { BookOpen, ChevronDown, Grid3x3, Menu, ShoppingCart, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // Kategoriya interfeysi
 export const Navbar = () => {
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+    const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
     const [cartCount, setCartCount] = useState(0);
     const [wishlistCount, setWishlistCount] = useState(0);
     const router = useRouter();
@@ -46,6 +47,10 @@ export const Navbar = () => {
     const { t, i18n } = useTranslation();
     const { data: categories = [] } = usePublicCategoriesQuery();
     const myBooksHref = '/my-books';
+    const activeCategory = categories.find((category) => category._id === activeCategoryId) ?? categories[0];
+    const activeSubgenres = activeCategory?.subgenres?.length
+        ? activeCategory.subgenres
+        : activeCategory?.subCategories || [];
 
     const countCartItems = useAppSelector(
         (state) => state.cart.items.length
@@ -166,9 +171,9 @@ export const Navbar = () => {
 
                             <DropdownMenuContent
                                 align='start'
-                                className={`mt-2 max-h-[68vh] w-[min(820px,calc(100vw-48px))] overflow-y-auto p-4 ${getBgColor('card')} border ${getBorderColor()} rounded-2xl shadow-2xl`}>
-                                <div className='mb-4'>
-                                    <div className='mb-3 flex items-center justify-between gap-4'>
+                                className={`mt-2 w-[min(860px,calc(100vw-48px))] overflow-hidden p-0 ${getBgColor('card')} border ${getBorderColor()} rounded-2xl shadow-2xl`}>
+                                <div>
+                                    <div className='flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3 dark:border-slate-800'>
                                         <h3
                                             className={`font-black ${getTextColor()} flex items-center gap-2 text-base`}>
                                             <span className='flex size-8 items-center justify-center rounded-lg bg-[#00a0e3]/10 text-[#00a0e3] dark:bg-blue-400/10 dark:text-blue-400'>
@@ -185,40 +190,95 @@ export const Navbar = () => {
                                         </Link>
                                     </div>
 
-                                    <div className='grid grid-cols-2 gap-2 xl:grid-cols-3'>
-                                        {categories.map((category) => (
-                                            <div
-                                                key={category._id}
-                                                className={`group rounded-xl border p-3 transition-all hover:-translate-y-0.5 hover:border-[#00a0e3]/30 hover:bg-[#00a0e3]/5 hover:shadow-sm ${getBorderColor()}`}>
-                                                <div className='min-w-0'>
-                                                    <Link
-                                                        href={getCatalogCategoryHref(category)}
-                                                        onClick={() => setIsCatalogOpen(false)}
-                                                        className={`block truncate text-sm font-black ${getTextColor()} transition-colors group-hover:text-[#f07e1a] dark:group-hover:text-orange-400`}>
-                                                        {getLocalizedCategoryName(category, i18n.language)}
-                                                    </Link>
+                                    <div className='grid max-h-[62vh] grid-cols-[260px_minmax(0,1fr)] overflow-hidden'>
+                                        <div className='max-h-[62vh] overflow-y-auto border-r border-slate-200 bg-slate-50/70 p-2 [scrollbar-color:#cbd5e1_transparent] [scrollbar-width:thin] dark:border-slate-800 dark:bg-slate-950/40 dark:[scrollbar-color:#334155_transparent]'>
+                                            {categories.map((category) => {
+                                                const isActive = activeCategory?._id === category._id;
+                                                const subgenres = category.subgenres?.length
+                                                    ? category.subgenres
+                                                    : category.subCategories || [];
 
-                                                    {!!category.subgenres?.length && (
-                                                        <div className='mt-2 flex flex-wrap gap-1.5'>
-                                                            {category.subgenres.slice(0, 3).map((sub, index) => (
+                                                return (
+                                                    <Link
+                                                        key={category._id}
+                                                        href={getCatalogCategoryHref(category)}
+                                                        onMouseEnter={() => setActiveCategoryId(category._id)}
+                                                        onFocus={() => setActiveCategoryId(category._id)}
+                                                        onClick={() => setIsCatalogOpen(false)}
+                                                        className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-black transition-colors ${
+                                                            isActive
+                                                                ? 'bg-white text-[#f07e1a] shadow-sm ring-1 ring-orange-100 dark:bg-slate-900 dark:text-orange-400 dark:ring-slate-800'
+                                                                : 'text-slate-700 hover:bg-white hover:text-[#f07e1a] dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-orange-400'
+                                                        }`}>
+                                                        <span className='min-w-0 truncate'>
+                                                            {getLocalizedCategoryName(category, i18n.language)}
+                                                        </span>
+                                                        {subgenres.length > 0 && (
+                                                            <span className='shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-black text-slate-500 dark:bg-slate-800 dark:text-slate-400'>
+                                                                {subgenres.length}
+                                                            </span>
+                                                        )}
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <div className='min-h-[360px] overflow-y-auto p-4'>
+                                            {activeCategory ? (
+                                                <>
+                                                    <div className='mb-4 flex items-start justify-between gap-4'>
+                                                        <div className='min-w-0'>
+                                                            <Link
+                                                                href={getCatalogCategoryHref(activeCategory)}
+                                                                onClick={() => setIsCatalogOpen(false)}
+                                                                className={`block text-xl leading-tight font-black ${getTextColor()} transition-colors hover:text-[#f07e1a] dark:hover:text-orange-400`}>
+                                                                {getLocalizedCategoryName(
+                                                                    activeCategory,
+                                                                    i18n.language
+                                                                )}
+                                                            </Link>
+                                                            <p className='mt-1 text-xs font-semibold text-slate-500 dark:text-slate-400'>
+                                                                {activeSubgenres.length
+                                                                    ? `${activeSubgenres.length} ta bo'lim`
+                                                                    : "Bu janrda bo'limlar hali yo'q"}
+                                                            </p>
+                                                        </div>
+                                                        <Link
+                                                            href={getCatalogCategoryHref(activeCategory)}
+                                                            onClick={() => setIsCatalogOpen(false)}
+                                                            className='shrink-0 rounded-lg bg-[#f07e1a]/10 px-3 py-2 text-xs font-black text-[#f07e1a] transition-colors hover:bg-[#f07e1a] hover:text-white'>
+                                                            Barchasi
+                                                        </Link>
+                                                    </div>
+
+                                                    {activeSubgenres.length > 0 ? (
+                                                        <div className='grid grid-cols-2 gap-2 xl:grid-cols-3'>
+                                                            {activeSubgenres.map((sub, index) => (
                                                                 <Link
-                                                                    key={index}
-                                                                    href={getCatalogSubgenreHref(category, sub)}
+                                                                    key={sub._id ?? sub.slug ?? index}
+                                                                    href={getCatalogSubgenreHref(activeCategory, sub)}
                                                                     onClick={() => setIsCatalogOpen(false)}
-                                                                    className='max-w-full truncate rounded-md bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-500 transition-colors hover:bg-[#f07e1a]/10 hover:text-[#f07e1a] dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-orange-400/10 dark:hover:text-orange-400'>
-                                                                    {getLocalizedTitle(sub.title, i18n.language)}
+                                                                    className='group rounded-xl border border-slate-200 bg-white p-3 transition-all hover:-translate-y-0.5 hover:border-[#00a0e3]/30 hover:bg-[#00a0e3]/5 hover:shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:hover:border-blue-400/30 dark:hover:bg-blue-400/10'>
+                                                                    <span className='block text-sm leading-snug font-black text-slate-800 group-hover:text-[#f07e1a] dark:text-slate-100 dark:group-hover:text-orange-400'>
+                                                                        {getLocalizedTitle(sub.title, i18n.language) ||
+                                                                            sub.name ||
+                                                                            sub.slug}
+                                                                    </span>
                                                                 </Link>
                                                             ))}
-                                                            {category.subgenres.length > 3 && (
-                                                                <span className='rounded-md px-2 py-1 text-[11px] font-bold text-slate-400 dark:text-slate-500'>
-                                                                    +{category.subgenres.length - 3}
-                                                                </span>
-                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className='grid min-h-40 place-items-center rounded-2xl border border-dashed border-slate-200 text-sm font-semibold text-slate-400 dark:border-slate-800 dark:text-slate-500'>
+                                                            Bo'limlar mavjud emas
                                                         </div>
                                                     )}
+                                                </>
+                                            ) : (
+                                                <div className='grid min-h-[360px] place-items-center text-sm font-semibold text-slate-400 dark:text-slate-500'>
+                                                    Janr tanlang
                                                 </div>
-                                            </div>
-                                        ))}
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </DropdownMenuContent>

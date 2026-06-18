@@ -21,6 +21,7 @@ export interface AuthState {
 
 export interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<void>;
+    loginWithPhone: (data: PhoneLoginRequest) => Promise<void>;
     sendPhoneOtp: (data: PhoneOtpRequest) => Promise<void>;
     verifyPhoneOtp: (data: PhoneOtpVerifyRequest) => Promise<void>;
     refreshUser: () => Promise<User | null>;
@@ -39,6 +40,11 @@ export interface LoginPayload {
 }
 
 export interface PhoneOtpRequest {
+    name: string;
+    phone: string;
+}
+
+export interface PhoneLoginRequest {
     name: string;
     phone: string;
 }

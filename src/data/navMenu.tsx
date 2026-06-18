@@ -71,7 +71,8 @@ export const mainNav = [
     { label: 'Mualliflar', href: '/authors' },
     { label: 'Nashriyotlar', href: '/publishers' },
     { label: 'Yangiliklar', href: '/news' },
-    { label: 'Biz haqimizda', href: '/about' }
+    { label: 'Biz haqimizda', href: '/about' },
+    { label: 'Xizmatlar', href: '/service' }
 ];
 
 export const serviceMenuItems = [

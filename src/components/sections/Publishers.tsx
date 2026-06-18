@@ -32,8 +32,6 @@ const Publishers = () => {
 
     return (
         <section className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>
-            <div className='brand-grid pointer-events-none absolute inset-0 opacity-80' />
-
             <div className='relative z-10 container mx-auto px-4'>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -41,7 +39,7 @@ const Publishers = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
                     className='mb-10 flex flex-col items-center gap-4 md:flex-row md:justify-between'>
-                    <div className='max-w-2xl flex gap-4'>
+                    <div className='flex max-w-2xl gap-4'>
                         <span className={`h-9 w-1 shrink-0 rounded-full bg-[#ef7f1a]/30`} />
                         <h2 className='text-3xl font-black tracking-tight text-slate-900 md:text-4xl dark:text-white'>
                             {t('publish.label')}

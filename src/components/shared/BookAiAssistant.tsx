@@ -52,7 +52,11 @@ export const BookAiAssistant = () => {
         setIsLoading(true);
 
         try {
-            const answer = await AiService.sendMessage(trimmedText);
+            const history = [...messages, userMessage]
+                .slice(-8)
+                .map(({ role, text }) => ({ role, text }));
+
+            const answer = await AiService.sendMessage(trimmedText, history);
 
             setMessages((current) => [
                 ...current,
@@ -70,7 +74,7 @@ export const BookAiAssistant = () => {
                 {
                     id: Date.now() + 1,
                     role: 'assistant',
-                    text: 'Kechirasiz, hozir javob bera olmadim. Qayta urinib ko‘ring. Yoki +998(71) 230-00-50 shu nomerga boglanishingiz mumkin'
+                    text: "Kechirasiz, hozir javob bera olmadim. Qayta urinib ko'ring. Yoki +998(71) 230-00-50 shu nomerga bog'lanishingiz mumkin"
                 }
             ]);
         } finally {
@@ -207,7 +211,7 @@ export const BookAiAssistant = () => {
                                     }}
                                     rows={1}
                                     disabled={isLoading}
-                                    placeholder='Kitob haqida so‘rang...'
+                                    placeholder="Kitob haqida so'rang..."
                                     aria-label='AI yordamchiga xabar'
                                     className='max-h-20 min-h-8 flex-1 resize-none bg-transparent px-2 py-1.5 text-xs text-slate-800 outline-none placeholder:text-slate-400 dark:text-white'
                                 />
@@ -220,7 +224,7 @@ export const BookAiAssistant = () => {
                                 </button>
                             </form>
                             <p className='mt-1.5 text-center text-[9px] text-slate-400'>
-                                AI javoblari xato bo‘lishi mumkin. Muhim ma'lumotlarni tekshiring.
+                                AI javoblari xato bo'lishi mumkin. Muhim ma'lumotlarni tekshiring.
                             </p>
                         </div>
                     </motion.section>

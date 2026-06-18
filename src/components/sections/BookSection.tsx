@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 import { getRequestParams, getSectionConfig, mapProductToBook } from '@/helpers/bookSection';
 import { bookService } from '@/services/book.service';
@@ -9,6 +9,7 @@ import type { BookSectionProps } from '@/types/section.types';
 
 import { BookCard } from '../cards/BookCard';
 import { BookCardSkeleton } from '../cards/BookCardSkeleton';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Award, BookOpen, ChevronRight, Flame, Headphones, Sparkles, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -18,65 +19,40 @@ import 'swiper/css/pagination';
 import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-export const BookSection = ({
-    title,
-    books,
-    type = 'default',
-    viewAllLink = '/catalog'
-}: BookSectionProps) => {
-    const [loading, setLoading] = useState(true);
-    const [fetchedBooks, setFetchedBooks] = useState<Book[]>([]);
+export const BookSection = ({ title, books, type = 'default', viewAllLink = '/catalog' }: BookSectionProps) => {
     const prevRef = useRef<HTMLButtonElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
 
     const { t } = useTranslation();
 
-    useEffect(() => {
-        let ignore = false;
-
-        const loadBooks = async () => {
-            if (books && books.length > 0) {
-                setFetchedBooks([]);
-                setLoading(false);
-
-                return;
+    const hasStaticBooks = Boolean(books?.length);
+    const { data: fetchedBooks = [], isLoading } = useQuery({
+        queryKey: ['book-section', type],
+        queryFn: async () => {
+            if (type === 'new') {
+                const products = await bookService.getNewArrivals();
+                return products.map((product) => mapProductToBook(product, type));
             }
 
-            setLoading(true);
+            const response = await bookService.getAllProducts(getRequestParams(type));
+            return response.products.map((product) => mapProductToBook(product, type));
+        },
+        enabled: !hasStaticBooks,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        refetchOnWindowFocus: false
+    });
 
-            try {
-                const response = await bookService.getAllProducts(getRequestParams(type));
-                if (!ignore) {
-                    setFetchedBooks(response.products.map((product) => mapProductToBook(product, type)));
-                }
-            } catch (error) {
-                console.error('BookSection kitoblari yuklanmadi:', error);
-                if (!ignore) {
-                    setFetchedBooks([]);
-                }
-            } finally {
-                if (!ignore) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        loadBooks();
-
-        return () => {
-            ignore = true;
-        };
-    }, [books, type]);
-
-    const displayBooks: Book[] = books && books.length > 0 ? books : fetchedBooks;
+    const loading = !hasStaticBooks && isLoading;
+    const displayBooks: Book[] = useMemo(
+        () => (hasStaticBooks ? books ?? [] : fetchedBooks),
+        [books, fetchedBooks, hasStaticBooks]
+    );
 
     const config = getSectionConfig(type);
 
     return (
         <section className='bg-background relative overflow-hidden py-6 dark:bg-slate-900'>
-            {/* <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" /> */}
-            <div className='brand-overlay' />
-
             <div className='relative z-10 container mx-auto px-4'>
                 {/* Header with animation */}
                 <motion.div

@@ -19,7 +19,7 @@ export default function MyBooksPage() {
     useEffect(() => {
         const isPageLoading = authLoading || loadingBooks;
         dispatch(setLoading(isPageLoading));
-        
+
         return () => {
             dispatch(setLoading(false));
         };
@@ -41,22 +41,11 @@ export default function MyBooksPage() {
     if (authLoading || loadingBooks) return null;
 
     return (
-        <main className='min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-white'>
-            <section className='border-b border-slate-200 bg-background dark:border-slate-800 dark:bg-slate-900'>
+        <main className='min-h-screen text-slate-950 dark:bg-slate-950 dark:text-white'>
+            <section className='border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900'>
                 <div className='mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8'>
                     <div className='flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between'>
-                        <div>
-                            <div className='mb-3 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-sm font-bold text-[#ef7f1a] dark:border-orange-900 dark:bg-orange-950/60 dark:text-orange-300'>
-                                <BookOpen size={16} />
-                                Mening kutubxonam
-                            </div>
-                            <h1 className='text-3xl font-black tracking-normal md:text-5xl'>Mening kitoblarim</h1>
-                            <p className='mt-3 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400'>
-                                {isAuthenticated
-                                    ? "Login qilingan holatda kitoblar serverdagi sevimlilar ro'yxatidan olinadi."
-                                    : "Login qilmagan holatda bu sahifada browser localStorage ichidagi ma'lumotlar ko'rinadi."}
-                            </p>
-                        </div>
+                        <h1 className='text-3xl font-black tracking-normal md:text-5xl'>Mening kitoblarim</h1>
 
                         <Button
                             asChild

@@ -120,7 +120,6 @@ export const Hero = () => {
                                                     </span>
 
                                                     {/* Hover effekti uchun biroz to'qroq rang beramiz */}
-                                                    <div className='absolute inset-0 bg-[#e67600] opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
                                                 </button>
                                             </motion.div>
                                         )}

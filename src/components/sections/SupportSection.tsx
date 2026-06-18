@@ -44,9 +44,7 @@ export const SupportSection = () => {
     const [openFaq, setOpenFaq] = useState<number | null>(0);
 
     return (
-        <section className='bg-background relative overflow-hidden py-12 dark:bg-slate-900'>
-            <div className='brand-grid' />
-
+        <section className='relative overflow-hidden py-12 dark:bg-slate-900'>
             <div className='relative z-10 container mx-auto max-w-6xl px-4'>
                 {/* Header */}
                 <div className='mb-10 text-center'>

@@ -126,7 +126,7 @@ const NewsDetailPage = () => {
     const imageUrl = getImageUrl(news.image);
 
     return (
-        <main className='min-h-screen bg-background py-10 dark:bg-slate-900'>
+        <main className='min-h-screen py-10 dark:bg-slate-900'>
             <div className='container mx-auto max-w-4xl px-4'>
                 <button
                     type='button'

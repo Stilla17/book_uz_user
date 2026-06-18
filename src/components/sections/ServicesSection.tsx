@@ -2,32 +2,10 @@
 
 import React, { useMemo } from 'react';
 
-import Link from 'next/link';
-
 import { cn } from '@/lib/utils';
 
-import { motion, useReducedMotion } from 'framer-motion';
-import {
-    Award,
-    BookHeadphones,
-    ChevronRight,
-    Cloud,
-    Coffee,
-    Compass,
-    CreditCard,
-    Crown,
-    Flower2,
-    Gem,
-    Headphones,
-    Heart,
-    Moon,
-    ShieldCheck,
-    Sparkles,
-    Star,
-    Sun,
-    Truck,
-    Zap
-} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { BookHeadphones, CreditCard, Headphones, ShieldCheck, Truck } from 'lucide-react';
 
 export type ServiceItem = {
     id: string;
@@ -51,24 +29,11 @@ const mockServices: ServiceItem[] = [
     {
         id: 's1',
         title: 'Yetkazib berish',
-        desc: 'Toshkent bo‘ylab tez, viloyatlarga esa ishonchli yetkazamiz.',
+        desc: "Toshkent shahri bo'ylab tez va ishonchli yetkazamiz.",
         icon: 'delivery',
         isActive: true
     },
-    {
-        id: 's2',
-        title: '24/7 Support',
-        desc: 'Telegram/Chat orqali doim aloqadamiz. Savol bo‘lsa yozing.',
-        icon: 'support',
-        isActive: true
-    },
-    {
-        id: 's3',
-        title: 'Audiokitoblar',
-        desc: 'Ilovada tinglang: yo‘lda, sportda, uyda — qulay format.',
-        icon: 'audiobooks',
-        isActive: true
-    },
+
     {
         id: 's4',
         title: 'Kafolat & Ishonch',
@@ -79,7 +44,7 @@ const mockServices: ServiceItem[] = [
     {
         id: 's5',
         title: 'Qulay to‘lovlar',
-        desc: 'Click/Payme/Uzum/Bank kartalar — hammasi bor.',
+        desc: 'Click/Payme/Xazna kartalar — hammasi bor.',
         icon: 'payment',
         isActive: true
     }
@@ -112,12 +77,10 @@ export const ServicesSection = ({
 
     return (
         <section className='bg-background relative overflow-hidden py-14 dark:bg-slate-900'>
-            <div className='brand-grid' />
-
             <div className='relative z-10 container mx-auto px-4'>
                 {/* Header */}
                 <motion.div
-                    className='mb-7 flex flex-col items-end justify-between gap-4 md:flex-row'
+                    className='services-section-header mb-7 flex flex-col items-end justify-between gap-4 md:flex-row'
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
