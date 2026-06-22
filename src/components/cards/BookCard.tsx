@@ -105,6 +105,8 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
     return (
         <div
             className='group relative mt-24 flex min-h-100 cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-4 pt-44 pb-4 dark:border-slate-700 dark:bg-slate-800'
+            onMouseEnter={prefetchBook}
+            onTouchStart={prefetchBook}
             onClick={openBookDetails}>
             <div className='absolute -top-20 left-1/2 h-64 w-[70%] -translate-x-1/2'>
                 <Link

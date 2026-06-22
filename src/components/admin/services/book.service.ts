@@ -1,7 +1,15 @@
 import { api } from './api';
 
+type BookPaginationParams = {
+    page: number;
+    limit?: number;
+    search?: string;
+    sortBy?: 'price' | 'title';
+    sortOrder?: 'asc' | 'desc';
+};
+
 export const BookService = {
-    getAdminBook: async (params?: { page: number; limit?: number; search?: string }) => {
+    getAdminBook: async (params?: BookPaginationParams) => {
         const response = await api.get('/admin/products', { params });
         return response.data.data;
     },

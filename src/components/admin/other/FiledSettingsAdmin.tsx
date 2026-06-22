@@ -1,7 +1,7 @@
 import { ElementType, ReactNode } from 'react';
 
 export const Field = ({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) => (
-    <label className='block space-y-2'>
+    <label className='block min-w-0 space-y-2'>
         <span className='text-sm font-black text-[#6f6255] dark:text-slate-300'>{label}</span>
         {children}
         {hint ? <span className='block text-xs font-semibold text-[#9d907e] dark:text-slate-500'>{hint}</span> : null}

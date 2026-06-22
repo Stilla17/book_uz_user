@@ -30,21 +30,21 @@ const SearchableSelect = ({
     const filteredOptions = options.filter((option) => option.label.toLowerCase().includes(query.trim().toLowerCase()));
 
     return (
-        <div className='relative'>
+        <div className='relative w-full max-w-full min-w-0'>
             <input type='hidden' name={name} value={value} />
             <button
                 type='button'
                 disabled={disabled}
                 onClick={() => setIsOpen((current) => !current)}
-                className='flex h-12 w-full items-center justify-between gap-3 rounded-2xl border border-[#eadfce] bg-white px-4 py-3 text-left text-sm font-semibold text-[#2f2a25] shadow-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-900 dark:text-white'>
-                <span className={selectedOption ? 'truncate' : 'truncate text-[#9d907e]'}>
+                className='flex h-12 w-full max-w-full min-w-0 items-center justify-between gap-3 overflow-hidden rounded-2xl border border-[#eadfce] bg-white px-4 py-3 text-left text-sm font-semibold text-[#2f2a25] shadow-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-900 dark:text-white'>
+                <span className={selectedOption ? 'min-w-0 flex-1 truncate' : 'min-w-0 flex-1 truncate text-[#9d907e]'}>
                     {selectedOption?.label ?? placeholder}
                 </span>
                 <Search size={16} className='shrink-0 text-[#9d907e]' />
             </button>
 
             {isOpen ? (
-                <div className='absolute top-full right-0 left-0 z-40 mt-2 rounded-2xl border border-[#eadfce] bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-950'>
+                <div className='absolute top-full right-0 left-0 z-40 mt-2 max-w-full overflow-hidden rounded-2xl border border-[#eadfce] bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-950'>
                     <Input
                         autoFocus
                         value={query}
@@ -64,7 +64,7 @@ const SearchableSelect = ({
                                         setQuery('');
                                         setIsOpen(false);
                                     }}
-                                    className={`block w-full rounded-xl px-3 py-2 text-left text-sm font-semibold transition hover:bg-[#f2e7d8] dark:hover:bg-slate-900 ${
+                                    className={`block w-full truncate rounded-xl px-3 py-2 text-left text-sm font-semibold transition hover:bg-[#f2e7d8] dark:hover:bg-slate-900 ${
                                         option.value === value
                                             ? 'bg-[#ef7f1a] text-white hover:bg-[#ef7f1a]'
                                             : 'text-[#2f2a25] dark:text-white'

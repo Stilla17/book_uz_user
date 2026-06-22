@@ -10,7 +10,6 @@ import AsideFilter from '@/components/filter/AsideFilter';
 import PanelResults, { type CatalogViewMode } from '@/components/filter/PanelResults';
 import { Pagination } from '@/components/shared/Pagination';
 import { buildQueryString, getLanguageParams, parseFilters, parsePage } from '@/helpers/catalog';
-import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
 import { bookService } from '@/services/book.service';
 import type { CatalogFilters } from '@/types';
 import { mapProductToCardBook } from '@/utils/book-formatters';
@@ -21,10 +20,10 @@ import { RefreshCcw, Search } from 'lucide-react';
 
 const DEFAULT_FILTERS: CatalogFilters = {
     keyword: '',
-    category: '',
-    subgenre: '',
-    author: '',
-    publisher: '',
+    category: [],
+    subgenre: [],
+    author: [],
+    publisher: [],
     language: '',
     minPrice: '',
     maxPrice: ''
@@ -51,39 +50,24 @@ export default function CatalogPage() {
         setPage(parsePage(searchParams.get('page')));
     }, [searchParams, searchParamsKey]);
 
-    const { data: categories = [] } = usePublicCategoriesQuery();
-
-    const selectedCategory = useMemo(
-        () => categories.find((category) => category._id === filters.category || category.slug === filters.category),
-        [categories, filters.category]
-    );
-
     const requestParams = useMemo(
         () => ({
             page,
             limit: PAGE_LIMIT,
             sort: '-createdAt',
             ...(filters.keyword && { keyword: filters.keyword }),
-            ...(selectedCategory?._id && { category: selectedCategory._id }),
-            ...(!selectedCategory && filters.category && { category: filters.category }),
-            ...(filters.subgenre && { subgenre: filters.subgenre }),
-            ...(filters.author && { author: filters.author }),
-            ...(filters.publisher && { publisher: filters.publisher }),
+            ...(filters.category.length > 0 ? { category: filters.category.join(',') } : {}),
+            ...(filters.subgenre.length > 0 ? { subgenre: filters.subgenre.join(',') } : {}),
+            ...(filters.author.length > 0 ? { author: filters.author.join(',') } : {}),
+            ...(filters.publisher.length > 0 ? { publisher: filters.publisher.join(',') } : {}),
             ...getLanguageParams(filters.language),
             ...(filters.minPrice && { minPrice: Number(filters.minPrice) }),
             ...(filters.maxPrice && { maxPrice: Number(filters.maxPrice) })
         }),
-        [filters, page, selectedCategory]
+        [filters, page]
     );
-    const shouldUseAuthorProducts =
-        Boolean(filters.author) &&
-        !filters.keyword &&
-        !filters.category &&
-        !filters.subgenre &&
-        !filters.publisher &&
-        !filters.language &&
-        !filters.minPrice &&
-        !filters.maxPrice;
+    
+    const shouldUseAuthorProducts = false;
 
     const {
         data: productsData,
@@ -93,8 +77,8 @@ export default function CatalogPage() {
     } = useQuery({
         queryKey: ['catalog-products', shouldUseAuthorProducts ? 'author-products' : 'all-products', requestParams],
         queryFn: () =>
-            shouldUseAuthorProducts && filters.author
-                ? bookService.getProductsByAuthor(filters.author, { page, limit: PAGE_LIMIT })
+            shouldUseAuthorProducts && filters.author.length === 1
+                ? bookService.getProductsByAuthor(filters.author[0], { page, limit: PAGE_LIMIT })
                 : bookService.getAllProducts(requestParams),
         placeholderData: (previousData) => previousData,
         staleTime: 5 * 60 * 1000
@@ -118,8 +102,8 @@ export default function CatalogPage() {
                 nextRequestParams
             ],
             queryFn: () =>
-                shouldUseAuthorProducts && filters.author
-                    ? bookService.getProductsByAuthor(filters.author, { page: page + 1, limit: PAGE_LIMIT })
+                shouldUseAuthorProducts && filters.author.length === 1
+                    ? bookService.getProductsByAuthor(filters.author[0], { page: page + 1, limit: PAGE_LIMIT })
                     : bookService.getAllProducts(nextRequestParams),
             staleTime: 5 * 60 * 1000
         });

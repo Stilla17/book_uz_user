@@ -446,8 +446,8 @@ const AdminNewBookPage = () => {
                     </section>
                 </div>
 
-                <aside className='space-y-5'>
-                    <section className='rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
+                <aside className='min-w-0 space-y-5'>
+                    <section className='min-w-0 overflow-hidden rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                         <SectionTitle icon={Sparkles} title='Katalog' />
 
                         <div className='grid gap-4'>

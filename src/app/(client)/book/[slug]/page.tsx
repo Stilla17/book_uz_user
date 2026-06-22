@@ -40,7 +40,9 @@ export default function BookDetailPage() {
         queryKey: ['book', slug],
         queryFn: () => bookService.getBookById(slug) as Promise<DetailBook | null>,
         enabled: !!slug,
-        staleTime: 5 * 60 * 1000
+        staleTime: 5 * 60 * 1000,
+        retry: false,
+        refetchOnWindowFocus: false
     });
 
     const viewedBookRef = useRef<string | null>(null);
@@ -57,8 +59,15 @@ export default function BookDetailPage() {
     const { cartItems, addItem, updateQuantity, removeItem } = useBookCart({ loadOnMount: false });
     const cartItem = useMemo(() => cartItems.find((item) => item.book._id === book?._id), [book?._id, cartItems]);
     const cartQuantity = cartItem?.quantity ?? 0;
+    const hiddenBranchNames = ['solnechniy', 'yangi asr avlodi'];
+    const formatBranchName = (name?: string) => (name || "Do'kon").replace(/^\s*\d+\s*/, '');
+
     const availableBranchStocks = useMemo(
-        () => book?.branchStocks?.filter((item) => (item.available ?? 0) > 0) ?? [],
+        () =>
+            book?.branchStocks?.filter((item) => {
+                const storeName = (item.storeName ?? '').trim().toLowerCase();
+                return (item.available ?? 0) > 0 && !hiddenBranchNames.some((name) => storeName.includes(name));
+            }) ?? [],
         [book?.branchStocks]
     );
     const hasBranchStocks = Boolean(book?.branchStocks?.length);
@@ -196,6 +205,44 @@ export default function BookDetailPage() {
                             alt={bookView.title}
                             className='h-full max-h-130 w-full object-contain'
                         />
+                        {availableBranchStocks.length ? (
+                            <div className='mt-5 space-y-3 border-t border-orange-100 pt-4 dark:border-slate-700'>
+                                <div className='space-y-2'>
+                                    {availableBranchStocks.map((item, index) => {
+                                        const available = Math.max(item.available ?? 0, 0);
+
+                                        return (
+                                            <div
+                                                key={item._id ?? item.storeId ?? index}
+                                                className='rounded-lg border border-slate-200 bg-white/70 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900/40'>
+                                                <div className='flex items-start justify-between gap-3'>
+                                                    <div className='flex min-w-0 items-center gap-2'>
+                                                        <div className='min-w-0'>
+                                                            <p className='truncate font-semibold text-slate-900 dark:text-white'>
+                                                                {formatBranchName(item.storeName)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <span className='shrink-0 rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-600 dark:bg-green-500/10 dark:text-green-400'>
+                                                        {available} dona
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ) : isBookAvailable && !hasBranchStocks ? (
+                            <div className='mt-5 rounded-lg border border-green-100 bg-green-50/70 p-3 text-sm font-semibold text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'>
+                                {availableStock} dona mavjud
+                            </div>
+                        ) : (
+                            <span className='flex items-center gap-2 text-sm text-red-500'>
+                                <span className='h-3 w-3 rounded-full bg-red-500'></span>
+                                Mavjud emas
+                            </span>
+                        )}
                     </div>
 
                     <div className='p-6'>
@@ -235,65 +282,6 @@ export default function BookDetailPage() {
                                     {viewsCount}
                                 </span>
                             </div>
-
-                            {availableBranchStocks.length ? (
-                                <div className='mt-5 space-y-3 border-t border-orange-100 pt-4 dark:border-slate-700'>
-                                    <div className='flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200'>
-                                        <PackageCheck size={18} className='text-green-500' />
-                                        Do'konlardagi mavjudlik
-                                    </div>
-
-                                    <div className='space-y-2'>
-                                        {availableBranchStocks.map((item, index) => {
-                                            const available = Math.max(item.available ?? 0, 0);
-                                            const quantity = Math.max(item.quantity ?? available, available, 1);
-                                            const percent = Math.min((available / quantity) * 100, 100);
-
-                                            return (
-                                                <div
-                                                    key={item._id ?? item.storeId ?? index}
-                                                    className='rounded-lg border border-slate-200 bg-white/70 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900/40'>
-                                                    <div className='flex items-start justify-between gap-3'>
-                                                        <div className='flex min-w-0 items-center gap-2'>
-                                                            <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400'>
-                                                                <Store size={17} />
-                                                            </span>
-                                                            <div className='min-w-0'>
-                                                                <p className='truncate font-semibold text-slate-900 dark:text-white'>
-                                                                    {item.storeName || "Do'kon"}
-                                                                </p>
-                                                                <p className='text-xs text-slate-500 dark:text-slate-400'>
-                                                                    Zaxirada mavjud
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        <span className='shrink-0 rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-600 dark:bg-green-500/10 dark:text-green-400'>
-                                                            {available} dona
-                                                        </span>
-                                                    </div>
-
-                                                    <div className='mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800'>
-                                                        <div
-                                                            className='h-full rounded-full bg-green-500'
-                                                            style={{ width: `${percent}%` }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            ) : isBookAvailable && !hasBranchStocks ? (
-                                <div className='mt-5 rounded-lg border border-green-100 bg-green-50/70 p-3 text-sm font-semibold text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'>
-                                    {availableStock} dona mavjud
-                                </div>
-                            ) : (
-                                <span className='flex items-center gap-2 text-sm text-red-500'>
-                                    <span className='h-3 w-3 rounded-full bg-red-500'></span>
-                                    Mavjud emas
-                                </span>
-                            )}
                         </div>
 
                         {/* Info Books */}

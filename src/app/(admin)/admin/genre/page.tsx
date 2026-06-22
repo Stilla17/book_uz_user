@@ -15,7 +15,7 @@ import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { BookOpen, Edit3, FolderTree, Plus, Search, Tags, Trash2 } from 'lucide-react';
+import { BookOpen, Edit3, FolderTree, Search, Tags, Trash2 } from 'lucide-react';
 
 const AdminGenrePage = () => {
     const router = useRouter();

@@ -181,10 +181,10 @@ export interface PublisherItems {
 
 export type CatalogFilters = {
     keyword: string;
-    category: string;
-    subgenre: string;
-    author: string;
-    publisher: string;
+    category: string[];
+    subgenre: string[];
+    author: string[];
+    publisher: string[];
     language: string;
     minPrice: string;
     maxPrice: string;

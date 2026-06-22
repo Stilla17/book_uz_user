@@ -111,10 +111,12 @@ const TabPanel = ({
     year,
     reviewsCount
 }: TabPanelProps) => {
+    const [activeTab, setActiveTab] = React.useState('description');
     const { data: commentsData, isLoading: commentsLoading } = useQuery({
         queryKey: ['comments', bookId],
         queryFn: () => UserService.getComments(bookId!),
-        enabled: !!bookId
+        enabled: !!bookId && activeTab === 'reviews',
+        staleTime: 5 * 60 * 1000
     });
 
     const comments = getCommentList(commentsData).filter(
@@ -127,7 +129,7 @@ const TabPanel = ({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             className='mt-12 rounded-[28px] border border-[#f7e3cf] bg-[#fff9f3] p-3 shadow-lg shadow-orange-100/70 backdrop-blur dark:border-slate-700 dark:bg-slate-800 dark:shadow-none'>
-            <Tabs defaultValue='description' className='w-full'>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
                 <TabsList className='flex h-auto w-full flex-wrap justify-start gap-2 rounded-[22px] bg-white/80 p-2 dark:bg-slate-900/70'>
                     <TabsTrigger
                         value='description'

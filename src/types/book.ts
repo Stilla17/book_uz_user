@@ -1,6 +1,6 @@
 import { OtherPagination } from '@/services/api';
 
-export type LocalizedText = string | { uz?: string; ru?: string; en?: string };
+export type LocalizedText = { uz?: string; ru?: string; en?: string };
 
 export interface Book {
     _id: string;

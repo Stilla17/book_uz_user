@@ -86,7 +86,7 @@ const NewsPage = () => {
 
     if (isLoading) {
         return (
-            <div className=' flex min-h-screen items-center justify-center dark:bg-slate-900'>
+            <div className='flex min-h-screen items-center justify-center dark:bg-slate-900'>
                 <div className='text-center'>
                     <div className='relative'>
                         <div className='mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-[#00a0e3]/20 border-t-[#00a0e3]' />
@@ -102,20 +102,11 @@ const NewsPage = () => {
     }
 
     return (
-        <main className=' min-h-screen py-12 dark:bg-slate-900'>
+        <main className='min-h-screen py-12 dark:bg-slate-900'>
             <div className='container mx-auto max-w-7xl px-4'>
                 <section className='mb-10 text-center'>
-                    <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#00a0e3]/10 to-[#ef7f1a]/10 px-4 py-2 dark:from-blue-600/20 dark:to-orange-600/20'>
-                        <Megaphone size={16} className='text-[#00a0e3] dark:text-blue-400' />
-                        <span className='text-xs font-bold text-[#ef7f1a] dark:text-orange-400'>
-                            BLOG & YANGILIKLAR
-                        </span>
-                    </div>
-
-                    <h1 className='mb-4 text-4xl font-black md:text-5xl'>
-                        <span className='bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] bg-clip-text text-transparent'>
+                    <h1 className='mb-4 text-4xl font-black text-[#ef7f1a] md:text-5xl'>
                             Barcha yangiliklar
-                        </span>
                     </h1>
 
                     <p className='mx-auto max-w-2xl text-lg text-gray-500 dark:text-gray-400'>

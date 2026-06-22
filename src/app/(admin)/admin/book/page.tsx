@@ -15,21 +15,32 @@ import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { StockFilter, getBookBarcodes, getStockStatus } from '@/helpers/admin/newBook';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
-import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
+import { getAuthor, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getLatestImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { BookOpen, Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowDownUp, ArrowUp, BookOpen, Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
+
+type SortKey = 'default' | 'price' | 'title';
+type SortOrder = 'asc' | 'desc';
 
 const AdminBookPage = () => {
+    const [sortKey, setSortKey] = useState<SortKey>('default');
+    const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const router = useRouter();
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
     const [stockFilter, setStockFilter] = useState<StockFilter>('all');
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { data, isFetching, isLoading } = useBookListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
+    const { data, isFetching, isLoading } = useBookListQuery(
+        page,
+        FETCH_PAGINATION_LIMIT,
+        debouncedSearch,
+        sortKey === 'default' ? undefined : sortKey,
+        sortKey === 'default' ? undefined : sortOrder
+    );
 
     const totalBooksLimit = Number(data?.pagination?.total || FETCH_PAGINATION_LIMIT);
 
@@ -38,9 +49,33 @@ const AdminBookPage = () => {
 
     const books = data?.products ?? [];
     const allBooks = allBooksData?.products ?? [];
-    console.log(allBooks);
+    const sourceBooks = allBooks.length > 0 ? allBooks : books;
 
-    const filteredBooks = books.filter((book) => {
+    const sortedBooks = useMemo(() => {
+        const list = [...sourceBooks];
+
+        if (sortKey === 'price') {
+            return list.sort((a, b) => {
+                const first = Number(a.price || 0);
+                const second = Number(b.price || 0);
+
+                return sortOrder === 'asc' ? first - second : second - first;
+            });
+        }
+
+        if (sortKey === 'title') {
+            return list.sort((a, b) => {
+                const first = getLocalizedText(a.title);
+                const second = getLocalizedText(b.title);
+
+                return sortOrder === 'asc' ? first.localeCompare(second, 'uz') : second.localeCompare(first, 'uz');
+            });
+        }
+
+        return list;
+    }, [sourceBooks, sortKey, sortOrder]);
+
+    const filteredBooks = sortedBooks.filter((book) => {
         const stock = Number(book.stock || 0);
 
         if (stockFilter === 'out') return stock <= 0;
@@ -49,7 +84,15 @@ const AdminBookPage = () => {
 
         return true;
     });
+    const pageSize = FETCH_PAGINATION_LIMIT;
+    const paginatedBooks = filteredBooks.slice((page - 1) * pageSize, page * pageSize);
     const pagination = data?.pagination;
+    const displayPagination = {
+        page,
+        limit: pageSize,
+        total: filteredBooks.length,
+        pages: Math.max(1, Math.ceil(filteredBooks.length / pageSize))
+    };
 
     useEffect(() => {
         setPage(urlPage);
@@ -83,7 +126,7 @@ const AdminBookPage = () => {
     const updatePage = (nextPage: number) => {
         updateUrlPage({
             nextPage,
-            totalPages: pagination?.pages ?? 1,
+            totalPages: displayPagination.pages,
             searchParams,
             replace: router.replace,
             setPage
@@ -122,6 +165,38 @@ const AdminBookPage = () => {
             activeClassName: 'ring-2 ring-red-400'
         }
     ];
+
+    const handleSort = (key: Exclude<SortKey, 'default'>) => {
+        if (sortKey === key && sortOrder === 'asc') {
+            setSortOrder('desc');
+        } else if (sortKey === key && sortOrder === 'desc') {
+            setSortKey('default');
+            setSortOrder('asc');
+        } else {
+            setSortKey(key);
+            setSortOrder('asc');
+        }
+
+        updateUrlPage({
+            nextPage: 1,
+            totalPages: displayPagination.pages,
+            searchParams,
+            replace: router.replace,
+            setPage
+        });
+    };
+
+    const SortIcon = ({ column }: { column: SortKey }) => {
+        if (sortKey !== column) {
+            return <ArrowDownUp size={14} className='text-[#b0a391]' />;
+        }
+
+        return sortOrder === 'asc' ? (
+            <ArrowUp size={14} className='text-[#ef7f1a]' />
+        ) : (
+            <ArrowDown size={14} className='text-[#ef7f1a]' />
+        );
+    };
 
     return (
         <div className='space-y-5'>
@@ -188,9 +263,24 @@ const AdminBookPage = () => {
                     <table className='w-full min-w-245 text-left'>
                         <thead>
                             <tr className='border-b border-[#eadfce] text-xs font-black text-[#9d907e] uppercase dark:border-slate-800 dark:text-slate-500'>
-                                <th className='px-4 py-3'>Kitob</th>
-                                <th className='px-4 py-3'>Kategoriya</th>
-                                <th className='px-4 py-3'>Narx</th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('title')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Kitob
+                                        <SortIcon column='title' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('price')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Narx
+                                        <SortIcon column='price' />
+                                    </button>
+                                </th>
                                 <th className='px-4 py-3'>Zaxira</th>
                                 <th className='px-4 py-3'>Reyting</th>
                                 <th className='px-4 py-3 text-right'>Amallar</th>
@@ -200,7 +290,7 @@ const AdminBookPage = () => {
                             {isLoading ? (
                                 <BooksTableSkeleton />
                             ) : (
-                                filteredBooks.map((book, index) => {
+                                paginatedBooks.map((book, index) => {
                                     const status = getStockStatus(book.stock);
                                     const imageUrl = getLatestImageUrl(book.images) || getLatestImageUrl(book.image);
                                     const barcode = getBookBarcodes(book);
@@ -236,9 +326,7 @@ const AdminBookPage = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className='px-4 py-4 text-sm font-bold text-[#6f6255] dark:text-slate-300'>
-                                                {getCategoryLabel(book.category)}
-                                            </td>
+
                                             <td className='px-4 py-4'>
                                                 <p className='font-black text-[#2f2a25] dark:text-white'>
                                                     {formatPrice(book.price)}
@@ -291,7 +379,7 @@ const AdminBookPage = () => {
                 </div>
 
                 <PaginationFooter
-                    pagination={data?.pagination}
+                    pagination={displayPagination}
                     page={page}
                     updatePage={updatePage}
                     isFetching={isFetching}

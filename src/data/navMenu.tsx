@@ -178,6 +178,11 @@ export const menuItems = [
         icon: MessageSquareText
     },
     {
+        label: 'Faq',
+        href: '/admin/faq',
+        icon: MessageSquareText
+    },
+    {
         label: 'Partners',
         href: '/admin/partners',
         icon: Handshake

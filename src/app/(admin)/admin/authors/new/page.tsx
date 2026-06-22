@@ -181,7 +181,7 @@ const AdminNewAuthorPage = () => {
                         </Field>
 
                         <Field label="Tug'ilgan sana">
-                            <Input className={inputClass} {...register('birthDate', { required: true })} />
+                            <Input className={inputClass} {...register('birthDate')} />
                         </Field>
 
                         <Field label='Vafot etgan sana' hint="Agar muallif hayot bo'lsa, bo'sh qoldiring.">

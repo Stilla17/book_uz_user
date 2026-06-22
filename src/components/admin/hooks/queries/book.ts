@@ -30,12 +30,18 @@ export const useBookQuery = () => {
     });
 };
 
-export const useBookListQuery = (page: number, limit: number, keyword = '') => {
+export const useBookListQuery = (
+    page: number,
+    limit: number,
+    keyword = '',
+    sortBy?: 'price' | 'title',
+    sortOrder?: 'asc' | 'desc'
+) => {
     const search = keyword.trim();
 
     return useQuery<AdminBooksResponse>({
-        queryKey: ['books', 'list', page, limit, search],
-        queryFn: () => BookService.getAdminBook({ page, limit, search }),
+        queryKey: ['books', 'list', page, limit, search, sortBy, sortOrder],
+        queryFn: () => BookService.getAdminBook({ page, limit, search, sortBy, sortOrder }),
         placeholderData: (previousData) => previousData
     });
 };

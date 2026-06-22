@@ -31,7 +31,6 @@ type AuthorsResponse = {
     };
 };
 
-const AUTHORS_PAGE_LIMIT = 100;
 const TOP_AUTHORS_LIMIT = 20;
 const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
 
@@ -39,42 +38,19 @@ const getAuthorBooksCount = (author: AuthorItem) => author.booksCount ?? author.
 
 const Authors = () => {
     const { data, isLoading } = useQuery({
-        queryKey: ['authors-preview', 'all-pages', AUTHORS_PAGE_LIMIT],
+        queryKey: ['authors-preview', 'top', TOP_AUTHORS_LIMIT],
         queryFn: async () => {
-            const firstResponse = await api.get('/authors', {
-                params: { page: 1, limit: AUTHORS_PAGE_LIMIT }
+            const response = await api.get('/authors/top', {
+                params: { limit: TOP_AUTHORS_LIMIT }
             });
-            const firstData = firstResponse.data?.data as AuthorsResponse;
-            const totalPages = firstData?.pagination?.pages ?? 1;
-
-            if (totalPages <= 1) return firstData;
-
-            const restResponses = await Promise.all(
-                Array.from({ length: totalPages - 1 }, (_, index) =>
-                    api.get('/authors', {
-                        params: { page: index + 2, limit: AUTHORS_PAGE_LIMIT }
-                    })
-                )
-            );
-
-            const authors = [
-                ...(firstData?.authors ?? []),
-                ...restResponses.flatMap((response) => {
-                    const data = response.data?.data as AuthorsResponse;
-                    return data?.authors ?? [];
-                })
-            ];
-
-            return {
-                ...firstData,
-                authors
-            };
-        }
+            return response.data?.data as AuthorsResponse;
+        },
+        staleTime: 10 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false
     });
 
-    const authors = [...(data?.authors ?? [])]
-        .sort((a, b) => getAuthorBooksCount(b) - getAuthorBooksCount(a))
-        .slice(0, TOP_AUTHORS_LIMIT);
+    const authors = (data?.authors ?? []).slice(0, TOP_AUTHORS_LIMIT);
 
     if (!isLoading && authors.length === 0) return null;
 

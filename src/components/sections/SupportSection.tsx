@@ -3,10 +3,24 @@
 import React, { useState } from 'react';
 
 import MiniCard from '@/components/shared/MiniCard';
-import { faqs, supportStats } from '@/data/support';
+import { supportStats } from '@/data/support';
+import { useFaq } from '@/hooks/faqsHooks/useFaq';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronRight, Clock, Mail, MessageCircle, Phone } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+type LocalizedText = {
+    uz?: string;
+    ru?: string;
+    en?: string;
+};
+
+type FaqItem = {
+    _id?: string;
+    question: LocalizedText;
+    answer: LocalizedText;
+};
 
 const contact = [
     {
@@ -42,6 +56,19 @@ const contact = [
 export const SupportSection = () => {
     const [activeTab, setActiveTab] = useState<'faq' | 'contact' | 'chat'>('faq');
     const [openFaq, setOpenFaq] = useState<number | null>(0);
+    const { i18n } = useTranslation();
+    const { data, isError, isLoading } = useFaq();
+    const currentLanguage = (i18n.language?.split('-')[0] || 'uz') as keyof LocalizedText;
+    const responseData = data?.data ?? data;
+    const faqs: FaqItem[] = Array.isArray(responseData?.faqs)
+        ? responseData.faqs
+        : Array.isArray(responseData)
+          ? responseData
+          : [];
+
+    const getLocalizedText = (value: LocalizedText) => {
+        return value?.[currentLanguage] || value?.uz || value?.ru || value?.en || '';
+    };
 
     return (
         <section className='relative overflow-hidden py-12 dark:bg-slate-900'>
@@ -94,41 +121,65 @@ export const SupportSection = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 className='space-y-2'>
-                                {faqs.map((f, i) => (
-                                    <div
-                                        key={i}
-                                        className='overflow-hidden rounded-xl border border-gray-100 bg-white dark:border-slate-700 dark:bg-slate-800'>
-                                        <button
-                                            onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                                            className='flex w-full items-center justify-between p-4 text-left'>
-                                            <span className='text-sm font-bold text-gray-800 dark:text-gray-200'>
-                                                {f.question}
-                                            </span>
-                                            <div
-                                                className={`rounded-full p-1.5 transition-all ${
-                                                    openFaq === i
-                                                        ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
-                                                        : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-gray-400'
-                                                }`}>
-                                                <ChevronDown
-                                                    size={14}
-                                                    className={`transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
-                                                />
-                                            </div>
-                                        </button>
-                                        <AnimatePresence>
-                                            {openFaq === i && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: 'auto', opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    className='border-t border-gray-50 px-4 pt-2 pb-4 text-xs text-gray-500 dark:border-slate-700 dark:text-gray-400'>
-                                                    {f.answer}
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+                                {isLoading ? (
+                                    Array.from({ length: 4 }).map((_, index) => (
+                                        <div
+                                            key={index}
+                                            className='h-16 animate-pulse rounded-xl border border-gray-100 bg-white dark:border-slate-700 dark:bg-slate-800'>
+                                            <div className='m-4 h-4 rounded-full bg-gray-100 dark:bg-slate-700' />
+                                        </div>
+                                    ))
+                                ) : isError ? (
+                                    <div className='rounded-xl border border-red-100 bg-red-50 p-4 text-center text-sm font-bold text-red-500 dark:border-red-500/20 dark:bg-red-500/10'>
+                                        FAQ ma'lumotlarini yuklashda xatolik yuz berdi.
                                     </div>
-                                ))}
+                                ) : faqs.length === 0 ? (
+                                    <div className='rounded-xl border border-gray-100 bg-white p-6 text-center text-sm font-bold text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-400'>
+                                        Hozircha FAQ savollari mavjud emas.
+                                    </div>
+                                ) : (
+                                    faqs.map((f, i) => (
+                                        <motion.div
+                                            layout
+                                            key={f._id ?? i}
+                                            transition={{ duration: 0.22, ease: 'easeOut' }}
+                                            className='overflow-hidden rounded-xl border border-gray-100 bg-white dark:border-slate-700 dark:bg-slate-800'>
+                                            <button
+                                                type='button'
+                                                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                                                className='flex w-full items-center justify-between gap-4 p-4 text-left'>
+                                                <span className='text-sm font-bold text-gray-800 dark:text-gray-200'>
+                                                    {getLocalizedText(f.question)}
+                                                </span>
+                                                <div
+                                                    className={`shrink-0 rounded-full p-1.5 transition-all ${
+                                                        openFaq === i
+                                                            ? 'bg-[#ef7f1a] text-white dark:bg-orange-600'
+                                                            : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-gray-400'
+                                                    }`}>
+                                                    <ChevronDown
+                                                        size={14}
+                                                        className={`transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
+                                                    />
+                                                </div>
+                                            </button>
+                                            <AnimatePresence initial={false}>
+                                                {openFaq === i && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                                                        className='overflow-hidden border-t border-gray-50 dark:border-slate-700'>
+                                                        <div className='px-4 pt-2 pb-4 text-xs leading-5 text-gray-500 dark:text-gray-400'>
+                                                            {getLocalizedText(f.answer)}
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </motion.div>
+                                    ))
+                                )}
                             </motion.div>
                         )}
 

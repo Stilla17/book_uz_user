@@ -2,18 +2,21 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { LANGUAGE_OPTIONS } from '@/data';
 import { useBookFilterQuery } from '@/hooks/queries/useFilter';
+import { filterService } from '@/services/filter.service';
 import { CatalogFilters } from '@/types';
 import type { Category } from '@/types/category.types';
 
 import { Slider } from '../ui/slider';
-import FilterSelect from './FilterSelect';
+import MultiFilterSelect from './MultiFilterSelect';
 import { motion } from 'framer-motion';
 import { Filter } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 const PRICE_SLIDER_MIN = 0;
 const PRICE_SLIDER_MAX = 1000000;
 const PRICE_SLIDER_STEP = 5000;
 const SEARCH_DEBOUNCE_MS = 450;
+const ENTITY_SEARCH_MIN_LENGTH = 2;
 
 type AsideFilterProps = {
     filters: CatalogFilters;
@@ -39,6 +42,18 @@ const getNormalizedPriceRange = (filters: CatalogFilters): [number, number] => {
     return clampedMin <= clampedMax ? [clampedMin, clampedMax] : [clampedMax, clampedMin];
 };
 
+const mergeEntitiesById = <T extends { _id: string }>(baseItems: T[], extraItems: T[]) => {
+    const entitiesById = new Map<string, T>();
+
+    [...baseItems, ...extraItems].forEach((item) => {
+        if (item._id) {
+            entitiesById.set(item._id, item);
+        }
+    });
+
+    return Array.from(entitiesById.values());
+};
+
 const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
     const { data, isLoading } = useBookFilterQuery();
     const categories = data?.categories || [];
@@ -46,7 +61,51 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
     const publishers = data?.publishers || [];
 
     const [keywordDraft, setKeywordDraft] = useState(filters.keyword);
+    const [authorSearch, setAuthorSearch] = useState('');
+    const [publisherSearch, setPublisherSearch] = useState('');
+    const [debouncedAuthorSearch, setDebouncedAuthorSearch] = useState('');
+    const [debouncedPublisherSearch, setDebouncedPublisherSearch] = useState('');
     const [priceRange, setPriceRange] = useState<[number, number]>(() => getNormalizedPriceRange(filters));
+
+    const authorSearchQuery = useQuery({
+        queryKey: ['book-filter', 'authors-search', debouncedAuthorSearch],
+        queryFn: () => filterService.searchAuthors(debouncedAuthorSearch),
+        enabled: debouncedAuthorSearch.length >= ENTITY_SEARCH_MIN_LENGTH,
+        staleTime: 10 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false
+    });
+
+    const publisherSearchQuery = useQuery({
+        queryKey: ['book-filter', 'publishers-search', debouncedPublisherSearch],
+        queryFn: () => filterService.searchPublishers(debouncedPublisherSearch),
+        enabled: debouncedPublisherSearch.length >= ENTITY_SEARCH_MIN_LENGTH,
+        staleTime: 10 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false
+    });
+
+    const visibleAuthors = useMemo(
+        () =>
+            debouncedAuthorSearch.length >= ENTITY_SEARCH_MIN_LENGTH
+                ? mergeEntitiesById(
+                      authors.filter((author) => filters.author.includes(author._id)),
+                      authorSearchQuery.data ?? []
+                  )
+                : authors,
+        [authors, authorSearchQuery.data, debouncedAuthorSearch.length, filters.author]
+    );
+
+    const visiblePublishers = useMemo(
+        () =>
+            debouncedPublisherSearch.length >= ENTITY_SEARCH_MIN_LENGTH
+                ? mergeEntitiesById(
+                      publishers.filter((publisher) => filters.publisher.includes(publisher._id)),
+                      publisherSearchQuery.data ?? []
+                  )
+                : publishers,
+        [debouncedPublisherSearch.length, filters.publisher, publisherSearchQuery.data, publishers]
+    );
 
     const filterOptions = useMemo(() => {
         return {
@@ -71,24 +130,24 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                 })
                 .filter((group) => group.options.length > 0),
 
-            authors: authors
+            authors: visibleAuthors
                 .map((author) => ({
                     value: author._id,
                     label: author.name
                 }))
                 .filter((option) => Boolean(option.value && option.label)),
 
-            publishers: publishers
+            publishers: visiblePublishers
                 .map((publisher) => ({
                     value: publisher._id,
                     label: publisher.name
                 }))
                 .filter((option) => Boolean(option.value && option.label))
         };
-    }, [categories, authors, publishers]);
+    }, [categories, visibleAuthors, visiblePublishers]);
 
-    const selectedGenre = filters.subgenre || filters.category;
-    const hasActiveFilters = Object.values(filters).some(Boolean);
+    const selectedGenre = [...filters.category, ...filters.subgenre];
+    const hasActiveFilters = Object.values(filters).some((value) => (Array.isArray(value) ? value.length > 0 : Boolean(value)));
 
     useEffect(() => {
         setKeywordDraft(filters.keyword);
@@ -97,6 +156,22 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
     useEffect(() => {
         setPriceRange(getNormalizedPriceRange(filters));
     }, [filters.minPrice, filters.maxPrice]);
+
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            setDebouncedAuthorSearch(authorSearch.trim());
+        }, SEARCH_DEBOUNCE_MS);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [authorSearch]);
+
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            setDebouncedPublisherSearch(publisherSearch.trim());
+        }, SEARCH_DEBOUNCE_MS);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [publisherSearch]);
 
     useEffect(() => {
         const nextKeyword = keywordDraft.trim();
@@ -113,26 +188,23 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
         onChange({ ...filters, ...partialFilters }, 1);
     };
 
-    const handleGenreChange = (value: string) => {
-        if (!value) {
-            updateFilters({ category: '', subgenre: '' });
-            return;
-        }
+    const handleGenreChange = (values: string[]) => {
+        const categoryValues: string[] = [];
+        const subgenreValues: string[] = [];
 
-        const parentCategory = categories.find((category) => category._id === value || category.slug === value);
-        if (parentCategory) {
-            updateFilters({ category: parentCategory._id || parentCategory.slug, subgenre: '' });
-            return;
-        }
+        values.forEach((value) => {
+            const parentCategory = categories.find((category) => category._id === value || category.slug === value);
 
-        const matchedCategory = categories.find((category) => {
-            const subgenres = category.subgenres || category.subCategories || [];
-            return subgenres.some((subgenre) => subgenre._id === value || subgenre.slug === value);
+            if (parentCategory) {
+                categoryValues.push(parentCategory._id || parentCategory.slug);
+            } else {
+                subgenreValues.push(value);
+            }
         });
 
         updateFilters({
-            category: matchedCategory?._id || matchedCategory?.slug || '',
-            subgenre: value
+            category: categoryValues,
+            subgenre: subgenreValues
         });
     };
 
@@ -217,7 +289,7 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                         </div>
                     </div>
 
-                    <FilterSelect
+                    <MultiFilterSelect
                         label='Janr'
                         placeholder='Janrni tanlang'
                         groups={filterOptions.genres}
@@ -226,22 +298,28 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                         disabled={isLoading}
                     />
 
-                    <FilterSelect
+                    <MultiFilterSelect
                         label='Muallif'
                         placeholder='Muallifni tanlang'
                         options={filterOptions.authors}
                         value={filters.author}
                         onChange={(value) => updateFilters({ author: value })}
                         disabled={isLoading}
+                        searchValue={authorSearch}
+                        onSearchChange={setAuthorSearch}
+                        isSearching={authorSearchQuery.isFetching}
                     />
 
-                    <FilterSelect
+                    <MultiFilterSelect
                         label='Nashriyot'
                         placeholder='Nashriyotni tanlang'
                         options={filterOptions.publishers}
                         value={filters.publisher}
                         onChange={(value) => updateFilters({ publisher: value })}
                         disabled={isLoading}
+                        searchValue={publisherSearch}
+                        onSearchChange={setPublisherSearch}
+                        isSearching={publisherSearchQuery.isFetching}
                     />
 
                     <div>
