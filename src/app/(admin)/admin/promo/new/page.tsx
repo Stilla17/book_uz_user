@@ -88,7 +88,13 @@ const AdminNewPromoPage = () => {
         if (!isEdit || !editablePromo) return;
 
         const productIds = (editablePromo.applicableProducts ?? []).map(getReferenceId);
-        const publisherIds = (editablePromo.applicablePublishers ?? []).map(getReferenceId);
+        const publisherIds = (
+            editablePromo.applicablePublishers ??
+            editablePromo.applicablePublisherIds ??
+            editablePromo.publisherIds ??
+            editablePromo.publishers ??
+            []
+        ).map(getReferenceId);
         const targetType: PromoTargetType = publisherIds.length ? 'publisher' : 'book';
 
         reset({
@@ -106,13 +112,17 @@ const AdminNewPromoPage = () => {
     }, [editablePromo, isEdit, reset]);
 
     const onSubmit = (values: PromoFormValues) => {
+        const publisherIds = values.targetType === 'publisher' ? values.publisherIds : [];
         const payload: CreatePromoPayload = {
             code: values.code,
             type: values.discountType === 'percentage' ? 'PERCENT' : 'FIXED',
             value: values.discountValue,
             discountPercentage: values.discountType === 'percentage' ? values.discountValue : undefined,
             applicableProducts: values.targetType === 'book' ? values.bookIds : [],
-            applicablePublishers: values.targetType === 'publisher' ? values.publisherIds : [],
+            applicablePublishers: publisherIds,
+            applicablePublisherIds: publisherIds,
+            publisherIds,
+            publishers: publisherIds,
             startDate: values.startDate,
             endDate: values.endDate,
             usageLimit: values.usageLimit,

@@ -3,10 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { CommentService } from '../../services/comment.service';
 
-export const useGetComment = () => {
+export const useGetComment = (params?: { search?: string; status?: 'all' | CommentStatus }) => {
     return useQuery<AdminComment[]>({
-        queryKey: ['admin', 'comments'],
-        queryFn: CommentService.getComment
+        queryKey: ['admin', 'comments', params?.search ?? '', params?.status ?? 'all'],
+        queryFn: () => CommentService.getComment(params)
     });
 };
 

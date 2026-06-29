@@ -1,27 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useDeletePublisher } from '@/components/admin/hooks/publisherHooks/useDeletePublisher';
 import { usePublisherQuery } from '@/components/admin/hooks/queries/publishers';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { PublishersSkeleton } from '@/components/ui/skeleton';
+import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { ArrowLeft, ArrowRight, BookOpen, Building2, Edit3, Plus, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, Building2, Edit3, Search, Trash2 } from 'lucide-react';
+
+type PublisherSortKey = 'title' | 'bookCount';
 
 const AdminPublishersPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
+    const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<PublisherSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
     const { data, isFetching, isLoading } = usePublisherQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate } = useDeletePublisher();
@@ -32,8 +37,23 @@ const AdminPublishersPage = () => {
 
     const publishers = data?.publishers ?? [];
     const pagination = data?.pagination;
+    const getPublisherBookCount = (publisher: { booksCount?: number; bookCount?: number }) =>
+        Number(publisher.booksCount ?? publisher.bookCount ?? 0);
+
+    const sortedPublishers = useMemo(() => {
+        return sortAdminItems({
+            items: publishers,
+            sortKey,
+            sortOrder,
+            sortConfig: {
+                title: (publisher) => publisher.name || '',
+                bookCount: getPublisherBookCount
+            }
+        });
+    }, [publishers, sortKey, sortOrder]);
+
     const totalBooks = publishers.reduce((sum, publisher) => {
-        return sum + Number(publisher.booksCount || 0);
+        return sum + getPublisherBookCount(publisher);
     }, 0);
 
     const stats = [
@@ -64,21 +84,7 @@ const AdminPublishersPage = () => {
                 href='publishers'
             />
 
-            <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-2'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>
-                            {isLoading ? 0 : value}
-                        </p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='w-full'>
                 <div className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
@@ -93,16 +99,34 @@ const AdminPublishersPage = () => {
                                 className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
                             />
                         </label>
-                        <span className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
-                            {publishers.length} ta nashriyot ko'rsatildi
-                        </span>
+                        <div className='flex flex-wrap items-center gap-2'>
+                            <Button
+                                type='button'
+                                variant='outline'
+                                onClick={() => handleSort('title')}
+                                className='h-10 rounded-2xl border-[#eadfce] bg-white text-xs font-black dark:border-slate-800 dark:bg-slate-900'>
+                                Nashriyot
+                                <SortIcon column='title' />
+                            </Button>
+                            <Button
+                                type='button'
+                                variant='outline'
+                                onClick={() => handleSort('bookCount')}
+                                className='h-10 rounded-2xl border-[#eadfce] bg-white text-xs font-black dark:border-slate-800 dark:bg-slate-900'>
+                                Kitoblar
+                                <SortIcon column='bookCount' />
+                            </Button>
+                            <span className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
+                                {publishers.length} ta nashriyot ko'rsatildi
+                            </span>
+                        </div>
                     </div>
 
                     {isLoading ? (
                         <PublishersSkeleton />
                     ) : (
                         <div className='grid gap-3 p-4'>
-                            {publishers.map((publisher, index) => (
+                            {sortedPublishers.map((publisher, index) => (
                                 <article
                                     key={publisher._id}
                                     className='grid gap-4 rounded-4xl bg-white p-4 ring-1 ring-[#eadfce] md:grid-cols-[minmax(0,1fr)_130px_120px_auto] md:items-center dark:bg-slate-900 dark:ring-slate-800'>
@@ -130,7 +154,7 @@ const AdminPublishersPage = () => {
                                             Kitoblar
                                         </p>
                                         <p className='mt-1 font-black text-[#2f2a25] dark:text-white'>
-                                            {publisher.booksCount}
+                                            {getPublisherBookCount(publisher)}
                                         </p>
                                     </div>
 

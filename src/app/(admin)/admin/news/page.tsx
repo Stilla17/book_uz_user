@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -8,9 +8,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDeleteNews } from '@/components/admin/hooks/newsHooks/useDeleteNews';
 import { useNewsListQuery } from '@/components/admin/hooks/queries/news';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
+import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getLocalizedText } from '@/utils/book-formatters';
@@ -18,20 +20,36 @@ import { getImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
-import { CalendarDays, Edit3, Eye, Newspaper, Search, Trash2 } from 'lucide-react';
+import { CalendarDays, Edit3, Newspaper, Search, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+type NewsSortKey = 'title' | 'date' | 'views';
 
 const AdminNewsPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
+    const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<NewsSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
     const { data, isFetching, isLoading } = useNewsListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate: deleteNews, isPending: isDeletePending } = useDeleteNews();
 
     const news = data?.news ?? [];
     const pagination = data?.pagination;
+    const sortedNews = useMemo(() => {
+        return sortAdminItems({
+            items: news,
+            sortKey,
+            sortOrder,
+            sortConfig: {
+                title: (item) => getLocalizedText(item.title),
+                date: (item) => new Date(item.createdAt || 0).getTime(),
+                views: (item) => Number(item.views || 0)
+            }
+        });
+    }, [news, sortKey, sortOrder]);
+
     const stats = [{ label: 'Jami yangiliklar', value: news.length, icon: Newspaper, color: 'bg-[#ef7f1a]' }];
 
     useEffect(() => {
@@ -67,19 +85,7 @@ const AdminNewsPage = () => {
                 href='news'
             />
 
-            <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>
@@ -103,9 +109,33 @@ const AdminNewsPage = () => {
                     <table className='w-full min-w-220 text-left'>
                         <thead>
                             <tr className='border-b border-[#eadfce] text-xs font-black text-[#9d907e] uppercase dark:border-slate-800 dark:text-slate-500'>
-                                <th className='px-4 py-3'>Yangilik</th>
-                                <th className='px-4 py-3'>Sana</th>
-                                <th className='px-4 py-3'>Ko'rishlar</th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('title')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Yangilik
+                                        <SortIcon column='title' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('date')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Sana
+                                        <SortIcon column='date' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('views')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Ko'rishlar
+                                        <SortIcon column='views' />
+                                    </button>
+                                </th>
                                 <th className='px-4 py-3 text-right'>Amallar</th>
                             </tr>
                         </thead>
@@ -113,7 +143,7 @@ const AdminNewsPage = () => {
                             {isLoading ? (
                                 <BooksTableSkeleton />
                             ) : (
-                                news.map((item, index) => (
+                                sortedNews.map((item, index) => (
                                     <tr
                                         key={item._id}
                                         className='border-b border-[#f0e4d3] last:border-0 dark:border-slate-900'>
@@ -142,9 +172,6 @@ const AdminNewsPage = () => {
                                         </td>
                                         <td className='px-4 py-4'>
                                             <div className='flex justify-end gap-2'>
-                                                <Button size='icon-sm' variant='ghost' className='rounded-xl'>
-                                                    <Eye size={17} />
-                                                </Button>
                                                 <Button size='icon-sm' variant='ghost' className='rounded-xl' asChild>
                                                     <Link href={`/admin/news/new?id=${item._id}`}>
                                                         <Edit3 size={17} />

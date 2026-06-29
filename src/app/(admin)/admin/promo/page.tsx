@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useDeletePromo } from '@/components/admin/hooks/promoHooks/useDeletePromo';
 import { useUpdatePromo } from '@/components/admin/hooks/promoHooks/useUpdatePromo';
 import { usePromoQuery } from '@/components/admin/hooks/queries/promo';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { Switch } from '@/components/ui/switch';
 import type { Coupon } from '@/types';
@@ -92,19 +93,7 @@ const AdminPromoPage = () => {
                 href='promo'
             />
 
-            <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>

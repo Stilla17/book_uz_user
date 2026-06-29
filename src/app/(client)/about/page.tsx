@@ -95,7 +95,7 @@ export default function AboutPage() {
                     </motion.h1>
 
                     <p className='mx-auto max-w-3xl text-xl text-gray-500 dark:text-gray-400'>
-                        BOOK.UZ — O'zbekistonning eng katta raqamli kutubxonasi. Biz {booksCount} + kitoblar bilan sizga
+                        BOOK.UZ - O'zbekistonning eng katta raqamli kutubxonasi. Biz {booksCount} + kitoblar bilan sizga
                         eng yaxshi o'qish tajribasini taqdim etamiz.
                     </p>
 
@@ -248,8 +248,8 @@ export default function AboutPage() {
                         <Target size={40} className='mb-4 text-[#00a0e3]' />
                         <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>Bizning vazifamiz</h3>
                         <p className='text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
-                            O'zbekistonda kitobxonlik madaniyatini rivojlantirish va har bir insonga sifatli kitoblarni
-                            qulay narxlarda taqdim etish. Biz orqali millionlab odamlar bilim olish va zavqlanish
+                            O'zbekistonda kitobxonlik madaniyatini rivojlantirish va har bir insonga sifatli kitoblarni
+                            qulay narxlarda taqdim etish. Biz orqali millionlab odamlar bilim olish va zavqlanish
                             imkoniyatiga ega bo'ladi.
                         </p>
                     </div>
@@ -259,7 +259,7 @@ export default function AboutPage() {
                         <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>Bizning maqsadimiz</h3>
                         <p className='text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
                             Markaziy Osiyodagi eng yirik raqamli kutubxonaga aylanish va 5 yil ichida 10 milliondan
-                            ortiq foydalanuvchiga xizmat ko'rsatish. Innovatsion texnologiyalar orqali kitob o'qishni
+                            ortiq foydalanuvchiga xizmat ko'rsatish. Innovatsion texnologiyalar orqali kitob o'qishni
                             yanada qulay va maroqli qilish.
                         </p>
                     </div>

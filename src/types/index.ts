@@ -129,6 +129,9 @@ export interface Coupon {
     discountPercentage?: number;
     applicableProducts?: string[];
     applicablePublishers?: string[];
+    applicablePublisherIds?: string[];
+    publisherIds?: string[];
+    publishers?: string[];
     minOrderAmount?: number;
     maxDiscount?: number;
     startDate: string;
@@ -161,6 +164,7 @@ export interface OrderPayload {
     description?: string;
     couponCode?: string;
     totalAmount: number;
+    deliveryFee: number;
     shippingAddress: {
         city: string;
         region: string;
@@ -168,6 +172,7 @@ export interface OrderPayload {
         phone: string;
     };
     deliveryType: 'PICKUP' | 'DELIVERY' | 'POST';
+    postDeliveryType?: 'POST_OFFICE' | 'POST_TO_HOME';
     paymentType: 'CASH' | 'CLICK' | 'UZUM' | 'PAYME' | 'XAZNA';
 }
 
@@ -222,6 +227,7 @@ export type Branch = {
     _id: string;
     branchName?: string;
     name?: string;
+    address?: string;
     latitude: number;
     longitude?: number;
 };
@@ -256,6 +262,9 @@ export interface CreatePromoPayload {
     discountPercentage?: number;
     applicableProducts?: string[];
     applicablePublishers?: string[];
+    applicablePublisherIds?: string[];
+    publisherIds?: string[];
+    publishers?: string[];
     startDate: string;
     endDate: string;
     usageLimit?: number;

@@ -67,6 +67,8 @@ const AdminNewPublisherPage = () => {
                             setImagePreview(updated.image);
                         }
                         toast.success('Nashriyot muvaffaqiyatli yangilandi');
+                        router.push('/admin/publishers');
+                        router.refresh();
                     }
                 }
             );

@@ -26,6 +26,9 @@ export interface DistrictItem {
 }
 
 export const DELIVERY_COST = 20000;
+export const POST_OFFICE_DELIVERY_COST = 40000;
+export const POST_TO_HOME_EXTRA_COST = 20000;
+export const POST_TO_HOME_DELIVERY_COST = POST_OFFICE_DELIVERY_COST + POST_TO_HOME_EXTRA_COST;
 
 export const getLocationName = (item?: { name?: LocationName }) =>
     item?.name?.uz || item?.name?.ru || item?.name?.en || "Noma'lum";
@@ -33,10 +36,17 @@ export const getLocationName = (item?: { name?: LocationName }) =>
 export const isValidUzPhone = (value: string) => /^\+998\s\d{2}\s\d{3}\s\d{2}\s\d{2}$/.test(value);
 
 export const getDeliveryType = (deliveryTitle: string): OrderPayload['deliveryType'] => {
-    if (deliveryTitle === 'Pochta orqali') return 'POST';
+    if (deliveryTitle === 'Pochta orqali' || deliveryTitle === 'Pochtadan uyga olib borib berish') return 'POST';
     if (deliveryTitle === "Do'kondan olib ketish") return 'PICKUP';
 
     return 'DELIVERY';
+};
+
+export const getPostDeliveryType = (deliveryTitle: string): OrderPayload['postDeliveryType'] => {
+    if (deliveryTitle === 'Pochta orqali') return 'POST_OFFICE';
+    if (deliveryTitle === 'Pochtadan uyga olib borib berish') return 'POST_TO_HOME';
+
+    return undefined;
 };
 
 export const getPaymentType = (paymentTitle: string): OrderPayload['paymentType'] => {
@@ -146,10 +156,18 @@ type BuildOrderPayloadParams = {
     selectedDistrictItem: DistrictItem;
     selectedDelivery: string;
     selectedPayment: string;
+    deliveryFee?: number;
 };
 
-export const getDeliveryCost = (selectedDelivery: string) =>
-    getDeliveryType(selectedDelivery) === 'PICKUP' ? 0 : DELIVERY_COST;
+export const getDeliveryCost = (selectedDelivery: string, deliveryFee = DELIVERY_COST) => {
+    const deliveryType = getDeliveryType(selectedDelivery);
+
+    if (deliveryType === 'PICKUP') return 0;
+    if (selectedDelivery === 'Pochta orqali') return POST_OFFICE_DELIVERY_COST;
+    if (selectedDelivery === 'Pochtadan uyga olib borib berish') return POST_TO_HOME_DELIVERY_COST;
+
+    return Math.max(0, Math.round(Number(deliveryFee) || DELIVERY_COST));
+};
 
 export const buildOrderPayload = ({
     cartItems,
@@ -160,26 +178,31 @@ export const buildOrderPayload = ({
     selectedRegionItem,
     selectedDistrictItem,
     selectedDelivery,
-    selectedPayment
-}: BuildOrderPayloadParams): OrderPayload => ({
-    ...(userId ? { user: userId } : {}),
-    items: getOrderItems(cartItems),
-    totalAmount: Math.max(
-        0,
-        totalPrice + getDeliveryCost(selectedDelivery) - (checkout.promoDiscount || 0)
-    ),
-    guestName: checkout.clientName.trim(),
-    description: checkout.description.trim(),
-    couponCode: checkout.promoCode || undefined,
-    shippingAddress: {
-        city: getLocationName(selectedRegionItem),
-        region: getLocationName(selectedDistrictItem),
-        street: checkout.address.trim(),
-        phone
-    },
-    deliveryType: getDeliveryType(selectedDelivery),
-    paymentType: getPaymentType(selectedPayment)
-});
+    selectedPayment,
+    deliveryFee: configuredDeliveryFee
+}: BuildOrderPayloadParams): OrderPayload => {
+    const deliveryFee = getDeliveryCost(selectedDelivery, configuredDeliveryFee);
+    const postDeliveryType = getPostDeliveryType(selectedDelivery);
+
+    return {
+        ...(userId ? { user: userId } : {}),
+        items: getOrderItems(cartItems),
+        totalAmount: Math.max(0, totalPrice + deliveryFee - (checkout.promoDiscount || 0)),
+        deliveryFee,
+        guestName: checkout.clientName.trim(),
+        description: checkout.description.trim(),
+        couponCode: checkout.promoCode || undefined,
+        shippingAddress: {
+            city: getLocationName(selectedRegionItem),
+            region: getLocationName(selectedDistrictItem),
+            street: checkout.address.trim(),
+            phone
+        },
+        deliveryType: getDeliveryType(selectedDelivery),
+        ...(postDeliveryType ? { postDeliveryType } : {}),
+        paymentType: getPaymentType(selectedPayment)
+    };
+};
 
 type ResolvePaymentRedirectParams = {
     response: unknown;

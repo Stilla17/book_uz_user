@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 
 import { useDeleteComment, useGetComment, useUpdateCommentStatus } from '@/components/admin/hooks/queries/comment';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
@@ -13,35 +14,50 @@ import {
     statusOptions,
     statusStyles
 } from '@/helpers/comment';
+import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
+import { useDebounce } from '@/hooks/useDebounce';
 import type { CommentStatus } from '@/types/comment';
 
 import dayjs from 'dayjs';
-import { CheckCircle2, Clock3, MessageSquareText, Search, Trash2, XCircle } from 'lucide-react';
+import { CheckCircle2, MessageSquareText, Search, Trash2, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+type CommentSortKey = 'user' | 'book' | 'date';
 
 const AdminCommentPage = () => {
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState<'all' | CommentStatus>('all');
+    const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<CommentSortKey>();
+    const debouncedSearch = useDebounce(search.trim(), 400);
 
-    const { data: commentsData, isLoading } = useGetComment();
+    const { data: commentsData, isLoading } = useGetComment({ search: debouncedSearch, status });
     const { mutate: deleteComment } = useDeleteComment();
     const { mutate: updateCommentStatus } = useUpdateCommentStatus();
 
     const filteredComments = useMemo(() => {
-        const keyword = search.trim().toLowerCase();
         return (
             commentsData?.filter((comment) => {
-                const authorName = getCommentAuthorName(comment);
                 const matchesStatus =
                     status === 'all' ||
                     comment.status === status ||
                     (status === 'approved' && comment.status === 'aproved');
-                const matchesSearch =
-                    authorName.toLowerCase().includes(keyword) || comment.text.toLowerCase().includes(keyword);
-                return matchesStatus && matchesSearch;
+                return matchesStatus;
             }) || []
         );
-    }, [commentsData, search, status]);
+    }, [commentsData, status]);
+
+    const sortedComments = useMemo(() => {
+        return sortAdminItems({
+            items: filteredComments,
+            sortKey,
+            sortOrder,
+            sortConfig: {
+                user: getCommentAuthorName,
+                book: getCommentBookTitle,
+                date: (comment) => new Date(comment.createdAt || 0).getTime()
+            }
+        });
+    }, [filteredComments, sortKey, sortOrder]);
 
     const stats = [
         {
@@ -55,12 +71,6 @@ const AdminCommentPage = () => {
             value: commentsData?.filter((comment) => ['approved', 'aproved'].includes(comment.status)).length ?? 0,
             icon: CheckCircle2,
             color: 'bg-emerald-500'
-        },
-        {
-            label: 'Kutilayotgan izohlar',
-            value: commentsData?.filter((comment) => comment.status === 'pending').length ?? 0,
-            icon: Clock3,
-            color: 'bg-amber-500'
         },
         {
             label: 'Rad etilgan',
@@ -89,29 +99,16 @@ const AdminCommentPage = () => {
 
     return (
         <div className='space-y-5'>
-            <HeadSection
-                title='Izohlar'
-                text='Kitoblarga yozilgan fikrlar, reytinglar va moderatsiya holatlarini boshqarish sahifasi.'
-                href='comment'
-            />
-
-            <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        {isLoading ? (
-                            <div className='mt-4 h-8 w-16 animate-pulse rounded-full bg-[#f2e7d8] dark:bg-slate-900' />
-                        ) : (
-                            <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value}</p>
-                        )}
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
+            <section className='flex flex-col gap-4 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] md:flex-row md:items-center md:justify-between md:p-5 dark:bg-slate-950 dark:ring-slate-800'>
+                <div>
+                    <h2 className='mt-1 text-2xl font-black text-[#2f2a25] dark:text-white'>Izohlar</h2>
+                    <p className='mt-2 max-w-2xl text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
+                        Kitoblarga yozilgan fikrlar, reytinglar va moderatsiya holatlarini boshqarish sahifasi.
+                    </p>
+                </div>
             </section>
+
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 lg:flex-row lg:items-center lg:justify-between dark:border-slate-800'>
@@ -147,19 +144,43 @@ const AdminCommentPage = () => {
                     <table className='w-full min-w-[920px] text-left'>
                         <thead>
                             <tr className='border-b border-[#eadfce] text-xs font-black text-[#9d907e] uppercase dark:border-slate-800 dark:text-slate-500'>
-                                <th className='px-4 py-3'>Foydalanuvchi</th>
-                                <th className='px-4 py-3'>Kitob</th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('user')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Foydalanuvchi
+                                        <SortIcon column='user' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('book')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Kitob
+                                        <SortIcon column='book' />
+                                    </button>
+                                </th>
                                 <th className='px-4 py-3'>Izoh</th>
                                 <th className='px-4 py-3'>Status</th>
-                                <th className='px-4 py-3'>Sana</th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('date')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Sana
+                                        <SortIcon column='date' />
+                                    </button>
+                                </th>
                                 <th className='px-4 py-3 text-right'>Amallar</th>
                             </tr>
                         </thead>
                         <tbody>
                             {isLoading ? (
                                 <BooksTableSkeleton />
-                            ) : filteredComments.length ? (
-                                filteredComments.map((comment) => (
+                            ) : sortedComments.length ? (
+                                sortedComments.map((comment) => (
                                     <tr
                                         key={comment._id}
                                         className='border-b border-[#f0e4d3] bg-white align-top last:border-0 dark:border-slate-900 dark:bg-slate-950'>

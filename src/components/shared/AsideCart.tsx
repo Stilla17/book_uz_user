@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 import Link from 'next/link';
 
 import { calculatePromoDiscount } from '@/helpers/promoDiscount';
+import { UserService } from '@/services/api';
 import { PromoServiceUser } from '@/services/promo.service';
 import type { CartItem } from '@/store/features/cartSlice';
 import { clearPromo, setPromo } from '@/store/features/checkoutSlice';
@@ -31,7 +32,11 @@ const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => 
     const [matchedPromo, setMatchedPromo] = useState<Coupon | null>(null);
     const [discountAmount, setDiscountAmount] = useState(0);
     const dispatch = useAppDispatch();
-    const deliveryPrice = totalQuantity > 0 ? 20000 : 0;
+    const { data: deliverySettings } = useQuery({
+        queryKey: ['settings', 'delivery'],
+        queryFn: UserService.getDeliverySettings
+    });
+    const deliveryPrice = totalQuantity > 0 ? deliverySettings?.deliveryFee ?? 20000 : 0;
     const paymentTotal = Math.max(0, totalPrice + deliveryPrice - discountAmount);
 
     const { data: promos = [] } = useQuery<Coupon[]>({
@@ -158,3 +163,4 @@ const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => 
 };
 
 export default AsideCart;
+

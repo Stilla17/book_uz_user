@@ -54,6 +54,12 @@ export const getAuthor = (author: unknown) => {
 
 export const getBookTitle = (book: Book) => getText(book.title, "Noma'lum kitob");
 
+const getBookTitleValue = (title: Book['title']): Book['title'] => ({
+    uz: title.uz || title.ru || title.en || "Noma'lum kitob",
+    ru: title.ru || title.uz || title.en || "Noma'lum kitob",
+    en: title.en || title.uz || title.ru || "Noma'lum kitob"
+});
+
 export const getBookAuthorName = (book: Book) => {
     if (typeof book.author === 'string') return book.author;
 
@@ -81,7 +87,7 @@ export const mapProductToBook = (product: Product, type?: string): Book => {
     return {
         _id: product._id,
         slug: product.slug,
-        title: getText(product.title, "Noma'lum kitob"),
+        title: getBookTitleValue(product.title),
         author: getProductAuthorName(product.author),
         price,
         oldPrice,

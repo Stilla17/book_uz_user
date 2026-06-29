@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDeleteFaq } from '@/components/admin/hooks/faqsHooks/useDeleteFaq';
 import { useFaqListQuery } from '@/components/admin/hooks/queries/faq';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { PublishersSkeleton } from '@/components/ui/skeleton';
@@ -53,22 +54,10 @@ const AdminFaqPage = () => {
                 href='faq'
             />
 
-            <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 lg:flex-row lg:items-center lg:justify-between dark:border-slate-800'>
+                {/* <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 lg:flex-row lg:items-center lg:justify-between dark:border-slate-800'>
                     <label className='flex h-11 min-w-0 items-center gap-2 rounded-2xl bg-[#f2e7d8] px-4 text-[#817466] lg:max-w-md lg:flex-1 dark:bg-slate-900 dark:text-slate-300'>
                         <Search size={18} className='shrink-0' />
                         <input
@@ -79,7 +68,7 @@ const AdminFaqPage = () => {
                             className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
                         />
                     </label>
-                </div>
+                </div> */}
 
                 <div className='grid gap-3 p-4'>
                     {isLoading ? (

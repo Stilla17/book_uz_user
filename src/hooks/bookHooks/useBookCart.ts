@@ -58,6 +58,8 @@ const normalizeCartItem = (item: any): CartItem | null => {
             images: getProductImage(book),
             stock: book.stock ?? 0,
             publisher: book.publisher,
+            publisherId: book.publisherId,
+            publisherName: book.publisherName,
             details: book.details
         },
         quantity: item?.quantity ?? 1

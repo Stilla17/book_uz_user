@@ -2,6 +2,11 @@ import type { Coupon } from '@/types';
 import type { CartItem } from '@/store/features/cartSlice';
 
 type EntityRef = string | { _id?: string; id?: string } | null | undefined;
+type CouponWithPublisherAliases = Coupon & {
+    applicablePublisherIds?: EntityRef[];
+    publisherIds?: EntityRef[];
+    publishers?: EntityRef[];
+};
 
 const getId = (value: EntityRef) => {
     if (!value) return '';
@@ -10,11 +15,21 @@ const getId = (value: EntityRef) => {
 };
 
 const getBookPublisherId = (book: CartItem['book']) =>
-    getId(book.publisher) || getId(book.details?.publisher);
+    getId(book.publisher) || book.publisherId || getId(book.details?.publisher) || book.details?.publisherId || '';
+
+const getPromoPublisherIds = (promo: CouponWithPublisherAliases) =>
+    [
+        ...(promo.applicablePublishers ?? []),
+        ...(promo.applicablePublisherIds ?? []),
+        ...(promo.publisherIds ?? []),
+        ...(promo.publishers ?? [])
+    ]
+        .map(getId)
+        .filter(Boolean);
 
 export const isPromoApplicableToCartItem = (promo: Coupon, item: CartItem) => {
     const productIds = (promo.applicableProducts ?? []).map(getId).filter(Boolean);
-    const publisherIds = (promo.applicablePublishers ?? []).map(getId).filter(Boolean);
+    const publisherIds = getPromoPublisherIds(promo);
     const hasRules = productIds.length > 0 || publisherIds.length > 0;
 
     if (!hasRules) return true;

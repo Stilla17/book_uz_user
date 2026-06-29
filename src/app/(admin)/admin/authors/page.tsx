@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -8,21 +8,26 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDeleteAuthor } from '@/components/admin/hooks/authorsHooks/useDeleteAuthor';
 import { useAuthorListQuery } from '@/components/admin/hooks/queries/author';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { PublishersSkeleton } from '@/components/ui/skeleton';
+import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { BookOpen, Edit3, Plus, Search, Trash2, User, Users } from 'lucide-react';
+import { BookOpen, Edit3, Search, Trash2, User, Users } from 'lucide-react';
+
+type AuthorSortKey = 'title' | 'bookCount';
 
 const AdminAuthorsPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
+    const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<AuthorSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
     const { data, isFetching, isLoading } = useAuthorListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate } = useDeleteAuthor();
@@ -33,8 +38,22 @@ const AdminAuthorsPage = () => {
 
     const authors = data?.authors ?? [];
     const pagination = data?.pagination;
+    const getAuthorBookCount = (author: { books?: unknown[] }) => Number(author.books?.length || 0);
+
+    const sortedAuthors = useMemo(() => {
+        return sortAdminItems({
+            items: authors,
+            sortKey,
+            sortOrder,
+            sortConfig: {
+                title: (author) => author.name || '',
+                bookCount: getAuthorBookCount
+            }
+        });
+    }, [authors, sortKey, sortOrder]);
+
     const totalAuthorBooks = authors.reduce((sum, auth) => {
-        return sum + Number(auth.books?.length || 0);
+        return sum + getAuthorBookCount(auth);
     }, 0);
 
     const stats = [
@@ -60,19 +79,7 @@ const AdminAuthorsPage = () => {
                 href='authors'
             />
 
-            <section className='grid gap-4 xl:grid-cols-2'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value || 0}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>
@@ -86,16 +93,34 @@ const AdminAuthorsPage = () => {
                             className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
                         />
                     </label>
-                    <span className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
-                        {authors.length} ta muallif ko'rsatildi
-                    </span>
+                    <div className='flex flex-wrap items-center gap-2'>
+                        <Button
+                            type='button'
+                            variant='outline'
+                            onClick={() => handleSort('title')}
+                            className='h-10 rounded-2xl border-[#eadfce] bg-white text-xs font-black dark:border-slate-800 dark:bg-slate-900'>
+                            Muallif
+                            <SortIcon column='title' />
+                        </Button>
+                        <Button
+                            type='button'
+                            variant='outline'
+                            onClick={() => handleSort('bookCount')}
+                            className='h-10 rounded-2xl border-[#eadfce] bg-white text-xs font-black dark:border-slate-800 dark:bg-slate-900'>
+                            Kitoblar
+                            <SortIcon column='bookCount' />
+                        </Button>
+                        <span className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
+                            {authors.length} ta muallif ko'rsatildi
+                        </span>
+                    </div>
                 </div>
 
                 <div className='grid gap-3 p-4'>
                     {isLoading ? (
                         <PublishersSkeleton />
                     ) : (
-                        authors.map((author, index) => (
+                        sortedAuthors.map((author, index) => (
                             <article
                                 key={author._id}
                                 className='grid gap-4 rounded-4xl bg-white p-4 ring-1 ring-[#eadfce] md:grid-cols-[minmax(0,1fr)_120px_110px] md:items-center dark:bg-slate-900 dark:ring-slate-800'>
@@ -124,7 +149,7 @@ const AdminAuthorsPage = () => {
                                         Kitoblar
                                     </p>
                                     <p className='mt-1 font-black text-[#2f2a25] dark:text-white'>
-                                        {author.books?.length}
+                                        {getAuthorBookCount(author)}
                                     </p>
                                 </div>
 

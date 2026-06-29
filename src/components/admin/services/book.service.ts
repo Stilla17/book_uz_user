@@ -34,7 +34,13 @@ export const BookService = {
     },
 
     getAdminBookId: async (id: string) => {
-        const response = await api.get(`/admin/products/${id}`);
+        const response = await api.get(`/admin/products/${id}`).catch((error) => {
+            if (error.response?.status === 404) {
+                return api.get(`/products/${id}`);
+            }
+
+            throw error;
+        });
         const data = response.data.data;
         if (Array.isArray(data.products)) return data.products[0];
         return data.product ?? data.products ?? data;

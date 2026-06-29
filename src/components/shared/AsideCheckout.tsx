@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 import { getDeliveryCost } from '@/helpers/checkout';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
@@ -16,6 +16,7 @@ interface AsideCheckoutProps {
     promoCode?: string;
     promoDiscount?: number;
     selectedDelivery: string;
+    deliveryFee?: number;
 }
 
 const AsideCheckout = ({
@@ -24,10 +25,11 @@ const AsideCheckout = ({
     onConfirm,
     promoCode,
     promoDiscount = 0,
-    selectedDelivery
+    selectedDelivery,
+    deliveryFee
 }: AsideCheckoutProps) => {
     const { cartItems, totalPrice, totalQuantity } = useBookCart();
-    const deliveryCost = getDeliveryCost(selectedDelivery);
+    const deliveryCost = getDeliveryCost(selectedDelivery, deliveryFee);
     const paymentTotal = Math.max(0, totalPrice + deliveryCost - promoDiscount);
 
     return (
@@ -135,3 +137,5 @@ const AsideCheckout = ({
 };
 
 export default AsideCheckout;
+
+

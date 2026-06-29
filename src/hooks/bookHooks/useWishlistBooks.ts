@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { type Book } from '@/components/cards/BookCard';
+import { type LocalizedText } from '@/types/book';
 import { useAuth } from '@/hooks/useAuth';
 import { UserService } from '@/services/api';
 import { setWishlist, type WishlistBook } from '@/store/features/wishlistSlice';
@@ -53,17 +54,22 @@ type WishlistCardSource = WishlistBook & {
     ratingCount?: number;
 };
 
+const toLocalizedText = (title: WishlistBook['title']): LocalizedText => {
+    if (typeof title === 'string') {
+        return { uz: title, ru: title, en: title };
+    }
+
+    return {
+        uz: title?.uz || '',
+        ru: title?.ru || '',
+        en: title?.en || ''
+    };
+};
+
 const mapWishlistBookToCardBook = (book: WishlistCardSource): Book => ({
     _id: book._id,
     slug: book.slug,
-    title:
-        typeof book.title === 'string'
-            ? book.title
-            : {
-                  uz: book.title?.uz || '',
-                  ru: book.title?.ru || '',
-                  en: book.title?.en || ''
-              },
+    title: toLocalizedText(book.title),
     author: book.author || "Noma'lum muallif",
     price: book.discountPrice && book.discountPrice > 0 ? book.discountPrice : book.price,
     oldPrice: book.discountPrice && book.discountPrice > 0 ? book.price : undefined,

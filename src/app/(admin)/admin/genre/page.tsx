@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -8,20 +8,31 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDeleteGenre } from '@/components/admin/hooks/genreHooks/useDeleteGenre';
 import { useGenreListQuery } from '@/components/admin/hooks/queries/genre';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
-import { Button } from '@/components/ui/button';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
+import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import { BookOpen, Edit3, FolderTree, Search, Tags, Trash2 } from 'lucide-react';
 
+type SortKey = 'title' | 'bookCount';
+
+type Genre = {
+    bookCount?: number;
+    subgenres: {
+        books?: unknown[];
+    }[];
+};
+
 const AdminGenrePage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
+    const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<SortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
     const { data, isFetching, isLoading } = useGenreListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate } = useDeleteGenre();
@@ -51,6 +62,21 @@ const AdminGenrePage = () => {
         });
     };
 
+    const getGenreBookCount = (genre: Genre) =>
+        genre.bookCount ?? genre.subgenres.reduce((sum, sg) => sum + (sg.books?.length || 0), 0);
+
+    const sortedGenres = useMemo(() => {
+        return sortAdminItems({
+            items: genres,
+            sortKey,
+            sortOrder,
+            sortConfig: {
+                title: (genre) => genre.title?.uz || '',
+                bookCount: getGenreBookCount
+            }
+        });
+    }, [genres, sortKey, sortOrder]);
+
     return (
         <div className='space-y-5'>
             <HeadSection
@@ -59,19 +85,7 @@ const AdminGenrePage = () => {
                 href='genre'
             />
 
-            <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>
@@ -94,8 +108,24 @@ const AdminGenrePage = () => {
                     <table className='w-full min-w-180 text-left'>
                         <thead>
                             <tr className='border-b border-[#eadfce] text-xs font-black text-[#9d907e] uppercase dark:border-slate-800 dark:text-slate-500'>
-                                <th className='px-4 py-3'>Janr</th>
-                                <th className='px-4 py-3'>Kitoblar</th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('title')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Janr
+                                        <SortIcon column='title' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('bookCount')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Kitoblar
+                                        <SortIcon column='bookCount' />
+                                    </button>
+                                </th>
                                 <th className='px-4 py-3 text-right'>Amallar</th>
                             </tr>
                         </thead>
@@ -103,7 +133,7 @@ const AdminGenrePage = () => {
                             {isLoading ? (
                                 <BooksTableSkeleton />
                             ) : (
-                                genres.map((genre, index) => (
+                                sortedGenres.map((genre, index) => (
                                     <tr
                                         key={genre.slug}
                                         className='border-b border-[#f0e4d3] last:border-0 dark:border-slate-900'>
@@ -119,8 +149,7 @@ const AdminGenrePage = () => {
                                             </div>
                                         </td>
                                         <td className='px-4 py-4 font-black text-[#2f2a25] dark:text-white'>
-                                            {genre.bookCount ??
-                                                genre.subgenres.reduce((sum, sg) => sum + (sg.books?.length || 0), 0)}
+                                            {getGenreBookCount(genre)}
                                         </td>
 
                                         <td className='px-4 py-4'>

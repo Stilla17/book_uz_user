@@ -119,7 +119,11 @@ export default function BookDetailPage() {
             slug: book.slug,
             price: book.price,
             images: book.image ?? book.images?.[0] ?? '',
-            stock: stockLimit ?? 0
+            stock: stockLimit ?? 0,
+            publisher: book.publisher,
+            publisherId: book.publisherId,
+            publisherName: book.publisherName,
+            details: book.details
         };
     };
 

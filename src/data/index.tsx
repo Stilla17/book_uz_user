@@ -5,7 +5,14 @@ export const deliveryOptions = [
     {
         icon: Mail,
         title: 'Pochta orqali',
-        active: true
+        active: true,
+        postDeliveryType: 'POST_OFFICE'
+    },
+    {
+        icon: Truck,
+        title: 'Pochtadan uyga olib borib berish',
+        active: false,
+        postDeliveryType: 'POST_TO_HOME'
     },
     {
         icon: Truck,

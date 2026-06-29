@@ -5,10 +5,21 @@ export type AdminUserListItem = {
     name: string;
     email: string;
     phones: string[];
+    telegramUsername?: string;
+    role?: string;
     salesCount: number;
     createdAt?: string;
     birthDate?: string;
     source: AdminUserSource;
+    purchasedBooks?: AdminUserPurchasedBook[];
+};
+
+export type AdminUserPurchasedBook = {
+    id: string;
+    title: string;
+    quantity: number;
+    price?: number;
+    createdAt?: string;
 };
 
 export type AdminUsersPagination = {

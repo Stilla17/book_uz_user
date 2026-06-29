@@ -45,6 +45,8 @@ export interface Book {
     cover?: string;
     details?: {
         publisher?: string;
+        publisherId?: string;
+        publisherName?: string;
         publishedYear?: number;
         pages?: number;
         language?: string;
@@ -57,6 +59,7 @@ export interface Book {
     weight?: string;
     duration?: string;
     publisher?: string;
+    publisherId?: string;
     publishedYear?: number;
     isbn?: string | number;
     views?: number;

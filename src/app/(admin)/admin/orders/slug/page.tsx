@@ -20,6 +20,15 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
     </div>
 );
 
+const getDeliveryLabel = (deliveryType?: string, postDeliveryType?: string) => {
+    if (deliveryType === 'PICKUP') return "Do'kondan olib ketish";
+    if (deliveryType === 'POST') {
+        return postDeliveryType === 'POST_TO_HOME' ? 'Pochtadan uyga olib borib berish' : 'Pochta orqali';
+    }
+
+    return 'Kuryer orqali';
+};
+
 const AdminOrderDetailPage = () => {
     const searchParams = useSearchParams();
     const id = searchParams.get('id') ?? '';
@@ -55,13 +64,6 @@ const AdminOrderDetailPage = () => {
                               ? `${dayjs(orderData.createdAt).format('DD.MM.YYYY | HH:mm')}`
                               : 'Buyurtma vaqti mavjud emas'}
                     </p>
-                </div>
-
-                <div className='flex flex-wrap gap-2'>
-                    <button className='inline-flex h-11 items-center gap-2 rounded-2xl bg-[#ef7f1a] px-4 text-sm font-black text-white hover:bg-orange-600'>
-                        <Check size={17} />
-                        Tasdiqlash
-                    </button>
                 </div>
             </section>
 
@@ -195,8 +197,11 @@ const AdminOrderDetailPage = () => {
                                 <h3 className='text-lg font-black text-[#2f2a25] dark:text-white'>Yetkazib berish</h3>
                             </div>
                             <div className='mt-4'>
-                                <InfoRow label='Usul' value='Kuryer orqali' />
-                                <InfoRow label='Yetkazish narxi' value="20 000 so'm" />
+                                <InfoRow
+                                    label='Usul'
+                                    value={getDeliveryLabel(orderData?.deliveryType, orderData?.postDeliveryType)}
+                                />
+                                <InfoRow label='Yetkazish narxi' value={formatPrice(orderData?.deliveryFee ?? 0)} />
                                 <InfoRow label="To'lov turi" value={orderData?.paymentType || ''} />
                             </div>
                         </article>

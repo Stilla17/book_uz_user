@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useOrderQuery } from '@/components/admin/hooks/queries/order';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
-import HeadSection from '@/components/admin/sections/HeadSection';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { orderStatusConfig } from '@/data';
+import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { OrderStatus } from '@/types/orders';
@@ -19,6 +20,13 @@ import dayjs from 'dayjs';
 import { Banknote, Clock3, Search, ShoppingBag } from 'lucide-react';
 
 export type StatusFilter = 'ALL' | OrderStatus;
+type OrderSortKey = 'customer' | 'date' | 'amount' | 'payment';
+
+const confirmedPaymentStatuses = new Set(['PAID', 'CONFIRMED', 'SUCCESS', 'COMPLETED']);
+
+const isConfirmedPayment = (paymentStatus?: string) => {
+    return confirmedPaymentStatuses.has(String(paymentStatus || '').toUpperCase());
+};
 
 const AdminOrdersPage = () => {
     const [active, setActive] = useState<StatusFilter>('ALL');
@@ -26,6 +34,7 @@ const AdminOrdersPage = () => {
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
+    const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<OrderSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
     const {
         data: orders,
@@ -53,18 +62,26 @@ const AdminOrdersPage = () => {
         (sum, item) => (item.paymentStatus.includes('PENDING') ? sum + 1 : sum),
         0
     );
-    const totalAmountItems = orders?.orders.reduce((sum, item) => item.totalAmount + sum, 0);
-    const formatterPrice = new Intl.NumberFormat('ru-RU').format(Number(totalAmountItems));
+    const confirmedPaymentTotal = orders?.orders.reduce((sum, item) => {
+        if (!isConfirmedPayment(item.paymentStatus)) return sum;
 
-    const filteredOrders = orders?.orders.filter((order) => {
-        const value = searchInput.toLowerCase();
+        return item.totalAmount + sum;
+    }, 0);
+    const formatterPrice = new Intl.NumberFormat('ru-RU').format(Number(confirmedPaymentTotal));
 
-        return (
-            order._id.toLowerCase().includes(value) ||
-            (order.guestName ?? '').toLowerCase().includes(value) ||
-            order.shippingAddress?.phone?.includes(value)
-        );
-    });
+    const sortedOrders = useMemo(() => {
+        return sortAdminItems({
+            items: orders?.orders ?? [],
+            sortKey,
+            sortOrder,
+            sortConfig: {
+                customer: (order) => order.guestName || '',
+                date: (order) => new Date(order.createdAt || 0).getTime(),
+                amount: (order) => Number(order.totalAmount || 0),
+                payment: (order) => order.paymentType || ''
+            }
+        });
+    }, [orders?.orders, sortKey, sortOrder]);
 
     const stats = [
         {
@@ -102,21 +119,7 @@ const AdminOrdersPage = () => {
 
     return (
         <div className='space-y-5'>
-            <section className='flex justify-between gap-4 max-sm:flex-wrap'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <article
-                        key={label}
-                        className='w-full rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <div className='flex items-start justify-between gap-3'>
-                            <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                                <Icon size={20} />
-                            </span>
-                        </div>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </article>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='overflow-hidden rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 xl:flex-row xl:items-center xl:justify-between dark:border-slate-800'>
@@ -154,11 +157,43 @@ const AdminOrdersPage = () => {
                         <thead>
                             <tr className='border-b border-[#eadfce] text-xs font-black text-[#9d907e] uppercase dark:border-slate-800 dark:text-slate-500'>
                                 <th className='px-4 py-3'>№</th>
-                                <th className='px-4 py-3'>Mijoz</th>
-                                <th className='px-4 py-3'>Buyurtma vaqti</th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('customer')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Mijoz
+                                        <SortIcon column='customer' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('date')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Buyurtma vaqti
+                                        <SortIcon column='date' />
+                                    </button>
+                                </th>
                                 <th className='px-4 py-3'>Telefon raqam</th>
-                                <th className='px-4 py-3'>Summa</th>
-                                <th className='px-4 py-3'>To'lov</th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('amount')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Summa
+                                        <SortIcon column='amount' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('payment')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        To'lov
+                                        <SortIcon column='payment' />
+                                    </button>
+                                </th>
                                 <th className='px-4 py-3'>Holat</th>
                             </tr>
                         </thead>
@@ -166,7 +201,7 @@ const AdminOrdersPage = () => {
                             {isLoading ? (
                                 <BooksTableSkeleton />
                             ) : (
-                                filteredOrders?.map((order, index) => {
+                                sortedOrders.map((order, index) => {
                                     const statusConfig = orderStatusConfig[order.status] ?? {
                                         label: order.status || "Noma'lum",
                                         className:

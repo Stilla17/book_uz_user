@@ -30,7 +30,7 @@ const SearchableSelect = ({
     const filteredOptions = options.filter((option) => option.label.toLowerCase().includes(query.trim().toLowerCase()));
 
     return (
-        <div className='relative w-full max-w-full min-w-0'>
+        <div className={`relative w-full max-w-full min-w-0 ${isOpen ? 'z-[100]' : ''}`}>
             <input type='hidden' name={name} value={value} />
             <button
                 type='button'
@@ -44,7 +44,7 @@ const SearchableSelect = ({
             </button>
 
             {isOpen ? (
-                <div className='absolute top-full right-0 left-0 z-40 mt-2 max-w-full overflow-hidden rounded-2xl border border-[#eadfce] bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-950'>
+                <div className='absolute top-full right-0 left-0 z-[9999] mt-2 max-w-full overflow-hidden rounded-2xl border border-[#eadfce] bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-950'>
                     <Input
                         autoFocus
                         value={query}

@@ -1,4 +1,4 @@
-import { CreateCommentPayload, OrderPayload, Product, PublisherItems } from '@/types';
+﻿import { CreateCommentPayload, OrderPayload, Product, PublisherItems } from '@/types';
 
 import axios from 'axios';
 
@@ -43,11 +43,11 @@ api.interceptors.request.use(
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
-        // console.log(`📤 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        // console.log(`рџ“¤ API Request: ${config.method?.toUpperCase()} ${config.url}`);
         return config;
     },
     (error) => {
-        console.error('❌ Request Error:', error);
+        console.error('вќЊ Request Error:', error);
         throw error;
     }
 );
@@ -95,7 +95,7 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                console.log('🔄 Token yangilanmoqda...');
+                console.log('рџ”„ Token yangilanmoqda...');
 
                 // Refresh token so'rovi (cookie avtomatik yuboriladi)
                 const refreshResponse = await axios.post(
@@ -112,7 +112,7 @@ api.interceptors.response.use(
 
                 if (refreshedAccessToken) {
                     accessToken = refreshedAccessToken;
-                    console.log('✅ Yangi accessToken olindi');
+                    console.log('вњ… Yangi accessToken olindi');
                 }
 
                 isRefreshing = false;
@@ -123,7 +123,7 @@ api.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError: any) {
-                console.error('❌ Refresh failed:', refreshError.response?.status || refreshError.message);
+                console.error('вќЊ Refresh failed:', refreshError.response?.status || refreshError.message);
 
                 isRefreshing = false;
                 processQueue(refreshError, null);
@@ -230,6 +230,11 @@ export const UserService = {
     createPaymePayment: async (orderId: string) => {
         const response = await api.post('/payme/create-order', { orderId });
         return response.data;
+    },
+
+    getDeliverySettings: async (): Promise<{ deliveryFee: number }> => {
+        const response = await api.get('/settings/delivery');
+        return response.data.data;
     },
 
     getOrders: async () => {
@@ -467,3 +472,4 @@ export const ClientService = {
         };
     }
 };
+

@@ -102,8 +102,9 @@ const AdminBookDetailPage = () => {
                     <Button
                         variant='outline'
                         className='h-11 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
-                        <Edit3 size={17} />
-                        Tahrirlash
+                        <Link href={`/admin/book/new?id=${book._id}`}>
+                            <Edit3 size={12} />
+                        </Link>
                     </Button>
                     <Button className='h-11 rounded-2xl bg-red-500 px-4 font-black text-white hover:bg-red-600'>
                         <Trash2 size={17} />

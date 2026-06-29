@@ -187,15 +187,39 @@ const AdminNewBookPage = () => {
         }
     };
 
+    const resolveOptionValue = (value: string, options: SearchableOption[]) => {
+        const trimmedValue = value.trim();
+        const exactValue = options.find((option) => option.value === trimmedValue);
+        if (exactValue) return exactValue.value;
+
+        const normalizedValue = trimmedValue.toLowerCase();
+        const matchedLabel = options.find((option) => option.label.trim().toLowerCase() === normalizedValue);
+
+        return matchedLabel?.value || trimmedValue;
+    };
+
+    const getErrorMessage = (error: unknown, fallback: string) => {
+        const maybeError = error as { response?: { data?: { message?: string | string[] } } };
+        const message = maybeError.response?.data?.message;
+        if (Array.isArray(message)) return message.join(', ');
+        return message || fallback;
+    };
+
+    const isMongoId = (value: string | null) => Boolean(value && /^[0-9a-fA-F]{24}$/.test(value));
+
     const onSubmit = (values: BookFormValues) => {
-        const coverValue = (values.cover as string) === 'hard' ? 'hardcover' : values.cover;
+        const categoryValue = resolveOptionValue(values.category, categoryOptions);
+        const subCategoryValue = resolveOptionValue(values.subCategoryId, subCategoryOptions);
+        const authorValue = resolveOptionValue(values.author, authorOptions);
+        const publisherValue = resolveOptionValue(values.publisher, publisherOptions);
+        const coverValue = values.cover;
 
         if (!values.title.uz.trim()) {
             toast.error('Kitob nomi (UZ) majburiy');
             return;
         }
 
-        if (!values.category || !values.subCategoryId || !values.author || !values.publisher) {
+        if (!categoryValue || !subCategoryValue || !authorValue || !publisherValue) {
             toast.error('Kategoriya, subkategoriya, muallif va nashriyotni tanlang');
             return;
         }
@@ -218,12 +242,12 @@ const AdminNewBookPage = () => {
         appendText(formData, 'isbn', values.isbn);
         appendText(formData, 'details[isbn]', values.isbn);
         appendText(formData, 'slug', values.slug);
-        formData.append('category', values.category);
-        formData.append('subCategoryId', values.subCategoryId);
-        formData.append('subCategory', values.subCategoryId);
-        formData.append('subgenre', values.subCategoryId);
-        formData.append('author', values.author);
-        formData.append('publisher', values.publisher);
+        formData.append('category', categoryValue);
+        formData.append('subCategoryId', subCategoryValue);
+        formData.append('subCategory', subCategoryValue);
+        formData.append('subgenre', subCategoryValue);
+        formData.append('author', authorValue);
+        formData.append('publisher', publisherValue);
         formData.append('language', values.language);
         formData.append('contentLanguage', values.contentLanguage);
         formData.append('cover', coverValue);
@@ -243,8 +267,15 @@ const AdminNewBookPage = () => {
         appendNumber(formData, 'discount', values.discount);
 
         if (id) {
+            const updateId = bookData?._id || id;
+
+            if (!isMongoId(updateId)) {
+                toast.error("Kitob ID noto'g'ri. Ro'yxatdan qayta kirib tahrirlang.");
+                return;
+            }
+
             updateBook(
-                { id, formData },
+                { id: updateId, formData },
                 {
                     onSuccess: (response: unknown) => {
                         const updated = (response as { data?: { image?: string; images?: string[] } })?.data;
@@ -255,7 +286,8 @@ const AdminNewBookPage = () => {
                         toast.success('Kitob muvaffaqiyatli yangilandi');
                         router.push('/admin/book');
                         router.refresh();
-                    }
+                    },
+                    onError: (error) => toast.error(getErrorMessage(error, 'Kitobni yangilashda xatolik yuz berdi'))
                 }
             );
         } else {
@@ -266,7 +298,8 @@ const AdminNewBookPage = () => {
                     toast.success("Kitob muvaffaqiyatli qo'shildi");
                     router.push('/admin/book');
                     router.refresh();
-                }
+                },
+                onError: (error) => toast.error(getErrorMessage(error, "Kitob qo'shishda xatolik yuz berdi"))
             });
         }
     };
@@ -447,7 +480,7 @@ const AdminNewBookPage = () => {
                 </div>
 
                 <aside className='min-w-0 space-y-5'>
-                    <section className='min-w-0 overflow-hidden rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
+                    <section className='min-w-0 overflow-visible rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                         <SectionTitle icon={Sparkles} title='Katalog' />
 
                         <div className='grid gap-4'>

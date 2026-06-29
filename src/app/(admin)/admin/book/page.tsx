@@ -8,11 +8,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useDeleteBook } from '@/components/admin/hooks/bookHooks/useDeleteBook';
 import { useBookListQuery } from '@/components/admin/hooks/queries/book';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { StockFilter, getBookBarcodes, getStockStatus } from '@/helpers/admin/newBook';
+import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getAuthor, getLocalizedText } from '@/utils/book-formatters';
@@ -20,19 +22,17 @@ import { formatPrice } from '@/utils/currency';
 import { getLatestImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { ArrowDown, ArrowDownUp, ArrowUp, BookOpen, Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
+import { BookOpen, Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
 
-type SortKey = 'default' | 'price' | 'title';
-type SortOrder = 'asc' | 'desc';
+type SortKey = 'price' | 'title';
 
 const AdminBookPage = () => {
-    const [sortKey, setSortKey] = useState<SortKey>('default');
-    const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const router = useRouter();
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
     const [stockFilter, setStockFilter] = useState<StockFilter>('all');
+    const { sortKey, sortOrder, handleSort: setAdminSort, SortIcon } = useAdminSort<SortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
     const { data, isFetching, isLoading } = useBookListQuery(
         page,
@@ -52,27 +52,15 @@ const AdminBookPage = () => {
     const sourceBooks = allBooks.length > 0 ? allBooks : books;
 
     const sortedBooks = useMemo(() => {
-        const list = [...sourceBooks];
-
-        if (sortKey === 'price') {
-            return list.sort((a, b) => {
-                const first = Number(a.price || 0);
-                const second = Number(b.price || 0);
-
-                return sortOrder === 'asc' ? first - second : second - first;
-            });
-        }
-
-        if (sortKey === 'title') {
-            return list.sort((a, b) => {
-                const first = getLocalizedText(a.title);
-                const second = getLocalizedText(b.title);
-
-                return sortOrder === 'asc' ? first.localeCompare(second, 'uz') : second.localeCompare(first, 'uz');
-            });
-        }
-
-        return list;
+        return sortAdminItems({
+            items: sourceBooks,
+            sortKey,
+            sortOrder,
+            sortConfig: {
+                price: (book) => Number(book.price || 0),
+                title: (book) => getLocalizedText(book.title)
+            }
+        });
     }, [sourceBooks, sortKey, sortOrder]);
 
     const filteredBooks = sortedBooks.filter((book) => {
@@ -86,7 +74,6 @@ const AdminBookPage = () => {
     });
     const pageSize = FETCH_PAGINATION_LIMIT;
     const paginatedBooks = filteredBooks.slice((page - 1) * pageSize, page * pageSize);
-    const pagination = data?.pagination;
     const displayPagination = {
         page,
         limit: pageSize,
@@ -117,7 +104,7 @@ const AdminBookPage = () => {
     const stats = [
         {
             label: 'Jami kitoblar',
-            value: data?.pagination.total,
+            value: data?.pagination?.total ?? 0,
             icon: BookOpen,
             color: 'bg-[#ef7f1a]'
         }
@@ -166,16 +153,8 @@ const AdminBookPage = () => {
         }
     ];
 
-    const handleSort = (key: Exclude<SortKey, 'default'>) => {
-        if (sortKey === key && sortOrder === 'asc') {
-            setSortOrder('desc');
-        } else if (sortKey === key && sortOrder === 'desc') {
-            setSortKey('default');
-            setSortOrder('asc');
-        } else {
-            setSortKey(key);
-            setSortOrder('asc');
-        }
+    const handleSort = (key: SortKey) => {
+        setAdminSort(key);
 
         updateUrlPage({
             nextPage: 1,
@@ -186,18 +165,6 @@ const AdminBookPage = () => {
         });
     };
 
-    const SortIcon = ({ column }: { column: SortKey }) => {
-        if (sortKey !== column) {
-            return <ArrowDownUp size={14} className='text-[#b0a391]' />;
-        }
-
-        return sortOrder === 'asc' ? (
-            <ArrowUp size={14} className='text-[#ef7f1a]' />
-        ) : (
-            <ArrowDown size={14} className='text-[#ef7f1a]' />
-        );
-    };
-
     return (
         <div className='space-y-5'>
             <HeadSection
@@ -206,19 +173,7 @@ const AdminBookPage = () => {
                 href='book'
             />
 
-            <section className='grid gap-4 md:grid-cols-3'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value || 0}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>

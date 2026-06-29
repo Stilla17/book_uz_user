@@ -24,7 +24,6 @@ export const getCommentAuthorName = (comment: AdminComment) => {
 export const statusOptions: Array<{ value: 'all' | CommentStatus; label: string }> = [
     { value: 'all', label: 'Barchasi' },
     { value: 'approved', label: 'Tasdiqlangan' },
-    { value: 'pending', label: 'Kutilmoqda' },
     { value: 'rejected', label: 'Rad etilgan' }
 ];
 

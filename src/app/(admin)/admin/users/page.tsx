@@ -2,19 +2,25 @@
 
 import { useEffect, useState } from 'react';
 
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAdminUsersQuery } from '@/components/admin/hooks/queries/users';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
+import { useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
+import { api } from '@/services/api';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import type { AdminUserListItem } from '@/types/admin-users';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
-import { ContactRound, Mail, Search, UserCheck, Users } from 'lucide-react';
+import { ContactRound, Edit3, Mail, Search, Table2, UserCheck, Users } from 'lucide-react';
+
+type UserSortKey = 'name' | 'phone' | 'source' | 'orders' | 'registeredAt' | 'birthDate';
 
 const formatDate = (value?: string) => {
     if (!value) return '-';
@@ -28,12 +34,14 @@ const UserRow = ({ user, index }: { user: AdminUserListItem; index: number }) =>
     <tr className='border-b border-[#f0e4d3] bg-white transition last:border-0 hover:bg-[#fffaf2] dark:border-slate-900 dark:bg-slate-950 dark:hover:bg-slate-900'>
         <td className='px-4 py-4'>
             <div className='min-w-0'>
-                <p className='font-black whitespace-nowrap text-[#2f2a25] dark:text-white'>
+                <Link
+                    href={`/admin/users/${user.id}`}
+                    className='font-black whitespace-nowrap text-[#2f2a25] transition hover:text-[#ef7f1a] dark:text-white dark:hover:text-orange-400'>
                     {index + 1}. {user.name}
-                </p>
+                </Link>
                 <p className='mt-1 flex items-center gap-1.5 text-xs font-bold text-[#9d907e] dark:text-slate-500'>
                     <Mail size={13} />
-                    {user.email || 'Email kiritilmagan'}
+                    {user.telegramUsername || 'Email kiritilmagan'}
                 </p>
             </div>
         </td>
@@ -70,6 +78,13 @@ const UserRow = ({ user, index }: { user: AdminUserListItem; index: number }) =>
         <td className='px-4 py-4 text-sm font-bold whitespace-nowrap text-[#8b7e70] dark:text-slate-400'>
             {formatDate(user.birthDate)}
         </td>
+        <td>
+            <button className='grid size-9 place-items-center rounded-xl text-[#817466] transition hover:bg-[#f2e7d8] hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-950'>
+                <Link href={`/admin/users/new?id=${user.id}`}>
+                    {user.source !== 'AMO_CRM' ? <Edit3 size={17} /> : ''}
+                </Link>
+            </button>
+        </td>
     </tr>
 );
 
@@ -78,8 +93,15 @@ const AdminUsersPage = () => {
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
+    const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<UserSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { data, isFetching, isLoading, isError } = useAdminUsersQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
+    const { data, isFetching, isLoading, isError } = useAdminUsersQuery(
+        page,
+        FETCH_PAGINATION_LIMIT,
+        debouncedSearch,
+        sortKey,
+        sortOrder
+    );
 
     useEffect(() => {
         setPage(urlPage);
@@ -117,6 +139,23 @@ const AdminUsersPage = () => {
         });
     };
 
+    const downloadExelFile = async () => {
+        const response = await api.get('/admin/users/export-excel', {
+            responseType: 'blob'
+        });
+
+        const blob = await response.data;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+
+        a.href = url;
+        a.download = 'mijozlar.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    };
+
     return (
         <div className='space-y-5'>
             <HeadSection
@@ -125,19 +164,7 @@ const AdminUsersPage = () => {
                 href='users'
             />
 
-            <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <article
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </article>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='overflow-hidden rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800'>
@@ -147,23 +174,79 @@ const AdminUsersPage = () => {
                             type='search'
                             value={searchInput}
                             onChange={(event) => setSearchInput(event.target.value)}
-                            placeholder='Ism, email yoki telefon raqami'
+                            placeholder="Ism, email, telefon yoki tug'ilgan sana"
                             className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
                         />
                     </label>
-                    <p className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>{items.length} ta natija</p>
+                    <div className='flex items-center gap-6'>
+                        <p className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
+                            {pagination?.total ?? items.length} ta natija
+                        </p>
+                        <button className='text-green-400' onClick={downloadExelFile}>
+                            <Table2 />
+                        </button>
+                    </div>
                 </div>
 
                 <div className='overflow-x-auto'>
                     <table className='w-full min-w-[1120px] text-left'>
                         <thead>
                             <tr className='border-b border-[#eadfce] text-xs font-black text-[#9d907e] uppercase dark:border-slate-800 dark:text-slate-500'>
-                                <th className='px-4 py-3'>Foydalanuvchi</th>
-                                <th className='px-4 py-3'>Telefon</th>
-                                <th className='px-4 py-3'>Manba</th>
-                                <th className='px-4 py-3'>Buyurtmalar</th>
-                                <th className='px-4 py-3'>Ro'yxatdan o'tgan</th>
-                                <th className='px-4 py-3'>Tug'ilgan sana</th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('name')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Foydalanuvchi
+                                        <SortIcon column='name' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('phone')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Telefon
+                                        <SortIcon column='phone' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('source')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Manba
+                                        <SortIcon column='source' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('orders')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Buyurtmalar
+                                        <SortIcon column='orders' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('registeredAt')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Ro'yxatdan o'tgan
+                                        <SortIcon column='registeredAt' />
+                                    </button>
+                                </th>
+                                <th className='px-4 py-3'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleSort('birthDate')}
+                                        className='inline-flex items-center gap-1 font-black uppercase'>
+                                        Tug'ilgan sana
+                                        <SortIcon column='birthDate' />
+                                    </button>
+                                </th>
+                                <th>Amallar</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -172,7 +255,7 @@ const AdminUsersPage = () => {
                             ) : isError ? (
                                 <tr>
                                     <td
-                                        colSpan={6}
+                                        colSpan={7}
                                         className='bg-white px-4 py-12 text-center text-sm font-bold text-red-500 dark:bg-slate-950'>
                                         Foydalanuvchilarni yuklab bo'lmadi.
                                     </td>
@@ -184,7 +267,7 @@ const AdminUsersPage = () => {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan={6}
+                                        colSpan={7}
                                         className='bg-white px-4 py-12 text-center text-sm font-bold text-[#8b7e70] dark:bg-slate-950 dark:text-slate-400'>
                                         Foydalanuvchi topilmadi.
                                     </td>

@@ -27,7 +27,8 @@ export interface Order {
     shippingAddress: ShippingAddress;
     description: string;
     discountAmount: number;
-    deliveryType: 'DELIVERY' | 'PICKUP';
+    deliveryType: 'DELIVERY' | 'PICKUP' | 'POST';
+    postDeliveryType?: 'POST_OFFICE' | 'POST_TO_HOME';
     paymentType: PaymentType;
     paymentStatus: PaymentStatus;
     status: OrderStatus;

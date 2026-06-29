@@ -8,9 +8,11 @@ import AsideCheckout from '@/components/shared/AsideCheckout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { deliveryOptions, paymentOptions } from '@/data';
 import {
+    DELIVERY_COST,
     type DistrictItem,
     type RegionItem,
     buildOrderPayload,
+    getDeliveryType,
     getLocationName,
     getOrderId,
     getPaymentRedirectUrl,
@@ -25,8 +27,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserService } from '@/services/api';
 import { resetCheckout, updateField } from '@/store/features/checkoutSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { matchesTransliteratedSearch } from '@/utils/transliteration';
 import { useQuery } from '@tanstack/react-query';
 
+import axios from 'axios';
 import {
     Banknote,
     CheckCircle2,
@@ -49,6 +53,7 @@ type CheckoutFormValues = {
 };
 
 const CheckoutPage = () => {
+    const [isGettingLocation, setIsGettingLocation] = useState(false);
     const router = useRouter();
     const dispatch = useAppDispatch();
     const checkout = useAppSelector((state) => state.checkout);
@@ -74,6 +79,11 @@ const CheckoutPage = () => {
         checkout.deliveryMethod || deliveryOptions[0]?.title || 'Kuryer'
     );
     const phone = watch('clientPhone');
+    const { data: deliverySettings } = useQuery({
+        queryKey: ['settings', 'delivery'],
+        queryFn: UserService.getDeliverySettings
+    });
+    const deliveryFee = deliverySettings?.deliveryFee ?? DELIVERY_COST;
 
     useEffect(() => {
         if (!user) return;
@@ -133,6 +143,16 @@ const CheckoutPage = () => {
         [districts, selectedDistrict]
     );
 
+    const isLocationNameMatch = (first?: string, second?: string) => {
+        if (!first || !second) return false;
+
+        return matchesTransliteratedSearch(first, second) || matchesTransliteratedSearch(second, first);
+    };
+
+    const isTashkentRegion = Boolean(
+        selectedRegionItem && isLocationNameMatch(getLocationName(selectedRegionItem), 'Toshkent')
+    );
+
     const handleRegionChange = (regionId: string) => {
         setSelectedRegion(regionId);
         setSelectedDistrict('');
@@ -140,6 +160,19 @@ const CheckoutPage = () => {
     };
 
     const phoneError = phoneTouched && phone.length > 0 && !isValidUzPhone(phone);
+
+    const isDeliveryDisabled = (title: string) =>
+        isTashkentRegion ? getDeliveryType(title) === 'POST' : title === 'Kuryer orqali';
+
+    useEffect(() => {
+        if (!isDeliveryDisabled(selectedDelivery)) return;
+
+        const nextDelivery = deliveryOptions.find((option) => !isDeliveryDisabled(option.title))?.title || '';
+        if (!nextDelivery) return;
+
+        setSelectedDelivery(nextDelivery);
+        dispatch(updateField({ deliveryMethod: nextDelivery }));
+    }, [dispatch, isTashkentRegion, selectedDelivery]);
 
     const handleSubmitOrder = async (formValues: CheckoutFormValues) => {
         setPhoneTouched(true);
@@ -174,7 +207,8 @@ const CheckoutPage = () => {
                 selectedRegionItem: selectedRegionItem!,
                 selectedDistrictItem: selectedDistrictItem!,
                 selectedDelivery,
-                selectedPayment
+                selectedPayment,
+                deliveryFee
             });
             const response = await createOrder.mutateAsync(payload);
             const orderId = getOrderId(response);
@@ -188,9 +222,9 @@ const CheckoutPage = () => {
 
             if (!paymentRedirectUrl && selectedPayment === 'Payme' && orderId) {
                 const paymeResponse = await UserService.createPaymePayment(orderId);
-                console.log('🔍 Payme Response:', paymeResponse);
+                console.log('рџ”Ќ Payme Response:', paymeResponse);
                 paymentRedirectUrl = getPaymentRedirectUrl(paymeResponse);
-                console.log('💳 Payment Redirect URL:', paymentRedirectUrl);
+                console.log('рџ’і Payment Redirect URL:', paymentRedirectUrl);
             }
 
             if (!isOnlinePayment(selectedPayment)) {
@@ -219,6 +253,103 @@ const CheckoutPage = () => {
         } catch (error: any) {
             toast.error(error?.response?.data?.message || 'Buyurtma yaratishda xatolik yuz berdi');
         }
+    };
+
+    const handleGetLocationAddress = () => {
+        if (!navigator.geolocation) {
+            toast.error("Brauzeringiz locationni qo'llab-quvvatlamaydi");
+            return;
+        }
+
+        setIsGettingLocation(true);
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                try {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    const response = await axios.get(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=uz`
+                    );
+
+                    const locationAddress = response.data?.address || {};
+                    const streetAddress =
+                        [
+                            locationAddress.road,
+                            locationAddress.house_number,
+                            locationAddress.neighbourhood || locationAddress.suburb
+                        ]
+                            .filter(Boolean)
+                            .join(', ') ||
+                        response.data?.display_name ||
+                        '';
+
+                    const regionCandidates = [
+                        locationAddress.state,
+                        locationAddress.state_district,
+                        locationAddress.region,
+                        locationAddress.province,
+                        locationAddress.city,
+                        locationAddress.town,
+                        locationAddress.municipality,
+                        response.data?.display_name
+                    ].filter(Boolean);
+                    const districtCandidates = [
+                        locationAddress.city_district,
+                        locationAddress.district,
+                        locationAddress.county,
+                        locationAddress.suburb,
+                        locationAddress.neighbourhood,
+                        locationAddress.municipality,
+                        response.data?.display_name
+                    ].filter(Boolean);
+
+                    const matchedDistrict = (districts || []).find((district) =>
+                        districtCandidates.some((candidate) =>
+                            isLocationNameMatch(getLocationName(district), candidate)
+                        )
+                    );
+                    const matchedRegion =
+                        (matchedDistrict?.region?.id
+                            ? (regions || []).find((region) => region.id === matchedDistrict.region?.id)
+                            : undefined) ||
+                        (regions || []).find((region) =>
+                            regionCandidates.some((candidate) =>
+                                isLocationNameMatch(getLocationName(region), candidate)
+                            )
+                        );
+
+                    if (matchedRegion) {
+                        setSelectedRegion(matchedRegion.id);
+                        setSelectedDistrict('');
+                        dispatch(updateField({ region: matchedRegion.id, district: '', address: streetAddress }));
+
+                        if (matchedDistrict?.region?.id === matchedRegion.id) {
+                            setSelectedDistrict(matchedDistrict.id);
+                            dispatch(updateField({ district: matchedDistrict.id }));
+                        }
+                    } else {
+                        dispatch(updateField({ address: streetAddress }));
+                    }
+
+                    setIsGettingLocation(false);
+                    toast.success('Manzil aniqlandi');
+                } catch (error) {
+                    setIsGettingLocation(false);
+                    toast.error("Manzilni aniqlashda xatolik bo'ldi");
+                }
+            },
+            () => {
+                setIsGettingLocation(false);
+                toast.error('Location uchun ruxsat berilmadi');
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
+            }
+        );
     };
 
     return (
@@ -411,6 +542,15 @@ const CheckoutPage = () => {
                                     </Select>
                                 </label>
 
+                                <button
+                                    type='button'
+                                    onClick={handleGetLocationAddress}
+                                    disabled={isGettingLocation}
+                                    className='inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 text-sm font-black text-[#ef7f1a] transition hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2 dark:border-orange-900/50 dark:bg-orange-950/20 dark:hover:bg-orange-950/40'>
+                                    <MapPin className='size-4' />
+                                    {isGettingLocation ? 'Aniqlanmoqda...' : 'Manzilni aniqlash'}
+                                </button>
+
                                 <label className='block md:col-span-2'>
                                     <span className='mb-2 block text-sm font-bold text-slate-700 dark:text-slate-200'>
                                         Ko&apos;cha, uy, xonadon
@@ -460,13 +600,17 @@ const CheckoutPage = () => {
                             <div className='mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
                                 {deliveryOptions.map((option) => {
                                     const isActive = selectedDelivery === option.title;
+                                    const isDisabled = isDeliveryDisabled(option.title);
                                     const Icon = option.icon;
 
                                     return (
                                         <button
                                             key={option.title}
                                             type='button'
+                                            disabled={isDisabled}
                                             onClick={() => {
+                                                if (isDisabled) return;
+
                                                 setSelectedDelivery(option.title);
                                                 dispatch(updateField({ deliveryMethod: option.title }));
                                             }}
@@ -474,6 +618,10 @@ const CheckoutPage = () => {
                                                 isActive
                                                     ? 'border-[#ef7f1a] bg-orange-50 ring-4 ring-orange-100 dark:bg-orange-950/20 dark:ring-orange-950/40'
                                                     : 'border-slate-200 bg-slate-50 hover:border-orange-200 hover:bg-orange-50/60 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900'
+                                            } ${
+                                                isDisabled
+                                                    ? 'cursor-not-allowed opacity-50 hover:border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-950'
+                                                    : ''
                                             }`}>
                                             {isActive ? (
                                                 <span className='absolute top-2 right-2 flex size-5 items-center justify-center rounded-full bg-[#ef7f1a] text-white'>
@@ -564,6 +712,7 @@ const CheckoutPage = () => {
                         promoDiscount={promoDiscount}
                         promoCode={promoCode}
                         selectedDelivery={selectedDelivery}
+                        deliveryFee={deliveryFee}
                     />
                 </div>
             </div>

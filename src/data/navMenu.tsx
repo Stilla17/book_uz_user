@@ -193,7 +193,7 @@ export const menuItems = [
         icon: ShoppingCart
     },
     {
-        label: 'Foydalanuvchilar',
+        label: 'Mijozlar',
         href: '/admin/users',
         icon: Users
     },

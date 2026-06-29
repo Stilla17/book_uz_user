@@ -6,10 +6,12 @@ import Link from 'next/link';
 
 import { useDeleteBranch } from '@/components/admin/hooks/branchHooks/useDeleteBranch';
 import { useBranchQuery } from '@/components/admin/hooks/queries/branch';
+import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { PublishersSkeleton } from '@/components/ui/skeleton';
+import { matchesTransliteratedSearch } from '@/utils/transliteration';
 
-import { Building2, Edit3,  MapPin, Search, Trash2 } from 'lucide-react';
+import { Building2, Edit3, MapPin, Search, Trash2 } from 'lucide-react';
 
 const AdminBranchesPage = () => {
     const [search, setSearch] = useState('');
@@ -17,12 +19,12 @@ const AdminBranchesPage = () => {
     const { mutate: deleteBranch, isPending: isDeleting } = useDeleteBranch();
 
     const filteredBranches = useMemo(() => {
-        const keyword = search.trim().toLowerCase();
+        const keyword = search.trim();
         if (!keyword) return branches;
 
         return branches.filter((branch) => {
-            const name = (branch.branchName ?? branch.name ?? '').toLowerCase();
-            return name.includes(keyword);
+            const searchableText = [branch.branchName, branch.name, branch.address].filter(Boolean).join(' ');
+            return matchesTransliteratedSearch(searchableText, keyword);
         });
     }, [branches, search]);
 
@@ -47,19 +49,7 @@ const AdminBranchesPage = () => {
                 href='branches'
             />
 
-            <section className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                {stats.map(({ label, value, icon: Icon, color }) => (
-                    <div
-                        key={label}
-                        className='rounded-[22px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                        <span className={`grid size-11 place-items-center rounded-2xl ${color} text-white`}>
-                            <Icon size={20} />
-                        </span>
-                        <p className='mt-4 text-2xl font-black text-[#2f2a25] dark:text-white'>{value}</p>
-                        <p className='text-sm font-bold text-[#9d907e] dark:text-slate-400'>{label}</p>
-                    </div>
-                ))}
-            </section>
+            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>

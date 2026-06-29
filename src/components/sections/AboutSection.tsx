@@ -10,7 +10,7 @@ import { useBookCount } from '@/hooks/bookHooks/useBookCount';
 import { ClientService } from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
 
-import { Award, Book, BookHeadphones, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
+import { Award, Book, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
 
 export const AboutSection = () => {
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
@@ -60,8 +60,7 @@ export const AboutSection = () => {
 
                         <p className='max-w-xl text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
                             Biz 2018-yildan buyon kitobxonlar uchun eng sara kitoblarni yetkazib kelmoqdamiz. Maqsadimiz
-                            — har bir xonadonga 
-                            <span className='font-bold text-[#00a0e3] dark:text-blue-400'>ilm nuri</span> kirib
+                            - har bir xonadonga <span className='font-bold text-[#00a0e3] dark:text-blue-400'>ilm nuri</span> kirib
                             borishini ta'minlash va mutolaa madaniyatini yuksaltirishdir.
                         </p>
 

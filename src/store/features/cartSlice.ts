@@ -9,8 +9,12 @@ export type CartBook = {
     images: string | string[];
     stock: number;
     publisher?: string | { _id?: string; id?: string };
+    publisherId?: string;
+    publisherName?: string;
     details?: {
         publisher?: string | { _id?: string; id?: string };
+        publisherId?: string;
+        publisherName?: string;
     };
 };
 
