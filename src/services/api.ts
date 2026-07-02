@@ -288,7 +288,7 @@ export const UserService = {
         return response.data;
     },
 
-    addToCart: async (data: { productId: string; quantity: number }) => {
+    addToCart: async (data: { productId: string; quantity: number; priceAtTime?: number }) => {
         const response = await api.post('/cart/add', data);
         return response.data;
     },

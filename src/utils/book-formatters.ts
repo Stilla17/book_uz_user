@@ -54,6 +54,32 @@ export const getAuthor = (author: unknown) => {
 
 export const getBookTitle = (book: Book) => getText(book.title, "Noma'lum kitob");
 
+const isObjectId = (value: string) => /^[a-f\d]{24}$/i.test(value);
+
+const getAuthorText = (author: unknown, fallback = "Noma'lum muallif"): string => {
+    if (!author) return fallback;
+
+    if (typeof author === 'string') {
+        return isObjectId(author) ? fallback : author;
+    }
+
+    if (Array.isArray(author)) {
+        return (
+            author
+                .map((item) => getAuthorText(item, ''))
+                .filter(Boolean)
+                .join(', ') || fallback
+        );
+    }
+
+    if (typeof author === 'object') {
+        const value = author as { name?: LocalizedText; title?: LocalizedText };
+        return getLocalizedText(value.name, '') || getLocalizedText(value.title, '') || fallback;
+    }
+
+    return fallback;
+};
+
 const getBookTitleValue = (title: Book['title']): Book['title'] => ({
     uz: title.uz || title.ru || title.en || "Noma'lum kitob",
     ru: title.ru || title.uz || title.en || "Noma'lum kitob",
@@ -61,16 +87,14 @@ const getBookTitleValue = (title: Book['title']): Book['title'] => ({
 });
 
 export const getBookAuthorName = (book: Book) => {
-    if (typeof book.author === 'string') return book.author;
+    const authorName = getAuthorText(book.authorName, '');
+    if (authorName) return authorName;
 
-    return getText(book.author?.name ? { name: book.author.name } : book.author, "Noma'lum muallif");
+    return getAuthorText(book.author);
 };
 
 export const getProductAuthorName = (author: Product['author']) => {
-    if (!author) return "Noma'lum muallif";
-    if (typeof author === 'string') return author;
-
-    return getText({ name: author.name }, "Noma'lum muallif");
+    return getAuthorText(author);
 };
 
 export const getProductPriceInfo = (product: Product) => {
@@ -81,6 +105,20 @@ export const getProductPriceInfo = (product: Product) => {
     return { price, oldPrice, discount };
 };
 
+export const getBookPriceInfo = (book?: Pick<Book, 'price' | 'oldPrice' | 'discountPrice' | 'discount'> | null) => {
+    const basePrice = Number(book?.price ?? 0);
+    const discountPrice = Number(book?.discountPrice);
+    const oldPriceValue = Number(book?.oldPrice);
+    const hasDiscountPrice = Number.isFinite(discountPrice) && discountPrice > 0 && discountPrice < basePrice;
+    const hasOldPrice = Number.isFinite(oldPriceValue) && oldPriceValue > basePrice;
+    const price = hasDiscountPrice ? discountPrice : basePrice;
+    const oldPrice = hasDiscountPrice ? basePrice : hasOldPrice ? oldPriceValue : undefined;
+    const discount =
+        oldPrice && oldPrice > price ? book?.discount || Math.round(((oldPrice - price) / oldPrice) * 100) : undefined;
+
+    return { price, oldPrice, discount, hasDiscount: Boolean(oldPrice && oldPrice > price) };
+};
+
 export const mapProductToBook = (product: Product, type?: string): Book => {
     const { price, oldPrice, discount } = getProductPriceInfo(product);
 
@@ -88,7 +126,8 @@ export const mapProductToBook = (product: Product, type?: string): Book => {
         _id: product._id,
         slug: product.slug,
         title: getBookTitleValue(product.title),
-        author: getProductAuthorName(product.author),
+        author: getAuthorText(product.authorName, '') || getAuthorText(product.author),
+        authorName: product.authorName,
         price,
         oldPrice,
         rating: product.ratingAvg || 0,

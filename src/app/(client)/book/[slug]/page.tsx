@@ -15,7 +15,7 @@ import { useBookStats } from '@/hooks/bookHooks/useBookStats';
 import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
-import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
+import { getAuthor, getBookPriceInfo, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
@@ -85,6 +85,7 @@ export default function BookDetailPage() {
     const stockLimit = availableStock > 0 ? availableStock : undefined;
     const isBookAvailable = availableStock > 0;
     const displayedQuantity = cartQuantity > 0 ? cartQuantity : selectedQuantity;
+    const priceInfo = getBookPriceInfo(book);
 
     const bookView = useMemo(
         () => ({
@@ -117,7 +118,10 @@ export default function BookDetailPage() {
             _id: book._id,
             title: book.title,
             slug: book.slug,
-            price: book.price,
+            price: priceInfo.price,
+            oldPrice: priceInfo.oldPrice,
+            discountPrice: priceInfo.price,
+            discount: priceInfo.discount,
             images: book.image ?? book.images?.[0] ?? '',
             stock: stockLimit ?? 0,
             publisher: book.publisher,
@@ -195,20 +199,25 @@ export default function BookDetailPage() {
     }
 
     return (
-        <div className='min-h-screen py-6 dark:bg-slate-900'>
-            <div className='container mx-auto max-w-7xl px-4'>
+        <div className='min-h-screen py-4 sm:py-6 dark:bg-slate-900'>
+            <div className='container mx-auto max-w-7xl px-3 sm:px-4'>
                 <BreadCrumb items={breadcrumbItems} />
 
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className='grid gap-8 rounded-2xl border border-[#f7e3cf] bg-[#fff9f3] p-1.5 shadow-lg shadow-orange-100/70 backdrop-blur lg:grid-cols-[minmax(0,460px)_1fr] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none'>
-                    <div className='relative min-h-105 overflow-hidden p-6'>
+                    className='grid gap-4 rounded-2xl border border-[#f7e3cf] bg-[#fff9f3] p-1.5 shadow-lg shadow-orange-100/70 backdrop-blur sm:gap-8 lg:grid-cols-[minmax(0,460px)_1fr] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none'>
+                    <div className='relative min-h-80 overflow-hidden p-4 sm:min-h-105 sm:p-6'>
                         <img
                             src={getImageUrl(bookView.image)}
                             alt={bookView.title}
                             className='h-full max-h-130 w-full object-contain'
                         />
+                        {priceInfo.discount ? (
+                            <span className='absolute top-4 left-4 rounded-full bg-[#ef7f1a] px-3 py-1.5 text-sm font-black text-white shadow-sm ring-1 ring-white/70 sm:top-6 sm:left-6'>
+                                -{priceInfo.discount}%
+                            </span>
+                        ) : null}
                         {availableBranchStocks.length ? (
                             <div className='mt-5 space-y-3 border-t border-orange-100 pt-4 dark:border-slate-700'>
                                 <div className='space-y-2'>
@@ -249,9 +258,9 @@ export default function BookDetailPage() {
                         )}
                     </div>
 
-                    <div className='p-6'>
+                    <div className='p-4 sm:p-6'>
                         <p className='mb-3 text-sm font-semibold text-[#ef7f1a]'>{bookView.category}</p>
-                        <h1 className='text-3xl font-black text-gray-900 md:text-4xl dark:text-white'>
+                        <h1 className='text-2xl font-black text-gray-900 sm:text-3xl md:text-4xl dark:text-white'>
                             {bookView.title}
                         </h1>
                         <p className='mt-3 text-lg text-gray-500 dark:text-gray-400'>{bookView.author}</p>
@@ -307,10 +316,24 @@ export default function BookDetailPage() {
 
                         <div className='mt-8 rounded-3xl'>
                             <div className='flex flex-col gap-4 lg:flex-row lg:items-center'>
-                                <div className='mt-2 flex items-end gap-3'>
-                                    <span className='text-4xl font-black tracking-tight text-[#ef7f1a]'>
-                                        {formatPrice(book?.price)}
-                                    </span>
+                                <div className='mt-2'>
+                                    {priceInfo.hasDiscount ? (
+                                        <div className='mb-2 flex flex-wrap items-center gap-2'>
+                                            <span className='text-base font-bold text-slate-400 line-through dark:text-slate-500'>
+                                                {formatPrice(priceInfo.oldPrice)}
+                                            </span>
+                                            {priceInfo.discount ? (
+                                                <span className='rounded-full bg-orange-50 px-2.5 py-1 text-xs font-black text-[#ef7f1a] dark:bg-orange-500/10 dark:text-orange-300'>
+                                                    -{priceInfo.discount}%
+                                                </span>
+                                            ) : null}
+                                        </div>
+                                    ) : null}
+                                    <div className='flex items-end gap-3'>
+                                        <span className='text-3xl font-black tracking-tight text-[#ef7f1a] sm:text-4xl'>
+                                            {formatPrice(priceInfo.price)}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <div className='flex items-center gap-1.5'>
@@ -342,7 +365,7 @@ export default function BookDetailPage() {
                                 <Button
                                     onClick={addBookToCart}
                                     disabled={!isBookAvailable || cartQuantity > 0}
-                                    className='h-14 rounded-2xl bg-[#ef7f1a] text-base font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] dark:shadow-none'>
+                                    className='h-12 rounded-2xl bg-[#ef7f1a] text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] sm:h-14 sm:text-base dark:shadow-none'>
                                     <ShoppingCart size={20} />
                                     {!isBookAvailable
                                         ? 'Mavjud emas'
@@ -354,7 +377,7 @@ export default function BookDetailPage() {
                                     variant='outline'
                                     disabled={favoriteLoading}
                                     onClick={toggleFavorite}
-                                    className={`h-14 rounded-2xl border-slate-200 bg-white/80 px-5 text-base font-bold backdrop-blur hover:border-[#ef7f1a] hover:text-[#ef7f1a] dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-slate-500 dark:hover:text-white`}>
+                                    className={`h-12 rounded-2xl border-slate-200 bg-white/80 px-4 text-sm font-bold backdrop-blur hover:border-[#ef7f1a] hover:text-[#ef7f1a] sm:h-14 sm:px-5 sm:text-base dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-slate-500 dark:hover:text-white`}>
                                     <Heart className={isBookmarked ? 'fill-red-500 text-red-500' : ''} size={20} />
                                     Sevimlilarga
                                 </Button>

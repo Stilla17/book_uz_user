@@ -6,11 +6,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { UserService } from '@/services/api';
 import { type CartBook, type CartItem, addCart, clearCart, removeCart, setCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { getBookPriceInfo } from '@/utils/book-formatters';
 import {
     addGuestCart,
+    clearCartPriceOverrides,
     clearGuestCart,
+    getCartPriceOverride,
     getCartFromLocalStotage,
+    removeCartPriceOverride,
     removeGuestCart,
+    saveCartPriceOverride,
     updateGuestCart
 } from '@/utils/cartStorage';
 
@@ -43,18 +48,38 @@ const getProductImage = (book: any) => {
     return '';
 };
 
+const getCartItemPriceInfo = (item: any, book: any) => {
+    const productId = getProductId(book);
+    const savedPrice = productId ? getCartPriceOverride(productId) : undefined;
+    const priceInfo = getBookPriceInfo({
+        price: Number(item?.price ?? item?.priceAtTime ?? book?.price ?? 0),
+        oldPrice: book?.oldPrice,
+        discountPrice: item?.discountPrice ?? book?.discountPrice,
+        discount: book?.discount
+    });
+
+    return {
+        ...priceInfo,
+        price: typeof savedPrice === 'number' ? savedPrice : priceInfo.price
+    };
+};
+
 // Serverdan kelgan maxsulotni CartItem formatiga o'tkazadi.
 const normalizeCartItem = (item: any): CartItem | null => {
     const book = item?.book ?? item?.product ?? item?.productId ?? item;
     const productId = getProductId(book);
     if (!book || typeof book !== 'object' || !productId) return null;
+    const priceInfo = getCartItemPriceInfo(item, book);
 
     return {
         book: {
             _id: productId,
             title: book.title ?? "Noma'lum kitob",
             slug: book.slug,
-            price: item?.price ?? book.price ?? 0,
+            price: priceInfo.price,
+            oldPrice: priceInfo.oldPrice,
+            discountPrice: priceInfo.price,
+            discount: priceInfo.discount,
             images: getProductImage(book),
             stock: book.stock ?? 0,
             publisher: book.publisher,
@@ -126,10 +151,12 @@ export const useBookCart = ({ loadOnMount = true }: { loadOnMount?: boolean } = 
         dispatch(addCart(cartItem));
 
         if (isAuthenticated) {
-            await UserService.addToCart({ productId: book._id, quantity: nextQuantity });
+            await UserService.addToCart({ productId: book._id, quantity: nextQuantity, priceAtTime: book.price });
+            saveCartPriceOverride(book._id, book.price);
             return;
         }
 
+        saveCartPriceOverride(book._id, book.price);
         addGuestCart([cartItem]);
     };
 
@@ -155,9 +182,11 @@ export const useBookCart = ({ loadOnMount = true }: { loadOnMount?: boolean } = 
 
         if (isAuthenticated) {
             await UserService.removeFromCart(productId);
+            removeCartPriceOverride(productId);
             return;
         }
 
+        removeCartPriceOverride(productId);
         removeGuestCart(productId);
     };
 
@@ -166,9 +195,11 @@ export const useBookCart = ({ loadOnMount = true }: { loadOnMount?: boolean } = 
 
         if (isAuthenticated) {
             await UserService.clearCart();
+            clearCartPriceOverrides();
             return;
         }
 
+        clearCartPriceOverrides();
         clearGuestCart();
     };
 

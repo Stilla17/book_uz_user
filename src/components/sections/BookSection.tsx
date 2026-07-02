@@ -52,11 +52,11 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
     const config = getSectionConfig(type);
 
     return (
-        <section className='bg-background relative overflow-hidden py-6 dark:bg-slate-900'>
-            <div className='relative z-10 container mx-auto px-4'>
+        <section className='bg-background relative overflow-hidden py-5 sm:py-6 dark:bg-slate-900'>
+            <div className='relative z-10 container mx-auto px-3 sm:px-4'>
                 {/* Header with animation */}
                 <motion.div
-                    className='mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center'
+                    className='mb-5 flex flex-col items-start justify-between gap-3 sm:mb-8 md:flex-row md:items-center'
                     initial={{ opacity: 0, x: -30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -66,7 +66,7 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
 
                         <div className='min-w-0'>
                             <div className='flex flex-wrap items-center gap-2'>
-                                <h2 className={`text-2xl font-semibold tracking-tight md:text-3xl ${config.color}`}>
+                                <h2 className={`text-xl font-semibold tracking-tight sm:text-2xl md:text-3xl ${config.color}`}>
                                     {title}
                                 </h2>
 
@@ -81,7 +81,7 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
 
                     <motion.a
                         href={viewAllLink}
-                        className={`group flex items-center rounded-full px-5 py-2.5 text-sm font-bold transition-all md:text-base ${config.bgColor} ${config.color} hover:shadow-md`}
+                        className={`group flex items-center rounded-full px-4 py-2 text-sm font-bold transition-all sm:px-5 sm:py-2.5 md:text-base ${config.bgColor} ${config.color} hover:shadow-md`}
                         whileHover={{ x: 5 }}
                         whileTap={{ scale: 0.95 }}>
                         {t('booksSection.viewAll')}
@@ -93,8 +93,8 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
                 <div className='relative'>
                     {/* Swiper Slider */}
                     <Swiper
-                        slidesPerView={1.4}
-                        spaceBetween={15}
+                        slidesPerView={1.15}
+                        spaceBetween={12}
                         loop={true}
                         navigation={{
                             prevEl: prevRef.current,
@@ -111,13 +111,14 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
                         }
                         modules={[Navigation, Autoplay]}
                         breakpoints={{
-                            480: { slidesPerView: 2.2, spaceBetween: 15 },
+                            420: { slidesPerView: 1.7, spaceBetween: 12 },
+                            480: { slidesPerView: 2.05, spaceBetween: 14 },
                             640: { slidesPerView: 2.5, spaceBetween: 15 },
                             768: { slidesPerView: 3.2, spaceBetween: 20 },
                             1024: { slidesPerView: 4.2, spaceBetween: 20 },
                             1280: { slidesPerView: 5.2, spaceBetween: 25 }
                         }}
-                        className='book-swiper mt-12 pb-12'>
+                        className='book-swiper mt-8 pb-10 sm:mt-12 sm:pb-12'>
                         {loading
                             ? Array.from({ length: 8 }).map((_, i) => (
                                   <SwiperSlide key={i}>

@@ -135,7 +135,7 @@ export const Navbar = () => {
 
             {/* MAIN ROW */}
             <div
-                className={`container mx-auto flex h-18 items-center justify-between gap-2 px-4 md:h-20 md:gap-4 ${getBgColor('card')}`}>
+                className={`container mx-auto flex h-16 items-center justify-between gap-2 px-3 sm:px-4 md:h-20 md:gap-4 ${getBgColor('card')}`}>
                 {/* Chap qism - Logo va Katalog */}
                 <div className='flex items-center gap-2 md:gap-4'>
                     {/* Mobile burger */}
@@ -148,6 +148,10 @@ export const Navbar = () => {
                     {/* LOGO */}
                     <Link href='/' className='group flex items-center gap-2 max-md:hidden'>
                         <Image src='/images/Logo.svg' alt='Logo' width={80} height={80} />
+                    </Link>
+
+                    <Link href='/' className='group flex items-center gap-2 sm:hidden'>
+                        <Image src='/images/Logo.svg' alt='Logo' width={58} height={58} />
                     </Link>
                 </div>
 
@@ -354,7 +358,9 @@ export const Navbar = () => {
             </div>
 
             {/* BOTTOM NAV - 10 ta link bilan */}
-            <NavbarFooter />
+            <div className='hidden md:block'>
+                <NavbarFooter />
+            </div>
         </header>
     );
 };

@@ -30,8 +30,8 @@ const DEFAULT_FILTERS: CatalogFilters = {
 };
 
 const PAGE_LIMIT = 12;
-const CATALOG_GRID_CLASS_NAME = 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3';
-const CATALOG_LIST_CLASS_NAME = 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+const CATALOG_GRID_CLASS_NAME = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-3';
+const CATALOG_LIST_CLASS_NAME = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4';
 
 export default function CatalogPage() {
     const router = useRouter();
@@ -139,15 +139,15 @@ export default function CatalogPage() {
 
     return (
         <div className='min-h-screen'>
-            <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
-                <div className='mt-6 grid gap-6 lg:grid-cols-[290px_minmax(0,1fr)]'>
+            <div className='mx-auto max-w-7xl px-3 py-5 sm:px-6 sm:py-8 lg:px-8'>
+                <div className='mt-3 grid gap-4 sm:mt-6 lg:grid-cols-[290px_minmax(0,1fr)] lg:gap-6'>
                     <AsideFilter filters={filters} onChange={applyFilters} onClear={clearFilters} />
 
                     <motion.section
                         initial={{ opacity: 0, y: 18 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.14 }}
-                        className='space-y-4'>
+                        className='min-w-0 space-y-4'>
                         <PanelResults total={pagination.total} viewMode={viewMode} onViewModeChange={setViewMode} />
 
                         {isError ? (

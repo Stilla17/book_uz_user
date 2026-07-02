@@ -56,13 +56,13 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                     <SheetContent
                         side='left'
                         showCloseButton={false}
-                        className={`w-[88vw] p-0 sm:w-105 ${getBgColor('card')}`}>
+                        className={`w-[92vw] max-w-[420px] p-0 sm:w-105 ${getBgColor('card')}`}>
                         <SheetTitle className='sr-only'>Mobil menyu</SheetTitle>
                         <SheetDescription className='sr-only'>
                             Sayt bo‘limlari, katalog, qidiruv va sozlamalar.
                         </SheetDescription>
 
-                        <div className={`border-b p-5 ${getBorderColor()} flex items-center justify-between`}>
+                        <div className={`border-b p-4 sm:p-5 ${getBorderColor()} flex items-center justify-between`}>
                             <Link href='/' className='group flex min-w-fit flex-col items-center gap-1 pt-2'>
                                 <div className='mt-1 flex items-center text-xl leading-none font-black tracking-tighter md:text-2xl'>
                                     <img src='/images/Logo.svg' alt='Logo' />
@@ -76,7 +76,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                             </SheetClose>
                         </div>
 
-                        <div className='max-h-[calc(100vh-120px)] space-y-5 overflow-y-auto p-5'>
+                        <div className='max-h-[calc(100dvh-92px)] space-y-4 overflow-y-auto p-4 sm:space-y-5 sm:p-5'>
                             <NavbarControls variant='mobile' onLanguageSelect={() => setMobileOpen(false)} />
 
                             <form className='relative' onSubmit={submitSearch}>
@@ -94,7 +94,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                 </button>
                             </form>
 
-                            <div className='grid grid-cols-2 gap-3'>
+                            <div className='grid grid-cols-2 gap-2.5 sm:gap-3'>
                                 <MobileAction
                                     href='/cart'
                                     icon={<ShoppingCart size={18} />}

@@ -9,7 +9,7 @@ import { useOrderQuery } from '@/components/admin/hooks/queries/order';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
-import { orderStatusConfig } from '@/data';
+import { orderStatusConfig, paymentStatusConfig } from '@/data';
 import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
@@ -111,8 +111,8 @@ const AdminOrdersPage = () => {
     }> = [
         { label: 'Barchasi', value: 'ALL' },
         { label: 'Kutilmoqda', value: 'PENDING' },
-        { label: 'Qabul qilindi', value: 'PROCESSING' },
-        { label: "Yo'lda", value: 'DELIVERING' },
+        { label: 'Qabul qilindi', value: 'CONFIRMED' },
+        { label: "Yo'lda", value: 'SHIPPED' },
         { label: 'Yetkazildi', value: 'DELIVERED' },
         { label: 'Bekor qilindi', value: 'CANCELLED' }
     ];
@@ -207,6 +207,11 @@ const AdminOrdersPage = () => {
                                         className:
                                             'bg-slate-50 text-slate-700 ring-slate-100 dark:bg-slate-500/10 dark:text-slate-300 dark:ring-slate-500/20'
                                     };
+                                    const paymentConfig = paymentStatusConfig[order.paymentStatus] ?? {
+                                        label: order.paymentStatus || "To'lov holati noma'lum",
+                                        className:
+                                            'bg-slate-50 text-slate-700 ring-slate-100 dark:bg-slate-500/10 dark:text-slate-300 dark:ring-slate-500/20'
+                                    };
 
                                     return (
                                         <tr
@@ -260,7 +265,11 @@ const AdminOrdersPage = () => {
                                                 <Link
                                                     href={`/admin/orders/slug?id=${order._id}`}
                                                     className='block px-4 py-4 text-sm font-bold text-[#6f6255] dark:text-slate-300'>
-                                                    {order.paymentType}
+                                                    <span className='block'>{order.paymentType}</span>
+                                                    <span
+                                                        className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${paymentConfig.className}`}>
+                                                        {paymentConfig.label}
+                                                    </span>
                                                 </Link>
                                             </td>
                                             <td className='p-0'>

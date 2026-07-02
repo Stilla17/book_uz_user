@@ -39,7 +39,7 @@ export const Hero = () => {
 
     if (isLoading || banners.length === 0) {
         return (
-            <section className='relative h-100 w-full overflow-hidden sm:h-125 lg:h-150'>
+            <section className='relative h-56 w-full overflow-hidden sm:h-90 lg:h-150'>
                 <div className='absolute inset-0 animate-pulse bg-gradient-to-r from-gray-300 to-gray-200 dark:from-slate-800 dark:to-slate-800'>
                     <div className='absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/10' />
                 </div>
@@ -77,7 +77,7 @@ export const Hero = () => {
                 }}
                 loop={true}
                 onSlideChange={handleSlideChange}
-                className='hero-swiper h-100 w-[90%] sm:h-125 lg:h-150'>
+                className='hero-swiper mx-auto h-56 w-full max-w-[1440px] sm:h-90 lg:h-150'>
                 {banners.map((banner) => {
                     const buttonLink = banner.buttonLink || banner.link;
                     const buttonText = getLocalizedText(banner.buttonText) || 'Barcha kitoblar';
@@ -87,7 +87,7 @@ export const Hero = () => {
                             <div className='relative h-full w-full'>
                                 {/* Background Image */}
                                 <div
-                                    className='swiper-slide-active:scale-110 absolute inset-0 scale-105 bg-contain bg-center bg-no-repeat transition-transform duration-10000'
+                                    className='swiper-slide-active:scale-105 absolute inset-0 scale-100 bg-contain bg-center bg-no-repeat transition-transform duration-10000 sm:scale-105'
                                     style={{
                                         backgroundImage: `url(${getImageUrl(banner.imageUrl) || banner.imageUrl})`
                                     }}

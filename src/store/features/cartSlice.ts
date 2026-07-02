@@ -6,6 +6,9 @@ export type CartBook = {
     title: string | { uz?: string; ru?: string; en?: string };
     slug?: string;
     price: number;
+    oldPrice?: number;
+    discountPrice?: number;
+    discount?: number;
     images: string | string[];
     stock: number;
     publisher?: string | { _id?: string; id?: string };

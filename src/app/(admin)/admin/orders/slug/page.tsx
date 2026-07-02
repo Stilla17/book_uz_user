@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { useOrderIdQuery } from '@/components/admin/hooks/queries/order';
-import { orderStatusConfig } from '@/data';
+import { orderStatusConfig, paymentStatusConfig } from '@/data';
 import { getAuthor, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
@@ -34,6 +34,9 @@ const AdminOrderDetailPage = () => {
     const id = searchParams.get('id') ?? '';
     const { data: orderData, isLoading: isDetailLoading } = useOrderIdQuery(id);
     const statusConfig = orderData ? orderStatusConfig[orderData.status] : null;
+    const paymentStatusLabel = orderData
+        ? paymentStatusConfig[orderData.paymentStatus]?.label || orderData.paymentStatus || "Noma'lum"
+        : '';
     const productsTotal = getOrderProductsTotal(orderData?.items);
 
     return (
@@ -203,6 +206,7 @@ const AdminOrderDetailPage = () => {
                                 />
                                 <InfoRow label='Yetkazish narxi' value={formatPrice(orderData?.deliveryFee ?? 0)} />
                                 <InfoRow label="To'lov turi" value={orderData?.paymentType || ''} />
+                                <InfoRow label="To'lov holati" value={paymentStatusLabel} />
                             </div>
                         </article>
                     </section>

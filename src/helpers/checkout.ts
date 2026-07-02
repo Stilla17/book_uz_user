@@ -121,7 +121,7 @@ const getOrderItems = (cartItems: CartItem[]) =>
     cartItems.map((item) => ({
         product: getCartProductId(item.book),
         quantity: item.quantity,
-        priceAtTime: item.book.price
+        priceAtTime: Number(item.book.price || 0)
     }));
 
 export const validateCheckout = ({

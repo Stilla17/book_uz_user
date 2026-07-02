@@ -41,8 +41,8 @@ export default function CartPage() {
     if (authLoading || loadingCart) return null;
 
     return (
-        <div className='min-h-screen bg-slate-50 py-6 sm:py-8 dark:bg-slate-950'>
-            <div className='container mx-auto max-w-7xl px-4'>
+        <div className='min-h-screen bg-slate-50 py-5 sm:py-8 dark:bg-slate-950'>
+            <div className='container mx-auto max-w-7xl px-3 sm:px-4'>
                 <div className='mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-slate-800'>
                     <div>
                         <h1 className='mt-2 text-2xl font-black text-slate-950 sm:text-3xl dark:text-white'>
@@ -59,7 +59,7 @@ export default function CartPage() {
                     </div>
                 </div>
 
-                <div className='grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]'>
+                <div className='grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px] xl:gap-6'>
                     <motion.section
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -96,9 +96,9 @@ export default function CartPage() {
                                     initial={{ opacity: 0, y: 18 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.08 + index * 0.05 }}
-                                    className='rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
+                                    className='rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4 dark:border-slate-800 dark:bg-slate-900'>
                                     <div className='flex flex-col gap-5 md:flex-row md:items-center'>
-                                        <div className='mx-auto flex h-44 w-full max-w-36 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-4 md:mx-0 dark:bg-slate-950'>
+                                        <div className='mx-auto flex h-40 w-full max-w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-3 sm:h-44 sm:max-w-36 sm:p-4 md:mx-0 dark:bg-slate-950'>
                                             <img
                                                 src={getImageUrl(item.book.images)}
                                                 alt={getText(item.book.title, "Noma'lum kitob")}
@@ -109,7 +109,7 @@ export default function CartPage() {
                                         <div className='flex min-w-0 flex-1 flex-col justify-between gap-5'>
                                             <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
                                                 <div className='min-w-0'>
-                                                    <h2 className='text-xl leading-7 font-black text-slate-900 dark:text-white'>
+                                                    <h2 className='text-lg leading-6 font-black text-slate-900 sm:text-xl sm:leading-7 dark:text-white'>
                                                         {getText(item.book.title, "Noma'lum kitob")}
                                                     </h2>
                                                     <p className='mt-2 text-sm font-semibold text-slate-500 dark:text-slate-400'>

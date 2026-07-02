@@ -6,10 +6,10 @@ import { Navbar } from '@/components/shared/Navbar';
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
     return (
-        <div className='relative flex min-h-screen flex-col'>
+        <div className='relative flex min-h-screen min-w-0 flex-col overflow-x-hidden'>
             <Navbar />
 
-            <main className='flex-1'>{children}</main>
+            <main className='min-w-0 flex-1'>{children}</main>
 
             <Footer />
             <BookAiAssistant />

@@ -43,32 +43,50 @@ const AsideCheckout = ({
 
             <div className='mt-5 max-h-[360px] space-y-3 overflow-y-auto pr-1'>
                 {cartItems.length > 0 ? (
-                    cartItems.map((item) => (
-                        <div
-                            key={item.book._id}
-                            className='flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950'>
-                            <div className='flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-2 shadow-sm dark:bg-slate-900'>
-                                <img
-                                    src={getImageUrl(item.book.images)}
-                                    alt={getText(item.book.title, "Noma'lum kitob")}
-                                    className='h-full w-full object-contain'
-                                />
-                            </div>
-                            <div className='min-w-0 flex-1'>
-                                <p className='line-clamp-2 leading-5 font-black text-slate-950 dark:text-white'>
-                                    {getText(item.book.title, "Noma'lum kitob")}
-                                </p>
-                                <div className='mt-2 flex items-center justify-between gap-3'>
-                                    <span className='rounded-full bg-white px-2 py-1 text-xs font-bold text-slate-500 dark:bg-slate-900 dark:text-slate-400'>
-                                        x{item.quantity}
-                                    </span>
-                                    <span className='text-sm font-black text-[#ef7f1a]'>
-                                        {formatPrice(item.book.price)}
-                                    </span>
+                    cartItems.map((item) => {
+                        const hasDiscount = Boolean(item.book.oldPrice && item.book.oldPrice > item.book.price);
+
+                        return (
+                            <div
+                                key={item.book._id}
+                                className='flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950'>
+                                <div className='flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-2 shadow-sm dark:bg-slate-900'>
+                                    <img
+                                        src={getImageUrl(item.book.images)}
+                                        alt={getText(item.book.title, "Noma'lum kitob")}
+                                        className='h-full w-full object-contain'
+                                    />
+                                </div>
+                                <div className='min-w-0 flex-1'>
+                                    <p className='line-clamp-2 leading-5 font-black text-slate-950 dark:text-white'>
+                                        {getText(item.book.title, "Noma'lum kitob")}
+                                    </p>
+                                    <div className='mt-2 flex items-center justify-between gap-3'>
+                                        <span className='rounded-full bg-white px-2 py-1 text-xs font-bold text-slate-500 dark:bg-slate-900 dark:text-slate-400'>
+                                            x{item.quantity}
+                                        </span>
+                                        <div className='text-right'>
+                                            {hasDiscount ? (
+                                                <div className='mb-0.5 flex items-center justify-end gap-1.5'>
+                                                    <span className='text-xs font-bold text-slate-400 line-through'>
+                                                        {formatPrice(item.book.oldPrice)}
+                                                    </span>
+                                                    {item.book.discount ? (
+                                                        <span className='rounded-full bg-orange-50 px-1.5 py-0.5 text-[10px] font-black text-[#ef7f1a] dark:bg-orange-500/10'>
+                                                            -{item.book.discount}%
+                                                        </span>
+                                                    ) : null}
+                                                </div>
+                                            ) : null}
+                                            <span className='text-sm font-black text-[#ef7f1a]'>
+                                                {formatPrice(item.book.price)}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
                     <div className='rounded-xl border border-dashed border-slate-200 bg-slate-50 p-5 text-center dark:border-slate-800 dark:bg-slate-950'>
                         <p className='text-sm font-bold text-slate-700 dark:text-slate-200'>Savat bo'sh</p>

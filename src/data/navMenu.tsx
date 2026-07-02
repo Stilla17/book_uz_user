@@ -17,6 +17,7 @@ import {
     LayoutDashboard,
     Mail,
     MapPinned,
+    MessageCircleQuestionMark,
     MessageSquareText,
     Newspaper,
     PenLine,
@@ -173,6 +174,11 @@ export const menuItems = [
         icon: TicketPercent
     },
     {
+        label: 'Chegirmalar',
+        href: '/admin/discount',
+        icon: Percent
+    },
+    {
         label: 'Kommentariya',
         href: '/admin/comments',
         icon: MessageSquareText
@@ -180,7 +186,7 @@ export const menuItems = [
     {
         label: 'Faq',
         href: '/admin/faq',
-        icon: MessageSquareText
+        icon: MessageCircleQuestionMark
     },
     {
         label: 'Partners',

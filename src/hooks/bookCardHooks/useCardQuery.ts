@@ -7,7 +7,7 @@ export const useAddCartMutation = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (data: { productId: string; quantity: number }) => {
+        mutationFn: async (data: { productId: string; quantity: number; priceAtTime?: number }) => {
             await UserService.addToCart(data);
         },
         onSuccess: () => {

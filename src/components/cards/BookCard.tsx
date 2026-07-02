@@ -13,8 +13,8 @@ import { bookService } from '@/services/book.service';
 import { addCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { type BookCardProps } from '@/types/book';
-import { getBookAuthorName, getBookTitle } from '@/utils/book-formatters';
-import { addGuestCart } from '@/utils/cartStorage';
+import { getBookAuthorName, getBookPriceInfo, getBookTitle } from '@/utils/book-formatters';
+import { addGuestCart, saveCartPriceOverride } from '@/utils/cartStorage';
 import { formatPriceNumber } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 import { useQueryClient } from '@tanstack/react-query';
@@ -40,6 +40,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
     });
 
     const { isBookmarked, favoriteLoading, toggleFavorite, user } = useBookWishlist(book, { onWishlistChange });
+    const priceInfo = getBookPriceInfo(book);
 
     const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
@@ -54,7 +55,10 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                 _id: book._id,
                 title: book.title,
                 slug: book.slug,
-                price: book.price,
+                price: priceInfo.price,
+                oldPrice: priceInfo.oldPrice,
+                discountPrice: priceInfo.price,
+                discount: priceInfo.discount,
                 images: book.image ?? book.images?.[0] ?? '',
                 stock: book.stock ?? 0,
                 publisher: book.publisher,
@@ -67,14 +71,16 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
         if (user) {
             addCartMutation.mutate(
-                { productId: book._id, quantity: 1 },
+                { productId: book._id, quantity: 1, priceAtTime: priceInfo.price },
                 {
                     onSuccess: () => {
+                        saveCartPriceOverride(book._id, priceInfo.price);
                         dispatch(addCart(cartItem));
                     }
                 }
             );
         } else {
+            saveCartPriceOverride(book._id, priceInfo.price);
             addGuestCart([cartItem]);
             dispatch(addCart(cartItem));
             queryClient.invalidateQueries({ queryKey: ['cart'] });
@@ -108,11 +114,11 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
     return (
         <div
-            className='group relative mt-24 flex min-h-100 cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-4 pt-44 pb-4 dark:border-slate-700 dark:bg-slate-800'
+            className='group relative mt-18 flex min-h-[350px] cursor-pointer flex-col rounded-[15px] border border-slate-200/80 bg-white px-3 pt-36 pb-3 sm:mt-24 sm:min-h-100 sm:px-4 sm:pt-44 sm:pb-4 dark:border-slate-700 dark:bg-slate-800'
             onMouseEnter={prefetchBook}
             onTouchStart={prefetchBook}
             onClick={openBookDetails}>
-            <div className='absolute -top-20 left-1/2 h-64 w-[70%] -translate-x-1/2'>
+            <div className='absolute -top-16 left-1/2 h-52 w-[72%] -translate-x-1/2 sm:-top-20 sm:h-64 sm:w-[70%]'>
                 <Link
                     href={bookHref}
                     onMouseEnter={prefetchBook}
@@ -133,6 +139,11 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                             <span className='text-xs font-semibold'>Rasm mavjud emas</span>
                         </div>
                     )}
+                    {priceInfo.discount ? (
+                        <span className='absolute top-2 left-2 z-10 rounded-full bg-[#ef7f1a] px-2.5 py-1 text-xs font-black text-white shadow-sm ring-1 ring-white/70'>
+                            -{priceInfo.discount}%
+                        </span>
+                    ) : null}
                 </Link>
             </div>
 
@@ -143,11 +154,11 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                         onMouseEnter={prefetchBook}
                         onFocus={prefetchBook}
                         className='block min-w-0 flex-1'>
-                        <h3 className='mt-4 mb-2 line-clamp-2 min-h-14 text-[18px] leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] dark:text-white dark:group-hover:text-blue-400'>
+                        <h3 className='mt-3 mb-2 line-clamp-2 min-h-11 text-base leading-snug font-bold tracking-tight text-gray-900 group-hover:text-[#00a0e3] sm:mt-4 sm:min-h-14 sm:text-[18px] dark:text-white dark:group-hover:text-blue-400'>
                             {getBookTitle(book)}
                         </h3>
 
-                        <p className='mb-2 line-clamp-1 flex min-h-5 items-center gap-1 text-[14px] text-gray-500 dark:text-gray-400'>
+                        <p className='mb-2 line-clamp-1 flex min-h-5 items-center gap-1 text-xs text-gray-500 sm:text-[14px] dark:text-gray-400'>
                             {getBookAuthorName(book)}
                         </p>
                     </Link>
@@ -179,9 +190,21 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                 <div className='mt-auto border-t border-dashed border-gray-200 pt-4 dark:border-slate-700'>
                     <div className='flex items-end justify-between'>
                         <div>
+                            {priceInfo.hasDiscount ? (
+                                <div className='mb-1 flex items-center gap-2'>
+                                    <span className='text-xs font-bold text-gray-400 line-through dark:text-gray-500'>
+                                        {formatPriceNumber(priceInfo.oldPrice)} so'm
+                                    </span>
+                                    {priceInfo.discount ? (
+                                        <span className='rounded-full bg-orange-50 px-2 py-0.5 text-xs font-black text-[#ef7f1a] dark:bg-orange-500/10 dark:text-orange-300'>
+                                            -{priceInfo.discount}%
+                                        </span>
+                                    ) : null}
+                                </div>
+                            ) : null}
                             <div className='flex items-baseline gap-1'>
-                                <span className='text-[18px] font-black text-[#ef7f1a] dark:text-blue-400'>
-                                    {formatPriceNumber(book.price)}
+                                <span className='text-base font-black text-[#ef7f1a] sm:text-[18px] dark:text-blue-400'>
+                                    {formatPriceNumber(priceInfo.price)}
                                 </span>
                                 <span className='font-medium text-gray-500 dark:text-gray-400'>so'm</span>
                             </div>

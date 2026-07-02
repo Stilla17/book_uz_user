@@ -8,7 +8,15 @@ export interface ShippingAddress {
     street: string;
 }
 
-export type OrderStatus = 'PENDING' | 'PROCESSING' | 'DELIVERING' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus =
+    | 'PENDING'
+    | 'CONFIRMED'
+    | 'PROCESSING'
+    | 'PACKED'
+    | 'SHIPPED'
+    | 'DELIVERING'
+    | 'DELIVERED'
+    | 'CANCELLED';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED';
 export type PaymentType = 'PAYME' | 'CLICK' | 'CASH';
 

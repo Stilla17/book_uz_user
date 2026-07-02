@@ -1,6 +1,7 @@
 import { CartItem } from '@/store/features/cartSlice';
 
 const CART_KEY = 'guest_cart';
+const CART_PRICE_OVERRIDES_KEY = 'cart_price_overrides';
 
 export const getCartFromLocalStotage = (): CartItem[] => {
     if (typeof window === 'undefined') return [];
@@ -48,4 +49,49 @@ export const clearGuestCart = () => {
 
     localStorage.removeItem(CART_KEY);
     return [];
+};
+
+export const getCartPriceOverrides = (): Record<string, number> => {
+    if (typeof window === 'undefined') return {};
+
+    try {
+        const data = localStorage.getItem(CART_PRICE_OVERRIDES_KEY);
+        return data ? JSON.parse(data) : {};
+    } catch {
+        return {};
+    }
+};
+
+export const getCartPriceOverride = (productId: string) => {
+    const price = Number(getCartPriceOverrides()[productId]);
+    return Number.isFinite(price) && price >= 0 ? price : undefined;
+};
+
+export const saveCartPriceOverride = (productId: string, price: number) => {
+    if (typeof window === 'undefined') return;
+
+    const normalizedPrice = Number(price);
+    if (!productId || !Number.isFinite(normalizedPrice) || normalizedPrice < 0) return;
+
+    localStorage.setItem(
+        CART_PRICE_OVERRIDES_KEY,
+        JSON.stringify({
+            ...getCartPriceOverrides(),
+            [productId]: normalizedPrice
+        })
+    );
+};
+
+export const removeCartPriceOverride = (productId: string) => {
+    if (typeof window === 'undefined') return;
+
+    const overrides = getCartPriceOverrides();
+    delete overrides[productId];
+    localStorage.setItem(CART_PRICE_OVERRIDES_KEY, JSON.stringify(overrides));
+};
+
+export const clearCartPriceOverrides = () => {
+    if (typeof window === 'undefined') return;
+
+    localStorage.removeItem(CART_PRICE_OVERRIDES_KEY);
 };
