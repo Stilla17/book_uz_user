@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -31,10 +31,12 @@ export default function LoginPage() {
 
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
-    const [otp, setOtp] = useState('');
+    const [otpValues, setOtpValues] = useState<string[]>(Array(OTP_LENGTH).fill(''));
     const [otpSent, setOtpSent] = useState(false);
+    const otpInputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
     const normalizedPhone = useMemo(() => normalizePhone(phone), [phone]);
+    const otp = useMemo(() => otpValues.join(''), [otpValues]);
 
     const getErrorMessage = (error: any, fallback: string) =>
         error?.response?.data?.message || error?.message || fallback;
@@ -52,6 +54,7 @@ export default function LoginPage() {
 
         try {
             await sendPhoneOtp({ name: name.trim(), phone: normalizedPhone });
+            setOtpValues(Array(OTP_LENGTH).fill(''));
             setOtpSent(true);
             toast.success('Tasdiqlash kodi telefon raqamga yuborildi');
         } catch (error: any) {
@@ -83,26 +86,47 @@ export default function LoginPage() {
         }
     };
 
+    const handleOtpChange = (index: number, value: string) => {
+        const digit = value.replace(/\D/g, '').slice(-1);
+        const nextOtpValues = otpValues.map((item, itemIndex) => (itemIndex === index ? digit : item));
+
+        setOtpValues(nextOtpValues);
+
+        if (digit && index < OTP_LENGTH - 1) {
+            otpInputRefs.current[index + 1]?.focus();
+        }
+    };
+
+    const handleOtpKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== 'Backspace' || otpValues[index]) return;
+
+        otpInputRefs.current[index - 1]?.focus();
+    };
+
+    const handleOtpPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+        event.preventDefault();
+
+        const pastedOtp = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH);
+        if (!pastedOtp) return;
+
+        setOtpValues(Array.from({ length: OTP_LENGTH }, (_, index) => pastedOtp[index] || ''));
+        otpInputRefs.current[Math.min(pastedOtp.length, OTP_LENGTH) - 1]?.focus();
+    };
+
+    useEffect(() => {
+        if (!otpSent) return;
+
+        otpInputRefs.current[0]?.focus();
+    }, [otpSent]);
+
     return (
         <div className='flex min-h-screen items-center justify-center px-4 py-12 dark:bg-slate-900'>
-            <div className='absolute inset-0 overflow-hidden'>
-                <div className='absolute -top-40 -right-40 h-80 w-80 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-600/5' />
-                <div className='absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-orange-500/10 blur-3xl dark:bg-orange-600/5' />
-            </div>
-
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className='relative z-10 w-full max-w-md rounded-[32px] border border-gray-100 bg-white/85 p-8 shadow-2xl backdrop-blur-xl md:p-10 dark:border-slate-700 dark:bg-slate-800/85 dark:shadow-blue-900/20'>
-                <div className='mb-6 flex justify-center'>
-                    <div className='relative h-16 w-16'>
-                        <div className='absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500 to-orange-500 opacity-20 blur-xl' />
-                        <div className='relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-orange-500 shadow-lg'>
-                            <span className='text-2xl font-black text-white'>B</span>
-                        </div>
-                    </div>
-                </div>
+                className='relative z-10 w-full max-w-md rounded-[32px] border border-gray-100 bg-white/85 p-8 shadow-2xl backdrop-blur-xl md:px-10 dark:border-slate-700 dark:bg-slate-800/85 dark:shadow-blue-900/20'>
+                <img src='/images/Logo.png' alt='Logo' className='mx-auto h-40 w-40 max-md:h-32 max-md:w-32' />
 
                 <div className='mb-8 text-center'>
                     <h1 className='text-3xl font-black text-gray-900 md:text-4xl dark:text-white'>Tizimga kirish</h1>
@@ -159,7 +183,7 @@ export default function LoginPage() {
                         <button
                             type='submit'
                             disabled={isLoading}
-                            className='mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-orange-500 py-4 font-bold text-white shadow-lg shadow-blue-500/30 transition-all hover:from-blue-600 hover:to-orange-600 disabled:cursor-not-allowed disabled:opacity-70 dark:shadow-blue-600/30'>
+                            className='mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ef7f1a] py-4 font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-[#d96f12] disabled:cursor-not-allowed disabled:opacity-70 dark:shadow-orange-600/30'>
                             {isLoading ? (
                                 <Loader2 className='animate-spin' size={22} />
                             ) : (
@@ -175,28 +199,40 @@ export default function LoginPage() {
                             <label className='ml-1 text-sm font-bold text-gray-600 dark:text-gray-400'>
                                 Tasdiqlash kodi
                             </label>
-                            <div className='group relative'>
-                                <ShieldCheck
-                                    className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400'
-                                    size={18}
-                                />
-                                <input
-                                    required
-                                    type='text'
-                                    inputMode='numeric'
-                                    maxLength={OTP_LENGTH}
-                                    placeholder='1234'
-                                    className='w-full rounded-2xl border border-gray-200 bg-gray-50 py-4 pr-4 pl-12 text-center text-lg font-bold text-gray-900 transition-all outline-none placeholder:text-gray-400 focus:border-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-400'
-                                    value={otp}
-                                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, OTP_LENGTH))}
-                                />
+                            <div className='grid grid-cols-4 gap-3'>
+                                {otpValues.map((digit, index) => (
+                                    <div key={index} className='group relative'>
+                                        <input
+                                            ref={(element) => {
+                                                otpInputRefs.current[index] = element;
+                                            }}
+                                            required
+                                            type='text'
+                                            inputMode='numeric'
+                                            autoComplete={index === 0 ? 'one-time-code' : 'off'}
+                                            maxLength={1}
+                                            aria-label={`Tasdiqlash kodi ${index + 1}-raqam`}
+                                            className='h-16 w-full rounded-2xl border border-gray-200 bg-gray-50 text-center text-2xl font-black text-gray-900 transition-all outline-none placeholder:text-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:ring-orange-950/40'
+                                            value={digit}
+                                            onChange={(event) => handleOtpChange(index, event.target.value)}
+                                            onKeyDown={(event) => handleOtpKeyDown(index, event)}
+                                            onPaste={handleOtpPaste}
+                                        />
+                                        {index === 0 ? (
+                                            <ShieldCheck
+                                                className='pointer-events-none absolute top-1/2 left-2 hidden -translate-y-1/2 text-gray-300 transition-colors group-focus-within:text-orange-500 sm:block dark:text-gray-500 dark:group-focus-within:text-orange-400'
+                                                size={14}
+                                            />
+                                        ) : null}
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
                         <button
                             type='submit'
                             disabled={isLoading}
-                            className='mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-orange-500 py-4 font-bold text-white shadow-lg shadow-blue-500/30 transition-all hover:from-blue-600 hover:to-orange-600 disabled:cursor-not-allowed disabled:opacity-70 dark:shadow-blue-600/30'>
+                            className='mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ef7f1a] py-4 font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-[#d96f12] disabled:cursor-not-allowed disabled:opacity-70 dark:shadow-orange-600/30'>
                             {isLoading ? (
                                 <Loader2 className='animate-spin' size={22} />
                             ) : (
@@ -211,7 +247,7 @@ export default function LoginPage() {
                                 type='button'
                                 onClick={() => {
                                     setOtpSent(false);
-                                    setOtp('');
+                                    setOtpValues(Array(OTP_LENGTH).fill(''));
                                 }}
                                 className='flex items-center gap-1 font-semibold text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'>
                                 <ArrowLeft size={16} />

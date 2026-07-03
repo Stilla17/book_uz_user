@@ -113,7 +113,7 @@ export const AuthorBannerSection = ({ authorId }: AuthorBannerProps) => {
         return (
             <section className='py-8 md:py-12'>
                 <div className='container mx-auto max-w-[1400px] px-4'>
-                    <div className='relative h-[400px] w-full animate-pulse overflow-hidden rounded-[50px] bg-gradient-to-r from-gray-300 to-gray-200 md:h-[500px] dark:from-slate-800 dark:to-slate-800' />
+                    <div className='relative h-[420px] w-full animate-pulse overflow-hidden rounded-3xl bg-gradient-to-r from-gray-300 to-gray-200 sm:rounded-[50px] md:h-[500px] dark:from-slate-800 dark:to-slate-800' />
                 </div>
             </section>
         );
@@ -141,7 +141,7 @@ export const AuthorBannerSection = ({ authorId }: AuthorBannerProps) => {
         <section className='bg-background relative overflow-hidden py-8 md:py-12 dark:bg-slate-900'>
             <div className='relative z-10 container mx-auto max-w-[1400px] px-4'>
                 <motion.div
-                    className='group relative mb-0 h-[400px] w-full overflow-hidden rounded-[50px] shadow-2xl md:h-[500px] dark:shadow-2xl dark:shadow-[#00a0e3]/20'
+                    className='group relative mb-0 h-[420px] w-full overflow-hidden rounded-3xl shadow-2xl sm:rounded-[50px] md:h-[500px] dark:shadow-2xl dark:shadow-[#00a0e3]/20'
                     onHoverStart={() => setIsHovered(true)}
                     onHoverEnd={() => setIsHovered(false)}
                     style={{ y }}>
@@ -161,13 +161,13 @@ export const AuthorBannerSection = ({ authorId }: AuthorBannerProps) => {
 
                     <div className='absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent dark:from-slate-900/95 dark:via-slate-900/80' />
 
-                    <div className='absolute top-10 right-10 opacity-10'>
-                        <Quote size={120} className='text-white dark:text-slate-400' />
+                    <div className='absolute top-6 right-6 opacity-10 sm:top-10 sm:right-10'>
+                        <Quote size={88} className='text-white sm:size-[120px] dark:text-slate-400' />
                     </div>
 
-                    <div className='absolute inset-0 flex flex-col justify-center px-10 text-white md:px-20'>
+                    <div className='absolute inset-0 flex min-w-0 flex-col justify-center px-5 text-white sm:px-10 md:px-20'>
                         <motion.div
-                            className='mb-4 flex items-center gap-3'
+                            className='mb-4 flex flex-wrap items-center gap-2 sm:gap-3'
                             initial={{ opacity: 0, x: -50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2 }}>
@@ -181,7 +181,7 @@ export const AuthorBannerSection = ({ authorId }: AuthorBannerProps) => {
                         </motion.div>
 
                         <motion.h2
-                            className='mb-3 text-5xl font-black tracking-tight text-white md:text-7xl'
+                            className='mb-3 text-3xl font-black tracking-tight break-words text-white sm:text-5xl md:text-7xl'
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}>
@@ -190,7 +190,7 @@ export const AuthorBannerSection = ({ authorId }: AuthorBannerProps) => {
 
                         {author.shortBio?.uz && (
                             <motion.p
-                                className='mb-4 text-xl font-light text-gray-200 md:text-2xl dark:text-gray-300'
+                                className='mb-4 line-clamp-2 text-base font-light text-gray-200 sm:text-xl md:text-2xl dark:text-gray-300'
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4 }}>
@@ -199,7 +199,7 @@ export const AuthorBannerSection = ({ authorId }: AuthorBannerProps) => {
                         )}
 
                         <motion.div
-                            className='mb-6 flex flex-wrap gap-6'
+                            className='mb-6 flex flex-wrap gap-3 sm:gap-6'
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 }}>
@@ -235,7 +235,7 @@ export const AuthorBannerSection = ({ authorId }: AuthorBannerProps) => {
 
                         {banner.description?.uz && (
                             <motion.p
-                                className='mb-8 max-w-2xl text-lg leading-relaxed text-gray-100 md:text-xl dark:text-gray-300'
+                                className='mb-8 line-clamp-3 max-w-2xl text-sm leading-relaxed text-gray-100 sm:text-lg md:text-xl dark:text-gray-300'
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.6 }}>
@@ -251,7 +251,7 @@ export const AuthorBannerSection = ({ authorId }: AuthorBannerProps) => {
                                 transition={{ delay: 0.7 }}>
                                 <motion.button
                                     onClick={() => handleBannerClick(banner.buttonLink)}
-                                    className='group flex items-center gap-2 rounded-2xl bg-white px-10 py-4 font-extrabold text-black shadow-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-[#00a0e3] hover:to-[#ef7f1a] hover:text-white dark:bg-slate-800 dark:text-white dark:hover:from-blue-600 dark:hover:to-orange-600'
+                                    className='group flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-extrabold text-black shadow-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-[#00a0e3] hover:to-[#ef7f1a] hover:text-white sm:px-10 sm:py-4 sm:text-base dark:bg-slate-800 dark:text-white dark:hover:from-blue-600 dark:hover:to-orange-600'
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}>
                                     {banner.buttonText.uz}

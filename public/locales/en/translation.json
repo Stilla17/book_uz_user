@@ -52,6 +52,12 @@
         "bestWeekSubtitle": "The most read books",
         "bestMonthSubtitle": "The most read books",
         "viewAll": "View All",
+        "discountBadge": "Discount",
+        "topWeekTitle": "Top 10 Books of the Week",
+        "topMonthTitle": "Top 10 Books of the Month",
+        "topSalesLabel": "Top 10",
+        "topSalesLoadError": "Top sales could not be loaded.",
+        "topSalesEmpty": "Top sales have not been synchronized yet.",
         "basket": "Basket"
     },
     "publish": {
@@ -59,5 +65,18 @@
         "label": "Reliable publishers with books for every taste",
         "desc": " A curated selection of publishers for the Book.uz showcase. Behind each emblem lies a unique style, direction, and catalog tailored to every reader.",
         "viewDetails": "View Details"
+    },
+    "nav": {
+        "books": "Books",
+        "authors": "Authors",
+        "publishers": "Publishers",
+        "news": "News",
+        "about": "About",
+        "services": "Services",
+        "promo": "Promokod",
+        "new": "New",
+        "popular": "Popular",
+        "discount": "Discount",
+        "top100": "Top 100"
     }
 }

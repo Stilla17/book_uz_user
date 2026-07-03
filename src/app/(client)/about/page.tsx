@@ -88,13 +88,13 @@ export default function AboutPage() {
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className='mb-6 text-5xl font-black md:text-7xl'>
+                        className='mb-6 text-3xl font-black sm:text-5xl md:text-7xl'>
                         <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>Kitobxonlar uchun</span>
                         <br />
                         <span className='text-gray-900 dark:text-white'>eng yaxshi platforma</span>
                     </motion.h1>
 
-                    <p className='mx-auto max-w-3xl text-xl text-gray-500 dark:text-gray-400'>
+                    <p className='mx-auto max-w-3xl text-base leading-7 text-gray-500 sm:text-xl dark:text-gray-400'>
                         BOOK.UZ - O'zbekistonning eng katta raqamli kutubxonasi. Biz {booksCount} + kitoblar bilan sizga
                         eng yaxshi o'qish tajribasini taqdim etamiz.
                     </p>
@@ -119,7 +119,7 @@ export default function AboutPage() {
 
                 {/* Tabs with new colors */}
                 <div className='mb-8'>
-                    <div className='flex justify-center gap-4'>
+                    <div className='flex flex-wrap justify-center gap-3 sm:gap-4'>
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
@@ -270,8 +270,8 @@ export default function AboutPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2 }}
-                    className='flex items-center justify-between'>
-                    <div className='flex flex-col gap-12'>
+                    className='flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between'>
+                    <div className='flex w-full flex-col gap-8 sm:gap-12 lg:w-auto'>
                         <div className='flex gap-4'>
                             <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-[#00a0e3]/10 text-[#00a0e3]'>
                                 <MapPin size={24} />
@@ -319,7 +319,7 @@ export default function AboutPage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 1.3 }}
-                            className='mt-12 flex justify-center gap-4'>
+                            className='mt-6 flex flex-wrap justify-start gap-3 sm:mt-12 sm:gap-4'>
                             {[
                                 { icon: <Facebook size={20} />, href: '#', label: 'Facebook' },
                                 { icon: <Twitter size={20} />, href: '#', label: 'Twitter' },
@@ -368,9 +368,9 @@ export default function AboutPage() {
                                         type='button'
                                         key={`legend-${branch.name}`}
                                         onClick={() => setFocusRequest({ name: branch.name, id: Date.now() })}
-                                        className='flex items-center gap-2 rounded-lg bg-gray-100 px-2 py-1 text-left text-gray-700 transition hover:bg-[#ef7f1a]/15 dark:bg-slate-700/60 dark:text-gray-200 dark:hover:bg-orange-500/20'>
+                                        className='flex min-w-0 items-center gap-2 rounded-lg bg-gray-100 px-2 py-1 text-left text-gray-700 transition hover:bg-[#ef7f1a]/15 dark:bg-slate-700/60 dark:text-gray-200 dark:hover:bg-orange-500/20'>
                                         <MapPin size={12} className='fill-[#ef7f1a] text-[#ef7f1a]' />
-                                        <span className='font-semibold'>{branch.name}</span>
+                                        <span className='truncate font-semibold'>{branch.name}</span>
                                     </button>
                                 ))}
                             </div>

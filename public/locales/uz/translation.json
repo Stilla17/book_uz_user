@@ -52,6 +52,12 @@
         "bestWeekSubtitle": "Eng ko'p o'qilgan kitoblar",
         "bestMonthSubtitle": "Eng ko'p o'qilgan kitoblar",
         "viewAll": "Barchasini ko'rish",
+        "discountBadge": "Chegirma",
+        "topWeekTitle": "Haftaning top 10 kitobi",
+        "topMonthTitle": "Oyning top 10 kitobi",
+        "topSalesLabel": "Top 10",
+        "topSalesLoadError": "Top sotuvlar yuklanmadi.",
+        "topSalesEmpty": "Hali top sotuvlar sinxron qilinmagan.",
         "basket": "Savat"
     },
     "publish": {
@@ -59,6 +65,18 @@
         "label": "Ishonchli nashriyotlar bilan",
         "desc": " Book.uz vitrinasi uchun saralangan nashriyotlar. Har bir emblem ortida o‘z uslubi, yo‘nalishi va o‘quvchiga mos katalogi bor.",
         "viewDetails": "Batafsil"
+    },
+    "nav": {
+        "books": "Kitoblar",
+        "authors": "Mualliflar",
+        "publishers": "Nashriyotlar",
+        "news": "Yangiliklar",
+        "about": "Biz haqimizda",
+        "services": "Xizmatlar",
+        "promo": "Promokod",
+        "new": "Yangi",
+        "popular": "Mashhur",
+        "discount": "Chegirma",
+        "top100": "Top 100"
     }
-    
 }

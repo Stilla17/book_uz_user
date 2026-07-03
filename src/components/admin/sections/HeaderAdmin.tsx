@@ -25,19 +25,7 @@ const HeaderAdmin = ({
                     className='grid size-11 place-items-center rounded-2xl bg-white text-[#817466] shadow-sm transition hover:text-[#ef7f1a] dark:bg-slate-900 dark:text-slate-300 dark:hover:text-white'>
                     {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
                 </button>
-                <button
-                    type='button'
-                    aria-label='Hisobotlar'
-                    className='grid size-11 place-items-center rounded-2xl bg-white text-[#817466] shadow-sm dark:bg-slate-900 dark:text-slate-300'>
-                    <BarChart3 size={19} />
-                </button>
-                <button
-                    type='button'
-                    aria-label='Bildirishnomalar'
-                    className='relative grid size-11 place-items-center rounded-2xl bg-white text-[#817466] shadow-sm dark:bg-slate-900 dark:text-slate-300'>
-                    <Bell size={19} />
-                    <span className='absolute top-2 right-2 size-2 rounded-full bg-[#ef7f1a]' />
-                </button>
+
                 <button
                     type='button'
                     onClick={() => setIsLogoutModalOpen(true)}

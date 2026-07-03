@@ -72,7 +72,7 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
 
                                 {type === 'discount' && (
                                     <span className='rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-orange-600 dark:border-orange-900/60 dark:bg-orange-950/40 dark:text-orange-400'>
-                                        Chegirma
+                                        {t('booksSection.discountBadge')}
                                     </span>
                                 )}
                             </div>

@@ -22,6 +22,7 @@ export const Hero = () => {
         queryFn: () => userBannerService.getHeroBanners()
     });
 
+    console.log('banners', banners);
     // Banner ko'rilganligini qayd etish
     const handleSlideChange = (swiper: any) => {
         if (banners[swiper.realIndex]) {
@@ -80,7 +81,6 @@ export const Hero = () => {
                 className='hero-swiper mx-auto h-56 w-full max-w-[1440px] sm:h-90 lg:h-150'>
                 {banners.map((banner) => {
                     const buttonLink = banner.buttonLink || banner.link;
-                    const buttonText = getLocalizedText(banner.buttonText) || 'Barcha kitoblar';
 
                     return (
                         <SwiperSlide key={banner._id}>
@@ -116,10 +116,8 @@ export const Hero = () => {
                                                             size={18}
                                                             className='transition-colors group-hover:text-white'
                                                         />
-                                                        {buttonText}
+                                                        {banner.name}
                                                     </span>
-
-                                                    {/* Hover effekti uchun biroz to'qroq rang beramiz */}
                                                 </button>
                                             </motion.div>
                                         )}

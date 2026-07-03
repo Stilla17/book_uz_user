@@ -64,7 +64,7 @@ export default function CartPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.05 }}
-                        className='space-y-4'>
+                        className='min-w-0 space-y-4'>
                         <div className='flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
                             <div className='flex flex-wrap items-center gap-3'>
                                 <Link
@@ -73,9 +73,6 @@ export default function CartPage() {
                                     <ArrowLeft size={16} />
                                     Xaridni davom ettirish
                                 </Link>
-                                <span className='rounded-full bg-orange-50 px-3 py-1 text-sm font-bold text-[#ef7f1a] dark:bg-slate-800 dark:text-orange-300'>
-                                    {isAuthenticated ? 'Server cart' : 'Guest cart'}
-                                </span>
                             </div>
 
                             {cartItems.length > 0 && (

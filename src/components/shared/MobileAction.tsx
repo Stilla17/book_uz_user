@@ -18,7 +18,7 @@ const MobileAction = ({ href, icon, label, badge, primary, onClick }: MobileActi
         <Link
             href={href}
             onClick={onClick}
-            className={`relative flex items-center gap-3 rounded-2xl border p-4 transition-all ${
+            className={`relative flex min-w-0 items-center gap-3 rounded-2xl border p-3 transition-all sm:p-4 ${
                 primary
                     ? 'border-transparent bg-[#2572c0] text-white dark:bg-blue-200'
                     : 'border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white'
@@ -29,7 +29,7 @@ const MobileAction = ({ href, icon, label, badge, primary, onClick }: MobileActi
                 }`}>
                 {icon}
             </div>
-            <div className='font-extrabold'>{label}</div>
+            <div className='min-w-0 truncate text-sm font-extrabold sm:text-base'>{label}</div>
             {badge && (
                 <span className='absolute top-2 right-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#FF8A00] text-[10px] font-black text-white dark:bg-orange-600'>
                     {badge}

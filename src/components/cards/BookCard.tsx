@@ -140,7 +140,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                         </div>
                     )}
                     {priceInfo.discount ? (
-                        <span className='absolute top-2 left-2 z-10 rounded-full bg-[#ef7f1a] px-2.5 py-1 text-xs font-black text-white shadow-sm ring-1 ring-white/70'>
+                        <span className='absolute top-2 left-2 z-10 rounded-full bg-red-600 px-2.5 py-1 text-sm font-black text-white shadow-sm ring-1 ring-white/70'>
                             -{priceInfo.discount}%
                         </span>
                     ) : null}
@@ -192,7 +192,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                         <div>
                             {priceInfo.hasDiscount ? (
                                 <div className='mb-1 flex items-center gap-2'>
-                                    <span className='text-xs font-bold text-gray-400 line-through dark:text-gray-500'>
+                                    <span className='text-sm font-bold text-gray-400 line-through dark:text-gray-500'>
                                         {formatPriceNumber(priceInfo.oldPrice)} so'm
                                     </span>
                                     {priceInfo.discount ? (
@@ -216,7 +216,6 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                             disabled={Boolean(!book?.stock || book.stock <= 0 || addCartMutation.isPending)}
                             onClick={handleAddToCart}>
                             <ShoppingCart size={18} />
-                            <span className='hidden font-medium md:inline'>{t('booksSection.basket')}</span>
                         </button>
                     </div>
                 </div>

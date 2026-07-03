@@ -30,8 +30,8 @@ const DEFAULT_FILTERS: CatalogFilters = {
 };
 
 const PAGE_LIMIT = 12;
-const CATALOG_GRID_CLASS_NAME = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-2 xl:grid-cols-3';
-const CATALOG_LIST_CLASS_NAME = 'grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4';
+const CATALOG_GRID_CLASS_NAME = 'grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:gap-4 lg:grid-cols-2 xl:grid-cols-3';
+const CATALOG_LIST_CLASS_NAME = 'grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4';
 
 export default function CatalogPage() {
     const router = useRouter();

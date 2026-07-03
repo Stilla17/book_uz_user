@@ -5,8 +5,11 @@ import Link from 'next/link';
 import { bottomNav, mainNav } from '@/data/navMenu';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 
+import { useTranslation } from 'react-i18next';
+
 const NavbarFooter: React.FC = () => {
     const { getBgColor, getBorderColor } = useThemeStyles();
+    const { t } = useTranslation();
 
     return (
         <div className={`border-t ${getBorderColor()} ${getBgColor('card')}`}>
@@ -16,12 +19,12 @@ const NavbarFooter: React.FC = () => {
                         <Link
                             key={item.label}
                             href={item.href}
-                            className='text-xs font-semibold whitespace-nowrap text-[#475266] transition-colors hover:text-[#e67600] dark:text-white dark:hover:text-[#e67600]'>
-                            {item.label}
+                            className='text-sm font-semibold whitespace-nowrap text-[#475266] transition-colors hover:text-[#e67600] dark:text-white dark:hover:text-[#e67600]'>
+                            {t(item.label)}
                         </Link>
                     ))}
                 </nav>
-                
+
                 <span className='h-5 w-px shrink-0 bg-slate-200 dark:bg-slate-700' />
 
                 <nav className='flex shrink-0 items-center gap-3 lg:gap-4'>
@@ -32,7 +35,7 @@ const NavbarFooter: React.FC = () => {
                             className='flex items-center gap-1 text-xs font-bold whitespace-nowrap text-[#475266] transition-colors hover:text-[#e67600] dark:text-white dark:hover:text-[#e67600]'
                             title={item.description}>
                             <span className='text-[#e67600]'>{item.icon}</span>
-                            {item.label}
+                            {t(item.label)}
                         </Link>
                     ))}
                 </nav>

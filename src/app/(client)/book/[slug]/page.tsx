@@ -315,8 +315,8 @@ export default function BookDetailPage() {
                         </div>
 
                         <div className='mt-8 rounded-3xl'>
-                            <div className='flex flex-col gap-4 lg:flex-row lg:items-center'>
-                                <div className='mt-2'>
+                            <div className='flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-center'>
+                                <div className='mt-2 min-w-0'>
                                     {priceInfo.hasDiscount ? (
                                         <div className='mb-2 flex flex-wrap items-center gap-2'>
                                             <span className='text-base font-bold text-slate-400 line-through dark:text-slate-500'>
@@ -329,8 +329,8 @@ export default function BookDetailPage() {
                                             ) : null}
                                         </div>
                                     ) : null}
-                                    <div className='flex items-end gap-3'>
-                                        <span className='text-3xl font-black tracking-tight text-[#ef7f1a] sm:text-4xl'>
+                                    <div className='flex min-w-0 items-end gap-3'>
+                                        <span className='break-words text-3xl font-black tracking-tight text-[#ef7f1a] sm:text-4xl'>
                                             {formatPrice(priceInfo.price)}
                                         </span>
                                     </div>

@@ -176,7 +176,7 @@ const ProfilePage = () => {
                     </div>
                 </aside>
 
-                <section className='w-full max-w-[905px]'>
+                <section className='min-w-0 w-full max-w-[905px]'>
                     {activeTab === 'wishlist' && (
                         <>
                             <h2 className='text-2xl font-bold text-black dark:text-white'>Mening kitoblarim</h2>
@@ -212,7 +212,7 @@ const ProfilePage = () => {
                                                 key={order._id}
                                                 className='rounded-lg border border-[#dddddd] p-4 dark:border-slate-700'>
                                                 <div className='flex flex-col gap-4 sm:flex-row sm:items-center'>
-                                                    <div className='flex shrink-0 gap-2'>
+                                                    <div className='no-scrollbar flex max-w-full shrink-0 gap-2 overflow-x-auto pb-1'>
                                                         {order.items.map((item, index) => {
                                                             const product = getOrderItemProduct(item);
                                                             const image = product

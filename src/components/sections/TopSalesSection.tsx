@@ -9,6 +9,7 @@ import { TopSalesPeriod } from '@/services/topSales.service';
 import { mapProductToCardBook } from '@/utils/book-formatters';
 
 import { CalendarDays, Trophy } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -21,6 +22,7 @@ type TopSalesSectionProps = {
 };
 
 export const TopSalesSection = ({ period, title }: TopSalesSectionProps) => {
+    const { t } = useTranslation();
     const { data, isLoading, isError } = useTopSalesQuery(period);
     const books = useMemo(() => (data?.products ?? []).map(mapProductToCardBook), [data?.products]);
     const Icon = period === 'week' ? Trophy : CalendarDays;
@@ -35,17 +37,17 @@ export const TopSalesSection = ({ period, title }: TopSalesSectionProps) => {
 
                     <span className='inline-flex h-11 w-fit items-center gap-2 rounded-2xl border border-orange-100 bg-white px-4 text-sm font-black text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200'>
                         <Icon size={16} />
-                        Top 10
+                        {t('booksSection.topSalesLabel')}
                     </span>
                 </div>
 
                 {isError ? (
                     <div className='rounded-2xl border border-red-100 bg-red-50 p-5 text-sm font-bold text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300'>
-                        Top sotuvlar yuklanmadi.
+                        {t('booksSection.topSalesLoadError')}
                     </div>
                 ) : !isLoading && !books.length ? (
                     <div className='rounded-2xl border border-dashed border-orange-200 bg-[#fff9f3] p-8 text-center text-sm font-bold text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400'>
-                        Hali top sotuvlar sinxron qilinmagan.
+                        {t('booksSection.topSalesEmpty')}
                     </div>
                 ) : (
                     <Swiper

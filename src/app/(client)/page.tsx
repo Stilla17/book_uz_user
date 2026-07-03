@@ -24,10 +24,10 @@ const Page = () => {
             <BookSection title={t('booksSection.newArrivals')} type='new' />
 
             {/* Haftalik MoySklad top sotuvlar */}
-            <TopSalesSection period='week' title='Haftaning top 10 kitobi' />
+            <TopSalesSection period='week' title={t('booksSection.topWeekTitle')} />
 
             {/* Oylik MoySklad top sotuvlar */}
-            <TopSalesSection period='month' title='Oyning top 10 kitobi' />
+            <TopSalesSection period='month' title={t('booksSection.topMonthTitle')} />
 
             <Authors />
 

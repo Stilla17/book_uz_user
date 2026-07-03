@@ -42,7 +42,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
     return (
         <div>
             {/* Mobile burger */}
-            <div className='lg:hidden'>
+            <div className='md:hidden'>
                 <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                     <SheetTrigger asChild>
                         <Button
@@ -56,7 +56,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                     <SheetContent
                         side='left'
                         showCloseButton={false}
-                        className={`w-[92vw] max-w-[420px] p-0 sm:w-105 ${getBgColor('card')}`}>
+                        className={`w-[92vw] max-w-[420px] p-0 sm:w-[420px] ${getBgColor('card')}`}>
                         <SheetTitle className='sr-only'>Mobil menyu</SheetTitle>
                         <SheetDescription className='sr-only'>
                             Sayt bo‘limlari, katalog, qidiruv va sozlamalar.
@@ -65,7 +65,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                         <div className={`border-b p-4 sm:p-5 ${getBorderColor()} flex items-center justify-between`}>
                             <Link href='/' className='group flex min-w-fit flex-col items-center gap-1 pt-2'>
                                 <div className='mt-1 flex items-center text-xl leading-none font-black tracking-tighter md:text-2xl'>
-                                    <img src='/images/Logo.svg' alt='Logo' />
+                                    <img src='/images/Logo.png' alt='Logo' />
                                 </div>
                             </Link>
 
@@ -146,7 +146,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                                 item.highlight ? 'bg-[#FF8A00]/10' : getBgColor('card')
                                             }`}>
                                             <span className={item.color ?? ''}>{item.icon}</span>
-                                            <span className={`text-whitefont-bold text-xs ${getTextColor()}`}>
+                                            <span className={`min-w-0 truncate text-xs font-bold ${getTextColor()}`}>
                                                 {item.label}
                                             </span>
                                         </Link>

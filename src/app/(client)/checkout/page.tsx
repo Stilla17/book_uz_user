@@ -372,7 +372,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className='grid gap-6 lg:grid-cols-[minmax(0,1fr)_390px]'>
-                    <div className='space-y-6'>
+                    <div className='min-w-0 space-y-6'>
                         <section className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900'>
                             <div className='flex items-center gap-3'>
                                 <span className='flex size-11 items-center justify-center rounded-xl bg-[#ef7f1a]/10 text-[#ef7f1a] dark:bg-orange-400/10 dark:text-orange-300'>

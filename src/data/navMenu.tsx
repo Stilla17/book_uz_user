@@ -36,31 +36,31 @@ import {
 // Bottom Navigation - to'liq jonlantirilgan (8 ta)
 export const bottomNav: NavItem[] = [
     {
-        label: 'Promokod',
+        label: 'nav.promo',
         href: '/promo',
         icon: <Gift size={14} />,
         description: 'Chegirmalar va aksiyalar'
     },
     {
-        label: 'Yangi',
+        label: 'nav.new',
         href: '/catalog?sort=-createdAt',
         icon: <Star size={14} />,
         description: 'Yangi kitoblar'
     },
     {
-        label: 'Mashhur',
+        label: 'nav.popular',
         href: '/catalog?sort=-ratingAvg',
         icon: <TrendingUp size={14} />,
         description: "Eng ko'p o'qilgan"
     },
     {
-        label: 'Chegirma',
+        label: 'nav.discount',
         href: '/catalog?isDiscount=true',
         icon: <Percent size={14} />,
         description: 'Chegirmadagi kitoblar'
     },
     {
-        label: 'Top 100',
+        label: 'nav.top100',
         href: '/catalog?isTop=true',
         icon: <Award size={14} />,
         description: 'Eng yaxshi kitoblar'
@@ -68,12 +68,12 @@ export const bottomNav: NavItem[] = [
 ];
 
 export const mainNav = [
-    { label: 'Kitoblar', href: '/catalog' },
-    { label: 'Mualliflar', href: '/authors' },
-    { label: 'Nashriyotlar', href: '/publishers' },
-    { label: 'Yangiliklar', href: '/news' },
-    { label: 'Biz haqimizda', href: '/about' },
-    { label: 'Xizmatlar', href: '/service' }
+    { label: 'nav.books', href: '/catalog' },
+    { label: 'nav.authors', href: '/authors' },
+    { label: 'nav.publishers', href: '/publishers' },
+    { label: 'nav.news', href: '/news' },
+    { label: 'nav.about', href: '/about' },
+    { label: 'nav.services', href: '/service' }
 ];
 
 export const serviceMenuItems = [

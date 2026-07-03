@@ -146,12 +146,12 @@ export const Navbar = () => {
                     />
 
                     {/* LOGO */}
-                    <Link href='/' className='group flex items-center gap-2 max-md:hidden'>
-                        <Image src='/images/Logo.svg' alt='Logo' width={80} height={80} />
+                    <Link href='/' className='group hidden items-center gap-2 sm:flex'>
+                        <Image src='/images/Logo.png' alt='Logo' width={80} height={80} />
                     </Link>
 
                     <Link href='/' className='group flex items-center gap-2 sm:hidden'>
-                        <Image src='/images/Logo.svg' alt='Logo' width={58} height={58} />
+                        <Image src='/images/Logo.png' alt='Logo' width={58} height={58} />
                     </Link>
                 </div>
 
@@ -247,12 +247,7 @@ export const Navbar = () => {
                                                                     : "Bu janrda bo'limlar hali yo'q"}
                                                             </p>
                                                         </div>
-                                                        <Link
-                                                            href={getCatalogCategoryHref(activeCategory)}
-                                                            onClick={() => setIsCatalogOpen(false)}
-                                                            className='shrink-0 rounded-lg bg-[#f07e1a]/10 px-3 py-2 text-xs font-black text-[#f07e1a] transition-colors hover:bg-[#f07e1a] hover:text-white'>
-                                                            Barchasi
-                                                        </Link>
+                                                       
                                                     </div>
 
                                                     {activeSubgenres.length > 0 ? (
@@ -300,12 +295,6 @@ export const Navbar = () => {
                         onFocus={() => setShowSearchDropdown(searchQuery.trim().length >= 2)}
                         className={`h-11 w-full rounded-2xl pr-24 pl-4 md:h-12 md:pr-28 lg:pl-48 ${getBgColor('muted')} border ${getBorderColor()} shadow-sm focus:border-[#f07e1a] focus-visible:ring-0 dark:focus:border-[#f07e1a]`}
                     />
-                    {/* <Button
-                        type='submit'
-                        className='absolute top-1/2 right-1.5 flex h-9 -translate-y-1/2 cursor-pointer items-center gap-2 rounded-xl bg-[#f07e1a] px-4 font-extrabold text-white shadow-sm hover:bg-[#fc953b] md:h-10'>
-                        <Search size={18} />
-                        <span className='hidden sm:inline'>{t('search')}</span>
-                    </Button> */}
 
                     {/* Search Dropdown */}
                     {showSearchDropdown && (
