@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { BookAiAssistant } from '@/components/shared/BookAiAssistant';
 import { Footer } from '@/components/shared/Footer';
 import { Navbar } from '@/components/shared/Navbar';
 
@@ -12,7 +11,6 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             <main className='min-w-0 flex-1'>{children}</main>
 
             <Footer />
-            <BookAiAssistant />
         </div>
     );
 }

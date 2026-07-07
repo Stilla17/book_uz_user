@@ -26,7 +26,7 @@ const contact = [
     {
         icon: <Phone size={18} />,
         title: 'Telefon',
-        val: '+998 71 200-99-99',
+        val: '+998(71) 230-00-50',
         sub: "Bepul qo'ng'iroq",
         color: 'blue'
     },
@@ -220,10 +220,10 @@ export const SupportSection = () => {
                 {/* Bottom Support Link */}
                 <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className='text-center'>
                     <a
-                        href='tel:+998901234567'
+                        href='tel:+998712300050'
                         className='inline-flex items-center gap-2 text-xs text-gray-500 transition-colors hover:text-[#00a0e3] dark:text-gray-400 dark:hover:text-blue-400'>
                         <Phone size={14} />
-                        <span>+998 (90) 123-45-67</span>
+                        <span>+998(71) 230-00-50</span>
                         <ChevronRight size={14} />
                     </a>
                 </motion.div>

@@ -160,6 +160,13 @@ const getOrdersCount = (item: {
     orders?: Array<unknown>;
 }) => item.ordersCount ?? item.orderCount ?? item.salesCount ?? item.orders?.length ?? 0;
 
+const getExternalSalesCount = (item: {
+    salesCount?: number;
+    ordersCount?: number;
+    orderCount?: number;
+    orders?: Array<unknown>;
+}) => item.salesCount ?? item.ordersCount ?? item.orderCount ?? item.orders?.length ?? 0;
+
 const mapUser = (user: ApiUser): AdminUserListItem => ({
     id: user._id,
     name: getDisplayName(user),
@@ -181,7 +188,7 @@ const mapAmoContact = (contact: ApiAmoContact): AdminUserListItem => ({
     phones: contact.phones ?? [],
     telegramUsername: contact.telegramUsername,
     role: contact.role,
-    salesCount: getOrdersCount(contact),
+    salesCount: getExternalSalesCount(contact),
     createdAt: contact.createdAt,
     birthDate: contact.birthDate,
     source: 'AMO_CRM',

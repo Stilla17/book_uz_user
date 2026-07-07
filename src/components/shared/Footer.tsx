@@ -5,19 +5,21 @@ import Link from 'next/link';
 import { mainNav } from '@/data/navMenu';
 
 import { motion } from 'framer-motion';
-import { ArrowUp, Facebook, Instagram, Mail, MapPin, Phone, Send, Youtube } from 'lucide-react';
+import { ArrowUp, Facebook, Instagram, Mail, Phone, Send, Youtube } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const Footer = () => {
+    const { t } = useTranslation();
     const currentYear = new Date().getFullYear();
 
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
     const footerLinks = {
         support: [
-            { name: "To'lov usullari", href: '/checkout' },
-            { name: 'Yetkazib berish', href: '/checkout' },
-            { name: 'Maxfiylik siyosati', href: '/about' },
-            { name: 'Foydalanish shartlari', href: '/about' }
+            { name: 'footer.supportLinks.payment', href: '/checkout' },
+            { name: 'footer.supportLinks.delivery', href: '/checkout' },
+            { name: 'footer.supportLinks.privacy', href: '/about' },
+            { name: 'footer.supportLinks.terms', href: '/about' }
         ]
     };
 
@@ -66,15 +68,12 @@ export const Footer = () => {
                             </div>
                         </Link>
 
-                        <p className='max-w-sm text-xs leading-relaxed text-slate-400'>
-                            O'zbekistondagi eng katta raqamli kutubxona. 50 000 + elektron va audio kitoblar. O'qing,
-                            tinglang, kashf eting.
-                        </p>
+                        <p className='max-w-sm text-xs leading-relaxed text-slate-400'>{t('footer.description')}</p>
 
                         {/* Social */}
                         <div className='pt-1'>
                             <div className='mb-2 text-xs font-bold tracking-wider text-white uppercase'>
-                                Bizni kuzating
+                                {t('footer.followUs')}
                             </div>
                             <div className='flex gap-2'>
                                 {socials.map(({ name, href, Icon, color }) => (
@@ -95,7 +94,7 @@ export const Footer = () => {
                     <div className='space-y-3 lg:col-span-2'>
                         <h4 className='flex items-center gap-1 text-sm font-bold text-white'>
                             <span className='h-3 w-1 rounded-full bg-[#005CB9]' />
-                            Platforma
+                            {t('footer.platform')}
                         </h4>
                         <ul className='space-y-1.5'>
                             {mainNav.map((link) => (
@@ -103,7 +102,7 @@ export const Footer = () => {
                                     <Link
                                         href={link.href}
                                         className='text-xs text-slate-400 transition-colors hover:text-[#005CB9]'>
-                                        {link.label}
+                                        {t(link.label)}
                                     </Link>
                                 </li>
                             ))}
@@ -113,7 +112,7 @@ export const Footer = () => {
                     <div className='space-y-3 lg:col-span-2'>
                         <h4 className='flex items-center gap-1 text-sm font-bold text-white'>
                             <span className='h-3 w-1 rounded-full bg-[#FF8A00]' />
-                            Yordam
+                            {t('footer.support')}
                         </h4>
                         <ul className='space-y-1.5'>
                             {footerLinks.support.map((link) => (
@@ -121,7 +120,7 @@ export const Footer = () => {
                                     <Link
                                         href={link.href}
                                         className='text-xs text-slate-400 transition-colors hover:text-[#FF8A00]'>
-                                        {link.name}
+                                        {t(link.name)}
                                     </Link>
                                 </li>
                             ))}
@@ -131,17 +130,17 @@ export const Footer = () => {
                     <div className='space-y-3 lg:col-span-2'>
                         <h4 className='flex items-center gap-1 text-sm font-bold text-white'>
                             <span className='h-3 w-1 rounded-full bg-[#FF8A00]' />
-                            Aloqa
+                            {t('footer.contact')}
                         </h4>
 
                         <div className='space-y-2'>
                             <a
-                                href='tel:+998901234567'
+                                href='tel:+998712300050'
                                 className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2 transition-all'>
                                 <div className='grid h-7 w-7 place-items-center rounded-lg bg-white/10'>
                                     <Phone size={12} className='text-white' />
                                 </div>
-                                <div className='text-xs font-bold text-white'>+998 90 123-45-67</div>
+                                <div className='text-xs font-bold text-nowrap text-white'>+998(71) 230-00-50</div>
                             </a>
 
                             <a
@@ -152,13 +151,6 @@ export const Footer = () => {
                                 </div>
                                 <div className='text-xs font-bold text-white'>support@book.uz</div>
                             </a>
-
-                            <div className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2'>
-                                <div className='grid h-7 w-7 place-items-center rounded-lg bg-white/10'>
-                                    <MapPin size={12} className='text-white' />
-                                </div>
-                                <div className='text-xs font-bold text-nowrap text-white'>Toshkent, Chilonzor</div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -166,15 +158,15 @@ export const Footer = () => {
                 {/* Bottom bar */}
                 <div className='flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-4 text-[10px] md:flex-row'>
                     <p className='text-slate-500'>
-                        © {currentYear} <span className='font-bold text-white'> BOOK.UZ</span>. Barcha huquqlar
-                        himoyalangan.
+                        &copy; {currentYear} <span className='font-bold text-white'> BOOK.UZ</span>.{' '}
+                        {t('footer.rights')}
                     </p>
 
                     {/* Scroll top */}
                     <button
                         onClick={scrollToTop}
                         className='fixed right-5 bottom-5 z-50 grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-1 hover:shadow-lg'
-                        aria-label='Scroll to top'>
+                        aria-label={t('footer.scrollTop')}>
                         <ArrowUp size={14} />
                     </button>
                 </div>

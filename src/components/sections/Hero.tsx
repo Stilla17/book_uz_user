@@ -1,12 +1,11 @@
 'use client';
 
-import { UserBanner, userBannerService } from '@/services/userBanner.service';
+import { userBannerService } from '@/services/userBanner.service';
 import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Eye } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
@@ -15,14 +14,11 @@ import { Autoplay, EffectFade, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 export const Hero = () => {
-    const { i18n } = useTranslation();
-
     const { data: banners = [], isLoading } = useQuery({
         queryKey: ['user-banners', 'hero'],
         queryFn: () => userBannerService.getHeroBanners()
     });
 
-    console.log('banners', banners);
     // Banner ko'rilganligini qayd etish
     const handleSlideChange = (swiper: any) => {
         if (banners[swiper.realIndex]) {
@@ -47,14 +43,6 @@ export const Hero = () => {
             </section>
         );
     }
-
-    const currentLanguage = i18n.language?.split('-')[0] as 'uz' | 'ru' | 'en';
-
-    const getLocalizedText = (field?: { uz?: string; ru?: string; en?: string }) => {
-        if (!field) return '';
-
-        return field[currentLanguage] || field.uz || field.ru || field.en || '';
-    };
 
     return (
         <section className='group relative w-full overflow-hidden'>

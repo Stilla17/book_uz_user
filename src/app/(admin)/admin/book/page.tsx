@@ -107,6 +107,12 @@ const AdminBookPage = () => {
             value: data?.pagination?.total ?? 0,
             icon: BookOpen,
             color: 'bg-[#ef7f1a]'
+        },
+        {
+            label: 'Active kitoblar',
+            value: data?.products?.filter((book) => book.isActive).length ?? 0,
+            icon: BookOpen,
+            color: 'bg-[#ef7f1a]'
         }
     ];
 

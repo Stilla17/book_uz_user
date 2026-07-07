@@ -212,22 +212,25 @@ const CheckoutPage = () => {
             });
             const response = await createOrder.mutateAsync(payload);
             const orderId = getOrderId(response);
-            let paymentRedirectUrl = await resolvePaymentRedirectUrl({
-                response,
-                selectedPayment,
-                orderId,
-                createClickPayment: UserService.createClickPayment,
-                createPaymePayment: UserService.createPaymePayment
-            });
+            const isOnlineSelectedPayment = isOnlinePayment(selectedPayment);
+            let paymentRedirectUrl = '';
 
-            if (!paymentRedirectUrl && selectedPayment === 'Payme' && orderId) {
-                const paymeResponse = await UserService.createPaymePayment(orderId);
-                console.log('рџ”Ќ Payme Response:', paymeResponse);
-                paymentRedirectUrl = getPaymentRedirectUrl(paymeResponse);
-                console.log('рџ’і Payment Redirect URL:', paymentRedirectUrl);
+            if (isOnlineSelectedPayment) {
+                paymentRedirectUrl = await resolvePaymentRedirectUrl({
+                    response,
+                    selectedPayment,
+                    orderId,
+                    createClickPayment: UserService.createClickPayment,
+                    createPaymePayment: UserService.createPaymePayment
+                });
+
+                if (!paymentRedirectUrl && selectedPayment === 'Payme' && orderId) {
+                    const paymeResponse = await UserService.createPaymePayment(orderId);
+                    paymentRedirectUrl = getPaymentRedirectUrl(paymeResponse);
+                }
             }
 
-            if (!isOnlinePayment(selectedPayment)) {
+            if (!isOnlineSelectedPayment) {
                 try {
                     await clearItems();
                 } catch (clearCartError) {
@@ -236,20 +239,25 @@ const CheckoutPage = () => {
             }
 
             dispatch(resetCheckout());
-            toast.success('Buyurtma muvaffaqiyatli yaratildi');
-
             if (paymentRedirectUrl) {
+                toast.success("Buyurtma muvaffaqiyatli yaratildi. To'lov sahifasiga yo'naltirilmoqda...");
                 window.location.href = paymentRedirectUrl;
                 return;
             }
 
-            if (isOnlinePayment(selectedPayment)) {
+            if (isOnlineSelectedPayment) {
                 toast.error(`${selectedPayment} to'lov havolasi backenddan qaytmadi`);
                 console.warn('Payment redirect URL topilmadi. Backend javobi:', response);
                 return;
             }
 
-            router.push(userId && orderId ? `/orders/${orderId}` : '/catalog');
+            toast.success(
+                userId
+                    ? "Buyurtma qabul qilindi. Buyurtmalaringiz bo'limida ko'rishingiz mumkin."
+                    : "Buyurtma qabul qilindi. Operator siz bilan telefon orqali bog'lanadi."
+            );
+
+            router.push(userId ? '/profile?tab=orders' : '/catalog');
         } catch (error: any) {
             toast.error(error?.response?.data?.message || 'Buyurtma yaratishda xatolik yuz berdi');
         }

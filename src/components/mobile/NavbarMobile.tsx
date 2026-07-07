@@ -168,11 +168,11 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                             </div>
 
                             <a
-                                href='tel:+998901234567'
+                                href='tel:+998712300050'
                                 className={`flex items-center justify-between rounded-2xl border ${getBorderColor()} ${getBgColor('muted')} p-4`}>
                                 <div className='text-sm'>
                                     <div className={`font-extrabold ${getTextColor()}`}>Aloqa</div>
-                                    <div className={`${getTextColor('muted')}`}>+998 (90) 123-45-67</div>
+                                    <div className={`${getTextColor('muted')}`}>+998(71) 230-00-50</div>
                                 </div>
                                 <Phone size={18} className='text-[#005CB9] dark:text-blue-400' />
                             </a>

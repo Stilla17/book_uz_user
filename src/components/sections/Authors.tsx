@@ -7,6 +7,7 @@ import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
 import { BookOpenText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Autoplay, Navigation } from 'swiper/modules';
@@ -37,6 +38,7 @@ const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
 const getAuthorBooksCount = (author: AuthorItem) => author.booksCount ?? author.bookCount ?? 0;
 
 const Authors = () => {
+    const { t } = useTranslation();
     const { data, isLoading } = useQuery({
         queryKey: ['authors-preview', 'top', TOP_AUTHORS_LIMIT],
         queryFn: async () => {
@@ -60,7 +62,7 @@ const Authors = () => {
                 <div className='flex max-w-2xl gap-4'>
                     <span className='h-9 w-1 shrink-0 rounded-full bg-[#ef7f1a]/30'></span>
                     <h2 className='mb-12 text-2xl font-black tracking-tight text-slate-950 md:text-3xl dark:text-white'>
-                        Mualliflar
+                        {t('authorsSection.title')}
                     </h2>
                 </div>
 
@@ -110,7 +112,7 @@ const Authors = () => {
                                         </h3>
                                         <div className='mt-2 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400'>
                                             <BookOpenText size={15} />
-                                            <span>{booksCount} kitob</span>
+                                            <span>{t('authorsSection.booksCount', { count: booksCount })}</span>
                                         </div>
                                     </div>
                                 </Link>

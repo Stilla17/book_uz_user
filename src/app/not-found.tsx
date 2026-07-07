@@ -23,7 +23,7 @@ import {
     Search,
     ShoppingBag,
     Sparkles,
-    TrendingUp,
+    TrendingUp
 } from 'lucide-react';
 
 // Random book facts array
@@ -49,8 +49,6 @@ export default function NotFound() {
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState('');
     const [randomFact, setRandomFact] = useState(bookFacts[0]);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [currentIconIndex, setCurrentIconIndex] = useState(0);
 
     // Change random fact every 5 seconds
     useEffect(() => {
@@ -72,13 +70,7 @@ export default function NotFound() {
         <div className='bg-background relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-16 dark:bg-slate-900'>
             <div className='relative z-10 container mx-auto max-w-4xl text-center'>
                 {/* Main 404 Text with Parallax */}
-                <motion.div
-                    animate={{
-                        x: mousePosition.x,
-                        y: mousePosition.y
-                    }}
-                    transition={{ type: 'spring', damping: 50 }}
-                    className='relative mb-8'>
+                <motion.div transition={{ type: 'spring', damping: 50 }} className='relative mb-8'>
                     <div className='bg-gradient-to-r from-blue-600 via-orange-500 to-pink-600 bg-clip-text text-[150px] leading-none font-black text-transparent select-none md:text-[250px] dark:from-blue-400 dark:via-orange-400 dark:to-pink-400'>
                         404
                     </div>
@@ -250,33 +242,6 @@ export default function NotFound() {
                     })}
                 </motion.div>
 
-                {/* Search Bar */}
-                <motion.form
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.6 }}
-                    onSubmit={handleSearch}
-                    className='mx-auto mb-10 max-w-md'>
-                    <div className='group relative'>
-                        <Input
-                            type='text'
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder='Kitob nomi, muallif yoki janr...'
-                            className='w-full rounded-xl border-2 border-gray-200 bg-white py-6 pr-24 pl-12 transition-all group-hover:shadow-lg focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:focus:border-blue-400'
-                        />
-                        <Search
-                            size={18}
-                            className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 transition-colors group-hover:text-blue-500'
-                        />
-                        <Button
-                            type='submit'
-                            className='absolute top-1/2 right-2 -translate-y-1/2 rounded-lg bg-gradient-to-r from-blue-600 to-orange-600 px-6 py-4 text-white hover:from-blue-700 hover:to-orange-700'>
-                            Qidirish
-                        </Button>
-                    </div>
-                </motion.form>
-
                 {/* Action Buttons */}
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
@@ -310,10 +275,10 @@ export default function NotFound() {
                     transition={{ duration: 0.5, delay: 0.8 }}
                     className='mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3'>
                     <a
-                        href='tel:+998901234567'
+                        href='tel:+998712300050'
                         className='flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400'>
                         <Phone size={14} />
-                        +998 (90) 123-45-67
+                        +998(71) 230-00-50
                     </a>
                     <a
                         href='mailto:support@book.uz'
@@ -325,16 +290,6 @@ export default function NotFound() {
                         <Clock size={14} />
                         09:00 - 22:00
                     </div>
-                </motion.div>
-
-                {/* Fun Fact Counter */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.9 }}
-                    className='mt-8 flex items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-500'>
-                    <FileQuestion size={14} />
-                    <span>Kutubxonamizda 50,000+ kitob va 10,000+ audio kitob mavjud</span>
                 </motion.div>
             </div>
         </div>

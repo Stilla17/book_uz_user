@@ -34,6 +34,8 @@ export interface Book {
     isHit?: boolean;
     isNew?: boolean;
     isFree?: boolean;
+    isActive?: boolean;
+    active?: boolean;
     format?: 'ebook' | 'audio' | 'paper';
     isWishlisted?: boolean;
     category?: Array<{ _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }>;
@@ -154,4 +156,5 @@ export type BookFormValues = {
     oldPrice?: number;
     discount?: number;
     image?: FileList;
+    isActive: boolean;
 };

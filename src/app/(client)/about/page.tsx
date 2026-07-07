@@ -293,9 +293,9 @@ export default function AboutPage() {
                             <div>
                                 <h3 className='mb-2 font-bold text-gray-900 dark:text-white'>Telefon</h3>
                                 <a
-                                    href='tel:+998901234567'
+                                    href='tel:+998712300050'
                                     className='text-gray-500 transition-colors hover:text-[#00a0e3] dark:text-gray-400'>
-                                    +998 (90) 123-45-67
+                                    +998(71) 230-00-50
                                 </a>
                             </div>
                         </div>

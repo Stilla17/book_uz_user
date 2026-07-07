@@ -13,6 +13,7 @@ import SearchableSelect, { type SearchableOption } from '@/components/admin/othe
 import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import {
     getBookBarcode,
     getBookCategoryId,
@@ -58,7 +59,9 @@ const AdminNewBookPage = () => {
             weight: '',
             price: 0,
             oldPrice: undefined,
-            discount: undefined
+            discount: undefined,
+            dimensions: '',
+            isActive: true
         }
     });
     const router = useRouter();
@@ -106,6 +109,7 @@ const AdminNewBookPage = () => {
                 bookData.year || bookData.publishedYear || bookData.details?.publishedYear || new Date().getFullYear()
             );
             setValue('weight', bookData.weight || bookData.details?.weight || '');
+            setValue('isActive', bookData.isActive ?? bookData.active ?? true);
 
             const previewImage = getLatestImageUrl(bookData.images) || getLatestImageUrl(bookData.image);
             if (previewImage) {
@@ -155,6 +159,7 @@ const AdminNewBookPage = () => {
     const contentLanguage = watch('contentLanguage');
     const cover = watch('cover');
     const format = watch('format');
+    const isActive = watch('isActive');
     const selectedCategory = categories.find((category) => category._id === categoryId || category.slug === categoryId);
     const subCategoryOptions = useMemo<SearchableOption[]>(
         () =>
@@ -265,6 +270,9 @@ const AdminNewBookPage = () => {
         appendNumber(formData, 'price', values.price);
         appendNumber(formData, 'oldPrice', values.oldPrice);
         appendNumber(formData, 'discount', values.discount);
+        formData.append('isActive', String(values.isActive));
+        formData.append('active', String(values.isActive));
+        formData.append('status', values.isActive ? 'ACTIVE' : 'INACTIVE');
 
         if (id) {
             const updateId = bookData?._id || id;
@@ -475,6 +483,31 @@ const AdminNewBookPage = () => {
                             <Field label="Og'irligi">
                                 <Input className={inputClass} placeholder='450 g' {...register('weight')} />
                             </Field>
+
+                            <div className='rounded-2xl border border-[#eadfce] bg-white p-4 dark:border-slate-800 dark:bg-slate-900'>
+                                <div className='flex items-center justify-between gap-4'>
+                                    <div>
+                                        <p className='text-sm font-black text-[#2f2a25] dark:text-white'>
+                                            Kitob holati
+                                        </p>
+                                        <p className='mt-1 text-xs font-semibold text-[#9d907e] dark:text-slate-500'>
+                                            {isActive ? "Saytda ko'rinadi" : "Saytda ko'rinmaydi"}
+                                        </p>
+                                    </div>
+
+                                    <Switch
+                                        id='isActive'
+                                        checked={Boolean(isActive)}
+                                        onCheckedChange={(checked) =>
+                                            setValue('isActive', checked, {
+                                                shouldDirty: true,
+                                                shouldTouch: true
+                                            })
+                                        }
+                                        className='h-6 w-11 data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-rose-500 [&_[data-slot=switch-thumb]]:size-5 [&_[data-slot=switch-thumb]]:bg-white [&_[data-slot=switch-thumb]]:shadow-lg'
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>

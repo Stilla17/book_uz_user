@@ -60,6 +60,25 @@
         "topSalesEmpty": "Hali top sotuvlar sinxron qilinmagan.",
         "basket": "Savat"
     },
+    "authorsSection": {
+        "title": "Mualliflar",
+        "booksCount": "{{count}} kitob"
+    },
+    "footer": {
+        "description": "O'zbekistondagi eng katta raqamli kutubxona. O'qing, tinglang, kashf eting.",
+        "followUs": "Bizni kuzating",
+        "platform": "Platforma",
+        "support": "Yordam",
+        "contact": "Aloqa",
+        "rights": "Barcha huquqlar himoyalangan.",
+        "scrollTop": "Yuqoriga qaytish",
+        "supportLinks": {
+            "payment": "To'lov usullari",
+            "delivery": "Yetkazib berish",
+            "privacy": "Maxfiylik siyosati",
+            "terms": "Foydalanish shartlari"
+        }
+    },
     "publish": {
         "title": "Nashriyotlar",
         "label": "Ishonchli nashriyotlar bilan",

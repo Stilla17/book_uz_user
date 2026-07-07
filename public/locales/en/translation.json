@@ -60,6 +60,25 @@
         "topSalesEmpty": "Top sales have not been synchronized yet.",
         "basket": "Basket"
     },
+    "authorsSection": {
+        "title": "Authors",
+        "booksCount": "{{count}} books"
+    },
+    "footer": {
+        "description": "Uzbekistan's largest digital library. Read, listen, and discover.",
+        "followUs": "Follow us",
+        "platform": "Platform",
+        "support": "Support",
+        "contact": "Contact",
+        "rights": "All rights reserved.",
+        "scrollTop": "Scroll to top",
+        "supportLinks": {
+            "payment": "Payment methods",
+            "delivery": "Delivery",
+            "privacy": "Privacy policy",
+            "terms": "Terms of use"
+        }
+    },
     "publish": {
         "title": "Publishers",
         "label": "Reliable publishers with books for every taste",
