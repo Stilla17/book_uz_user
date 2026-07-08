@@ -1,14 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { useBranchQuery } from '@/components/admin/hooks/queries/branch';
 import { useAdminUsersQuery } from '@/components/admin/hooks/queries/users';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import { useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
@@ -18,7 +20,7 @@ import type { AdminUserListItem } from '@/types/admin-users';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
-import { ContactRound, Edit3, Mail, Search, Table2, UserCheck, Users } from 'lucide-react';
+import { Building2, ContactRound, Edit3, Mail, Search, Table2, UserCheck, Users } from 'lucide-react';
 
 type UserSortKey = 'name' | 'phone' | 'source' | 'orders' | 'registeredAt' | 'birthDate';
 
@@ -92,15 +94,21 @@ const AdminUsersPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
+    const selectedBranchId = searchParams.get('branch') ?? 'all';
     const [page, setPage] = useState(urlPage);
     const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<UserSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
+    const { data: branches = [] } = useBranchQuery();
+    const selectedBranch = branches.find((branch) => branch._id === selectedBranchId);
+    const selectedBranchName = selectedBranch?.branchName ?? selectedBranch?.name ?? '';
     const { data, isFetching, isLoading, isError } = useAdminUsersQuery(
         page,
         FETCH_PAGINATION_LIMIT,
         debouncedSearch,
         sortKey,
-        sortOrder
+        sortOrder,
+        selectedBranchId === 'all' ? '' : selectedBranchId,
+        selectedBranchName
     );
 
     useEffect(() => {
@@ -112,6 +120,16 @@ const AdminUsersPage = () => {
     const items = data?.items ?? [];
     const pagination = data?.pagination;
     const totals = data?.totals;
+    const branchOptions = useMemo(
+        () =>
+            branches
+                .map((branch) => ({
+                    value: branch._id,
+                    label: branch.branchName ?? branch.name ?? 'Filial'
+                }))
+                .filter((branch) => branch.value),
+        [branches]
+    );
 
     const stats = [
         {
@@ -139,9 +157,30 @@ const AdminUsersPage = () => {
         });
     };
 
+    const updateBranchFilter = (branchId: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (branchId === 'all') {
+            params.delete('branch');
+        } else {
+            params.set('branch', branchId);
+        }
+
+        params.set('page', '1');
+        setPage(1);
+        router.replace(`?${params.toString()}`, {
+            scroll: false
+        });
+    };
+
     const downloadExelFile = async () => {
         const response = await api.get('/admin/users/export-excel', {
-            responseType: 'blob'
+            responseType: 'blob',
+            params: {
+                search: debouncedSearch || undefined,
+                branchId: selectedBranchId === 'all' ? undefined : selectedBranchId,
+                branch: selectedBranchName || undefined
+            }
         });
 
         const blob = await response.data;
@@ -167,7 +206,7 @@ const AdminUsersPage = () => {
             <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
             <section className='overflow-hidden rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800'>
+                <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 lg:flex-row lg:items-center lg:justify-between dark:border-slate-800'>
                     <label className='flex h-11 min-w-0 items-center gap-2 rounded-2xl bg-[#f2e7d8] px-4 text-[#817466] sm:max-w-sm sm:flex-1 dark:bg-slate-900 dark:text-slate-300'>
                         <Search size={18} className='shrink-0' />
                         <input
@@ -178,10 +217,23 @@ const AdminUsersPage = () => {
                             className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
                         />
                     </label>
-                    <div className='flex items-center gap-6'>
-                        <p className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
-                            {pagination?.total ?? items.length} ta natija
-                        </p>
+                    <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+                        <div className='flex h-11 min-w-0 items-center gap-2 rounded-2xl bg-[#f2e7d8] px-3 text-[#817466] dark:bg-slate-900 dark:text-slate-300'>
+                            <Building2 size={18} className='shrink-0' />
+                            <Select value={selectedBranchId} onValueChange={updateBranchFilter}>
+                                <SelectTrigger className='h-9 min-w-56 border-0 bg-transparent px-0 py-0 font-bold shadow-none focus:ring-0 dark:bg-transparent'>
+                                    <SelectValue placeholder='Filial tanlang' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value='all'>Barcha filiallar</SelectItem>
+                                    {branchOptions.map((branch) => (
+                                        <SelectItem key={branch.value} value={branch.value}>
+                                            {branch.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <button className='text-green-400' onClick={downloadExelFile}>
                             <Table2 />
                         </button>

@@ -10,6 +10,9 @@ export type AdminUserListItem = {
     salesCount: number;
     createdAt?: string;
     birthDate?: string;
+    branchId?: string;
+    branchName?: string;
+    branchNames?: string[];
     source: AdminUserSource;
     purchasedBooks?: AdminUserPurchasedBook[];
 };

@@ -68,6 +68,8 @@ export interface Book {
     viewsCount?: number;
     sales?: number;
     soldQuantity?: number;
+    tags?: string[];
+    tegs?: string[];
 }
 
 export type Product = Book;
@@ -157,4 +159,5 @@ export type BookFormValues = {
     discount?: number;
     image?: FileList;
     isActive: boolean;
+    tags: string;
 };

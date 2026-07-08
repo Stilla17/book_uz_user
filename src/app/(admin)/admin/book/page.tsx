@@ -42,18 +42,13 @@ const AdminBookPage = () => {
         sortKey === 'default' ? undefined : sortOrder
     );
 
-    const totalBooksLimit = Number(data?.pagination?.total || FETCH_PAGINATION_LIMIT);
-
-    const { data: allBooksData } = useBookListQuery(1, totalBooksLimit, debouncedSearch);
     const { mutate } = useDeleteBook();
 
     const books = data?.products ?? [];
-    const allBooks = allBooksData?.products ?? [];
-    const sourceBooks = allBooks.length > 0 ? allBooks : books;
 
     const sortedBooks = useMemo(() => {
         return sortAdminItems({
-            items: sourceBooks,
+            items: books,
             sortKey,
             sortOrder,
             sortConfig: {
@@ -61,7 +56,7 @@ const AdminBookPage = () => {
                 title: (book) => getLocalizedText(book.title)
             }
         });
-    }, [sourceBooks, sortKey, sortOrder]);
+    }, [books, sortKey, sortOrder]);
 
     const filteredBooks = sortedBooks.filter((book) => {
         const stock = Number(book.stock || 0);
@@ -73,13 +68,21 @@ const AdminBookPage = () => {
         return true;
     });
     const pageSize = FETCH_PAGINATION_LIMIT;
-    const paginatedBooks = filteredBooks.slice((page - 1) * pageSize, page * pageSize);
-    const displayPagination = {
-        page,
-        limit: pageSize,
-        total: filteredBooks.length,
-        pages: Math.max(1, Math.ceil(filteredBooks.length / pageSize))
-    };
+    const paginatedBooks = filteredBooks;
+    const displayPagination =
+        stockFilter === 'all'
+            ? (data?.pagination ?? {
+                  page,
+                  limit: pageSize,
+                  total: filteredBooks.length,
+                  pages: Math.max(1, Math.ceil(filteredBooks.length / pageSize))
+              })
+            : {
+                  page,
+                  limit: pageSize,
+                  total: filteredBooks.length,
+                  pages: Math.max(1, Math.ceil(filteredBooks.length / pageSize))
+              };
 
     useEffect(() => {
         setPage(urlPage);
@@ -87,7 +90,7 @@ const AdminBookPage = () => {
 
     const stockCounts = useMemo(
         () =>
-            allBooks.reduce(
+            books.reduce(
                 (counts, book) => {
                     const stock = Number(book.stock || 0);
                     stock <= 0 ? (counts.out += 1) : stock < 10 ? (counts.low += 1) : (counts.available += 1);
@@ -99,7 +102,7 @@ const AdminBookPage = () => {
                     out: 0
                 }
             ),
-        [allBooks]
+        [books]
     );
     const stats = [
         {
@@ -300,8 +303,8 @@ const AdminBookPage = () => {
                                             </td>
                                             <td className='px-4 py-4'>
                                                 <span
-                                                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-black ring-1 ${status.className}`}>
-                                                    {status.label} - {book.stock} dona
+                                                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-black text-nowrap ring-1 ${status.className}`}>
+                                                    {status.label} {book.stock} dona
                                                 </span>
                                             </td>
                                             <td className='px-4 py-4'>

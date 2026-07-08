@@ -46,6 +46,7 @@ const AdminNewBookPage = () => {
             },
             isbn: '',
             slug: '',
+            tags: '',
             category: '',
             subCategoryId: '',
             author: '',
@@ -110,6 +111,8 @@ const AdminNewBookPage = () => {
             );
             setValue('weight', bookData.weight || bookData.details?.weight || '');
             setValue('isActive', bookData.isActive ?? bookData.active ?? true);
+            const bookTags = Array.isArray(bookData.tegs) ? bookData.tegs : bookData.tags;
+            setValue('tags', Array.isArray(bookTags) ? bookTags.join(', ') : '');
 
             const previewImage = getLatestImageUrl(bookData.images) || getLatestImageUrl(bookData.image);
             if (previewImage) {
@@ -192,6 +195,16 @@ const AdminNewBookPage = () => {
         }
     };
 
+    const getNormalizedTags = (value: string) =>
+        Array.from(
+            new Set(
+                value
+                    .split(',')
+                    .map((tag) => tag.trim())
+                    .filter(Boolean)
+            )
+        );
+
     const resolveOptionValue = (value: string, options: SearchableOption[]) => {
         const trimmedValue = value.trim();
         const exactValue = options.find((option) => option.value === trimmedValue);
@@ -218,6 +231,7 @@ const AdminNewBookPage = () => {
         const authorValue = resolveOptionValue(values.author, authorOptions);
         const publisherValue = resolveOptionValue(values.publisher, publisherOptions);
         const coverValue = values.cover;
+        const tags = getNormalizedTags(values.tags);
 
         if (!values.title.uz.trim()) {
             toast.error('Kitob nomi (UZ) majburiy');
@@ -247,6 +261,7 @@ const AdminNewBookPage = () => {
         appendText(formData, 'isbn', values.isbn);
         appendText(formData, 'details[isbn]', values.isbn);
         appendText(formData, 'slug', values.slug);
+        tags.forEach((tag) => formData.append('tegs', tag));
         formData.append('category', categoryValue);
         formData.append('subCategoryId', subCategoryValue);
         formData.append('subCategory', subCategoryValue);
@@ -362,7 +377,7 @@ const AdminNewBookPage = () => {
                         </div>
 
                         <div className='mt-4 grid gap-4 md:grid-cols-3'>
-                            <Field label='Tavsif (UZ)' hint='Qisqa va tushunarli tavsif yozing.'>
+                            <Field label='Tavsif (UZ)'>
                                 <textarea
                                     rows={6}
                                     className='min-h-36 w-full resize-none rounded-2xl border border-[#eadfce] bg-white px-4 py-3 text-sm font-semibold text-[#2f2a25] shadow-sm transition outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500'
@@ -387,7 +402,7 @@ const AdminNewBookPage = () => {
                                 />
                             </Field>
                         </div>
-                        <div className='mt-4 grid grid-cols-2 gap-4 space-y-4'>
+                        <div className='mt-4 grid grid-cols-3 gap-4 space-y-4'>
                             <Field label='Asosiy narx'>
                                 <Input
                                     type='number'
@@ -398,6 +413,14 @@ const AdminNewBookPage = () => {
                             </Field>
                             <Field label='Slug'>
                                 <Input type='text' className={inputClass} placeholder='oq-kema' {...register('slug')} />
+                            </Field>
+                            <Field label='Teglar'>
+                                <Input
+                                    type='text'
+                                    className={inputClass}
+                                    placeholder='tarixiy roman, psixologiya, biznes'
+                                    {...register('tags')}
+                                />
                             </Field>
                         </div>
                     </section>

@@ -24,9 +24,17 @@ type ApiUser = {
     ordersCount?: number;
     orderCount?: number;
     createdAt?: string;
+    branch?: ApiBranchValue;
+    branchId?: string;
+    branchName?: string;
+    branchNames?: string[];
+    filial?: string;
+    store?: ApiBranchValue;
+    storeId?: string;
+    storeName?: string;
     purchasedBooks?: ApiPurchasedBook[];
     items?: ApiPurchasedBook[];
-    orders?: Array<{ items?: ApiPurchasedBook[]; createdAt?: string }>;
+    orders?: Array<{ items?: ApiPurchasedBook[]; createdAt?: string } & ApiBranchFields>;
 };
 
 type ApiAmoContact = {
@@ -43,9 +51,30 @@ type ApiAmoContact = {
     ordersCount?: number;
     orderCount?: number;
     createdAt?: string;
+    branch?: ApiBranchValue;
+    branchId?: string;
+    branchName?: string;
+    branchNames?: string[];
+    filial?: string;
+    store?: ApiBranchValue;
+    storeId?: string;
+    storeName?: string;
     purchasedBooks?: ApiPurchasedBook[];
     items?: ApiPurchasedBook[];
-    orders?: Array<{ items?: ApiPurchasedBook[]; createdAt?: string }>;
+    orders?: Array<{ items?: ApiPurchasedBook[]; createdAt?: string } & ApiBranchFields>;
+};
+
+type ApiBranchValue = string | { _id?: string; id?: string; name?: string; branchName?: string };
+
+type ApiBranchFields = {
+    branch?: ApiBranchValue;
+    branchId?: string;
+    branchName?: string;
+    branchNames?: string[];
+    filial?: string;
+    store?: ApiBranchValue;
+    storeId?: string;
+    storeName?: string;
 };
 
 type ApiPurchasedBook = {
@@ -85,6 +114,8 @@ type GetAdminUsersParams = {
     search?: string;
     sortKey?: AdminUserSortKey | 'default';
     sortOrder?: AdminUserSortOrder;
+    branchId?: string;
+    branchName?: string;
 };
 
 const ALL_USERS_PAGE_LIMIT = 1000;
@@ -167,6 +198,49 @@ const getExternalSalesCount = (item: {
     orders?: Array<unknown>;
 }) => item.salesCount ?? item.ordersCount ?? item.orderCount ?? item.orders?.length ?? 0;
 
+const getBranchValueId = (value?: ApiBranchValue) => {
+    if (!value) return undefined;
+    if (typeof value === 'string') return value;
+
+    return value._id || value.id;
+};
+
+const getBranchValueName = (value?: ApiBranchValue) => {
+    if (!value || typeof value === 'string') return undefined;
+
+    return value.branchName || value.name;
+};
+
+const getBranchInfo = (item: ApiBranchFields) => {
+    const orderBranchNames =
+        item.branchNames ??
+        ('orders' in item && Array.isArray(item.orders)
+            ? item.orders
+                  .flatMap((order) => [
+                      order.branchName,
+                      order.filial,
+                      order.storeName,
+                      getBranchValueName(order.branch),
+                      getBranchValueName(order.store)
+                  ])
+                  .filter((value): value is string => Boolean(value))
+            : []);
+    const branchName =
+        item.branchName ||
+        item.filial ||
+        item.storeName ||
+        getBranchValueName(item.branch) ||
+        getBranchValueName(item.store) ||
+        orderBranchNames[0];
+    const branchId = item.branchId || item.storeId || getBranchValueId(item.branch) || getBranchValueId(item.store);
+
+    return {
+        branchId,
+        branchName,
+        branchNames: Array.from(new Set([branchName, ...orderBranchNames].filter(Boolean) as string[]))
+    };
+};
+
 const mapUser = (user: ApiUser): AdminUserListItem => ({
     id: user._id,
     name: getDisplayName(user),
@@ -177,6 +251,7 @@ const mapUser = (user: ApiUser): AdminUserListItem => ({
     salesCount: getOrdersCount(user),
     createdAt: user.createdAt,
     birthDate: user.birthDate,
+    ...getBranchInfo(user),
     source: 'BOOK_UZ',
     purchasedBooks: getPurchasedBooks(user)
 });
@@ -191,6 +266,7 @@ const mapAmoContact = (contact: ApiAmoContact): AdminUserListItem => ({
     salesCount: getExternalSalesCount(contact),
     createdAt: contact.createdAt,
     birthDate: contact.birthDate,
+    ...getBranchInfo(contact),
     source: 'AMO_CRM',
     purchasedBooks: getPurchasedBooks(contact)
 });
@@ -326,6 +402,23 @@ const userMatchesSearch = (user: AdminUserListItem, search: string) => {
     );
 };
 
+const userMatchesBranch = (user: AdminUserListItem, branchId?: string, branchName?: string) => {
+    if (!branchId && !branchName) return true;
+
+    const normalizedBranchName = normalizeSearchValue(branchName || '');
+    const userBranchNames = [user.branchName, ...(user.branchNames ?? [])].map((value) =>
+        normalizeSearchValue(value || '')
+    );
+
+    return (
+        Boolean(branchId && user.branchId === branchId) ||
+        Boolean(
+            normalizedBranchName &&
+                userBranchNames.some((name) => name === normalizedBranchName || name.includes(normalizedBranchName))
+        )
+    );
+};
+
 const getUniqueUsers = (items: AdminUserListItem[]) => {
     const seen = new Set<string>();
 
@@ -384,19 +477,25 @@ const createUsersResponse = (
     totals
 });
 
-const fetchAdminUsersPage = async (params: Pick<GetAdminUsersParams, 'page' | 'limit' | 'search'>) => {
+const fetchAdminUsersPage = async (params: Pick<GetAdminUsersParams, 'page' | 'limit' | 'search' | 'branchId' | 'branchName'>) => {
     const response = await api.get<AdminUsersApiResponse>('/admin/users', {
         params: {
             page: params.page,
             limit: params.limit,
-            search: params.search?.trim() || undefined
+            search: params.search?.trim() || undefined,
+            branchId: params.branchId || undefined,
+            branch: params.branchName || undefined
         }
     });
 
     return normalizeUsersResponse(response.data.data);
 };
 
-const fetchAdminUsersPagesInBatches = async (pages: number[], limit: number) => {
+const fetchAdminUsersPagesInBatches = async (
+    pages: number[],
+    limit: number,
+    filters: Pick<GetAdminUsersParams, 'branchId' | 'branchName'> = {}
+) => {
     const batchSize = 8;
     const responses: AdminUsersResponse[] = [];
 
@@ -406,7 +505,8 @@ const fetchAdminUsersPagesInBatches = async (pages: number[], limit: number) => 
             batch.map((page) =>
                 fetchAdminUsersPage({
                     page,
-                    limit
+                    limit,
+                    ...filters
                 })
             )
         );
@@ -459,11 +559,35 @@ const getAllAdminUsersCached = async () => {
     return allUsersRequest;
 };
 
+const fetchAllAdminUsersFromApi = async (params: Pick<GetAdminUsersParams, 'branchId' | 'branchName'>) => {
+    const firstPage = await fetchAdminUsersPage({
+        page: 1,
+        limit: ALL_USERS_PAGE_LIMIT,
+        ...params
+    });
+    const pageLimit = firstPage.pagination.limit || ALL_USERS_PAGE_LIMIT;
+    const totalPages = Math.max(1, firstPage.pagination.pages || 1);
+    const restPages = Array.from({ length: totalPages - 1 }, (_, index) => index + 2);
+    const responses = await fetchAdminUsersPagesInBatches(restPages, pageLimit, params);
+
+    return {
+        items: getUniqueUsers([firstPage, ...responses].flatMap((response) => response.items)),
+        totals: firstPage.totals
+    };
+};
+
 const fetchAllAdminUsers = async (params: GetAdminUsersParams): Promise<AdminUsersResponse> => {
-    const { items: allItems, totals } = await getAllAdminUsersCached();
-    const matchedItems = params.search
-        ? allItems.filter((item) => userMatchesSearch(item, params.search || ''))
-        : allItems;
+    const hasBranchFilter = Boolean(params.branchId || params.branchName);
+    const { items: allItems, totals } = hasBranchFilter
+        ? await fetchAllAdminUsersFromApi(params)
+        : await getAllAdminUsersCached();
+    const canFilterBranchLocally =
+        hasBranchFilter && allItems.some((item) => item.branchId || item.branchName || item.branchNames?.length);
+    const matchedItems = allItems.filter(
+        (item) =>
+            userMatchesSearch(item, params.search || '') &&
+            (!canFilterBranchLocally || userMatchesBranch(item, params.branchId, params.branchName))
+    );
     const sortedItems = sortUsers(matchedItems, params.sortKey, params.sortOrder);
     const start = (params.page - 1) * params.limit;
     const pageItems = sortedItems.slice(start, start + params.limit);
@@ -507,9 +631,10 @@ const normalizeUserDetailResponse = (response: AdminUserApiResponse, fallbackId:
 export const UsersService = {
     getAdminUsers: async (params: GetAdminUsersParams): Promise<AdminUsersResponse> => {
         const search = params.search?.trim();
+        const hasBranchFilter = Boolean(params.branchId || params.branchName);
         const hasSort = Boolean(params.sortKey && params.sortKey !== 'default');
 
-        if (search || hasSort) {
+        if (search || hasSort || hasBranchFilter) {
             return fetchAllAdminUsers({ ...params, search });
         }
 

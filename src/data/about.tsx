@@ -120,12 +120,12 @@ export const teamMembers: TeamMember[] = [
 export const timelineEvents: TimelineEvent[] = [
     {
         year: '2018',
-        title: 'BOOK.UZ tashkil topdi',
+        title: 'BOOK.UZ Brandi tashkil topdi',
         titleRu: 'BOOK.UZ основан',
         titleEn: 'BOOK.UZ founded',
-        description: "Kitobxonlar uchun zamonaviy platforma yaratish g'oyasi bilan ish boshladik.",
-        descriptionRu: 'Мы начали с идеи создания современной платформы для читателей.',
-        descriptionEn: 'We started with the idea of creating a modern platform for readers.',
+        description: 'Biz dokonimizni yangi BOOK.UZ brandi bilan boshladik. ',
+        descriptionRu: 'Мы начали наш магазин с новым брендом BOOK.UZ.',
+        descriptionEn: 'We started our store with the new BOOK.UZ brand.',
         icon: <Rocket size={20} />
     },
     {

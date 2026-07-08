@@ -13,8 +13,10 @@ export const usersKeys = {
         limit: number,
         search: string,
         sortKey: AdminSortKey<UserSortKey>,
-        sortOrder: AdminSortOrder
-    ) => [...usersKeys.all, 'list', page, limit, search, sortKey, sortOrder] as const
+        sortOrder: AdminSortOrder,
+        branchId: string,
+        branchName: string
+    ) => [...usersKeys.all, 'list', page, limit, search, sortKey, sortOrder, branchId, branchName] as const
 };
 
 export const useAdminUsersQuery = (
@@ -22,13 +24,15 @@ export const useAdminUsersQuery = (
     limit: number,
     keyword = '',
     sortKey: AdminSortKey<UserSortKey> = 'default',
-    sortOrder: AdminSortOrder = 'asc'
+    sortOrder: AdminSortOrder = 'asc',
+    branchId = '',
+    branchName = ''
 ) => {
     const search = keyword.trim();
 
     return useQuery<AdminUsersResponse>({
-        queryKey: usersKeys.list(page, limit, search, sortKey, sortOrder),
-        queryFn: () => UsersService.getAdminUsers({ page, limit, search, sortKey, sortOrder }),
+        queryKey: usersKeys.list(page, limit, search, sortKey, sortOrder, branchId, branchName),
+        queryFn: () => UsersService.getAdminUsers({ page, limit, search, sortKey, sortOrder, branchId, branchName }),
         placeholderData: (previousData) => previousData
     });
 };
