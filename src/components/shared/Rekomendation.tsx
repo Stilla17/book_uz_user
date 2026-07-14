@@ -10,6 +10,7 @@ import type { Category } from '@/types';
 import type { Book } from '@/types/book';
 import { useQuery } from '@tanstack/react-query';
 
+import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Autoplay } from 'swiper/modules';
@@ -52,6 +53,7 @@ const getGenreValue = (book: RecommendationBook, categories: Category[]) => {
 };
 
 export default function Rekomendation({ book }: RekomendationProps) {
+    const { t } = useTranslation();
     const { data: categories = [], isLoading: categoriesLoading } = usePublicCategoriesQuery();
     const genreValue = useMemo(() => getGenreValue(book, categories), [book, categories]);
     const { data: genreBooksData, isLoading: genreBooksLoading } = useQuery({
@@ -70,7 +72,7 @@ export default function Rekomendation({ book }: RekomendationProps) {
 
     return (
         <section className='mt-10'>
-            <h2 className='text-2xl font-black text-slate-900 dark:text-white'>Shu janrdagi kitoblar</h2>
+            <h2 className='text-2xl font-black text-slate-900 dark:text-white'>{t('bookDetail.sameGenreBooks')}</h2>
 
             {isLoading ? (
                 <div className='mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>

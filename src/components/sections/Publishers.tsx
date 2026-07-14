@@ -50,7 +50,7 @@ const Publishers = () => {
                             <Link
                                 href='/publishers'
                                 className='group flex items-center rounded-full bg-[#ef7f1a]/10 px-5 py-2.5 text-sm font-bold text-[#ef7f1a] transition-all hover:shadow-md md:text-base dark:bg-orange-500/20 dark:text-orange-400'>
-                                Barchasini ko'rish
+                                {t('publish.viewAll')}
                                 <ChevronRight size={18} />
                             </Link>
                         </div>

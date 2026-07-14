@@ -9,6 +9,7 @@ import Publishers from '@/components/sections/Publishers';
 import { ServicesSection } from '@/components/sections/ServicesSection';
 import { SupportSection } from '@/components/sections/SupportSection';
 import { TopSalesSection } from '@/components/sections/TopSalesSection';
+import HomepageStructuredData from '@/components/seo/HomepageStructuredData';
 
 import { useTranslation } from 'react-i18next';
 
@@ -17,6 +18,8 @@ const Page = () => {
 
     return (
         <div className='bg-background flex flex-col dark:bg-slate-900'>
+            <HomepageStructuredData />
+
             {/* Hero Section */}
             <Hero />
 

@@ -8,6 +8,7 @@
         "dev": "next dev --turbopack",
         "build": "next build",
         "start": "next start",
+        "migrate:product-images": "node scripts/migrate-product-images-to-cloudinary.cjs",
         "lint": "next lint",
         "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
         "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""

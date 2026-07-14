@@ -17,6 +17,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import dayjs from 'dayjs';
 import { ArrowUpRight, Calendar, Eye, Megaphone, Newspaper, Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const PAGE_LIMIT = 9;
 const NEWS_VIEWS_STORAGE_KEY = 'news_views';
@@ -52,6 +53,7 @@ const getPublicNews = async (page: number, search: string): Promise<NewsResponse
 };
 
 const NewsPage = () => {
+    const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const [searchInput, setSearchInput] = useState('');
     const queryClient = useQueryClient();
@@ -95,7 +97,7 @@ const NewsPage = () => {
                             size={32}
                         />
                     </div>
-                    <p className='animate-pulse text-gray-500 dark:text-gray-400'>Yangiliklar yuklanmoqda...</p>
+                    <p className='animate-pulse text-gray-500 dark:text-gray-400'>{t('newsPage.loading')}</p>
                 </div>
             </div>
         );
@@ -105,12 +107,10 @@ const NewsPage = () => {
         <main className='min-h-screen py-12 dark:bg-slate-900'>
             <div className='container mx-auto max-w-7xl px-4'>
                 <section className='mb-10 text-center'>
-                    <h1 className='mb-4 text-4xl font-black text-[#ef7f1a] md:text-5xl'>
-                            Barcha yangiliklar
-                    </h1>
+                    <h1 className='mb-4 text-4xl font-black text-[#ef7f1a] md:text-5xl'>{t('newsPage.title')}</h1>
 
                     <p className='mx-auto max-w-2xl text-lg text-gray-500 dark:text-gray-400'>
-                        Platformamizdagi eng so'nggi yangiliklar, yangi kitoblar va aksiyalardan xabardor bo'ling.
+                        {t('newsPage.description')}
                     </p>
                 </section>
 
@@ -120,12 +120,13 @@ const NewsPage = () => {
                         <Input
                             value={searchInput}
                             onChange={(event) => handleSearch(event.target.value)}
-                            placeholder='Yangilik qidirish...'
+                            placeholder={t('newsPage.searchPlaceholder')}
                             className='h-12 rounded-xl border-2 border-gray-200 bg-white pr-10 pl-10 focus:border-[#00a0e3] dark:border-gray-700 dark:bg-slate-800'
                         />
                         {searchInput ? (
                             <button
                                 type='button'
+                                aria-label={t('newsPage.clearSearch')}
                                 onClick={() => handleSearch('')}
                                 className='absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600'>
                                 <X size={16} />
@@ -138,7 +139,7 @@ const NewsPage = () => {
                     <>
                         <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
                             {news.map((item: NewsItems) => {
-                                const title = getLocalizedText(item.title, 'Yangilik');
+                                const title = getLocalizedText(item.title, t('newsSection.fallbackTitle'));
                                 const excerpt = getLocalizedText(item.excerpt || item.description);
                                 const imageUrl = getImageUrl(item.image);
 
@@ -184,7 +185,7 @@ const NewsPage = () => {
                                             </p>
 
                                             <span className='inline-flex items-center gap-1 text-xs font-bold text-[#ef7f1a] transition-all group-hover:gap-2 dark:text-orange-400'>
-                                                Batafsil o'qish
+                                                {t('newsSection.details')}
                                                 <ArrowUpRight size={14} />
                                             </span>
                                         </div>
@@ -209,17 +210,17 @@ const NewsPage = () => {
                         <div className='mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-full bg-gray-100 dark:bg-slate-800'>
                             <Newspaper size={44} className='text-gray-400 dark:text-gray-500' />
                         </div>
-                        <h3 className='mb-2 text-2xl font-bold text-gray-900 dark:text-white'>Yangilik topilmadi</h3>
+                        <h3 className='mb-2 text-2xl font-bold text-gray-900 dark:text-white'>
+                            {t('newsPage.notFoundTitle')}
+                        </h3>
                         <p className='mb-6 text-gray-500 dark:text-gray-400'>
-                            {searchInput
-                                ? `"${searchInput}" bo'yicha hech qanday yangilik topilmadi`
-                                : "Hozircha yangiliklar yo'q"}
+                            {searchInput ? t('newsPage.noSearchResults', { query: searchInput }) : t('newsPage.empty')}
                         </p>
                         {searchInput ? (
                             <Button
                                 onClick={() => handleSearch('')}
                                 className='bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] text-white'>
-                                Qidiruvni tozalash
+                                {t('newsPage.clearSearch')}
                             </Button>
                         ) : null}
                     </div>

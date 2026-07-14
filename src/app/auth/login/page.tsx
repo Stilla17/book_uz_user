@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Loader2, Phone, ShieldCheck, User } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { IMaskInput } from 'react-imask';
 
 const OTP_LENGTH = 4;
@@ -26,6 +27,7 @@ const normalizePhone = (value: string) => {
 const isValidUzPhone = (value: string) => /^\+998\d{9}$/.test(value);
 
 export default function LoginPage() {
+    const { t } = useTranslation();
     const { sendPhoneOtp, verifyPhoneOtp, isLoading } = useAuth();
     const router = useRouter();
 
@@ -43,12 +45,12 @@ export default function LoginPage() {
 
     const requestOtp = async () => {
         if (name.trim().length < 2) {
-            toast.error("Ism familya kamida 2 ta belgidan iborat bo'lishi kerak");
+            toast.error(t('loginPage.nameMinLength'));
             return;
         }
 
         if (!isValidUzPhone(normalizedPhone)) {
-            toast.error("Telefon raqamni to'liq kiriting");
+            toast.error(t('loginPage.invalidPhone'));
             return;
         }
 
@@ -56,9 +58,9 @@ export default function LoginPage() {
             await sendPhoneOtp({ name: name.trim(), phone: normalizedPhone });
             setOtpValues(Array(OTP_LENGTH).fill(''));
             setOtpSent(true);
-            toast.success('Tasdiqlash kodi telefon raqamga yuborildi');
+            toast.success(t('loginPage.codeSent'));
         } catch (error: any) {
-            toast.error(getErrorMessage(error, 'Telefon raqamga kod yuborishda xatolik yuz berdi'));
+            toast.error(getErrorMessage(error, t('loginPage.sendCodeError')));
         }
     };
 
@@ -71,18 +73,18 @@ export default function LoginPage() {
         e.preventDefault();
 
         if (otp.trim().length !== OTP_LENGTH) {
-            toast.error(`${OTP_LENGTH} xonali tasdiqlash kodini kiriting`);
+            toast.error(t('loginPage.enterOtpLength', { count: OTP_LENGTH }));
             return;
         }
 
         try {
             await verifyPhoneOtp({ phone: normalizedPhone, otp: otp.trim() });
-            toast.success('Xush kelibsiz!');
+            toast.success(t('loginPage.welcome'));
             const redirect = new URLSearchParams(window.location.search).get('redirect');
             router.push(redirect || '/');
             router.refresh();
         } catch (error: any) {
-            toast.error(getErrorMessage(error, "Tasdiqlash kodi noto'g'ri yoki muddati tugagan"));
+            toast.error(getErrorMessage(error, t('loginPage.invalidOtp')));
         }
     };
 
@@ -129,11 +131,13 @@ export default function LoginPage() {
                 <img src='/images/Logo.png' alt='Logo' className='mx-auto h-40 w-40 max-md:h-32 max-md:w-32' />
 
                 <div className='mb-8 text-center'>
-                    <h1 className='text-3xl font-black text-gray-900 md:text-4xl dark:text-white'>Tizimga kirish</h1>
+                    <h1 className='text-3xl font-black text-gray-900 md:text-4xl dark:text-white'>
+                        {t('loginPage.title')}
+                    </h1>
                     <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
                         {otpSent
-                            ? `${normalizedPhone} raqamiga yuborilgan kodni kiriting`
-                            : 'Ism familya va telefon raqam orqali kiring'}
+                            ? t('loginPage.otpDescription', { phone: normalizedPhone })
+                            : t('loginPage.description')}
                     </p>
                 </div>
 
@@ -141,7 +145,7 @@ export default function LoginPage() {
                     <form onSubmit={handleSendOtp} className='space-y-5'>
                         <div className='space-y-2'>
                             <label className='ml-1 text-sm font-bold text-gray-600 dark:text-gray-400'>
-                                Ism familya
+                                {t('loginPage.fullName')}
                             </label>
                             <div className='group relative'>
                                 <User
@@ -151,7 +155,7 @@ export default function LoginPage() {
                                 <input
                                     required
                                     type='text'
-                                    placeholder='Ism familyangiz'
+                                    placeholder={t('loginPage.fullNamePlaceholder')}
                                     className='w-full rounded-2xl border border-gray-200 bg-gray-50 py-4 pr-4 pl-12 text-gray-900 transition-all outline-none placeholder:text-gray-400 focus:border-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-400'
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
@@ -161,7 +165,7 @@ export default function LoginPage() {
 
                         <div className='space-y-2'>
                             <label className='ml-1 text-sm font-bold text-gray-600 dark:text-gray-400'>
-                                Telefon raqam
+                                {t('loginPage.phone')}
                             </label>
                             <div className='group relative'>
                                 <Phone
@@ -188,7 +192,7 @@ export default function LoginPage() {
                                 <Loader2 className='animate-spin' size={22} />
                             ) : (
                                 <>
-                                    Kod yuborish <ArrowRight size={20} />
+                                    {t('loginPage.sendCode')} <ArrowRight size={20} />
                                 </>
                             )}
                         </button>
@@ -197,7 +201,7 @@ export default function LoginPage() {
                     <form onSubmit={handleVerifyOtp} className='space-y-5'>
                         <div className='space-y-2'>
                             <label className='ml-1 text-sm font-bold text-gray-600 dark:text-gray-400'>
-                                Tasdiqlash kodi
+                                {t('loginPage.otpLabel')}
                             </label>
                             <div className='grid grid-cols-4 gap-3'>
                                 {otpValues.map((digit, index) => (
@@ -211,7 +215,7 @@ export default function LoginPage() {
                                             inputMode='numeric'
                                             autoComplete={index === 0 ? 'one-time-code' : 'off'}
                                             maxLength={1}
-                                            aria-label={`Tasdiqlash kodi ${index + 1}-raqam`}
+                                            aria-label={t('loginPage.otpDigitLabel', { number: index + 1 })}
                                             className='h-16 w-full rounded-2xl border border-gray-200 bg-gray-50 text-center text-2xl font-black text-gray-900 transition-all outline-none placeholder:text-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:ring-orange-950/40'
                                             value={digit}
                                             onChange={(event) => handleOtpChange(index, event.target.value)}
@@ -237,7 +241,7 @@ export default function LoginPage() {
                                 <Loader2 className='animate-spin' size={22} />
                             ) : (
                                 <>
-                                    Kirish <ArrowRight size={20} />
+                                    {t('loginPage.signIn')} <ArrowRight size={20} />
                                 </>
                             )}
                         </button>
@@ -251,14 +255,14 @@ export default function LoginPage() {
                                 }}
                                 className='flex items-center gap-1 font-semibold text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'>
                                 <ArrowLeft size={16} />
-                                Raqamni o'zgartirish
+                                {t('loginPage.changePhone')}
                             </button>
                             <button
                                 type='button'
                                 disabled={isLoading}
                                 onClick={requestOtp}
                                 className='font-semibold text-orange-500 transition-colors hover:text-orange-600 disabled:opacity-60 dark:text-orange-400 dark:hover:text-orange-300'>
-                                Kodni qayta yuborish
+                                {t('loginPage.resendCode')}
                             </button>
                         </div>
                     </form>

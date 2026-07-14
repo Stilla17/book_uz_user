@@ -25,30 +25,30 @@ type FaqItem = {
 const contact = [
     {
         icon: <Phone size={18} />,
-        title: 'Telefon',
+        titleKey: 'supportSection.contact.phone.title',
         val: '+998(71) 230-00-50',
-        sub: "Bepul qo'ng'iroq",
+        subKey: 'supportSection.contact.phone.subtitle',
         color: 'blue'
     },
     {
         icon: <Mail size={18} />,
-        title: 'Email',
+        titleKey: 'supportSection.contact.email.title',
         val: 'support@book.uz',
-        sub: '24/7',
+        subKey: 'supportSection.contact.email.subtitle',
         color: 'orange'
     },
     {
         icon: <MessageCircle size={18} />,
-        title: 'Telegram',
+        titleKey: 'supportSection.contact.telegram.title',
         val: '@bookuz_bot',
-        sub: 'Online',
+        subKey: 'supportSection.contact.telegram.subtitle',
         color: 'blue'
     },
     {
         icon: <Clock size={18} />,
-        title: 'Ish vaqti',
+        titleKey: 'supportSection.contact.workingHours.title',
         val: '09:00 - 22:00',
-        sub: 'Dushanba-Yakshanba',
+        subKey: 'supportSection.contact.workingHours.subtitle',
         color: 'orange'
     }
 ];
@@ -56,7 +56,7 @@ const contact = [
 export const SupportSection = () => {
     const [activeTab, setActiveTab] = useState<'faq' | 'contact' | 'chat'>('faq');
     const [openFaq, setOpenFaq] = useState<number | null>(0);
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { data, isError, isLoading } = useFaq();
     const currentLanguage = (i18n.language?.split('-')[0] || 'uz') as keyof LocalizedText;
     const responseData = data?.data ?? data;
@@ -70,6 +70,11 @@ export const SupportSection = () => {
         return value?.[currentLanguage] || value?.uz || value?.ru || value?.en || '';
     };
 
+    const translatedStats = supportStats.map((item) => ({
+        ...item,
+        label: t(`supportSection.stats.${item.id}`)
+    }));
+
     return (
         <section className='relative overflow-hidden py-12 dark:bg-slate-900'>
             <div className='relative z-10 container mx-auto max-w-6xl px-4'>
@@ -79,19 +84,19 @@ export const SupportSection = () => {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         className='mb-2 text-3xl font-black md:text-4xl'>
-                        <span className='text-[#00a0e3] dark:text-blue-400'>Sizga qanday</span>{' '}
-                        <span className='text-[#ef7f1a] dark:text-orange-400'>yordam bera olamiz?</span>
+                        <span className='text-[#00a0e3] dark:text-blue-400'>{t('supportSection.titleFirst')}</span>{' '}
+                        <span className='text-[#ef7f1a] dark:text-orange-400'>{t('supportSection.titleSecond')}</span>
                     </motion.h2>
                 </div>
 
                 {/* Quick Stats */}
-                <MiniCard items={supportStats} initialDelay={0} itemDelayStep={0.05} />
+                <MiniCard items={translatedStats} initialDelay={0} itemDelayStep={0.05} />
 
                 {/* Support Tabs */}
                 <div className='mx-auto mb-8 flex max-w-xs rounded-xl bg-gray-100 p-1 dark:bg-slate-700'>
                     {[
                         { id: 'faq', label: 'FAQ' },
-                        { id: 'contact', label: 'Aloqa' }
+                        { id: 'contact', label: t('supportSection.tabs.contact') }
                     ].map((tab) => (
                         <button
                             key={tab.id}
@@ -131,11 +136,11 @@ export const SupportSection = () => {
                                     ))
                                 ) : isError ? (
                                     <div className='rounded-xl border border-red-100 bg-red-50 p-4 text-center text-sm font-bold text-red-500 dark:border-red-500/20 dark:bg-red-500/10'>
-                                        FAQ ma'lumotlarini yuklashda xatolik yuz berdi.
+                                        {t('supportSection.faq.loadError')}
                                     </div>
                                 ) : faqs.length === 0 ? (
                                     <div className='rounded-xl border border-gray-100 bg-white p-6 text-center text-sm font-bold text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-400'>
-                                        Hozircha FAQ savollari mavjud emas.
+                                        {t('supportSection.faq.empty')}
                                     </div>
                                 ) : (
                                     faqs.map((f, i) => (
@@ -201,14 +206,14 @@ export const SupportSection = () => {
                                             } mb-2`}>
                                             {c.icon}
                                             <span className='text-xs font-bold tracking-wider text-gray-400 uppercase dark:text-gray-500'>
-                                                {c.title}
+                                                {t(c.titleKey)}
                                             </span>
                                         </div>
                                         <div className='ml-9 text-sm font-black text-gray-900 dark:text-white'>
                                             {c.val}
                                         </div>
                                         <div className='mt-1 ml-9 text-[10px] text-gray-400 dark:text-gray-500'>
-                                            {c.sub}
+                                            {t(c.subKey)}
                                         </div>
                                     </div>
                                 ))}

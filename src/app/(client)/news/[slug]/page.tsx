@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 
+import { NewsStructuredData } from '@/components/seo/StructuredData';
 import { Button } from '@/components/ui/button';
 import { api } from '@/services/api';
 import type { NewsItems, NewsResponse } from '@/types/news';
@@ -15,6 +16,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import dayjs from 'dayjs';
 import { ArrowLeft, Calendar, Eye, Megaphone, Newspaper } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type NewsDetailResponse = NewsItems & {
     content?: NewsItems['description'];
@@ -60,6 +62,7 @@ const getNewsDetail = async (slug: string): Promise<NewsDetailResponse> => {
 };
 
 const NewsDetailPage = () => {
+    const { t } = useTranslation();
     const params = useParams();
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -111,29 +114,33 @@ const NewsDetailPage = () => {
             <div className='flex min-h-screen items-center justify-center bg-gray-50 px-4 text-center dark:bg-slate-900'>
                 <div>
                     <Newspaper size={44} className='mx-auto text-gray-400' />
-                    <h1 className='mt-4 text-2xl font-black text-gray-900 dark:text-white'>Yangilik topilmadi</h1>
+                    <h1 className='mt-4 text-2xl font-black text-gray-900 dark:text-white'>
+                        {t('newsPage.notFoundTitle')}
+                    </h1>
                     <Button asChild className='mt-5 bg-[#ef7f1a] text-white hover:bg-orange-600'>
-                        <Link href='/news'>Yangiliklarga qaytish</Link>
+                        <Link href='/news'>{t('newsPage.backToNews')}</Link>
                     </Button>
                 </div>
             </div>
         );
     }
 
-    const title = getLocalizedText(news.title, 'Yangilik');
+    const title = getLocalizedText(news.title, t('newsSection.fallbackTitle'));
     const excerpt = getLocalizedText(news.excerpt);
     const content = getLocalizedText(news.content || news.description);
     const imageUrl = getImageUrl(news.image);
 
     return (
         <main className='min-h-screen py-10 dark:bg-slate-900'>
+            <NewsStructuredData news={news} />
+
             <div className='container mx-auto max-w-4xl px-4'>
                 <button
                     type='button'
                     onClick={() => router.back()}
                     className='mb-6 inline-flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-[#00a0e3] dark:text-gray-400'>
                     <ArrowLeft size={16} />
-                    Orqaga
+                    {t('newsPage.back')}
                 </button>
 
                 <article className='overflow-hidden rounded-2xl border border-gray-100 bg-white dark:border-slate-700 dark:bg-slate-800'>
@@ -159,20 +166,18 @@ const NewsDetailPage = () => {
                             </span>
                         </div>
 
-                        <h1 className='mb-4 text-2xl font-black text-gray-900 md:text-4xl dark:text-white'>
-                            {title}
-                        </h1>
+                        <h1 className='mb-4 text-2xl font-black text-gray-900 md:text-4xl dark:text-white'>{title}</h1>
 
                         {excerpt ? (
                             <div className='mb-6 rounded-xl border-l-4 border-[#00a0e3] bg-[#00a0e3]/5 p-4 dark:bg-blue-600/10'>
-                                <p className='italic text-gray-700 dark:text-gray-300'>{excerpt}</p>
+                                <p className='text-gray-700 italic dark:text-gray-300'>{excerpt}</p>
                             </div>
                         ) : null}
 
-                        <div className='prose prose-lg max-w-none dark:prose-invert'>
-                            {content.split('\n').map((paragraph, index) =>
-                                paragraph.trim() ? <p key={index}>{paragraph}</p> : null
-                            )}
+                        <div className='prose prose-lg dark:prose-invert max-w-none'>
+                            {content
+                                .split('\n')
+                                .map((paragraph, index) => (paragraph.trim() ? <p key={index}>{paragraph}</p> : null))}
                         </div>
                     </div>
                 </article>

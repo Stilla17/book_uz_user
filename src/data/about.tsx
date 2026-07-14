@@ -160,52 +160,55 @@ export const timelineEvents: TimelineEvent[] = [
     },
     {
         year: '2022',
-        title: 'Xalqaro bozorga chiqish',
-        titleRu: 'Выход на международный рынок',
-        titleEn: 'International expansion',
-        description: "15 ta mamlakatda xizmat ko'rsata boshladik.",
-        descriptionRu: 'Мы начали提供服务 в 15 странах.',
-        descriptionEn: 'We started serving in 15 countries.',
-        icon: <Globe size={20} />
-    },
-    {
-        year: '2023',
-        title: 'Premium obuna xizmati',
-        titleRu: 'Премиум подписка',
-        titleEn: 'Premium subscription',
-        description: 'Cheksiz kitoblar va maxsus imkoniyatlarga ega premium obunani ishga tushirdik.',
-        descriptionRu: 'Мы запустили премиум-подписку с безлимитными книгами.',
-        descriptionEn: 'We launched premium subscription with unlimited books.',
+        title: 'Eng yaxshi kitob targʻiboti',
+        titleRu: 'Лучшая популяризация книг',
+        titleEn: 'Best book promotion',
+        description:
+            '3-Toshkent koʻrgazma-yarmarkasida "Eng yaxshi kitob targʻiboti uchun" nominatsiyasi bilan taqdirlandi.',
+        descriptionRu:
+            'На 3-й Ташкентской выставке-ярмарке BOOK.UZ был награждён в номинации «За лучшую популяризацию книг».',
+        descriptionEn:
+            'At the 3rd Tashkent Book Fair, BOOK.UZ received the award for best book promotion.',
         icon: <Crown size={20} />
     },
     {
+        year: '2023',
+        title: 'Bolalar kitob festivali',
+        titleRu: 'Фестиваль детской книги',
+        titleEn: 'Children\'s Book Festival',
+        description: ' "Bolalar kitob festivali"da faol ishtiroki uchun taqdirlandi.',
+        descriptionRu: 'Был награжден за активное участие в "Фестивале детской книги".',
+        descriptionEn: 'Awarded for active participation in the "Children\'s Book Festival".',
+        icon: <Globe size={20} />
+    },
+    {
         year: '2024',
-        title: 'Premium obuna xizmati',
-        titleRu: 'Премиум подписка',
-        titleEn: 'Premium subscription',
-        description: 'Cheksiz kitoblar va maxsus imkoniyatlarga ega premium obunani ishga tushirdik.',
-        descriptionRu: 'Мы запустили премиум-подписку с безлимитными книгами.',
-        descriptionEn: 'We launched premium subscription with unlimited books.',
+        title: 'Namangan va Qarshi',
+        titleRu: 'Наманган и Карши',
+        titleEn: 'Namangan & Karshi',
+        description: "Namangan va Qarshi shaharlarida o'z filiallarini ochdi.",
+        descriptionRu: 'Открыли филиалы в городах Наманган и Карши.',
+        descriptionEn: 'Opened branches in Namangan and Karshi cities.',
         icon: <Crown size={20} />
     },
     {
         year: '2025',
-        title: 'Premium obuna xizmati',
-        titleRu: 'Премиум подписка',
-        titleEn: 'Premium subscription',
-        description: 'Cheksiz kitoblar va maxsus imkoniyatlarga ega premium obunani ishga tushirdik.',
-        descriptionRu: 'Мы запустили премиум-подписку с безлимитными книгами.',
-        descriptionEn: 'We launched premium subscription with unlimited books.',
+        title: 'Chorsu va Oloy',
+        titleRu: 'Чорсу и Олой',
+        titleEn: 'Chorsu & Oloy',
+        description: 'Chorsu va Oloy bozorlarida yangi filiallarini ochdi.',
+        descriptionRu: 'Открыли филиалы на рынках Чорсу и Олой.',
+        descriptionEn: 'Opened new branches at Chorsu and Oloy markets.',
         icon: <Crown size={20} />
     },
     {
         year: '2026',
-        title: 'Premium obuna xizmati',
-        titleRu: 'Премиум подписка',
-        titleEn: 'Premium subscription',
-        description: 'Cheksiz kitoblar va maxsus imkoniyatlarga ega premium obunani ishga tushirdik.',
-        descriptionRu: 'Мы запустили премиум-подписку с безлимитными книгами.',
-        descriptionEn: 'We launched premium subscription with unlimited books.',
+        title: 'Yangi filiallar',
+        titleRu: 'Новые филиалы',
+        titleEn: 'New Branches',
+        description: 'Qarshi shahridagi 2-filial, Qoraqamish va Buxoro shaharlarida yangi filiallarini ochdi.',
+        descriptionRu: 'Открыли второй филиал в Карши, а также новые филиалы в Кора-Камыше и Бухаре.',
+        descriptionEn: 'Opened the second branch in Karshi and new branches in Kora-Kamish and Bukhara.',
         icon: <Crown size={20} />
     }
 ];

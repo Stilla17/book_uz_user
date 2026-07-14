@@ -17,6 +17,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { RefreshCcw, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const DEFAULT_FILTERS: CatalogFilters = {
     keyword: '',
@@ -34,6 +35,7 @@ const CATALOG_GRID_CLASS_NAME = 'grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 
 const CATALOG_LIST_CLASS_NAME = 'grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4';
 
 export default function CatalogPage() {
+    const { t } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -66,7 +68,7 @@ export default function CatalogPage() {
         }),
         [filters, page]
     );
-    
+
     const shouldUseAuthorProducts = false;
 
     const {
@@ -152,16 +154,18 @@ export default function CatalogPage() {
 
                         {isError ? (
                             <div className='rounded-[1.75rem] border border-red-200 bg-white/90 p-8 text-center shadow-sm dark:border-red-900/60 dark:bg-slate-900/90'>
-                                <p className='text-xl text-slate-900 dark:text-white'>Katalog yuklanmadi</p>
+                                <p className='text-xl text-slate-900 dark:text-white'>
+                                    {t('catalogPage.loadErrorTitle')}
+                                </p>
                                 <p className='mt-2 text-sm text-slate-500 dark:text-slate-400'>
-                                    API yoki tarmoq bilan bogliq vaqtinchalik muammo bolishi mumkin.
+                                    {t('catalogPage.loadErrorDescription')}
                                 </p>
                                 <button
                                     type='button'
                                     onClick={() => refetch()}
                                     className='mt-5 inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white dark:bg-[#ef7f1a]'>
                                     <RefreshCcw size={16} />
-                                    Qayta urinish
+                                    {t('catalogPage.retry')}
                                 </button>
                             </div>
                         ) : productsLoading ? (
@@ -195,17 +199,18 @@ export default function CatalogPage() {
                                 <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300'>
                                     <Search size={22} />
                                 </div>
-                                <h3 className='mt-4 text-2xl text-slate-900 dark:text-white'>Natija topilmadi</h3>
+                                <h3 className='mt-4 text-2xl text-slate-900 dark:text-white'>
+                                    {t('catalogPage.emptyTitle')}
+                                </h3>
                                 <p className='mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400'>
-                                    Tanlangan filterlar boyicha kitob topilmadi. Filterlarni soddalashtirib qayta urinib
-                                    koring.
+                                    {t('catalogPage.emptyDescription')}
                                 </p>
                                 <button
                                     type='button'
                                     onClick={clearFilters}
                                     className='mt-5 inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white dark:bg-[#ef7f1a]'>
                                     <RefreshCcw size={16} />
-                                    Filterlarni tozalash
+                                    {t('catalogPage.clearFilters')}
                                 </button>
                             </div>
                         )}

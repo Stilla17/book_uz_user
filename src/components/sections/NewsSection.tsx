@@ -10,23 +10,24 @@ import { getText } from '@/utils/book-formatters';
 import { api } from '@/services/api';
 import { getImageUrl } from '@/utils/image';
 
-import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Calendar, ChevronRight, Eye, Megaphone } from 'lucide-react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { useTranslation } from 'react-i18next';
 
 const NEWS_VIEWS_STORAGE_KEY = 'news_views';
 const NEWS_VIEWS_EVENT = 'news-views-change';
 
 export const NewsSection = () => {
+    const { t, i18n } = useTranslation();
     const [news, setNews] = useState<NewsItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [savedViews, setSavedViews] = useState<Record<string, number>>({});
 
-    dayjs.locale('uz');
+    const language = i18n.resolvedLanguage?.split('-')[0] || i18n.language?.split('-')[0] || 'uz';
 
     // Yangiliklarni yuklash
     useEffect(() => {
@@ -105,15 +106,15 @@ export const NewsSection = () => {
                         <span className={`h-9 w-1 shrink-0 rounded-full bg-[#ef7f1a]/30`} />
 
                         <h2 className='text-2xl font-black md:text-3xl'>
-                            <span className='text-[#00a0e3] dark:text-blue-400'>Platforma</span>{' '}
-                            <span className='text-[#ef7f1a] dark:text-orange-400'>yangiliklari</span>
+                            <span className='text-[#00a0e3] dark:text-blue-400'>{t('newsSection.platform')}</span>{' '}
+                            <span className='text-[#ef7f1a] dark:text-orange-400'>{t('newsSection.news')}</span>
                         </h2>
                     </div>
 
                     <Link
                         href='/news'
                         className='group inline-flex items-center gap-2 rounded-full bg-[#ef7f1a]/15 px-6 py-3 text-sm font-bold text-[#ef7f1a] transition-all duration-300 dark:bg-[#5b3a2b] dark:text-[#ef7f1a]'>
-                        Barchasini ko'rish
+                        {t('newsSection.viewAll')}
                         <ChevronRight
                             size={16}
                             className='transition-transform duration-300 group-hover:translate-x-1'
@@ -143,11 +144,11 @@ export const NewsSection = () => {
                     }}
                     className='news-swiper !overflow-visible pb-12'>
                     {news.map((item, index) => {
-                        const title = getText(item.title, item.titleRu || item.titleEn || 'Yangilik');
+                        const title = getText(item.title, item.titleRu || item.titleEn || t('newsSection.fallbackTitle'));
                         const description = getText(item.excerpt, getText(item.description, ''));
                         const imageUrl = getImageUrl(item.image || item.imageUrl);
                         const href = item.slug ? `/news/${item.slug}` : '/news';
-                        const date = formatDate(item.publishedAt || item.createdAt);
+                        const date = formatDate(item.publishedAt || item.createdAt, language);
 
                         return (
                             <SwiperSlide key={item._id} className='h-auto'>
@@ -205,7 +206,7 @@ export const NewsSection = () => {
 
                                             <div className='mt-auto pt-2'>
                                                 <span className='inline-flex items-center gap-1 text-xs font-bold text-[#ef7f1a] transition-all group-hover:gap-2 dark:text-orange-400'>
-                                                    Batafsil
+                                                    {t('newsSection.details')}
                                                     <ArrowUpRight size={14} />
                                                 </span>
                                             </div>

@@ -60,6 +60,81 @@
         "topSalesEmpty": "Топ продаж пока не синхронизирован.",
         "basket": "Корзина"
     },
+    "servicesSection": {
+        "title": "Услуги",
+        "subtitle": "Мы создаём удобство — быстро, безопасно и выгодно",
+        "items": {
+            "s1": { "title": "Доставка", "description": "Быстро и надёжно доставляем по всему Ташкенту." },
+            "s4": { "title": "Гарантия и доверие", "description": "Безопасность заказа, правила возврата и система контроля." },
+            "s5": { "title": "Удобная оплата", "description": "Доступны Click, Payme и карты Xazna." }
+        }
+    },
+    "aboutSection": {
+        "badge": "О НАС",
+        "titleFirst": "Ваш интеллектуальный",
+        "titleSecond": "спутник",
+        "descriptionBefore": "С 2018 года мы доставляем читателям лучшие книги. Наша цель — чтобы в каждый дом проник",
+        "highlight": "свет знаний",
+        "descriptionAfter": "и чтобы культура чтения продолжала развиваться.",
+        "moreDetails": "Подробнее",
+        "branchesOnMap": "Филиалов на карте: {{count}}",
+        "noBranches": "Филиалов пока нет",
+        "branchFallback": "Филиал",
+        "stats": {
+            "books": "Книги",
+            "publishers": "Издательства",
+            "branches": "Филиалы",
+            "delivery": "Доставка"
+        }
+    },
+    "newsSection": {
+        "platform": "Новости",
+        "news": "платформы",
+        "viewAll": "Посмотреть все",
+        "details": "Подробнее",
+        "fallbackTitle": "Новость"
+    },
+    "supportSection": {
+        "titleFirst": "Как мы можем",
+        "titleSecond": "вам помочь?",
+        "tabs": {
+            "contact": "Контакты"
+        },
+        "stats": {
+            "customers": "Клиентов",
+            "responseTime": "Быстрый ответ",
+            "service": "Сервис",
+            "satisfaction": "Довольны"
+        },
+        "faq": {
+            "loadError": "Произошла ошибка при загрузке FAQ.",
+            "empty": "Вопросов FAQ пока нет."
+        },
+        "contact": {
+            "phone": {
+                "title": "Телефон",
+                "subtitle": "Бесплатный звонок"
+            },
+            "email": {
+                "title": "Email",
+                "subtitle": "24/7"
+            },
+            "telegram": {
+                "title": "Telegram",
+                "subtitle": "Онлайн"
+            },
+            "workingHours": {
+                "title": "Время работы",
+                "subtitle": "Понедельник-Воскресенье"
+            }
+        }
+    },
+    "authorsPage": {
+        "totalAuthors": "Авторов: {{count}}",
+        "pageCount": "Страница {{current}} из {{total}}",
+        "empty": "Авторы не найдены",
+        "viewBooks": "Посмотреть книги"
+    },
     "authorsSection": {
         "title": "Авторы",
         "booksCount": "{{count}} книг"
@@ -79,11 +154,394 @@
             "terms": "Условия использования"
         }
     },
+    "notFoundPage": {
+        "title": "Страница не найдена",
+        "description": "К сожалению, запрашиваемая страница не существует или была удалена.",
+        "suggestion": "Вернитесь на главную и продолжите знакомство с миром из более чем 50 000 книг.",
+        "didYouKnow": "ЗНАЕТЕ ЛИ ВЫ?",
+        "links": {
+            "home": "Главная",
+            "books": "Книги",
+            "news": "Новости",
+            "favorites": "Избранное",
+            "cart": "Корзина",
+            "myBooks": "Мои книги"
+        },
+        "goBack": "Вернуться назад",
+        "goHome": "Перейти на главную",
+        "facts": {
+            "expensiveBook": "Самая дорогая книга в мире была продана за 30 миллионов долларов.",
+            "largestLibrary": "В крупнейшей библиотеке хранится более 170 миллионов книг.",
+            "averageBook": "Средняя книга содержит 300–400 страниц.",
+            "dailyPublishing": "Ежедневно в мире издаётся более 4 000 книг.",
+            "oldestBook": "Самая древняя книга была написана 2 500 лет назад.",
+            "uzbekistanPublishing": "В Узбекистане ежегодно издаётся более 2 000 книг.",
+            "audiobooks": "Аудиокнигу можно прослушать примерно вдвое быстрее обычного чтения.",
+            "readingPreference": "Около 15 процентов населения мира не любит читать книги.",
+            "mostReadBook": "Самая читаемая книга в мире — Библия.",
+            "harryPotter": "Книги о Гарри Поттере проданы тиражом 500 миллионов экземпляров.",
+            "alisherNavoi": "Один из самых читаемых авторов Узбекистана — Алишер Навои.",
+            "stressReduction": "Чтение книг снижает уровень стресса на 68 процентов.",
+            "longerLife": "Три часа чтения в неделю могут продлить жизнь на два года.",
+            "ebooks": "Электронные книги появились в 1971 году.",
+            "smallestBook": "Самая маленькая книга в мире размером с крупинку соли."
+        }
+    },
+    "profilePage": {
+        "userFallback": "Пользователь",
+        "profileImage": "Фото профиля",
+        "tabs": {
+            "wishlist": "Мои книги",
+            "orders": "Заказы",
+            "settings": "Настройки"
+        },
+        "logout": "Выйти",
+        "booksLoading": "Книги загружаются...",
+        "noFavoriteBooks": "В избранном пока нет книг",
+        "ordersLoading": "Заказы загружаются...",
+        "orderProduct": "Товар из заказа",
+        "itemQuantity": "{{count}} шт.",
+        "orderNumber": "Заказ № {{number}}",
+        "orderStatuses": {
+            "PENDING": "Ожидается",
+            "CONFIRMED": "Принят",
+            "PROCESSING": "Принят",
+            "PACKED": "Готовится",
+            "SHIPPED": "В пути",
+            "DELIVERING": "В пути",
+            "DELIVERED": "Доставлен",
+            "CANCELLED": "Отменён"
+        },
+        "noOrders": "Заказов пока нет",
+        "settingsTitle": "Настройки профиля",
+        "firstName": "Имя",
+        "lastName": "Фамилия",
+        "phone": "Номер телефона",
+        "saving": "Сохранение...",
+        "save": "Сохранить",
+        "updateFailed": "Профиль не обновлён",
+        "updateSuccess": "Профиль успешно обновлён",
+        "updateError": "Не удалось обновить профиль"
+    },
+    "userMenu": {
+        "openMenu": "Открыть меню профиля",
+        "userFallback": "Пользователь",
+        "profile": "Личный кабинет",
+        "myBooks": "Мои книги",
+        "orders": "Мои заказы",
+        "settings": "Настройки",
+        "logout": "Выйти"
+    },
+    "loginPage": {
+        "title": "Вход",
+        "description": "Войдите, указав имя и номер телефона",
+        "otpDescription": "Введите код, отправленный на номер {{phone}}",
+        "fullName": "Имя и фамилия",
+        "fullNamePlaceholder": "Ваше имя и фамилия",
+        "phone": "Номер телефона",
+        "sendCode": "Отправить код",
+        "otpLabel": "Код подтверждения",
+        "otpDigitLabel": "Цифра {{number}} кода подтверждения",
+        "signIn": "Войти",
+        "changePhone": "Изменить номер",
+        "resendCode": "Отправить код повторно",
+        "nameMinLength": "Имя и фамилия должны содержать не менее 2 символов",
+        "invalidPhone": "Введите номер телефона полностью",
+        "codeSent": "Код подтверждения отправлен на ваш номер телефона",
+        "sendCodeError": "Не удалось отправить код на номер телефона",
+        "enterOtpLength": "Введите {{count}}-значный код подтверждения",
+        "welcome": "Добро пожаловать!",
+        "invalidOtp": "Код подтверждения неверен или срок его действия истёк"
+    },
+    "myBooksPage": {
+        "title": "Мои книги",
+        "goToCatalog": "Перейти в каталог",
+        "books": "Книги",
+        "status": "Статус",
+        "signedIn": "Выполнен вход",
+        "guest": "Гость",
+        "serverBooks": "Сохранённые книги",
+        "localBooks": "Книги на устройстве",
+        "emptyTitle": "Книг пока нет",
+        "emptyAuthenticated": "Ваш список избранных книг пока пуст.",
+        "emptyGuest": "Книги, добавленные в избранное из каталога, появятся здесь."
+    },
+    "newsPage": {
+        "loading": "Новости загружаются...",
+        "title": "Все новости",
+        "description": "Следите за последними новостями платформы, новыми книгами и акциями.",
+        "searchPlaceholder": "Поиск новостей...",
+        "clearSearch": "Очистить поиск",
+        "notFoundTitle": "Новость не найдена",
+        "noSearchResults": "По запросу \"{{query}}\" ничего не найдено",
+        "empty": "Новостей пока нет",
+        "backToNews": "Вернуться к новостям",
+        "back": "Назад"
+    },
+    "publishersPage": {
+        "allPublishers": "Все издательства",
+        "description": "Просмотрите издательства в каталоге и сравните количество выпущенных ими книг.",
+        "totalPublishers": "Издательств: {{count}}",
+        "pageCount": "Страница {{current}} из {{total}}",
+        "publisherBooksFallback": "Книги издательства",
+        "publisherLabel": "Издательство",
+        "booksFound": "Найдено книг: {{count}}",
+        "noBooksTitle": "Книги не найдены",
+        "noBooksDescription": "Книги этого издательства пока отсутствуют."
+    },
     "publish": {
         "title": "Издательства",
-        "label": "Надёжные издательства с книгами на любой вкус",
+        "label": "Издательства",
         "desc": " Подборка издательств для витрины Book.uz. За каждой эмблемой стоит свой стиль, направление и каталог, который подходит каждому читателю.",
-        "viewDetails": "Посмотреть детали"
+        "viewDetails": "Посмотреть детали",
+        "viewAll": "Посмотреть все",
+        "booksCount": "{{count}} книг"
+    },
+    "loading": {
+        "message": "Путешествие в волшебный мир книг..."
+    },
+    "breadcrumb": {
+        "home": "Главная"
+    },
+    "bookDetail": {
+        "storeFallback": "Магазин",
+        "unknownAuthor": "Автор неизвестен",
+        "notFoundTitle": "Книга не найдена",
+        "notFoundDescription": "Эта книга не существует или была удалена из каталога.",
+        "itemsAvailable": "В наличии: {{count}} шт.",
+        "stockAvailable": "В наличии: {{count}} шт.",
+        "outOfStock": "Нет в наличии",
+        "starRating": "Оценка: {{count}}",
+        "script": "Письменность",
+        "cyrillic": "Кириллица",
+        "latin": "Латиница",
+        "pages": "Количество страниц",
+        "year": "Год",
+        "publisher": "Издательство",
+        "language": "Язык",
+        "cover": "Обложка",
+        "paperback": "Мягкая",
+        "hardcover": "Твёрдая",
+        "decreaseQuantity": "Уменьшить количество",
+        "increaseQuantity": "Увеличить количество",
+        "inCart": "В корзине",
+        "addToCart": "Добавить в корзину",
+        "favorites": "В избранное",
+        "sameGenreBooks": "Книги того же жанра",
+        "tabs": {
+            "description": "Описание",
+            "details": "Характеристики",
+            "reviews": "Отзывы"
+        },
+        "aboutBook": "О книге",
+        "noDescription": "Описание этой книги пока не добавлено. Позже здесь появится информация о содержании, стиле и рекомендуемой аудитории.",
+        "bookDetails": "Характеристики книги",
+        "detailsSubtitle": "Основная техническая и издательская информация",
+        "author": "Автор",
+        "category": "Категория",
+        "notProvided": "Не указано",
+        "totalReviews": "Всего отзывов",
+        "userFallback": "Пользователь",
+        "newReview": "Новый отзыв",
+        "noReviewsTitle": "Отзывов пока нет",
+        "noReviewsDescription": "Вы можете первым оставить отзыв об этой книге.",
+        "reviewForm": {
+            "success": "Ваш отзыв принят",
+            "error": "Не удалось отправить отзыв",
+            "loginRequired": "Войдите, чтобы оставить отзыв",
+            "commentRequired": "Введите текст отзыва",
+            "title": "Напишите свой отзыв",
+            "subtitle": "Поделитесь кратким впечатлением о книге.",
+            "placeholder": "Например: книга очень интересная, рекомендую...",
+            "loginPlaceholder": "Войдите, чтобы оставить отзыв...",
+            "helperAuthenticated": "Ваш отзыв поможет другим покупателям сделать выбор.",
+            "helperGuest": "Войдите в аккаунт, чтобы написать и отправить отзыв.",
+            "sending": "Отправка...",
+            "submit": "Оставить отзыв",
+            "login": "Войти"
+        }
+    },
+    "checkoutPage": {
+        "title": "Оформление заказа",
+        "subtitle": "Проверьте данные доставки и подтвердите заказ.",
+        "securePayment": "Безопасная оплата",
+        "recipient": "Получатель",
+        "contactDetails": "Основные контактные данные",
+        "fullName": "Имя и фамилия",
+        "fullNamePlaceholder": "Например: Азиз Каримов",
+        "phone": "Номер телефона",
+        "phoneFormatError": "Номер телефона должен быть в формате +998 90 123 45 67.",
+        "phoneExample": "Например: +998 90 123 45 67",
+        "deliveryAddress": "Адрес доставки",
+        "deliveryAddressSubtitle": "Адрес, куда должен приехать курьер",
+        "region": "Регион",
+        "regionsLoading": "Регионы загружаются...",
+        "regionsError": "Не удалось загрузить регионы",
+        "selectRegion": "Выберите регион",
+        "district": "Район",
+        "districtsLoading": "Районы загружаются...",
+        "districtsError": "Не удалось загрузить районы",
+        "selectDistrict": "Выберите район",
+        "selectRegionFirst": "Сначала выберите регион",
+        "detectingLocation": "Определение...",
+        "detectLocation": "Определить адрес",
+        "streetAddress": "Улица, дом, квартира",
+        "streetAddressPlaceholder": "Улица Амира Темура, дом 12",
+        "additionalNote": "Дополнительный комментарий",
+        "additionalNotePlaceholder": "Ориентир или дополнительная информация для курьера",
+        "deliveryType": "Способ доставки",
+        "deliveryTypeSubtitle": "Выберите удобный вариант",
+        "deliveryOptions": {
+            "postOffice": "До почтового отделения",
+            "postToHome": "Почтой до дома",
+            "courier": "Курьером",
+            "pickup": "Самовывоз из магазина"
+        },
+        "paymentMethod": "Способ оплаты",
+        "paymentMethodSubtitle": "Выберите способ оплаты заказа",
+        "protected": "Защищено",
+        "cash": "Наличные",
+        "orderCreatedRedirect": "Заказ успешно создан. Переход на страницу оплаты...",
+        "paymentLinkMissing": "Сервер не вернул ссылку для оплаты через {{payment}}",
+        "orderAcceptedUser": "Заказ принят. Его можно посмотреть в разделе ваших заказов.",
+        "orderAcceptedGuest": "Заказ принят. Оператор свяжется с вами по телефону.",
+        "orderError": "Не удалось создать заказ",
+        "geolocationUnsupported": "Ваш браузер не поддерживает определение местоположения",
+        "locationDetected": "Адрес определён",
+        "locationError": "Не удалось определить адрес",
+        "locationPermissionDenied": "Доступ к местоположению не предоставлен",
+        "validation": {
+            "emptyCart": "Корзина пуста",
+            "nameRequired": "Введите имя и фамилию",
+            "invalidPhone": "Введите корректный номер телефона",
+            "locationRequired": "Выберите регион и район",
+            "addressRequired": "Введите улицу, дом и квартиру",
+            "paymentRequired": "Выберите способ оплаты",
+            "productIdMissing": "Не найден идентификатор товара в корзине. Обновите корзину и попробуйте снова"
+        },
+        "summary": "Итого заказа",
+        "productCount": "Товаров: {{count}}",
+        "unknownBook": "Неизвестная книга",
+        "emptyCart": "Корзина пуста",
+        "price": "Стоимость товаров",
+        "delivery": "Доставка",
+        "free": "Бесплатно",
+        "promoCode": "Промокод",
+        "totalPayment": "Итого к оплате",
+        "paymentProtected": "Данные оплаты и заказа защищены.",
+        "submitting": "Отправка...",
+        "confirmOrder": "Подтвердить заказ"
+    },
+    "cartPage": {
+        "title": "Выбранные книги",
+        "subtitle": "Проверьте количество, удалите ненужные книги и перейдите к оформлению заказа.",
+        "productCount": "Товаров: {{count}}",
+        "continueShopping": "Продолжить покупки",
+        "clearAll": "Очистить всё",
+        "unknownBook": "Неизвестная книга",
+        "stockCount": "На складе: {{count}} шт.",
+        "remove": "Удалить",
+        "emptyTitle": "Корзина пуста",
+        "emptyDescription": "Добавленные из каталога книги появятся здесь.",
+        "decreaseQuantity": "Уменьшить количество",
+        "increaseQuantity": "Увеличить количество",
+        "summary": "Итого заказа",
+        "products": "Товары",
+        "discount": "Скидка",
+        "delivery": "Доставка",
+        "amountDue": "К оплате",
+        "promoCode": "Промокод",
+        "promoPlaceholder": "Например: BOOKUZ10",
+        "apply": "Применить",
+        "securePayment": "Безопасная оплата",
+        "securePaymentDescription": "Платёжные данные обрабатываются через защищённый канал.",
+        "fastDelivery": "Быстрая доставка",
+        "fastDeliveryDescription": "По Ташкенту — в течение 24 часов, в регионы — в кратчайшие сроки.",
+        "checkout": "Оформить заказ"
+    },
+    "catalogPage": {
+        "filters": "Фильтры",
+        "clear": "Очистить",
+        "search": "Поиск",
+        "searchPlaceholder": "Поиск по названию книги",
+        "language": "Язык",
+        "languages": {
+            "all": "Все языки",
+            "uz": "Узбекский",
+            "kr": "Узбекский (кириллица)",
+            "ru": "Русский",
+            "en": "Английский"
+        },
+        "genre": "Жанр",
+        "selectGenre": "Выберите жанр",
+        "author": "Автор",
+        "selectAuthor": "Выберите автора",
+        "publisher": "Издательство",
+        "selectPublisher": "Выберите издательство",
+        "priceRange": "Диапазон цен",
+        "priceMin": "0 сум",
+        "priceMax": "1 000 000 сум",
+        "thousandPrice": "{{value}} тыс.",
+        "millionPrice": "{{value}} млн",
+        "all": "Все",
+        "selectedCount": "Выбрано: {{count}}",
+        "searchShort": "Поиск...",
+        "searching": "Поиск...",
+        "notFound": "Ничего не найдено",
+        "resultsPanel": "Результаты",
+        "booksFound": "Найдено книг: {{count}}",
+        "gridView": "В виде сетки",
+        "listView": "В виде списка",
+        "loadErrorTitle": "Не удалось загрузить каталог",
+        "loadErrorDescription": "Возможно, возникла временная проблема с API или сетью.",
+        "retry": "Повторить",
+        "emptyTitle": "Ничего не найдено",
+        "emptyDescription": "По выбранным фильтрам книги не найдены. Упростите фильтры и попробуйте снова.",
+        "clearFilters": "Очистить фильтры"
+    },
+    "aboutPage": {
+        "badge": "О НАС",
+        "branchFallback": "Филиал",
+        "hero": {
+            "titleFirst": "Для любителей книг",
+            "titleSecond": "лучшая платформа",
+            "description": "BOOK.UZ — крупнейшая цифровая библиотека Узбекистана. Мы предлагаем лучший опыт чтения с более чем {{count}} книгами.",
+            "cta": "Смотреть книги"
+        },
+        "tabs": {
+            "history": "История",
+            "values": "Ценности"
+        },
+        "statistics": {
+            "books": "Книги",
+            "users": "Пользователи",
+            "rating": "Средний рейтинг",
+            "branches": "Филиалы"
+        },
+        "valuesTitleBefore": "Наши",
+        "valuesTitleHighlight": "ценности",
+        "historyTitleBefore": "Наша",
+        "historyTitleHighlight": "история",
+        "mission": {
+            "title": "Наша миссия",
+            "description": "Развивать культуру чтения в Узбекистане и предоставлять каждому качественные книги по доступным ценам. С нами миллионы людей получают возможность учиться и наслаждаться чтением."
+        },
+        "vision": {
+            "title": "Наша цель",
+            "description": "Стать крупнейшей цифровой библиотекой Центральной Азии и в течение пяти лет обслуживать более 10 миллионов пользователей. Сделать чтение ещё удобнее и приятнее с помощью инновационных технологий."
+        },
+        "contact": {
+            "addressTitle": "Адрес",
+            "addressLineOne": "г. Ташкент, Чиланзарский район",
+            "addressLineTwo": "19-й квартал, дом 45",
+            "phone": "Телефон",
+            "email": "Электронная почта"
+        },
+        "map": {
+            "branches": "Филиалов на карте: {{count}}",
+            "country": "Узбекистан",
+            "empty": "Филиалов пока нет"
+        }
     },
     "nav": {
         "books": "Книги",
@@ -97,5 +555,14 @@
         "popular": "Популярные",
         "discount": "Со скидкой",
         "top100": "Топ 100"
+    },
+    "bookCard": {
+        "alreadyInCart": "Эта книга уже в корзине",
+        "addedToCart": "Добавлено в корзину",
+        "detailsLabel": "Подробнее о {{title}}",
+        "noImage": "Изображение отсутствует",
+        "bookmark": "Добавить в избранное",
+        "addToCart": "Добавить в корзину",
+        "currency": "сум"
     }
 }

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -14,38 +13,37 @@ import {
     BookMarked,
     BookOpen,
     Clock,
-    FileQuestion,
     Headphones,
     Heart,
     Home,
     Mail,
     Phone,
-    Search,
     ShoppingBag,
-    Sparkles,
-    TrendingUp
+    Sparkles
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Random book facts array
 const bookFacts = [
-    { fact: 'Dunyodagi eng qimmat kitob 30 million dollarga sotilgan', emoji: '💰' },
-    { fact: 'Eng katta kutubxonada 170 million dan ortiq kitob bor', emoji: '📚' },
-    { fact: "O'rtacha kitob 300-400 sahifadan iborat", emoji: '📖' },
-    { fact: 'Dunyoda har kuni 4000 dan ortiq kitob nashr etiladi', emoji: '🌍' },
-    { fact: 'Eng qadimgi kitob 2500 yil oldin yozilgan', emoji: '🕰️' },
-    { fact: "O'zbekistonda yiliga 2000 dan ortiq kitob nashr qilinadi", emoji: '🇺🇿' },
-    { fact: "Audio kitoblar tinglash kitob o'qishdan 2 barobar tez", emoji: '🎧' },
-    { fact: "Dunyo aholisining 15% kitob o'qishni yoqtirmaydi", emoji: '😴' },
-    { fact: "Eng ko'p o'qilgan kitob - Bibliya", emoji: '📖' },
-    { fact: 'Harry Potter kitoblari 500 million nusxada sotilgan', emoji: '⚡' },
-    { fact: "O'zbekistonda eng ko'p o'qilgan muallif - Alisher Navoiy", emoji: '🖋️' },
-    { fact: "Kitob o'qish stressni 68% ga kamaytiradi", emoji: '😌' },
-    { fact: "Haftada 3 soat kitob o'qish umrni 2 yilga uzaytiradi", emoji: '⏳' },
-    { fact: "Elektron kitoblar 1971-yilda paydo bo'lgan", emoji: '💻' },
-    { fact: 'Eng kichik kitob tuz donasidek', emoji: '🔬' }
+    { key: 'expensiveBook', emoji: '💰' },
+    { key: 'largestLibrary', emoji: '📚' },
+    { key: 'averageBook', emoji: '📖' },
+    { key: 'dailyPublishing', emoji: '🌍' },
+    { key: 'oldestBook', emoji: '🕰️' },
+    { key: 'uzbekistanPublishing', emoji: '🇺🇿' },
+    { key: 'audiobooks', emoji: '🎧' },
+    { key: 'readingPreference', emoji: '😴' },
+    { key: 'mostReadBook', emoji: '📖' },
+    { key: 'harryPotter', emoji: '⚡' },
+    { key: 'alisherNavoi', emoji: '🖋️' },
+    { key: 'stressReduction', emoji: '😌' },
+    { key: 'longerLife', emoji: '⏳' },
+    { key: 'ebooks', emoji: '💻' },
+    { key: 'smallestBook', emoji: '🔬' }
 ];
 
 export default function NotFound() {
+    const { t } = useTranslation();
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState('');
     const [randomFact, setRandomFact] = useState(bookFacts[0]);
@@ -137,7 +135,7 @@ export default function NotFound() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className='mb-4 text-4xl font-black text-gray-900 md:text-5xl dark:text-white'>
                     <span className='bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-orange-400'>
-                        Sahifa topilmadi
+                        {t('notFoundPage.title')}
                     </span>
                 </motion.h1>
 
@@ -148,10 +146,10 @@ export default function NotFound() {
                     transition={{ duration: 0.5, delay: 0.3 }}
                     className='relative'>
                     <p className='mx-auto mb-4 max-w-2xl text-lg text-gray-600 md:text-xl dark:text-gray-400'>
-                        {" Kechirasiz, siz qidirgan sahifa mavjud emas yoki o'chirilgan bo'lishi mumkin. "}
+                        {t('notFoundPage.description')}
                     </p>
                     <p className='mx-auto max-w-xl text-base text-gray-500 dark:text-gray-500'>
-                        Bosh sahifaga qaytib, 50,000+ kitoblar olamini kashf etishni davom ettiring.
+                        {t('notFoundPage.suggestion')}
                     </p>
                 </motion.div>
 
@@ -163,7 +161,7 @@ export default function NotFound() {
                     className='mx-auto mt-8 mb-10 max-w-md'>
                     <AnimatePresence mode='wait'>
                         <motion.div
-                            key={randomFact.fact}
+                            key={randomFact.key}
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: -20, opacity: 0 }}
@@ -173,9 +171,11 @@ export default function NotFound() {
                                 <span className='text-4xl'>{randomFact.emoji}</span>
                                 <div className='flex-1 text-left'>
                                     <p className='mb-1 text-xs font-bold text-blue-600 dark:text-blue-400'>
-                                        BILASIZMI?
+                                        {t('notFoundPage.didYouKnow')}
                                     </p>
-                                    <p className='text-sm text-gray-700 dark:text-gray-300'>{randomFact.fact}</p>
+                                    <p className='text-sm text-gray-700 dark:text-gray-300'>
+                                        {t(`notFoundPage.facts.${randomFact.key}`)}
+                                    </p>
                                 </div>
                             </div>
                         </motion.div>
@@ -187,31 +187,45 @@ export default function NotFound() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.5, delay: 0.5 }}
-                    className='mx-auto mb-10 grid max-w-2xl grid-cols-2 gap-4 sm:grid-cols-4'>
+                    className='mx-auto mb-10 grid max-w-2xl grid-cols-2 gap-4 sm:grid-cols-3'>
                     {[
-                        { icon: <Home size={20} />, label: 'Bosh sahifa', href: '/', color: 'blue' },
-                        { icon: <BookOpen size={20} />, label: 'Kitoblar', href: '/catalog', color: 'orange' },
                         {
-                            icon: <Headphones size={20} />,
-                            label: 'Audio',
-                            href: '/catalog?format=audio',
-                            color: 'green'
+                            icon: <Home size={20} />,
+                            label: t('notFoundPage.links.home'),
+                            href: '/',
+                            color: 'blue'
                         },
                         {
+                            icon: <BookOpen size={20} />,
+                            label: t('notFoundPage.links.books'),
+                            href: '/catalog',
+                            color: 'orange'
+                        },
+
+                        {
                             icon: <Sparkles size={20} />,
-                            label: 'Yangiliklar',
+                            label: t('notFoundPage.links.news'),
                             href: '/catalog?sort=-createdAt',
                             color: 'purple'
                         },
                         {
-                            icon: <TrendingUp size={20} />,
-                            label: 'Mashhur',
-                            href: '/catalog?sort=-ratingAvg',
-                            color: 'red'
+                            icon: <Heart size={20} />,
+                            label: t('notFoundPage.links.favorites'),
+                            href: '/wishlist',
+                            color: 'pink'
                         },
-                        { icon: <Heart size={20} />, label: 'Sevimlilar', href: '/wishlist', color: 'pink' },
-                        { icon: <ShoppingBag size={20} />, label: 'Savat', href: '/cart', color: 'amber' },
-                        { icon: <BookMarked size={20} />, label: 'Kitoblarim', href: '/my-books', color: 'indigo' }
+                        {
+                            icon: <ShoppingBag size={20} />,
+                            label: t('notFoundPage.links.cart'),
+                            href: '/cart',
+                            color: 'amber'
+                        },
+                        {
+                            icon: <BookMarked size={20} />,
+                            label: t('notFoundPage.links.myBooks'),
+                            href: '/my-books',
+                            color: 'indigo'
+                        }
                     ].map((item, index) => {
                         const colorClasses = {
                             blue: 'hover:border-blue-500 hover:text-blue-500',
@@ -254,7 +268,7 @@ export default function NotFound() {
                             variant='outline'
                             className='flex items-center gap-2 border-2 border-gray-200 px-8 py-6 text-base transition-all hover:border-blue-500 hover:text-blue-500 dark:border-slate-700 dark:hover:border-blue-400 dark:hover:text-blue-400'>
                             <ArrowLeft size={18} />
-                            Ortga qaytish
+                            {t('notFoundPage.goBack')}
                         </Button>
                     </motion.div>
 
@@ -262,7 +276,7 @@ export default function NotFound() {
                         <Link href='/'>
                             <Button className='flex items-center gap-2 bg-gradient-to-r from-blue-600 to-orange-600 px-8 py-6 text-base text-white shadow-lg transition-all hover:from-blue-700 hover:to-orange-700 hover:shadow-xl'>
                                 <Home size={18} />
-                                {" Bosh sahifaga o'tish "}
+                                {t('notFoundPage.goHome')}
                             </Button>
                         </Link>
                     </motion.div>

@@ -10,9 +10,11 @@ import { useBookCount } from '@/hooks/bookHooks/useBookCount';
 import { ClientService } from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
 
-import { Award, Book, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
+import { Book, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const AboutSection = () => {
+    const { t, i18n } = useTranslation();
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
     const { data: apiBranches = [] } = useBranchUserQuery();
     const { data: book } = useBookCount();
@@ -30,16 +32,20 @@ export const AboutSection = () => {
 
     const branches = apiBranches
         .map((branch) => ({
-            name: branch.branchName ?? branch.name ?? 'Filial',
+            name: branch.branchName ?? branch.name ?? t('aboutSection.branchFallback'),
             coords: [Number(branch.latitude), Number(branch.longitude)] as [number, number]
         }))
         .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1]));
 
     const stats = [
-        { icon: <Book size={24} />, label: 'Kitoblar', value: `${booksCount.toLocaleString()}+` },
-        { icon: <BookOpen size={24} />, label: 'Nashryotlar soni', value: `${publishersCount}+` },
-        { icon: <Building2 size={24} />, label: 'Filyallar soni', value: `${branches.length}+` },
-        { icon: <Truck size={24} />, label: 'Yetkazib berish', value: '24/7' }
+        {
+            icon: <Book size={24} />,
+            label: t('aboutSection.stats.books'),
+            value: `${booksCount.toLocaleString(i18n.language)}+`
+        },
+        { icon: <BookOpen size={24} />, label: t('aboutSection.stats.publishers'), value: `${publishersCount}+` },
+        { icon: <Building2 size={24} />, label: t('aboutSection.stats.branches'), value: `${branches.length}+` },
+        { icon: <Truck size={24} />, label: t('aboutSection.stats.delivery'), value: '24/7' }
     ];
 
     return (
@@ -48,20 +54,23 @@ export const AboutSection = () => {
                 <div className='flex flex-col items-center gap-12 lg:flex-row lg:gap-16'>
                     <div className='space-y-6 lg:w-1/2'>
                         <div className='inline-flex items-center gap-2 rounded-full border border-[#ef7f1a] bg-[#ef7f1a]/15 px-4 py-2'>
-                            <Award size={16} className='text-[#ef7f1a] dark:text-orange-400' />
-                            <span className='text-xs font-bold text-[#ef7f1a] dark:text-white'>BIZ HAQIMIZDA</span>
+                            <span className='text-xs font-bold text-[#ef7f1a] dark:text-white'>
+                                {t('aboutSection.badge')}
+                            </span>
                         </div>
 
                         <h2 className='text-3xl leading-tight font-black md:text-4xl lg:text-5xl'>
-                            <span className='text-[#00a0e3] dark:text-blue-400'>Sizning intellektual</span>
+                            <span className='text-[#00a0e3] dark:text-blue-400'>{t('aboutSection.titleFirst')}</span>
                             <br />
-                            <span className='text-[#ef7f1a] dark:text-orange-400'>hamrohingiz</span>
+                            <span className='text-[#ef7f1a] dark:text-orange-400'>{t('aboutSection.titleSecond')}</span>
                         </h2>
 
                         <p className='max-w-xl text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
-                            Biz 2018-yildan buyon kitobxonlar uchun eng sara kitoblarni yetkazib kelmoqdamiz. Maqsadimiz
-                            - har bir xonadonga <span className='font-bold text-[#00a0e3] dark:text-blue-400'>ilm nuri</span> kirib
-                            borishini ta'minlash va mutolaa madaniyatini yuksaltirishdir.
+                            {t('aboutSection.descriptionBefore')}{' '}
+                            <span className='font-bold text-[#00a0e3] dark:text-blue-400'>
+                                {t('aboutSection.highlight')}
+                            </span>{' '}
+                            {t('aboutSection.descriptionAfter')}
                         </p>
 
                         <div className='grid grid-cols-2 gap-6 pt-6'>
@@ -85,7 +94,7 @@ export const AboutSection = () => {
                         <button className='group relative mt-4 transform overflow-hidden rounded-full bg-[#ef7f1a] px-8 py-4 font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl'>
                             <Link href={'/about'} className='relative z-10 flex items-center gap-2'>
                                 <BookOpen size={18} />
-                                Batafsil ma'lumot
+                                {t('aboutSection.moreDetails')}
                             </Link>
                         </button>
                     </div>
@@ -94,11 +103,8 @@ export const AboutSection = () => {
                         <div className='relative overflow-hidden rounded-[2rem] border border-[#00a0e3]/20 bg-white/80 p-5 shadow-xl backdrop-blur-sm dark:border-[#00a0e3]/30 dark:bg-slate-800/70'>
                             <div className='mb-4 flex items-center justify-between'>
                                 <h3 className='text-xl font-black text-gray-900 dark:text-white'>
-                                    {branches.length} ta filial xaritada
+                                    {t('aboutSection.branchesOnMap', { count: branches.length })}
                                 </h3>
-                                <span className='rounded-full bg-[#ef7f1a]/10 px-3 py-1 text-xs font-bold text-[#ef7f1a] dark:bg-orange-500/20 dark:text-orange-300'>
-                                    O'zbekiston
-                                </span>
                             </div>
 
                             <div className='h-90 w-full overflow-hidden rounded-2xl'>
@@ -106,7 +112,7 @@ export const AboutSection = () => {
                                     <BranchMap focusRequest={focusRequest} branches={branches} />
                                 ) : (
                                     <div className='grid h-full place-items-center bg-gray-100 text-center text-sm font-bold text-gray-500 dark:bg-slate-900 dark:text-slate-400'>
-                                        Hozircha filiallar mavjud emas
+                                        {t('aboutSection.noBranches')}
                                     </div>
                                 )}
                             </div>

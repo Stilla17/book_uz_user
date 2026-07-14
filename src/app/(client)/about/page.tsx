@@ -28,40 +28,64 @@ import {
     Twitter,
     Youtube
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AboutPage() {
+    const { t, i18n } = useTranslation();
+    const language = i18n.resolvedLanguage ?? i18n.language;
     const tabs: Array<{ id: 'values' | 'history'; label: string; icon: React.ReactNode }> = [
-        { id: 'history', label: 'Tarix', icon: <Clock size={18} /> },
-        { id: 'values', label: 'Qadriyatlar', icon: <Heart size={18} /> }
+        { id: 'history', label: t('aboutPage.tabs.history'), icon: <Clock size={18} /> },
+        { id: 'values', label: t('aboutPage.tabs.values'), icon: <Heart size={18} /> }
     ];
     const [activeTab, setActiveTab] = useState<'history' | 'values'>('history');
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
     const { data: apiBranches = [] } = useBranchUserQuery();
     const branches = apiBranches
         .map((branch) => ({
-            name: branch.branchName ?? branch.name ?? 'Filial',
+            name: branch.branchName ?? branch.name ?? t('aboutPage.branchFallback'),
             coords: [Number(branch.latitude), Number(branch.longitude)] as [number, number]
         }))
         .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1]));
     const { data: book } = useBookCount();
     const booksCount = book?.pagination?.total ?? 0;
-    const aboutStatistics = statistics.map((item) => {
-        if (item.label === 'Kitoblar') {
+    const statisticKeys = ['books', 'users', 'rating', 'branches'] as const;
+    const aboutStatistics = statistics.map((item, index) => {
+        if (index === 0) {
             return {
                 ...item,
-                value: `${booksCount}+`
+                value: `${booksCount.toLocaleString(language)}+`,
+                label: t(`aboutPage.statistics.${statisticKeys[index]}`)
             };
         }
 
-        if (item.label === 'Filiallar') {
+        if (index === 3) {
             return {
                 ...item,
-                value: `${branches.length}+`
+                value: `${branches.length}+`,
+                label: t(`aboutPage.statistics.${statisticKeys[index]}`)
             };
         }
 
-        return item;
+        return { ...item, label: t(`aboutPage.statistics.${statisticKeys[index]}`) };
     });
+    const localizedValues = values.map((value) => ({
+        ...value,
+        title: language.startsWith('ru') ? value.titleRu : language.startsWith('en') ? value.titleEn : value.title,
+        description: language.startsWith('ru')
+            ? value.descriptionRu
+            : language.startsWith('en')
+              ? value.descriptionEn
+              : value.description
+    }));
+    const localizedTimelineEvents = timelineEvents.map((event) => ({
+        ...event,
+        title: language.startsWith('ru') ? event.titleRu : language.startsWith('en') ? event.titleEn : event.title,
+        description: language.startsWith('ru')
+            ? event.descriptionRu
+            : language.startsWith('en')
+              ? event.descriptionEn
+              : event.description
+    }));
 
     return (
         <div className='relative min-h-screen overflow-hidden py-12 dark:bg-slate-900'>
@@ -80,7 +104,7 @@ export default function AboutPage() {
                             <Sparkles size={15} />
                         </span>
                         <span className='text-sm font-black tracking-wide text-[#005CB9] dark:text-orange-200'>
-                            BIZ HAQIMIZDA
+                            {t('aboutPage.badge')}
                         </span>
                     </motion.div>
 
@@ -89,14 +113,15 @@ export default function AboutPage() {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
                         className='mb-6 text-3xl font-black sm:text-5xl md:text-7xl'>
-                        <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>Kitobxonlar uchun</span>
+                        <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>
+                            {t('aboutPage.hero.titleFirst')}
+                        </span>
                         <br />
-                        <span className='text-gray-900 dark:text-white'>eng yaxshi platforma</span>
+                        <span className='text-gray-900 dark:text-white'>{t('aboutPage.hero.titleSecond')}</span>
                     </motion.h1>
 
                     <p className='mx-auto max-w-3xl text-base leading-7 text-gray-500 sm:text-xl dark:text-gray-400'>
-                        BOOK.UZ - O'zbekistonning eng katta raqamli kutubxonasi. Biz {booksCount} + kitoblar bilan sizga
-                        eng yaxshi o'qish tajribasini taqdim etamiz.
+                        {t('aboutPage.hero.description', { count: booksCount.toLocaleString(language) })}
                     </p>
 
                     {/* CTA Buttons with new colors */}
@@ -108,7 +133,7 @@ export default function AboutPage() {
                         <Link href='/catalog'>
                             <Button className='group rounded-xl border border-[#ef7f1a]/20 bg-[#ef7f1a] px-8 py-6 text-lg font-black text-white shadow-[0_18px_44px_-26px_rgba(239,127,26,0.95)] transition-all hover:-translate-y-0.5 dark:border-orange-300/20 dark:bg-[#ef7f1a]'>
                                 <BookOpen size={20} className='mr-2' />
-                                {"Kitoblarni ko'rish"}
+                                {t('aboutPage.hero.cta')}
                             </Button>
                         </Link>
                     </motion.div>
@@ -148,12 +173,14 @@ export default function AboutPage() {
                             transition={{ duration: 0.3 }}
                             className='mb-20'>
                             <h2 className='mb-12 text-center text-3xl font-bold text-gray-900 dark:text-white'>
-                                Bizning{' '}
-                                <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>qadriyatlarimiz</span>
+                                {t('aboutPage.valuesTitleBefore')}{' '}
+                                <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>
+                                    {t('aboutPage.valuesTitleHighlight')}
+                                </span>
                             </h2>
 
                             <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-                                {values.map((value, index) => (
+                                {localizedValues.map((value, index) => (
                                     <motion.div
                                         key={index}
                                         initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
@@ -186,14 +213,17 @@ export default function AboutPage() {
                             transition={{ duration: 0.3 }}
                             className='mb-20'>
                             <h2 className='mb-12 text-center text-3xl font-bold text-gray-900 dark:text-white'>
-                                Bizning <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>tariximiz</span>
+                                {t('aboutPage.historyTitleBefore')}{' '}
+                                <span className='bg-[#ef7f1a] bg-clip-text text-transparent'>
+                                    {t('aboutPage.historyTitleHighlight')}
+                                </span>
                             </h2>
 
                             <div className='relative'>
                                 {/* Timeline Line */}
                                 <div className='absolute left-1/2 hidden h-full w-1 -translate-x-1/2 transform bg-[#999999] md:block' />
 
-                                {timelineEvents.map((event, index) => (
+                                {localizedTimelineEvents.map((event, index) => (
                                     <motion.div
                                         key={index}
                                         initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
@@ -246,21 +276,21 @@ export default function AboutPage() {
                     className='mb-20 grid grid-cols-1 gap-6 md:grid-cols-2'>
                     <div className='rounded-2xl border p-8'>
                         <Target size={40} className='mb-4 text-[#00a0e3]' />
-                        <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>Bizning vazifamiz</h3>
+                        <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>
+                            {t('aboutPage.mission.title')}
+                        </h3>
                         <p className='text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
-                            O'zbekistonda kitobxonlik madaniyatini rivojlantirish va har bir insonga sifatli kitoblarni
-                            qulay narxlarda taqdim etish. Biz orqali millionlab odamlar bilim olish va zavqlanish
-                            imkoniyatiga ega bo'ladi.
+                            {t('aboutPage.mission.description')}
                         </p>
                     </div>
 
                     <div className='rounded-2xl border p-8'>
                         <Eye size={40} className='mb-4 text-[#ef7f1a]' />
-                        <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>Bizning maqsadimiz</h3>
+                        <h3 className='mb-4 text-2xl font-bold text-gray-900 dark:text-white'>
+                            {t('aboutPage.vision.title')}
+                        </h3>
                         <p className='text-lg leading-relaxed text-gray-600 dark:text-gray-400'>
-                            Markaziy Osiyodagi eng yirik raqamli kutubxonaga aylanish va 5 yil ichida 10 milliondan
-                            ortiq foydalanuvchiga xizmat ko'rsatish. Innovatsion texnologiyalar orqali kitob o'qishni
-                            yanada qulay va maroqli qilish.
+                            {t('aboutPage.vision.description')}
                         </p>
                     </div>
                 </motion.div>
@@ -277,11 +307,13 @@ export default function AboutPage() {
                                 <MapPin size={24} />
                             </div>
                             <div>
-                                <h3 className='mb-2 font-bold text-gray-900 dark:text-white'>Manzil</h3>
+                                <h3 className='mb-2 font-bold text-gray-900 dark:text-white'>
+                                    {t('aboutPage.contact.addressTitle')}
+                                </h3>
                                 <p className='text-gray-500 dark:text-gray-400'>
-                                    Toshkent sh., Chilonzor tumani
+                                    {t('aboutPage.contact.addressLineOne')}
                                     <br />
-                                    19-kvartal, 45-uy
+                                    {t('aboutPage.contact.addressLineTwo')}
                                 </p>
                             </div>
                         </div>
@@ -291,7 +323,9 @@ export default function AboutPage() {
                                 <Phone size={24} />
                             </div>
                             <div>
-                                <h3 className='mb-2 font-bold text-gray-900 dark:text-white'>Telefon</h3>
+                                <h3 className='mb-2 font-bold text-gray-900 dark:text-white'>
+                                    {t('aboutPage.contact.phone')}
+                                </h3>
                                 <a
                                     href='tel:+998712300050'
                                     className='text-gray-500 transition-colors hover:text-[#00a0e3] dark:text-gray-400'>
@@ -305,7 +339,9 @@ export default function AboutPage() {
                                 <Mail size={24} />
                             </div>
                             <div>
-                                <h3 className='mb-2 font-bold text-gray-900 dark:text-white'>Email</h3>
+                                <h3 className='mb-2 font-bold text-gray-900 dark:text-white'>
+                                    {t('aboutPage.contact.email')}
+                                </h3>
                                 <a
                                     href='mailto:info@book.uz'
                                     className='text-gray-500 transition-colors hover:text-[#00a0e3] dark:text-gray-400'>
@@ -345,10 +381,10 @@ export default function AboutPage() {
                         <div className='relative overflow-hidden rounded-[2rem] border border-[#00a0e3]/20 bg-white/80 p-5 shadow-xl backdrop-blur-sm dark:border-[#00a0e3]/30 dark:bg-slate-800/70'>
                             <div className='mb-4 flex items-center justify-between'>
                                 <h3 className='text-xl font-black text-gray-900 dark:text-white'>
-                                    {branches.length} ta filial xaritada
+                                    {t('aboutPage.map.branches', { count: branches.length })}
                                 </h3>
                                 <span className='rounded-full bg-[#ef7f1a]/10 px-3 py-1 text-xs font-bold text-[#ef7f1a] dark:bg-orange-500/20 dark:text-orange-300'>
-                                    O'zbekiston
+                                    {t('aboutPage.map.country')}
                                 </span>
                             </div>
 
@@ -357,7 +393,7 @@ export default function AboutPage() {
                                     <BranchMap focusRequest={focusRequest} branches={branches} />
                                 ) : (
                                     <div className='grid h-full place-items-center bg-gray-100 text-center text-sm font-bold text-gray-500 dark:bg-slate-900 dark:text-slate-400'>
-                                        Hozircha filiallar mavjud emas
+                                        {t('aboutPage.map.empty')}
                                     </div>
                                 )}
                             </div>

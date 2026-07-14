@@ -1,5 +1,6 @@
 import type { CartItem } from '@/store/features/cartSlice';
 import type { OrderPayload } from '@/types';
+import { getLocalizedText } from '@/utils/book-formatters';
 
 export interface LocationName {
     uz?: string;
@@ -30,8 +31,7 @@ export const POST_OFFICE_DELIVERY_COST = 40000;
 export const POST_TO_HOME_EXTRA_COST = 20000;
 export const POST_TO_HOME_DELIVERY_COST = POST_OFFICE_DELIVERY_COST + POST_TO_HOME_EXTRA_COST;
 
-export const getLocationName = (item?: { name?: LocationName }) =>
-    item?.name?.uz || item?.name?.ru || item?.name?.en || "Noma'lum";
+export const getLocationName = (item?: { name?: LocationName }) => getLocalizedText(item?.name, "Noma'lum");
 
 export const isValidUzPhone = (value: string) => /^\+998\s\d{2}\s\d{3}\s\d{2}\s\d{2}$/.test(value);
 
@@ -133,14 +133,14 @@ export const validateCheckout = ({
     selectedPayment,
     paymentTitles
 }: ValidateCheckoutParams) => {
-    if (!cartItems.length) return "Savat bo'sh";
-    if (!checkout.clientName.trim()) return 'Ism familiyani kiriting';
-    if (!isValidUzPhone(phone)) return "Telefon raqamni to'g'ri kiriting";
-    if (!selectedRegionItem || !selectedDistrictItem) return 'Viloyat va tumanni tanlang';
-    if (!checkout.address.trim()) return "Ko'cha, uy va xonadonni kiriting";
-    if (!paymentTitles.includes(selectedPayment)) return "To'lov usulini tanlang";
+    if (!cartItems.length) return 'emptyCart';
+    if (!checkout.clientName.trim()) return 'nameRequired';
+    if (!isValidUzPhone(phone)) return 'invalidPhone';
+    if (!selectedRegionItem || !selectedDistrictItem) return 'locationRequired';
+    if (!checkout.address.trim()) return 'addressRequired';
+    if (!paymentTitles.includes(selectedPayment)) return 'paymentRequired';
     if (getOrderItems(cartItems).some((item) => !item.product)) {
-        return "Savatdagi mahsulot ID si topilmadi. Savatni yangilab qayta urinib ko'ring";
+        return 'productIdMissing';
     }
 
     return '';

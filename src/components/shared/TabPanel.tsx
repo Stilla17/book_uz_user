@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import FormComment from './FormComment';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 type BookComment = {
     _id?: string;
@@ -82,12 +83,11 @@ const getCommentList = (data: unknown): BookComment[] => {
     return [];
 };
 
-const getCommentAuthor = (comment: BookComment) => {
+const getCommentAuthor = (comment: BookComment, fallback: string) => {
     if (comment.name) return comment.name;
-    if (comment.user && typeof comment.user === 'object')
-        return comment.user.name || comment.user.email || 'Foydalanuvchi';
+    if (comment.user && typeof comment.user === 'object') return comment.user.name || comment.user.email || fallback;
 
-    return 'Foydalanuvchi';
+    return fallback;
 };
 
 const getCommentText = (comment: BookComment) =>
@@ -95,9 +95,9 @@ const getCommentText = (comment: BookComment) =>
 
 const getCommentInitial = (name: string) => name.trim().charAt(0).toUpperCase() || 'F';
 
-const formatCommentDate = (date?: string) => {
+const formatCommentDate = (date: string | undefined, fallback: string) => {
     const parsedDate = dayjs(date);
-    return parsedDate.isValid() ? parsedDate.format('DD MMM YYYY HH:mm') : 'Yangi izoh';
+    return parsedDate.isValid() ? parsedDate.format('DD.MM.YYYY HH:mm') : fallback;
 };
 
 const TabPanel = ({
@@ -111,6 +111,7 @@ const TabPanel = ({
     year,
     reviewsCount
 }: TabPanelProps) => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = React.useState('description');
     const { data: commentsData, isLoading: commentsLoading } = useQuery({
         queryKey: ['comments', bookId],
@@ -134,27 +135,26 @@ const TabPanel = ({
                     <TabsTrigger
                         value='description'
                         className='rounded-2xl px-5 py-3 text-sm font-semibold text-slate-600 data-[state=active]:bg-[#ef7f1a] data-[state=active]:text-white dark:text-slate-300 dark:data-[state=active]:bg-white dark:data-[state=active]:text-slate-900'>
-                        Tavsif
+                        {t('bookDetail.tabs.description')}
                     </TabsTrigger>
                     <TabsTrigger
                         value='details'
                         className='rounded-2xl px-5 py-3 text-sm font-semibold text-slate-600 data-[state=active]:bg-[#ef7f1a] data-[state=active]:text-white dark:text-slate-300 dark:data-[state=active]:bg-white dark:data-[state=active]:text-slate-900'>
-                        Tafsilotlar
+                        {t('bookDetail.tabs.details')}
                     </TabsTrigger>
                     <TabsTrigger
                         value='reviews'
                         className='rounded-2xl px-5 py-3 text-sm font-semibold text-slate-600 data-[state=active]:bg-[#ef7f1a] data-[state=active]:text-white dark:text-slate-300 dark:data-[state=active]:bg-white dark:data-[state=active]:text-slate-900'>
-                        Izohlar
+                        {t('bookDetail.tabs.reviews')}
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent
                     value='description'
                     className='mt-4 rounded-[24px] bg-white p-6 shadow-sm dark:bg-slate-900/80'>
-                    <h2 className='text-2xl font-black text-slate-900 dark:text-white'>Kitob haqida</h2>
+                    <h2 className='text-2xl font-black text-slate-900 dark:text-white'>{t('bookDetail.aboutBook')}</h2>
                     <p className='mt-5 leading-8 text-slate-600 dark:text-slate-300'>
-                        {description ||
-                            "Hozircha bu kitob uchun tavsif kiritilmagan. Keyinroq bu yerda asar mazmuni, uslubi va kimlar uchun tavsiya etilishi haqida ma'lumot chiqadi."}
+                        {description || t('bookDetail.noDescription')}
                     </p>
                 </TabsContent>
 
@@ -163,48 +163,50 @@ const TabPanel = ({
                     className='mt-4 rounded-[24px] bg-white p-6 shadow-sm dark:bg-slate-900/80'>
                     <div className='flex items-center justify-between gap-4'>
                         <div>
-                            <h2 className='text-2xl font-black text-slate-900 dark:text-white'>Kitob tafsilotlari</h2>
+                            <h2 className='text-2xl font-black text-slate-900 dark:text-white'>
+                                {t('bookDetail.bookDetails')}
+                            </h2>
                             <p className='mt-2 text-sm text-slate-500 dark:text-slate-400'>
-                                Asosiy texnik va nashr ma'lumotlari
+                                {t('bookDetail.detailsSubtitle')}
                             </p>
                         </div>
                     </div>
 
                     <div className='mt-6 grid gap-3 md:grid-cols-2'>
                         <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60'>
-                            <p className='text-sm text-slate-500 dark:text-slate-400'>Muallif</p>
+                            <p className='text-sm text-slate-500 dark:text-slate-400'>{t('bookDetail.author')}</p>
                             <p className='mt-2 text-base font-bold text-slate-900 dark:text-white'>
-                                {author || 'Kiritilmagan'}
+                                {author || t('bookDetail.notProvided')}
                             </p>
                         </div>
                         <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60'>
-                            <p className='text-sm text-slate-500 dark:text-slate-400'>Kategoriya</p>
+                            <p className='text-sm text-slate-500 dark:text-slate-400'>{t('bookDetail.category')}</p>
                             <p className='mt-2 text-base font-bold text-slate-900 dark:text-white'>
-                                {category || 'Kiritilmagan'}
+                                {category || t('bookDetail.notProvided')}
                             </p>
                         </div>
                         <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60'>
-                            <p className='text-sm text-slate-500 dark:text-slate-400'>Sahifalar</p>
+                            <p className='text-sm text-slate-500 dark:text-slate-400'>{t('bookDetail.pages')}</p>
                             <p className='mt-2 text-base font-bold text-slate-900 dark:text-white'>
-                                {pages || 'Kiritilmagan'}
+                                {pages || t('bookDetail.notProvided')}
                             </p>
                         </div>
                         <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60'>
-                            <p className='text-sm text-slate-500 dark:text-slate-400'>Til</p>
+                            <p className='text-sm text-slate-500 dark:text-slate-400'>{t('bookDetail.language')}</p>
                             <p className='mt-2 text-base font-bold text-slate-900 dark:text-white'>
-                                {language?.toUpperCase() || 'Kiritilmagan'}
+                                {language?.toUpperCase() || t('bookDetail.notProvided')}
                             </p>
                         </div>
                         <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60'>
-                            <p className='text-sm text-slate-500 dark:text-slate-400'>Nashriyot</p>
+                            <p className='text-sm text-slate-500 dark:text-slate-400'>{t('bookDetail.publisher')}</p>
                             <p className='mt-2 text-base font-bold text-slate-900 dark:text-white'>
-                                {publisherName || 'Kiritilmagan'}
+                                {publisherName || t('bookDetail.notProvided')}
                             </p>
                         </div>
                         <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60'>
-                            <p className='text-sm text-slate-500 dark:text-slate-400'>Yili</p>
+                            <p className='text-sm text-slate-500 dark:text-slate-400'>{t('bookDetail.year')}</p>
                             <p className='mt-2 text-base font-bold text-slate-900 dark:text-white'>
-                                {year || 'Kiritilmagan'}
+                                {year || t('bookDetail.notProvided')}
                             </p>
                         </div>
                     </div>
@@ -215,12 +217,16 @@ const TabPanel = ({
                     className='mt-4 rounded-[24px] bg-white p-6 shadow-sm dark:bg-slate-900/80'>
                     <div className='flex justify-between gap-6'>
                         <div className='max-w-md'>
-                            <h2 className='text-2xl font-black text-slate-900 dark:text-white'>Izohlar</h2>
+                            <h2 className='text-2xl font-black text-slate-900 dark:text-white'>
+                                {t('bookDetail.tabs.reviews')}
+                            </h2>
                         </div>
 
                         <div className='rounded-2xl bg-slate-50 p-4 text-center dark:bg-slate-950/60'>
                             <p className='text-2xl font-black text-slate-900 dark:text-white'>{totalComments}</p>
-                            <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>Jami izoh</p>
+                            <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>
+                                {t('bookDetail.totalReviews')}
+                            </p>
                         </div>
                     </div>
 
@@ -248,7 +254,7 @@ const TabPanel = ({
                         ) : comments.length ? (
                             <div className='space-y-3'>
                                 {comments.map((comment, index) => {
-                                    const authorName = getCommentAuthor(comment);
+                                    const authorName = getCommentAuthor(comment, t('bookDetail.userFallback'));
                                     const commentText = getCommentText(comment);
 
                                     return (
@@ -265,7 +271,10 @@ const TabPanel = ({
                                                             {authorName}
                                                         </p>
                                                         <p className='text-sm text-slate-500 dark:text-slate-400'>
-                                                            {formatCommentDate(comment.createdAt || comment.updatedAt)}
+                                                            {formatCommentDate(
+                                                                comment.createdAt || comment.updatedAt,
+                                                                t('bookDetail.newReview')
+                                                            )}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -283,10 +292,10 @@ const TabPanel = ({
                                     0
                                 </div>
                                 <h3 className='mt-4 text-lg font-black text-slate-900 dark:text-white'>
-                                    Hozircha izohlar yo'q
+                                    {t('bookDetail.noReviewsTitle')}
                                 </h3>
                                 <p className='mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400'>
-                                    Bu kitob haqida birinchi fikrni siz qoldirishingiz mumkin.
+                                    {t('bookDetail.noReviewsDescription')}
                                 </p>
                             </div>
                         )}

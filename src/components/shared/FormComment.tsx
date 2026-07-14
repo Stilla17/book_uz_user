@@ -10,12 +10,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { MessageSquareText, Send } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     bookId: string;
 };
 
 const FormComment = ({ bookId }: Props) => {
+    const { t } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
     const queryClient = useQueryClient();
@@ -27,13 +29,13 @@ const FormComment = ({ bookId }: Props) => {
         mutationFn: UserService.createComment,
         onSuccess: () => {
             setComment('');
-            toast.success('Izohingiz qabul qilindi');
+            toast.success(t('bookDetail.reviewForm.success'));
             queryClient.invalidateQueries({
                 queryKey: ['comments', bookId]
             });
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Izoh yuborishda xatolik yuz berdi');
+            toast.error(error.response?.data?.message || t('bookDetail.reviewForm.error'));
         }
     });
 
@@ -47,7 +49,7 @@ const FormComment = ({ bookId }: Props) => {
         if (authLoading) return;
 
         if (!isAuthenticated) {
-            toast.error('Izoh qoldirish uchun avval tizimga kiring');
+            toast.error(t('bookDetail.reviewForm.loginRequired'));
             goToLogin();
             return;
         }
@@ -55,13 +57,13 @@ const FormComment = ({ bookId }: Props) => {
         const trimmedComment = comment.trim();
 
         if (!trimmedComment) {
-            toast.error('Izoh matnini kiriting');
+            toast.error(t('bookDetail.reviewForm.commentRequired'));
             return;
         }
 
         mutate({
             bookId,
-            name: user?.name || user?.email || 'Foydalanuvchi',
+            name: user?.name || user?.email || t('bookDetail.userFallback'),
             text: trimmedComment
         });
     };
@@ -79,10 +81,10 @@ const FormComment = ({ bookId }: Props) => {
                     </span>
                     <div>
                         <label htmlFor='review' className='text-base font-black text-slate-900 dark:text-white'>
-                            Fikringizni yozing
+                            {t('bookDetail.reviewForm.title')}
                         </label>
                         <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>
-                            Kitob haqida qisqa taassurotingizni qoldiring.
+                            {t('bookDetail.reviewForm.subtitle')}
                         </p>
                     </div>
                 </div>
@@ -98,15 +100,15 @@ const FormComment = ({ bookId }: Props) => {
                     rows={5}
                     placeholder={
                         isAuthenticated
-                            ? 'Masalan: kitob juda qiziqarli, tavsiya qilaman...'
-                            : 'Izoh qoldirish uchun avval tizimga kiring...'
+                            ? t('bookDetail.reviewForm.placeholder')
+                            : t('bookDetail.reviewForm.loginPlaceholder')
                     }
                     className='min-h-32 w-full resize-none bg-transparent p-4 text-sm leading-7 text-slate-700 placeholder:text-slate-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 dark:text-slate-200 dark:placeholder:text-slate-500'></textarea>
                 <div className='flex flex-col gap-3 border-t border-orange-100 bg-orange-50/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 dark:bg-slate-950/70'>
                     <p className='text-xs font-medium text-slate-500 dark:text-slate-400'>
                         {isAuthenticated
-                            ? 'Izohlaringiz boshqa xaridorlarga tanlov qilishda yordam beradi.'
-                            : 'Izoh yozish va yuborish uchun akkauntingizga kiring.'}
+                            ? t('bookDetail.reviewForm.helperAuthenticated')
+                            : t('bookDetail.reviewForm.helperGuest')}
                     </p>
                     {isAuthenticated ? (
                         <button
@@ -114,7 +116,7 @@ const FormComment = ({ bookId }: Props) => {
                             type='submit'
                             className='inline-flex items-center justify-center gap-2 rounded-2xl bg-[#ef7f1a] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f14] focus:ring-4 focus:ring-[#ef7f1a]/25 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:shadow-none'>
                             <Send className='size-4' />
-                            {isPending ? 'Yuborilmoqda...' : 'Izoh qoldirish'}
+                            {isPending ? t('bookDetail.reviewForm.sending') : t('bookDetail.reviewForm.submit')}
                         </button>
                     ) : (
                         <button
@@ -122,7 +124,7 @@ const FormComment = ({ bookId }: Props) => {
                             onClick={goToLogin}
                             disabled={authLoading}
                             className='inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-slate-200 transition hover:bg-[#ef7f1a] focus:ring-4 focus:ring-[#ef7f1a]/25 focus:outline-none disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-slate-900 dark:shadow-none dark:hover:bg-orange-100'>
-                            Tizimga kirish
+                            {t('bookDetail.reviewForm.login')}
                         </button>
                     )}
                 </div>

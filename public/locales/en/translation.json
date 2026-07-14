@@ -60,6 +60,90 @@
         "topSalesEmpty": "Top sales have not been synchronized yet.",
         "basket": "Basket"
     },
+    "bookCard": {
+        "alreadyInCart": "This book is already in your cart",
+        "addedToCart": "Added to cart",
+        "detailsLabel": "More details about {{title}}",
+        "noImage": "No image available",
+        "bookmark": "Add to wishlist",
+        "addToCart": "Add to cart",
+        "currency": "UZS"
+    },
+    "servicesSection": {
+        "title": "Services",
+        "subtitle": "Making things convenient for you — fast, secure, and beneficial",
+        "items": {
+            "s1": { "title": "Delivery", "description": "Fast and reliable delivery throughout Tashkent." },
+            "s4": { "title": "Guarantee and trust", "description": "Order security, return policies, and a reliable control system." },
+            "s5": { "title": "Easy payments", "description": "Click, Payme, and Xazna cards are all available." }
+        }
+    },
+    "aboutSection": {
+        "badge": "ABOUT US",
+        "titleFirst": "Your intellectual",
+        "titleSecond": "companion",
+        "descriptionBefore": "Since 2018, we have been delivering the finest books to readers. Our goal is to bring the",
+        "highlight": "light of knowledge",
+        "descriptionAfter": "into every home and foster a culture of reading.",
+        "moreDetails": "Learn more",
+        "branchesOnMap": "{{count}} branches on the map",
+        "noBranches": "No branches are available yet",
+        "branchFallback": "Branch",
+        "stats": {
+            "books": "Books",
+            "publishers": "Publishers",
+            "branches": "Branches",
+            "delivery": "Delivery"
+        }
+    },
+    "newsSection": {
+        "platform": "Platform",
+        "news": "news",
+        "viewAll": "View all",
+        "details": "Read more",
+        "fallbackTitle": "News"
+    },
+    "supportSection": {
+        "titleFirst": "How can we",
+        "titleSecond": "help you?",
+        "tabs": {
+            "contact": "Contact"
+        },
+        "stats": {
+            "customers": "Customers",
+            "responseTime": "Quick response",
+            "service": "Service",
+            "satisfaction": "Satisfied"
+        },
+        "faq": {
+            "loadError": "An error occurred while loading FAQ data.",
+            "empty": "There are no FAQ questions yet."
+        },
+        "contact": {
+            "phone": {
+                "title": "Phone",
+                "subtitle": "Free call"
+            },
+            "email": {
+                "title": "Email",
+                "subtitle": "24/7"
+            },
+            "telegram": {
+                "title": "Telegram",
+                "subtitle": "Online"
+            },
+            "workingHours": {
+                "title": "Working hours",
+                "subtitle": "Monday-Sunday"
+            }
+        }
+    },
+    "authorsPage": {
+        "totalAuthors": "{{count}} authors",
+        "pageCount": "Page {{current}} of {{total}}",
+        "empty": "No authors found",
+        "viewBooks": "View books"
+    },
     "authorsSection": {
         "title": "Authors",
         "booksCount": "{{count}} books"
@@ -79,11 +163,394 @@
             "terms": "Terms of use"
         }
     },
+    "notFoundPage": {
+        "title": "Page not found",
+        "description": "Sorry, the page you are looking for does not exist or may have been removed.",
+        "suggestion": "Return home and continue exploring a world of more than 50,000 books.",
+        "didYouKnow": "DID YOU KNOW?",
+        "links": {
+            "home": "Home",
+            "books": "Books",
+            "news": "News",
+            "favorites": "Favorites",
+            "cart": "Cart",
+            "myBooks": "My books"
+        },
+        "goBack": "Go back",
+        "goHome": "Go to homepage",
+        "facts": {
+            "expensiveBook": "The world's most expensive book was sold for 30 million dollars.",
+            "largestLibrary": "The largest library holds more than 170 million books.",
+            "averageBook": "The average book contains 300–400 pages.",
+            "dailyPublishing": "More than 4,000 books are published worldwide every day.",
+            "oldestBook": "The oldest book was written 2,500 years ago.",
+            "uzbekistanPublishing": "More than 2,000 books are published in Uzbekistan each year.",
+            "audiobooks": "Listening to an audiobook can be twice as fast as reading it.",
+            "readingPreference": "Around 15 percent of the world's population does not enjoy reading books.",
+            "mostReadBook": "The most widely read book in the world is the Bible.",
+            "harryPotter": "Harry Potter books have sold 500 million copies.",
+            "alisherNavoi": "Alisher Navoi is one of the most widely read authors in Uzbekistan.",
+            "stressReduction": "Reading books can reduce stress by 68 percent.",
+            "longerLife": "Reading for three hours a week may add two years to your life.",
+            "ebooks": "Electronic books first appeared in 1971.",
+            "smallestBook": "The world's smallest book is about the size of a grain of salt."
+        }
+    },
+    "profilePage": {
+        "userFallback": "User",
+        "profileImage": "Profile picture",
+        "tabs": {
+            "wishlist": "My books",
+            "orders": "Orders",
+            "settings": "Settings"
+        },
+        "logout": "Sign out",
+        "booksLoading": "Loading books...",
+        "noFavoriteBooks": "There are no favorite books yet",
+        "ordersLoading": "Loading orders...",
+        "orderProduct": "Order item",
+        "itemQuantity": "{{count}} items",
+        "orderNumber": "Order No. {{number}}",
+        "orderStatuses": {
+            "PENDING": "Pending",
+            "CONFIRMED": "Confirmed",
+            "PROCESSING": "Processing",
+            "PACKED": "Being prepared",
+            "SHIPPED": "Shipped",
+            "DELIVERING": "Out for delivery",
+            "DELIVERED": "Delivered",
+            "CANCELLED": "Cancelled"
+        },
+        "noOrders": "There are no orders yet",
+        "settingsTitle": "Profile settings",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "phone": "Phone number",
+        "saving": "Saving...",
+        "save": "Save",
+        "updateFailed": "Profile was not updated",
+        "updateSuccess": "Profile updated successfully",
+        "updateError": "An error occurred while updating the profile"
+    },
+    "userMenu": {
+        "openMenu": "Open profile menu",
+        "userFallback": "User",
+        "profile": "My profile",
+        "myBooks": "My books",
+        "orders": "My orders",
+        "settings": "Settings",
+        "logout": "Sign out"
+    },
+    "loginPage": {
+        "title": "Sign in",
+        "description": "Sign in with your full name and phone number",
+        "otpDescription": "Enter the code sent to {{phone}}",
+        "fullName": "Full name",
+        "fullNamePlaceholder": "Your full name",
+        "phone": "Phone number",
+        "sendCode": "Send code",
+        "otpLabel": "Verification code",
+        "otpDigitLabel": "Verification code digit {{number}}",
+        "signIn": "Sign in",
+        "changePhone": "Change phone number",
+        "resendCode": "Resend code",
+        "nameMinLength": "Your full name must contain at least 2 characters",
+        "invalidPhone": "Enter the complete phone number",
+        "codeSent": "A verification code was sent to your phone number",
+        "sendCodeError": "An error occurred while sending the code",
+        "enterOtpLength": "Enter the {{count}}-digit verification code",
+        "welcome": "Welcome!",
+        "invalidOtp": "The verification code is incorrect or has expired"
+    },
+    "myBooksPage": {
+        "title": "My books",
+        "goToCatalog": "Go to catalog",
+        "books": "Books",
+        "status": "Status",
+        "signedIn": "Signed in",
+        "guest": "Guest",
+        "serverBooks": "Saved books",
+        "localBooks": "Books on this device",
+        "emptyTitle": "No books yet",
+        "emptyAuthenticated": "Your saved books list is currently empty.",
+        "emptyGuest": "Books you add to favorites from the catalog will appear here."
+    },
+    "newsPage": {
+        "loading": "Loading news...",
+        "title": "All news",
+        "description": "Stay informed about the latest platform news, new books, and promotions.",
+        "searchPlaceholder": "Search news...",
+        "clearSearch": "Clear search",
+        "notFoundTitle": "News not found",
+        "noSearchResults": "No news found for \"{{query}}\"",
+        "empty": "There is no news yet",
+        "backToNews": "Back to news",
+        "back": "Back"
+    },
+    "publishersPage": {
+        "allPublishers": "All publishers",
+        "description": "Browse publishers in the book catalog and compare the number of books they offer.",
+        "totalPublishers": "{{count}} publishers",
+        "pageCount": "Page {{current}} of {{total}}",
+        "publisherBooksFallback": "Publisher books",
+        "publisherLabel": "Publisher",
+        "booksFound": "{{count}} books found",
+        "noBooksTitle": "No books found",
+        "noBooksDescription": "There are currently no books from this publisher."
+    },
     "publish": {
         "title": "Publishers",
-        "label": "Reliable publishers with books for every taste",
+        "label": "Publishers",
         "desc": " A curated selection of publishers for the Book.uz showcase. Behind each emblem lies a unique style, direction, and catalog tailored to every reader.",
-        "viewDetails": "View Details"
+        "viewDetails": "View Details",
+        "viewAll": "View all",
+        "booksCount": "{{count}} books"
+    },
+    "loading": {
+        "message": "Journey into the magical world of books..."
+    },
+    "breadcrumb": {
+        "home": "Home"
+    },
+    "bookDetail": {
+        "storeFallback": "Store",
+        "unknownAuthor": "Unknown author",
+        "notFoundTitle": "Book not found",
+        "notFoundDescription": "This book does not exist or has been removed from the catalog.",
+        "itemsAvailable": "{{count}} available",
+        "stockAvailable": "{{count}} available",
+        "outOfStock": "Out of stock",
+        "starRating": "{{count}} stars",
+        "script": "Script",
+        "cyrillic": "Cyrillic",
+        "latin": "Latin",
+        "pages": "Number of pages",
+        "year": "Year",
+        "publisher": "Publisher",
+        "language": "Language",
+        "cover": "Cover",
+        "paperback": "Paperback",
+        "hardcover": "Hardcover",
+        "decreaseQuantity": "Decrease quantity",
+        "increaseQuantity": "Increase quantity",
+        "inCart": "In cart",
+        "addToCart": "Add to cart",
+        "favorites": "Add to favorites",
+        "sameGenreBooks": "Books in the same genre",
+        "tabs": {
+            "description": "Description",
+            "details": "Details",
+            "reviews": "Reviews"
+        },
+        "aboutBook": "About the book",
+        "noDescription": "No description has been added for this book yet. Information about its content, style, and recommended audience will appear here later.",
+        "bookDetails": "Book details",
+        "detailsSubtitle": "Key technical and publication information",
+        "author": "Author",
+        "category": "Category",
+        "notProvided": "Not provided",
+        "totalReviews": "Total reviews",
+        "userFallback": "User",
+        "newReview": "New review",
+        "noReviewsTitle": "No reviews yet",
+        "noReviewsDescription": "You can be the first to review this book.",
+        "reviewForm": {
+            "success": "Your review has been submitted",
+            "error": "An error occurred while submitting the review",
+            "loginRequired": "Sign in to leave a review",
+            "commentRequired": "Enter your review",
+            "title": "Write your review",
+            "subtitle": "Share a short impression of the book.",
+            "placeholder": "For example: this book is very interesting, I recommend it...",
+            "loginPlaceholder": "Sign in to leave a review...",
+            "helperAuthenticated": "Your review helps other customers make a choice.",
+            "helperGuest": "Sign in to your account to write and submit a review.",
+            "sending": "Sending...",
+            "submit": "Submit review",
+            "login": "Sign in"
+        }
+    },
+    "checkoutPage": {
+        "title": "Checkout",
+        "subtitle": "Review your delivery details and confirm the order.",
+        "securePayment": "Secure payment",
+        "recipient": "Recipient",
+        "contactDetails": "Primary contact details",
+        "fullName": "Full name",
+        "fullNamePlaceholder": "For example: Aziz Karimov",
+        "phone": "Phone number",
+        "phoneFormatError": "The phone number must be in the +998 90 123 45 67 format.",
+        "phoneExample": "For example: +998 90 123 45 67",
+        "deliveryAddress": "Delivery address",
+        "deliveryAddressSubtitle": "The address the courier should visit",
+        "region": "Region",
+        "regionsLoading": "Loading regions...",
+        "regionsError": "Regions could not be loaded",
+        "selectRegion": "Select a region",
+        "district": "District",
+        "districtsLoading": "Loading districts...",
+        "districtsError": "Districts could not be loaded",
+        "selectDistrict": "Select a district",
+        "selectRegionFirst": "Select a region first",
+        "detectingLocation": "Detecting...",
+        "detectLocation": "Detect address",
+        "streetAddress": "Street, house, apartment",
+        "streetAddressPlaceholder": "12 Amir Temur Street",
+        "additionalNote": "Additional note",
+        "additionalNotePlaceholder": "Landmark or additional information for the courier",
+        "deliveryType": "Delivery method",
+        "deliveryTypeSubtitle": "Choose the most convenient option",
+        "deliveryOptions": {
+            "postOffice": "Delivery to post office",
+            "postToHome": "Postal delivery to home",
+            "courier": "Courier delivery",
+            "pickup": "Pick up from store"
+        },
+        "paymentMethod": "Payment method",
+        "paymentMethodSubtitle": "Choose how to pay for the order",
+        "protected": "Protected",
+        "cash": "Cash",
+        "orderCreatedRedirect": "Order created successfully. Redirecting to payment...",
+        "paymentLinkMissing": "The server did not return a {{payment}} payment link",
+        "orderAcceptedUser": "Your order has been accepted. You can view it in your orders.",
+        "orderAcceptedGuest": "Your order has been accepted. An operator will contact you by phone.",
+        "orderError": "An error occurred while creating the order",
+        "geolocationUnsupported": "Your browser does not support location detection",
+        "locationDetected": "Address detected",
+        "locationError": "The address could not be detected",
+        "locationPermissionDenied": "Location permission was denied",
+        "validation": {
+            "emptyCart": "Your cart is empty",
+            "nameRequired": "Enter your full name",
+            "invalidPhone": "Enter a valid phone number",
+            "locationRequired": "Select a region and district",
+            "addressRequired": "Enter the street, house, and apartment",
+            "paymentRequired": "Select a payment method",
+            "productIdMissing": "A product ID is missing from the cart. Refresh the cart and try again"
+        },
+        "summary": "Order summary",
+        "productCount": "{{count}} items",
+        "unknownBook": "Unknown book",
+        "emptyCart": "Your cart is empty",
+        "price": "Products",
+        "delivery": "Delivery",
+        "free": "Free",
+        "promoCode": "Promo code",
+        "totalPayment": "Total payment",
+        "paymentProtected": "Payment and order details are protected.",
+        "submitting": "Submitting...",
+        "confirmOrder": "Confirm order"
+    },
+    "cartPage": {
+        "title": "Selected books",
+        "subtitle": "Check the quantities, remove any books you do not need, and proceed to checkout.",
+        "productCount": "{{count}} items",
+        "continueShopping": "Continue shopping",
+        "clearAll": "Clear all",
+        "unknownBook": "Unknown book",
+        "stockCount": "In stock: {{count}}",
+        "remove": "Remove",
+        "emptyTitle": "Your cart is empty",
+        "emptyDescription": "Books you add from the catalog will appear here.",
+        "decreaseQuantity": "Decrease quantity",
+        "increaseQuantity": "Increase quantity",
+        "summary": "Order summary",
+        "products": "Products",
+        "discount": "Discount",
+        "delivery": "Delivery",
+        "amountDue": "Amount due",
+        "promoCode": "Promo code",
+        "promoPlaceholder": "For example: BOOKUZ10",
+        "apply": "Apply",
+        "securePayment": "Secure payment",
+        "securePaymentDescription": "Payment details are processed through a secure channel.",
+        "fastDelivery": "Fast delivery",
+        "fastDeliveryDescription": "Within 24 hours in Tashkent and promptly to other regions.",
+        "checkout": "Proceed to checkout"
+    },
+    "catalogPage": {
+        "filters": "Filters",
+        "clear": "Clear",
+        "search": "Search",
+        "searchPlaceholder": "Search by book title",
+        "language": "Language",
+        "languages": {
+            "all": "All languages",
+            "uz": "Uzbek",
+            "kr": "Uzbek (Cyrillic)",
+            "ru": "Russian",
+            "en": "English"
+        },
+        "genre": "Genre",
+        "selectGenre": "Select a genre",
+        "author": "Author",
+        "selectAuthor": "Select an author",
+        "publisher": "Publisher",
+        "selectPublisher": "Select a publisher",
+        "priceRange": "Price range",
+        "priceMin": "0 UZS",
+        "priceMax": "1,000,000 UZS",
+        "thousandPrice": "{{value}}K",
+        "millionPrice": "{{value}}M",
+        "all": "All",
+        "selectedCount": "{{count}} selected",
+        "searchShort": "Search...",
+        "searching": "Searching...",
+        "notFound": "Not found",
+        "resultsPanel": "Results",
+        "booksFound": "{{count}} books found",
+        "gridView": "Grid view",
+        "listView": "List view",
+        "loadErrorTitle": "Catalog could not be loaded",
+        "loadErrorDescription": "There may be a temporary API or network issue.",
+        "retry": "Try again",
+        "emptyTitle": "No results found",
+        "emptyDescription": "No books match the selected filters. Simplify the filters and try again.",
+        "clearFilters": "Clear filters"
+    },
+    "aboutPage": {
+        "badge": "ABOUT US",
+        "branchFallback": "Branch",
+        "hero": {
+            "titleFirst": "For book lovers",
+            "titleSecond": "the best platform",
+            "description": "BOOK.UZ is Uzbekistan's largest digital library. We provide the best reading experience with more than {{count}} books.",
+            "cta": "Browse books"
+        },
+        "tabs": {
+            "history": "History",
+            "values": "Values"
+        },
+        "statistics": {
+            "books": "Books",
+            "users": "Users",
+            "rating": "Average rating",
+            "branches": "Branches"
+        },
+        "valuesTitleBefore": "Our",
+        "valuesTitleHighlight": "values",
+        "historyTitleBefore": "Our",
+        "historyTitleHighlight": "history",
+        "mission": {
+            "title": "Our mission",
+            "description": "To foster a culture of reading in Uzbekistan and make quality books available to everyone at affordable prices. Through us, millions of people can learn and enjoy reading."
+        },
+        "vision": {
+            "title": "Our goal",
+            "description": "To become Central Asia's largest digital library and serve more than 10 million users within five years. We aim to make reading more convenient and enjoyable through innovative technologies."
+        },
+        "contact": {
+            "addressTitle": "Address",
+            "addressLineOne": "Chilanzar district, Tashkent",
+            "addressLineTwo": "Block 19, building 45",
+            "phone": "Phone",
+            "email": "Email"
+        },
+        "map": {
+            "branches": "{{count}} branches on the map",
+            "country": "Uzbekistan",
+            "empty": "No branches are available yet"
+        }
     },
     "nav": {
         "books": "Books",

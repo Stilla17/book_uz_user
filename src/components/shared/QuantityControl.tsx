@@ -1,6 +1,7 @@
 'use client';
 
 import { Minus, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type QuantityControlProps = {
     quantity: number;
@@ -11,6 +12,7 @@ type QuantityControlProps = {
 };
 
 const QuantityControl = ({ quantity, min = 0, max, onDecrement, onIncrement }: QuantityControlProps) => {
+    const { t } = useTranslation();
     const isDecrementDisabled = quantity <= min;
     const isIncrementDisabled = typeof max === 'number' && quantity >= max;
 
@@ -18,7 +20,7 @@ const QuantityControl = ({ quantity, min = 0, max, onDecrement, onIncrement }: Q
         <div className='inline-flex w-fit items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-1.5 dark:border-slate-800 dark:bg-slate-950'>
             <button
                 type='button'
-                aria-label='Kamaytirish'
+                aria-label={t('cartPage.decreaseQuantity')}
                 disabled={isDecrementDisabled}
                 onClick={onDecrement}
                 className='flex h-11 w-11 items-center justify-center rounded-xl text-slate-600 transition hover:bg-white hover:text-[#ef7f1a] disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-300 dark:hover:bg-slate-800'>
@@ -31,7 +33,7 @@ const QuantityControl = ({ quantity, min = 0, max, onDecrement, onIncrement }: Q
 
             <button
                 type='button'
-                aria-label='Kopaytirish'
+                aria-label={t('cartPage.increaseQuantity')}
                 disabled={isIncrementDisabled}
                 onClick={onIncrement}
                 className='flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white transition hover:bg-[#ef7f1a] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900'>

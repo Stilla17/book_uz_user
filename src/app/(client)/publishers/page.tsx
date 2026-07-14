@@ -10,10 +10,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Building2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const PUBLISHERS_PER_PAGE = 12;
 
 const PublishersPage = () => {
+    const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const queryClient = useQueryClient();
 
@@ -50,7 +52,7 @@ const PublishersPage = () => {
                 <BreadCrumb
                     items={[
                         {
-                            label: 'Nashriyotlar'
+                            label: t('publish.title')
                         }
                     ]}
                 />
@@ -61,13 +63,13 @@ const PublishersPage = () => {
                     className='mb-8 rounded-2xl border border-orange-100 bg-[#fff9f3] p-6 dark:border-slate-700 dark:bg-slate-800'>
                     <div className='mb-4 inline-flex items-center gap-2 rounded-full border border-[#ef7f1a]/20 bg-[#ef7f1a]/10 px-4 py-2 text-xs font-black tracking-[0.18em] text-[#ef7f1a] uppercase dark:border-orange-400/20 dark:bg-orange-400/10 dark:text-orange-300'>
                         <Building2 size={14} />
-                        Nashriyotlar
+                        {t('publish.title')}
                     </div>
                     <h1 className='text-3xl font-black tracking-tight text-slate-900 md:text-4xl dark:text-white'>
-                        Barcha nashriyotlar
+                        {t('publishersPage.allPublishers')}
                     </h1>
                     <p className='mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base dark:text-slate-300'>
-                        Kitoblar katalogidagi nashriyotlarni ko'ring va ularning kitoblari sonini solishtiring.
+                        {t('publishersPage.description')}
                     </p>
                 </motion.section>
 
@@ -83,10 +85,8 @@ const PublishersPage = () => {
                 ) : (
                     <>
                         <div className='mb-5 flex items-center justify-between gap-4 text-sm text-slate-500 dark:text-slate-400'>
-                            <span>{totalPublishers} ta nashriyot</span>
-                            <span>
-                                {currentPage} / {totalPages} sahifa
-                            </span>
+                            <span>{t('publishersPage.totalPublishers', { count: totalPublishers })}</span>
+                            <span>{t('publishersPage.pageCount', { current: currentPage, total: totalPages })}</span>
                         </div>
 
                         <div

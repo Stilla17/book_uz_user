@@ -1,6 +1,11 @@
+'use client';
+
 import { BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const Loading = () => {
+    const { t } = useTranslation();
+
     return (
         <div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900'>
             <div className='text-center'>
@@ -11,9 +16,7 @@ export const Loading = () => {
                         size={32}
                     />
                 </div>
-                <p className='animate-pulse text-lg text-gray-500 dark:text-gray-400'>
-                    Sehrli kitoblar dunyosiga sayohat...
-                </p>
+                <p className='animate-pulse text-lg text-gray-500 dark:text-gray-400'>{t('loading.message')}</p>
             </div>
         </div>
     );

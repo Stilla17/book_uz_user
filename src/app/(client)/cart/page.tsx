@@ -15,8 +15,11 @@ import { getImageUrl } from '@/utils/image';
 
 import { motion } from 'framer-motion';
 import { ArrowLeft, ShoppingBag, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function CartPage() {
+    const { t } = useTranslation();
+    const formatCartPrice = (value?: number) => formatPrice(value, t('bookCard.currency'));
     const dispatch = useAppDispatch();
     const {
         cartItems,
@@ -46,16 +49,16 @@ export default function CartPage() {
                 <div className='mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-slate-800'>
                     <div>
                         <h1 className='mt-2 text-2xl font-black text-slate-950 sm:text-3xl dark:text-white'>
-                            Tanlangan kitoblar
+                            {t('cartPage.title')}
                         </h1>
                         <p className='mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400'>
-                            Miqdorni tekshiring, kerak bo'lmagan kitoblarni olib tashlang va tolovga o'ting.
+                            {t('cartPage.subtitle')}
                         </p>
                     </div>
 
                     <div className='inline-flex w-fit items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200'>
                         <ShoppingBag className='size-5 text-[#ef7f1a]' />
-                        {totalQuantity} ta mahsulot
+                        {t('cartPage.productCount', { count: totalQuantity })}
                     </div>
                 </div>
 
@@ -71,7 +74,7 @@ export default function CartPage() {
                                     href='/catalog'
                                     className='inline-flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 transition hover:border-orange-200 hover:text-[#ef7f1a] dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200'>
                                     <ArrowLeft size={16} />
-                                    Xaridni davom ettirish
+                                    {t('cartPage.continueShopping')}
                                 </Link>
                             </div>
 
@@ -81,7 +84,7 @@ export default function CartPage() {
                                     onClick={clearItems}
                                     className='inline-flex h-11 items-center gap-2 rounded-xl bg-rose-50 px-4 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300'>
                                     <Trash2 size={16} />
-                                    Hammasini tozalash
+                                    {t('cartPage.clearAll')}
                                 </button>
                             )}
                         </div>
@@ -98,7 +101,7 @@ export default function CartPage() {
                                         <div className='mx-auto flex h-40 w-full max-w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-3 sm:h-44 sm:max-w-36 sm:p-4 md:mx-0 dark:bg-slate-950'>
                                             <img
                                                 src={getImageUrl(item.book.images)}
-                                                alt={getText(item.book.title, "Noma'lum kitob")}
+                                                alt={getText(item.book.title, t('cartPage.unknownBook'))}
                                                 className='h-full w-full object-contain'
                                             />
                                         </div>
@@ -107,16 +110,16 @@ export default function CartPage() {
                                             <div className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
                                                 <div className='min-w-0'>
                                                     <h2 className='text-lg leading-6 font-black text-slate-900 sm:text-xl sm:leading-7 dark:text-white'>
-                                                        {getText(item.book.title, "Noma'lum kitob")}
+                                                        {getText(item.book.title, t('cartPage.unknownBook'))}
                                                     </h2>
                                                     <p className='mt-2 text-sm font-semibold text-slate-500 dark:text-slate-400'>
-                                                        Omborda: {item.book.stock || 0} ta
+                                                        {t('cartPage.stockCount', { count: item.book.stock || 0 })}
                                                     </p>
                                                 </div>
 
                                                 <div className='rounded-xl bg-slate-50 px-4 py-3 text-left lg:text-right dark:bg-slate-950'>
                                                     <p className='text-xl font-black text-[#ef7f1a]'>
-                                                        {formatPrice(item.book.price)}
+                                                        {formatCartPrice(item.book.price)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -135,7 +138,7 @@ export default function CartPage() {
                                                     onClick={() => removeItem(item.book._id)}
                                                     className='inline-flex h-11 w-fit items-center gap-2 rounded-xl bg-rose-50 px-4 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300'>
                                                     <Trash2 size={16} />
-                                                    Olib tashlash
+                                                    {t('cartPage.remove')}
                                                 </button>
                                             </div>
                                         </div>
@@ -144,9 +147,11 @@ export default function CartPage() {
                             ))
                         ) : (
                             <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
-                                <h2 className='text-2xl font-black text-slate-900 dark:text-white'>Savat bo'sh</h2>
+                                <h2 className='text-2xl font-black text-slate-900 dark:text-white'>
+                                    {t('cartPage.emptyTitle')}
+                                </h2>
                                 <p className='mt-2 text-sm text-slate-500 dark:text-slate-400'>
-                                    Katalogdan kitob qo'shsangiz, shu yerda ko'rinadi.
+                                    {t('cartPage.emptyDescription')}
                                 </p>
                             </div>
                         )}

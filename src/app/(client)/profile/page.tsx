@@ -13,6 +13,7 @@ import { useGetOrder } from '@/hooks/orderHooks/useGetOrder';
 import { useAuth } from '@/hooks/useAuth';
 import { UserService } from '@/services/api';
 import type { Book } from '@/types/book';
+import { getText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 import { getOrderItemProduct } from '@/utils/order';
@@ -21,6 +22,7 @@ import dayjs from 'dayjs';
 import { CalendarDays, Camera, ImageIcon, LogOut, User } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 type ProfileForm = {
     firstName: string;
@@ -28,22 +30,8 @@ type ProfileForm = {
     phone: string;
 };
 
-const paymentStatusConfig = {
-    PAID: {
-        label: "To'langan",
-        className: 'bg-green-50 text-green-700 ring-green-200 dark:bg-green-500/10 dark:text-green-400'
-    },
-    PENDING: {
-        label: 'Kutilmoqda',
-        className: 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-400'
-    },
-    FAILED: {
-        label: "To'lov amalga oshmadi",
-        className: 'bg-red-50 text-red-700 ring-red-200 dark:bg-red-500/10 dark:text-red-400'
-    }
-} as const;
-
 const ProfilePage = () => {
+    const { t } = useTranslation();
     const { user, isLoading: authLoading, refreshUser, logout } = useAuth();
     const { imageFile, imagePreview, setImagePreview, handleImageChange } = useImagePreview();
     const { books, loadingBooks } = useWishlistBooks();
@@ -81,7 +69,8 @@ const ProfilePage = () => {
     const firstName = watch('firstName');
     const lastName = watch('lastName');
     const phone = watch('phone');
-    const fullName = [lastName, firstName].filter(Boolean).join(' ') || user?.name || 'Foydalanuvchi';
+    const fullName = [lastName, firstName].filter(Boolean).join(' ') || user?.name || t('profilePage.userFallback');
+    const formatProfilePrice = (value?: number) => formatPrice(value, t('bookCard.currency'));
 
     const onSubmit = async (values: ProfileForm) => {
         const formData = new FormData();
@@ -98,13 +87,13 @@ const ProfilePage = () => {
             const response = await UserService.updateProfile(formData);
 
             if (response?.success === false) {
-                throw new Error(response.message || 'Profil yangilanmadi');
+                throw new Error(response.message || t('profilePage.updateFailed'));
             }
 
             await refreshUser();
-            toast.success('Profil muvaffaqiyatli yangilandi');
+            toast.success(t('profilePage.updateSuccess'));
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || error?.message || 'Profilni yangilashda xatolik yuz berdi');
+            toast.error(error?.response?.data?.message || error?.message || t('profilePage.updateError'));
         }
     };
 
@@ -124,7 +113,11 @@ const ProfilePage = () => {
                         <div className='relative mx-auto size-[100px]'>
                             <div className='size-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800'>
                                 {imagePreview ? (
-                                    <img src={imagePreview} alt='Profil rasmi' className='size-full object-cover' />
+                                    <img
+                                        src={imagePreview}
+                                        alt={t('profilePage.profileImage')}
+                                        className='size-full object-cover'
+                                    />
                                 ) : (
                                     <div className='grid size-full place-items-center text-slate-500'>
                                         <User size={42} />
@@ -159,7 +152,7 @@ const ProfilePage = () => {
                                         item.value === activeTab ? 'text-[#ff6b00]' : 'text-black dark:text-white'
                                     }`}>
                                     <item.icon size={17} strokeWidth={1.5} />
-                                    {item.label}
+                                    {t(`profilePage.tabs.${item.value}`)}
                                 </Link>
                             ))}
                         </nav>
@@ -171,17 +164,21 @@ const ProfilePage = () => {
                             onClick={handleLogout}
                             className='flex w-full items-center gap-3 py-2.5 text-base text-[#555555] dark:text-slate-300'>
                             <LogOut size={17} strokeWidth={1.5} />
-                            Chiqish
+                            {t('profilePage.logout')}
                         </button>
                     </div>
                 </aside>
 
-                <section className='min-w-0 w-full max-w-[905px]'>
+                <section className='w-full max-w-[905px] min-w-0'>
                     {activeTab === 'wishlist' && (
                         <>
-                            <h2 className='text-2xl font-bold text-black dark:text-white'>Mening kitoblarim</h2>
+                            <h2 className='text-2xl font-bold text-black dark:text-white'>
+                                {t('profilePage.tabs.wishlist')}
+                            </h2>
                             {loadingBooks ? (
-                                <p className='mt-5 text-[#777777] dark:text-slate-400'>Kitoblar yuklanmoqda...</p>
+                                <p className='mt-5 text-[#777777] dark:text-slate-400'>
+                                    {t('profilePage.booksLoading')}
+                                </p>
                             ) : books.length ? (
                                 <div className='mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
                                     {books.map((book) => (
@@ -190,7 +187,7 @@ const ProfilePage = () => {
                                 </div>
                             ) : (
                                 <p className='mt-5 text-[#777777] dark:text-slate-400'>
-                                    Hozircha sevimli kitoblar mavjud emas
+                                    {t('profilePage.noFavoriteBooks')}
                                 </p>
                             )}
                         </>
@@ -198,15 +195,17 @@ const ProfilePage = () => {
 
                     {activeTab === 'orders' && (
                         <>
-                            <h2 className='text-2xl font-bold text-black dark:text-white'>Buyurtmalar</h2>
+                            <h2 className='text-2xl font-bold text-black dark:text-white'>
+                                {t('profilePage.tabs.orders')}
+                            </h2>
                             {ordersLoading ? (
-                                <p className='mt-5 text-[#777777] dark:text-slate-400'>Buyurtmalar yuklanmoqda...</p>
+                                <p className='mt-5 text-[#777777] dark:text-slate-400'>
+                                    {t('profilePage.ordersLoading')}
+                                </p>
                             ) : orders.length ? (
                                 <div className='mt-5 space-y-4'>
                                     {orders.map((order) => {
                                         const status = orderStatusConfig[order.status];
-                                        const paymentStatus = paymentStatusConfig[order.paymentStatus];
-
                                         return (
                                             <article
                                                 key={order._id}
@@ -229,12 +228,10 @@ const ProfilePage = () => {
                                                                     {image ? (
                                                                         <img
                                                                             src={image}
-                                                                            alt={
-                                                                                product &&
-                                                                                typeof product.title === 'string'
-                                                                                    ? product.title
-                                                                                    : 'Buyurtma mahsuloti'
-                                                                            }
+                                                                            alt={getText(
+                                                                                (product as Book | undefined)?.title,
+                                                                                t('profilePage.orderProduct')
+                                                                            )}
                                                                             className='size-full object-cover'
                                                                         />
                                                                     ) : (
@@ -244,7 +241,9 @@ const ProfilePage = () => {
                                                                     )}
                                                                     {item.quantity >= 1 && (
                                                                         <span className='absolute right-1 bottom-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] text-white'>
-                                                                            {item.quantity} ta
+                                                                            {t('profilePage.itemQuantity', {
+                                                                                count: item.quantity
+                                                                            })}
                                                                         </span>
                                                                     )}
                                                                 </div>
@@ -255,11 +254,13 @@ const ProfilePage = () => {
                                                     <div className='min-w-0 flex-1'>
                                                         <div className='flex flex-wrap items-center gap-3'>
                                                             <h3 className='font-semibold text-black dark:text-white'>
-                                                                Buyurtma № {order.orderNumber}
+                                                                {t('profilePage.orderNumber', {
+                                                                    number: order.orderNumber
+                                                                })}
                                                             </h3>
                                                             <span
                                                                 className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${status.className}`}>
-                                                                {status.label}
+                                                                {t(`profilePage.orderStatuses.${order.status}`)}
                                                             </span>
                                                         </div>
                                                         <p className='mt-2 flex items-center gap-2 text-sm text-[#777777] dark:text-slate-400'>
@@ -270,7 +271,7 @@ const ProfilePage = () => {
 
                                                     <div className='sm:text-right'>
                                                         <p className='font-semibold text-[#ff6b00]'>
-                                                            {formatPrice(order.totalAmount)}
+                                                            {formatProfilePrice(order.totalAmount)}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -279,31 +280,31 @@ const ProfilePage = () => {
                                     })}
                                 </div>
                             ) : (
-                                <p className='mt-5 text-[#777777] dark:text-slate-400'>
-                                    Hozircha buyurtmalar mavjud emas
-                                </p>
+                                <p className='mt-5 text-[#777777] dark:text-slate-400'>{t('profilePage.noOrders')}</p>
                             )}
                         </>
                     )}
 
                     {activeTab === 'settings' && (
                         <>
-                            <h2 className='text-2xl font-bold text-black dark:text-white'>Profilim sozlamalari</h2>
+                            <h2 className='text-2xl font-bold text-black dark:text-white'>
+                                {t('profilePage.settingsTitle')}
+                            </h2>
 
                             <form onSubmit={handleSubmit(onSubmit)} className='mt-4'>
                                 <div className='grid gap-x-4 gap-y-5 md:grid-cols-2'>
                                     <label className='block text-[15px] text-[#777777] dark:text-slate-400'>
-                                        Ismingiz
+                                        {t('profilePage.firstName')}
                                         <input {...register('firstName')} className={`mt-1 ${inputClassName}`} />
                                     </label>
 
                                     <label className='block text-[15px] text-[#777777] dark:text-slate-400'>
-                                        Familiyangiz
+                                        {t('profilePage.lastName')}
                                         <input {...register('lastName')} className={`mt-1 ${inputClassName}`} />
                                     </label>
 
                                     <label className='block text-[15px] text-[#777777] dark:text-slate-400'>
-                                        Telefon raqamingiz
+                                        {t('profilePage.phone')}
                                         <input type='tel' {...register('phone')} className={`mt-1 ${inputClassName}`} />
                                     </label>
                                 </div>
@@ -312,7 +313,7 @@ const ProfilePage = () => {
                                     type='submit'
                                     disabled={isSubmitting}
                                     className='mt-6 h-12 rounded-lg bg-[#ff760d] px-6 text-sm font-medium text-white transition hover:bg-[#ef6900] disabled:cursor-not-allowed disabled:opacity-60'>
-                                    {isSubmitting ? 'Saqlanmoqda...' : 'Saqlash'}
+                                    {isSubmitting ? t('profilePage.saving') : t('profilePage.save')}
                                 </button>
                             </form>
                         </>

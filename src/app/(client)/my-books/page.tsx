@@ -11,8 +11,10 @@ import { setLoading } from '@/store/features/globalSlice';
 import { useAppDispatch } from '@/store/hooks';
 
 import { BookOpen, ShoppingBag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function MyBooksPage() {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { books, loadingBooks, isAuthenticated, authLoading, removeBook } = useWishlistBooks();
 
@@ -27,10 +29,13 @@ export default function MyBooksPage() {
 
     const stats = useMemo(
         () => [
-            { label: 'Kitoblar', value: books.length },
-            { label: 'Holat', value: isAuthenticated ? 'Login' : 'Guest' }
+            { label: t('myBooksPage.books'), value: books.length },
+            {
+                label: t('myBooksPage.status'),
+                value: isAuthenticated ? t('myBooksPage.signedIn') : t('myBooksPage.guest')
+            }
         ],
-        [books.length, isAuthenticated]
+        [books.length, isAuthenticated, t]
     );
 
     const handleWishlistChange = (bookId: string, isWishlisted: boolean) => {
@@ -45,14 +50,14 @@ export default function MyBooksPage() {
             <section className='border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900'>
                 <div className='mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8'>
                     <div className='flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between'>
-                        <h1 className='text-3xl font-black tracking-normal md:text-5xl'>Mening kitoblarim</h1>
+                        <h1 className='text-3xl font-black tracking-normal md:text-5xl'>{t('myBooksPage.title')}</h1>
 
                         <Button
                             asChild
                             className='h-11 rounded-lg bg-[#ef7f1a] px-5 font-bold text-white hover:bg-[#d96f12]'>
                             <Link href='/catalog'>
                                 <ShoppingBag size={18} />
-                                Katalogga otish
+                                {t('myBooksPage.goToCatalog')}
                             </Link>
                         </Button>
                     </div>
@@ -74,7 +79,7 @@ export default function MyBooksPage() {
                 {books.length > 0 ? (
                     <div className='rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900'>
                         <h2 className='text-xl font-black'>
-                            {isAuthenticated ? 'Serverdagi kitoblar' : 'LocalStorage kitoblari'}
+                            {isAuthenticated ? t('myBooksPage.serverBooks') : t('myBooksPage.localBooks')}
                         </h2>
                         <div className='mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
                             {books.map((book) => (
@@ -85,11 +90,9 @@ export default function MyBooksPage() {
                 ) : (
                     <div className='rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center dark:border-slate-700 dark:bg-slate-900'>
                         <BookOpen size={34} className='mx-auto text-slate-400' />
-                        <h2 className='mt-4 text-xl font-black'>Kitoblar yo'q</h2>
+                        <h2 className='mt-4 text-xl font-black'>{t('myBooksPage.emptyTitle')}</h2>
                         <p className='mx-auto mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400'>
-                            {isAuthenticated
-                                ? "Serverdagi sevimlilar ro'yxatingiz hozircha bo'sh."
-                                : "Katalogdan sevimliga qo'shsangiz, kitob card holatida shu yerda ko'rinadi."}
+                            {isAuthenticated ? t('myBooksPage.emptyAuthenticated') : t('myBooksPage.emptyGuest')}
                         </p>
                     </div>
                 )}

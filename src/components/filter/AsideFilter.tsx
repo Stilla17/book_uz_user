@@ -5,12 +5,13 @@ import { useBookFilterQuery } from '@/hooks/queries/useFilter';
 import { filterService } from '@/services/filter.service';
 import { CatalogFilters } from '@/types';
 import type { Category } from '@/types/category.types';
+import { useQuery } from '@tanstack/react-query';
 
 import { Slider } from '../ui/slider';
 import MultiFilterSelect from './MultiFilterSelect';
 import { motion } from 'framer-motion';
 import { Filter } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 const PRICE_SLIDER_MIN = 0;
 const PRICE_SLIDER_MAX = 1000000;
@@ -29,8 +30,16 @@ const parsePriceValue = (value: string, fallback: number) => {
     return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-const getCategoryLabel = (category: Category) => {
-    return category.title?.uz || category.title?.ru || category.title?.en || category.slug || category._id;
+const getCategoryLabel = (category: Category, language: string) => {
+    const locale = language.split('-')[0] as 'uz' | 'ru' | 'en';
+    return (
+        category.title?.[locale] ||
+        category.title?.uz ||
+        category.title?.ru ||
+        category.title?.en ||
+        category.slug ||
+        category._id
+    );
 };
 
 const getNormalizedPriceRange = (filters: CatalogFilters): [number, number] => {
@@ -55,6 +64,7 @@ const mergeEntitiesById = <T extends { _id: string }>(baseItems: T[], extraItems
 };
 
 const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
+    const { t, i18n } = useTranslation();
     const { data, isLoading } = useBookFilterQuery();
     const categories = data?.categories || [];
     const authors = data?.authors || [];
@@ -111,7 +121,7 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
         return {
             genres: categories
                 .map((category: Category) => {
-                    const categoryLabel = getCategoryLabel(category);
+                    const categoryLabel = getCategoryLabel(category, i18n.language);
                     const subgenres = category.subgenres || category.subCategories || [];
 
                     return {
@@ -123,7 +133,12 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                             },
                             ...subgenres.map((subgenre) => ({
                                 value: subgenre._id || subgenre.slug,
-                                label: subgenre.title?.uz || subgenre.title?.ru || subgenre.title?.en || subgenre.slug
+                                label:
+                                    subgenre.title?.[i18n.language.split('-')[0] as 'uz' | 'ru' | 'en'] ||
+                                    subgenre.title?.uz ||
+                                    subgenre.title?.ru ||
+                                    subgenre.title?.en ||
+                                    subgenre.slug
                             }))
                         ].filter((option) => Boolean(option.value && option.label))
                     };
@@ -144,10 +159,12 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                 }))
                 .filter((option) => Boolean(option.value && option.label))
         };
-    }, [categories, visibleAuthors, visiblePublishers]);
+    }, [categories, i18n.language, visibleAuthors, visiblePublishers]);
 
     const selectedGenre = [...filters.category, ...filters.subgenre];
-    const hasActiveFilters = Object.values(filters).some((value) => (Array.isArray(value) ? value.length > 0 : Boolean(value)));
+    const hasActiveFilters = Object.values(filters).some((value) =>
+        Array.isArray(value) ? value.length > 0 : Boolean(value)
+    );
 
     useEffect(() => {
         setKeywordDraft(filters.keyword);
@@ -211,10 +228,14 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
     const formatPricePill = (value: number) => {
         if (value >= 1000000) {
             const millions = value / 1000000;
-            return `${Number.isInteger(millions) ? millions : millions.toFixed(1)} mln`;
+            return t('catalogPage.millionPrice', {
+                value: Number.isInteger(millions) ? millions : millions.toFixed(1)
+            });
         }
 
-        return `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)} ming`;
+        return t('catalogPage.thousandPrice', {
+            value: (value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)
+        });
     };
 
     const handlePriceRangeChange = (values: number[]) => {
@@ -242,7 +263,7 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                 <div className='mb-4 flex items-center justify-between'>
                     <div className='flex items-center gap-2'>
                         <Filter size={18} className='text-[#00a0e3] dark:text-orange-300' />
-                        <h3 className='text-xl text-slate-900 dark:text-white'>Filterlar</h3>
+                        <h3 className='text-xl text-slate-900 dark:text-white'>{t('catalogPage.filters')}</h3>
                     </div>
 
                     <button
@@ -250,24 +271,28 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                         onClick={onClear}
                         disabled={!hasActiveFilters}
                         className='text-sm font-medium text-slate-500 transition-colors hover:text-[#ef7f1a] disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-400 dark:hover:text-orange-300'>
-                        Tozalash
+                        {t('catalogPage.clear')}
                     </button>
                 </div>
 
                 <div className='space-y-5'>
                     <div>
-                        <p className='mb-2 text-sm font-medium text-slate-600 dark:text-slate-300'>Qidiruv</p>
+                        <p className='mb-2 text-sm font-medium text-slate-600 dark:text-slate-300'>
+                            {t('catalogPage.search')}
+                        </p>
                         <input
                             type='text'
                             value={keywordDraft}
                             onChange={(event) => setKeywordDraft(event.target.value)}
-                            placeholder="Kitob nomi bo'yicha qidirish"
+                            placeholder={t('catalogPage.searchPlaceholder')}
                             className='mb-4 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700 transition-colors focus:outline-[#ef7f1a]/50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:focus:border-orange-300 dark:focus:ring-orange-300'
                         />
                     </div>
 
                     <div>
-                        <p className='mb-2 text-sm font-medium text-slate-600 dark:text-slate-300'>Til</p>
+                        <p className='mb-2 text-sm font-medium text-slate-600 dark:text-slate-300'>
+                            {t('catalogPage.language')}
+                        </p>
                         <div className='flex flex-wrap gap-2'>
                             {LANGUAGE_OPTIONS.map((option) => {
                                 const isActive = filters.language === option.value;
@@ -282,7 +307,7 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                                                 ? 'bg-[#ef7f1a] text-white hover:bg-black'
                                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
                                         }`}>
-                                        {option.label}
+                                        {t(`catalogPage.languages.${option.value || 'all'}`)}
                                     </button>
                                 );
                             })}
@@ -290,8 +315,8 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                     </div>
 
                     <MultiFilterSelect
-                        label='Janr'
-                        placeholder='Janrni tanlang'
+                        label={t('catalogPage.genre')}
+                        placeholder={t('catalogPage.selectGenre')}
                         groups={filterOptions.genres}
                         value={selectedGenre}
                         onChange={handleGenreChange}
@@ -299,8 +324,8 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                     />
 
                     <MultiFilterSelect
-                        label='Muallif'
-                        placeholder='Muallifni tanlang'
+                        label={t('catalogPage.author')}
+                        placeholder={t('catalogPage.selectAuthor')}
                         options={filterOptions.authors}
                         value={filters.author}
                         onChange={(value) => updateFilters({ author: value })}
@@ -311,8 +336,8 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                     />
 
                     <MultiFilterSelect
-                        label='Nashriyot'
-                        placeholder='Nashriyotni tanlang'
+                        label={t('catalogPage.publisher')}
+                        placeholder={t('catalogPage.selectPublisher')}
                         options={filterOptions.publishers}
                         value={filters.publisher}
                         onChange={(value) => updateFilters({ publisher: value })}
@@ -323,7 +348,9 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                     />
 
                     <div>
-                        <p className='mb-2 text-sm font-medium text-slate-600 dark:text-slate-300'>Narx diapazoni</p>
+                        <p className='mb-2 text-sm font-medium text-slate-600 dark:text-slate-300'>
+                            {t('catalogPage.priceRange')}
+                        </p>
                         <div className='rounded-[1.5rem] border border-slate-200/80 bg-white px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-950'>
                             <div className='mb-5 flex items-center justify-between gap-3'>
                                 <div className='min-w-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-center text-sm font-semibold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100'>
@@ -345,8 +372,8 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                             />
 
                             <div className='mt-3 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500'>
-                                <span>0 som</span>
-                                <span>1 000 000 som</span>
+                                <span>{t('catalogPage.priceMin')}</span>
+                                <span>{t('catalogPage.priceMax')}</span>
                             </div>
                         </div>
                     </div>

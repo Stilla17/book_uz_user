@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface BreadcrumbItem {
     label: string;
@@ -15,13 +16,15 @@ interface BreadcrumbProps {
 }
 
 const BreadCrumb = ({ items }: BreadcrumbProps) => {
+    const { t } = useTranslation();
+
     return (
         <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className='mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400'>
             <Link href='/' className='hover:text-blue-600 dark:hover:text-blue-400'>
-                Bosh sahifa
+                {t('breadcrumb.home')}
             </Link>
 
             {items.map((item, index) => {

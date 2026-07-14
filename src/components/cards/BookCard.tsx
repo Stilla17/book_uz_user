@@ -46,7 +46,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
         event.stopPropagation();
 
         if (isBookInCart || addCartMutation.isPending) {
-            toast('Bu kitob savatda bor');
+            toast(t('bookCard.alreadyInCart'));
             return;
         }
 
@@ -84,7 +84,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
             addGuestCart([cartItem]);
             dispatch(addCart(cartItem));
             queryClient.invalidateQueries({ queryKey: ['cart'] });
-            toast.success('savatga qoshildi');
+            toast.success(t('bookCard.addedToCart'));
         }
     };
 
@@ -123,7 +123,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                     href={bookHref}
                     onMouseEnter={prefetchBook}
                     onFocus={prefetchBook}
-                    aria-label={`${getBookTitle(book)} haqida batafsil`}
+                    aria-label={t('bookCard.detailsLabel', { title: getBookTitle(book) })}
                     className='relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] dark:border-slate-700 dark:bg-slate-900'>
                     {bookImageUrl ? (
                         <Image
@@ -136,7 +136,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                     ) : (
                         <div className='flex size-full flex-col items-center justify-center gap-3 bg-slate-50 text-slate-400 dark:bg-slate-900 dark:text-slate-500'>
                             <BookOpen size={48} strokeWidth={1.5} />
-                            <span className='text-xs font-semibold'>Rasm mavjud emas</span>
+                            <span className='text-xs font-semibold'>{t('bookCard.noImage')}</span>
                         </div>
                     )}
                     {priceInfo.discount ? (
@@ -164,7 +164,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                     </Link>
                     <button
                         type='button'
-                        aria-label='Bookmark'
+                        aria-label={t('bookCard.bookmark')}
                         className={`mt-5 shrink-0 ${
                             isBookmarked
                                 ? 'text-[#ef7f1a] dark:text-orange-400'
@@ -193,7 +193,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                             {priceInfo.hasDiscount ? (
                                 <div className='mb-1 flex items-center gap-2'>
                                     <span className='text-sm font-bold text-gray-400 line-through dark:text-gray-500'>
-                                        {formatPriceNumber(priceInfo.oldPrice)} so'm
+                                        {formatPriceNumber(priceInfo.oldPrice)} {t('bookCard.currency')}
                                     </span>
                                     {priceInfo.discount ? (
                                         <span className='rounded-full bg-orange-50 px-2 py-0.5 text-xs font-black text-[#ef7f1a] dark:bg-orange-500/10 dark:text-orange-300'>
@@ -206,12 +206,15 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                                 <span className='text-base font-black text-[#ef7f1a] sm:text-[18px] dark:text-blue-400'>
                                     {formatPriceNumber(priceInfo.price)}
                                 </span>
-                                <span className='font-medium text-gray-500 dark:text-gray-400'>so'm</span>
+                                <span className='font-medium text-gray-500 dark:text-gray-400'>
+                                    {t('bookCard.currency')}
+                                </span>
                             </div>
                         </div>
 
                         <button
                             type='button'
+                            aria-label={t('bookCard.addToCart')}
                             className='flex items-center gap-1 rounded-full bg-[#ef7f1a] p-2.5 text-white shadow-[0_10px_22px_-10px_rgba(239,127,26,0.9)] hover:bg-[#df7012] hover:shadow-lg'
                             disabled={Boolean(!book?.stock || book.stock <= 0 || addCartMutation.isPending)}
                             onClick={handleAddToCart}>

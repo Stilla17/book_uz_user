@@ -1,6 +1,7 @@
 import type { Book, Product } from '@/types/book';
 
 export type LocalizedText = string | { uz?: string; ru?: string; en?: string } | null | undefined;
+type Language = 'uz' | 'ru' | 'en';
 
 export type TextLike =
     | string
@@ -14,53 +15,118 @@ export type CategoryLike =
     | null
     | undefined;
 
-export const getLocalizedText = (value?: LocalizedText, fallback = '') => {
-    if (!value) return fallback;
-    if (typeof value === 'string') return value;
+const LANGUAGE_STORAGE_KEY = 'bookuz-language';
 
-    return value.uz || value.ru || value.en || fallback;
+const fallbackText = {
+    unknown: {
+        uz: "Noma'lum",
+        ru: 'Неизвестно',
+        en: 'Unknown'
+    },
+    bookTitle: {
+        uz: "Noma'lum kitob",
+        ru: 'Неизвестная книга',
+        en: 'Unknown book'
+    },
+    author: {
+        uz: "Noma'lum muallif",
+        ru: 'Неизвестный автор',
+        en: 'Unknown author'
+    }
+} satisfies Record<string, Record<Language, string>>;
+
+const fallbackTranslations: Record<string, Record<Language, string>> = {
+    "Noma'lum": fallbackText.unknown,
+    "Noma'lum kitob": fallbackText.bookTitle,
+    'Muallif nomalum': fallbackText.author,
+    "Noma'lum muallif": fallbackText.author
+};
+
+const isLanguage = (value?: string | null): value is Language => value === 'uz' || value === 'ru' || value === 'en';
+
+const getCurrentLanguage = (): Language => {
+    if (typeof window === 'undefined') return 'uz';
+
+    const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (isLanguage(savedLanguage)) return savedLanguage;
+
+    const documentLanguage = window.document.documentElement.lang.split('-')[0];
+
+    return isLanguage(documentLanguage) ? documentLanguage : 'uz';
+};
+
+const getFallbackText = (fallback = '') => fallbackTranslations[fallback]?.[getCurrentLanguage()] ?? fallback;
+
+const isUnknownFallback = (value: string) => Boolean(fallbackTranslations[value]);
+
+export const getLocalizedText = (value?: LocalizedText, fallback = '') => {
+    const translatedFallback = getFallbackText(fallback);
+
+    if (!value) return translatedFallback;
+    if (typeof value === 'string') return isUnknownFallback(value) ? getFallbackText(value) : value || translatedFallback;
+
+    const language = getCurrentLanguage();
+
+    return value[language] || value.uz || value.ru || value.en || translatedFallback;
 };
 
 export const getText = (value: TextLike, fallback: string): string => {
-    if (!value) return fallback;
-    if (typeof value === 'string') return value || fallback;
-    if (typeof value.uz === 'string') return value.uz;
-    if (typeof value.ru === 'string') return value.ru;
-    if (typeof value.en === 'string') return value.en;
-    if (typeof value.name === 'string') return value.name;
-    if (typeof value.title === 'string') return value.title;
+    const translatedFallback = getFallbackText(fallback);
 
-    return fallback;
+    if (!value) return translatedFallback;
+    if (typeof value === 'string') return isUnknownFallback(value) ? getFallbackText(value) : value || translatedFallback;
+
+    const language = getCurrentLanguage();
+    const localizedValue = value[language];
+
+    if (typeof localizedValue === 'string' && localizedValue) return localizedValue;
+    if (typeof value.uz === 'string' && value.uz) return value.uz;
+    if (typeof value.ru === 'string' && value.ru) return value.ru;
+    if (typeof value.en === 'string' && value.en) return value.en;
+    if (typeof value.name === 'string' && value.name) {
+        return isUnknownFallback(value.name) ? getFallbackText(value.name) : value.name;
+    }
+    if (typeof value.title === 'string' && value.title) {
+        return isUnknownFallback(value.title) ? getFallbackText(value.title) : value.title;
+    }
+
+    return translatedFallback;
 };
 
 export const getCategoryLabel = (category?: CategoryLike, fallback = '') => {
-    if (!category) return fallback;
+    const translatedFallback = getFallbackText(fallback);
+
+    if (!category) return translatedFallback;
 
     const getOne = (item: Exclude<NonNullable<CategoryLike>, unknown[]>) =>
         getLocalizedText(item.name, '') || getLocalizedText(item.title, '');
 
     return Array.isArray(category)
-        ? category.map(getOne).filter(Boolean).join(', ') || fallback
-        : getOne(category) || fallback;
+        ? category.map(getOne).filter(Boolean).join(', ') || translatedFallback
+        : getOne(category) || translatedFallback;
 };
 
 export const getAuthor = (author: unknown) => {
     if (typeof author === 'string') return author;
     if (author && typeof author === 'object' && 'name' in author) {
-        return getLocalizedText((author as { name?: LocalizedText }).name, 'Muallif nomalum');
+        return getLocalizedText((author as { name?: LocalizedText }).name, fallbackText.author.uz);
     }
-    return 'Muallif nomalum';
+    return getFallbackText(fallbackText.author.uz);
 };
 
-export const getBookTitle = (book: Book) => getText(book.title, "Noma'lum kitob");
+export const getBookTitle = (book: Book) => getText(book.title, fallbackText.bookTitle.uz);
 
 const isObjectId = (value: string) => /^[a-f\d]{24}$/i.test(value);
 
-const getAuthorText = (author: unknown, fallback = "Noma'lum muallif"): string => {
-    if (!author) return fallback;
+const getAuthorText = (author: unknown, fallback = fallbackText.author.uz): string => {
+    const translatedFallback = getFallbackText(fallback);
+
+    if (!author) return translatedFallback;
 
     if (typeof author === 'string') {
-        return isObjectId(author) ? fallback : author;
+        if (isObjectId(author)) return translatedFallback;
+
+        return isUnknownFallback(author) ? translatedFallback : author;
     }
 
     if (Array.isArray(author)) {
@@ -68,22 +134,22 @@ const getAuthorText = (author: unknown, fallback = "Noma'lum muallif"): string =
             author
                 .map((item) => getAuthorText(item, ''))
                 .filter(Boolean)
-                .join(', ') || fallback
+                .join(', ') || translatedFallback
         );
     }
 
     if (typeof author === 'object') {
         const value = author as { name?: LocalizedText; title?: LocalizedText };
-        return getLocalizedText(value.name, '') || getLocalizedText(value.title, '') || fallback;
+        return getLocalizedText(value.name, '') || getLocalizedText(value.title, '') || translatedFallback;
     }
 
-    return fallback;
+    return translatedFallback;
 };
 
 const getBookTitleValue = (title: Book['title']): Book['title'] => ({
-    uz: title.uz || title.ru || title.en || "Noma'lum kitob",
-    ru: title.ru || title.uz || title.en || "Noma'lum kitob",
-    en: title.en || title.uz || title.ru || "Noma'lum kitob"
+    uz: title.uz || title.ru || title.en || fallbackText.bookTitle.uz,
+    ru: title.ru || title.uz || title.en || fallbackText.bookTitle.ru,
+    en: title.en || title.uz || title.ru || fallbackText.bookTitle.en
 });
 
 export const getBookAuthorName = (book: Book) => {

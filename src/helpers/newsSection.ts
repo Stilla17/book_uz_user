@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+import 'dayjs/locale/en';
+import 'dayjs/locale/ru';
+import 'dayjs/locale/uz-latn';
 
 export type LocalizedText = string | { uz?: string; ru?: string; en?: string } | null | undefined;
 
@@ -38,7 +41,9 @@ export const normalizeNewsResponse = (data: any): NewsItem[] => {
     return items;
 };
 
-export const formatDate = (dateString?: string) => {
+export const formatDate = (dateString?: string, language = 'uz') => {
     if (!dateString) return '';
-    return dayjs(dateString).format('D MMMM YYYY');
+    const locale = language === 'uz' ? 'uz-latn' : language === 'ru' ? 'ru' : 'en';
+
+    return dayjs(dateString).locale(locale).format('D MMMM YYYY');
 };

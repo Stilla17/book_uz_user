@@ -14,10 +14,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Building2, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const PAGE_LIMIT = 12;
 
 const PublisherBooksPage = () => {
+    const { t } = useTranslation();
     const params = useParams();
     const slug = params?.slug as string;
     const [page, setPage] = useState(1);
@@ -59,11 +61,11 @@ const PublisherBooksPage = () => {
                 <BreadCrumb
                     items={[
                         {
-                            label: 'Nashriyotlar',
+                            label: t('publish.title'),
                             path: '/publishers'
                         },
                         {
-                            label: publisher?.name || 'Nashriyot kitoblari'
+                            label: publisher?.name || t('publishersPage.publisherBooksFallback')
                         }
                     ]}
                 />
@@ -74,13 +76,13 @@ const PublisherBooksPage = () => {
                     className='mb-8 rounded-2xl border border-orange-100 bg-[#fff9f3] p-6 dark:border-slate-700 dark:bg-slate-800'>
                     <div className='mb-4 inline-flex items-center gap-2 rounded-full border border-[#ef7f1a]/20 bg-[#ef7f1a]/10 px-4 py-2 text-xs font-black tracking-[0.18em] text-[#ef7f1a] uppercase dark:border-orange-400/20 dark:bg-orange-400/10 dark:text-orange-300'>
                         <Building2 size={14} />
-                        Nashriyot
+                        {t('publishersPage.publisherLabel')}
                     </div>
                     <h1 className='text-3xl font-black tracking-tight text-slate-900 md:text-4xl dark:text-white'>
-                        {publisher?.name || 'Nashriyot kitoblari'}
+                        {publisher?.name || t('publishersPage.publisherBooksFallback')}
                     </h1>
                     <p className='mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base dark:text-slate-300'>
-                        {pagination.total} ta kitob topildi
+                        {t('publishersPage.booksFound', { count: pagination.total })}
                     </p>
                 </motion.section>
 
@@ -110,9 +112,11 @@ const PublisherBooksPage = () => {
                         <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300'>
                             <Search size={28} />
                         </div>
-                        <h3 className='mt-4 text-xl font-bold text-slate-900 dark:text-white'>Kitob topilmadi</h3>
+                        <h3 className='mt-4 text-xl font-bold text-slate-900 dark:text-white'>
+                            {t('publishersPage.noBooksTitle')}
+                        </h3>
                         <p className='mt-2 text-sm text-slate-500 dark:text-slate-400'>
-                            Bu nashriyotga tegishli kitoblar hozircha mavjud emas.
+                            {t('publishersPage.noBooksDescription')}
                         </p>
                     </div>
                 )}

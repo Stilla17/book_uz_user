@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 
 import { motion } from 'framer-motion';
 import { BookHeadphones, CreditCard, Headphones, ShieldCheck, Truck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export type ServiceItem = {
     id: string;
@@ -52,17 +53,27 @@ const mockServices: ServiceItem[] = [
 
 export const ServicesSection = ({
     adminServices,
-    title = 'Xizmatlar',
-    subtitle = 'Biz sizga qulaylik yaratamiz — tez, xavfsiz va foydali'
+    title,
+    subtitle
 }: {
     adminServices?: ServiceItem[];
     title?: string;
     subtitle?: string;
 }) => {
+    const { t } = useTranslation();
+    const sectionTitle = title ?? t('servicesSection.title');
+    const sectionSubtitle = subtitle ?? t('servicesSection.subtitle');
+
     const services = useMemo(() => {
-        const src = adminServices?.length ? adminServices : mockServices;
+        const translatedServices = mockServices.map((service) => ({
+            ...service,
+            title: t(`servicesSection.items.${service.id}.title`),
+            desc: t(`servicesSection.items.${service.id}.description`)
+        }));
+        const src = adminServices?.length ? adminServices : translatedServices;
+
         return src.filter((s) => s.isActive !== false);
-    }, [adminServices]);
+    }, [adminServices, t]);
 
     // Badge ranglarini aniqlash (dark mode qo'shilgan)
     const getBadgeStyle = (badge: string) => {
@@ -87,13 +98,13 @@ export const ServicesSection = ({
                     transition={{ duration: 0.6 }}>
                     <div>
                         <h2 className='text-2xl font-black tracking-tight md:text-3xl'>
-                            <span className='text-[#00a0e3] dark:text-blue-400'>{title.split(' ')[0]}</span>
+                            <span className='text-[#00a0e3] dark:text-blue-400'>{sectionTitle.split(' ')[0]}</span>
                             <span className='text-[#ef7f1a] dark:text-orange-400'>
                                 {' '}
-                                {title.split(' ').slice(1).join(' ')}
+                                {sectionTitle.split(' ').slice(1).join(' ')}
                             </span>
                         </h2>
-                        <p className='mt-1 text-sm text-gray-500 md:text-base dark:text-gray-400'>{subtitle}</p>
+                        <p className='mt-1 text-sm text-gray-500 md:text-base dark:text-gray-400'>{sectionSubtitle}</p>
                     </div>
                 </motion.div>
 

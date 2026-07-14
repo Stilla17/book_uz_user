@@ -4,6 +4,7 @@ import type { PublisherItems } from '@/types';
 import { getImageUrl } from '@/utils/image';
 
 import { BookOpen, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type PublisherCardProps = {
     publisher: PublisherItems;
@@ -11,6 +12,8 @@ type PublisherCardProps = {
 };
 
 const PublisherCard = ({ publisher, className = '' }: PublisherCardProps) => {
+    const { t } = useTranslation();
+
     return (
         <article className={className}>
             <Link
@@ -32,7 +35,7 @@ const PublisherCard = ({ publisher, className = '' }: PublisherCardProps) => {
                     <h3 className='truncate text-lg font-semibold text-slate-900 dark:text-white'>{publisher.name}</h3>
                     <div className='mt-1 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400'>
                         <BookOpen size={15} className='text-[#ef7f1a]' />
-                        <span>{publisher.booksCount} ta kitob</span>
+                        <span>{t('publish.booksCount', { count: publisher.booksCount })}</span>
                     </div>
                 </div>
 

@@ -60,6 +60,99 @@
         "topSalesEmpty": "Hali top sotuvlar sinxron qilinmagan.",
         "basket": "Savat"
     },
+    "bookCard": {
+        "alreadyInCart": "Bu kitob savatda bor",
+        "addedToCart": "Savatga qo'shildi",
+        "detailsLabel": "{{title}} haqida batafsil",
+        "noImage": "Rasm mavjud emas",
+        "bookmark": "Sevimlilarga qo'shish",
+        "addToCart": "Savatga qo'shish",
+        "currency": "so'm"
+    },
+    "servicesSection": {
+        "title": "Xizmatlar",
+        "subtitle": "Biz sizga qulaylik yaratamiz — tez, xavfsiz va foydali",
+        "items": {
+            "s1": {
+                "title": "Yetkazib berish",
+                "description": "Toshkent shahri bo'ylab tez va ishonchli yetkazamiz."
+            },
+            "s4": {
+                "title": "Kafolat va ishonch",
+                "description": "Buyurtma xavfsizligi, qaytarish qoidalari va nazorat tizimi."
+            },
+            "s5": {
+                "title": "Qulay to'lovlar",
+                "description": "Click, Payme va Xazna kartalari — hammasi mavjud."
+            }
+        }
+    },
+    "aboutSection": {
+        "badge": "BIZ HAQIMIZDA",
+        "titleFirst": "Sizning intellektual",
+        "titleSecond": "hamrohingiz",
+        "descriptionBefore": "Biz 2018-yildan buyon kitobxonlar uchun eng sara kitoblarni yetkazib kelmoqdamiz. Maqsadimiz — har bir xonadonga",
+        "highlight": "ilm nuri",
+        "descriptionAfter": "kirib borishini ta'minlash va mutolaa madaniyatini yuksaltirishdir.",
+        "moreDetails": "Batafsil ma'lumot",
+        "branchesOnMap": "{{count}} ta filial xaritada",
+        "noBranches": "Hozircha filiallar mavjud emas",
+        "branchFallback": "Filial",
+        "stats": {
+            "books": "Kitoblar",
+            "publishers": "Nashriyotlar soni",
+            "branches": "Filiallar soni",
+            "delivery": "Yetkazib berish"
+        }
+    },
+    "newsSection": {
+        "platform": "Platforma",
+        "news": "yangiliklari",
+        "viewAll": "Barchasini ko'rish",
+        "details": "Batafsil",
+        "fallbackTitle": "Yangilik"
+    },
+    "supportSection": {
+        "titleFirst": "Sizga qanday",
+        "titleSecond": "yordam bera olamiz?",
+        "tabs": {
+            "contact": "Aloqa"
+        },
+        "stats": {
+            "customers": "Mijozlar",
+            "responseTime": "Tezkor javob",
+            "service": "Xizmat",
+            "satisfaction": "Mamnun"
+        },
+        "faq": {
+            "loadError": "FAQ ma'lumotlarini yuklashda xatolik yuz berdi.",
+            "empty": "Hozircha FAQ savollari mavjud emas."
+        },
+        "contact": {
+            "phone": {
+                "title": "Telefon",
+                "subtitle": "Bepul qo'ng'iroq"
+            },
+            "email": {
+                "title": "Email",
+                "subtitle": "24/7"
+            },
+            "telegram": {
+                "title": "Telegram",
+                "subtitle": "Online"
+            },
+            "workingHours": {
+                "title": "Ish vaqti",
+                "subtitle": "Dushanba-Yakshanba"
+            }
+        }
+    },
+    "authorsPage": {
+        "totalAuthors": "{{count}} ta muallif",
+        "pageCount": "{{current}} / {{total}} sahifa",
+        "empty": "Mualliflar topilmadi",
+        "viewBooks": "Kitoblarini ko'rish"
+    },
     "authorsSection": {
         "title": "Mualliflar",
         "booksCount": "{{count}} kitob"
@@ -79,11 +172,394 @@
             "terms": "Foydalanish shartlari"
         }
     },
+    "notFoundPage": {
+        "title": "Sahifa topilmadi",
+        "description": "Kechirasiz, siz qidirgan sahifa mavjud emas yoki o'chirilgan bo'lishi mumkin.",
+        "suggestion": "Bosh sahifaga qaytib, 50 000 dan ortiq kitoblar olamini kashf etishda davom eting.",
+        "didYouKnow": "BILASIZMI?",
+        "links": {
+            "home": "Bosh sahifa",
+            "books": "Kitoblar",
+            "news": "Yangiliklar",
+            "favorites": "Sevimlilar",
+            "cart": "Savat",
+            "myBooks": "Kitoblarim"
+        },
+        "goBack": "Ortga qaytish",
+        "goHome": "Bosh sahifaga o'tish",
+        "facts": {
+            "expensiveBook": "Dunyodagi eng qimmat kitob 30 million dollarga sotilgan.",
+            "largestLibrary": "Eng katta kutubxonada 170 milliondan ortiq kitob bor.",
+            "averageBook": "O'rtacha kitob 300–400 sahifadan iborat.",
+            "dailyPublishing": "Dunyoda har kuni 4 000 dan ortiq kitob nashr etiladi.",
+            "oldestBook": "Eng qadimgi kitob 2 500 yil oldin yozilgan.",
+            "uzbekistanPublishing": "O'zbekistonda yiliga 2 000 dan ortiq kitob nashr qilinadi.",
+            "audiobooks": "Audio kitobni tinglash kitob o'qishdan ikki barobar tez.",
+            "readingPreference": "Dunyo aholisining 15 foizi kitob o'qishni yoqtirmaydi.",
+            "mostReadBook": "Dunyoda eng ko'p o'qilgan kitob — Bibliya.",
+            "harryPotter": "Harry Potter kitoblari 500 million nusxada sotilgan.",
+            "alisherNavoi": "O'zbekistonda eng ko'p o'qilgan mualliflardan biri — Alisher Navoiy.",
+            "stressReduction": "Kitob o'qish stressni 68 foizga kamaytiradi.",
+            "longerLife": "Haftada uch soat kitob o'qish umrni ikki yilga uzaytirishi mumkin.",
+            "ebooks": "Elektron kitoblar 1971-yilda paydo bo'lgan.",
+            "smallestBook": "Dunyodagi eng kichik kitob tuz donasidek."
+        }
+    },
+    "profilePage": {
+        "userFallback": "Foydalanuvchi",
+        "profileImage": "Profil rasmi",
+        "tabs": {
+            "wishlist": "Mening kitoblarim",
+            "orders": "Buyurtmalar",
+            "settings": "Sozlamalar"
+        },
+        "logout": "Chiqish",
+        "booksLoading": "Kitoblar yuklanmoqda...",
+        "noFavoriteBooks": "Hozircha sevimli kitoblar mavjud emas",
+        "ordersLoading": "Buyurtmalar yuklanmoqda...",
+        "orderProduct": "Buyurtma mahsuloti",
+        "itemQuantity": "{{count}} ta",
+        "orderNumber": "Buyurtma № {{number}}",
+        "orderStatuses": {
+            "PENDING": "Kutilmoqda",
+            "CONFIRMED": "Qabul qilindi",
+            "PROCESSING": "Qabul qilindi",
+            "PACKED": "Tayyorlanmoqda",
+            "SHIPPED": "Yo'lda",
+            "DELIVERING": "Yo'lda",
+            "DELIVERED": "Yetkazib berildi",
+            "CANCELLED": "Bekor qilindi"
+        },
+        "noOrders": "Hozircha buyurtmalar mavjud emas",
+        "settingsTitle": "Profilim sozlamalari",
+        "firstName": "Ismingiz",
+        "lastName": "Familiyangiz",
+        "phone": "Telefon raqamingiz",
+        "saving": "Saqlanmoqda...",
+        "save": "Saqlash",
+        "updateFailed": "Profil yangilanmadi",
+        "updateSuccess": "Profil muvaffaqiyatli yangilandi",
+        "updateError": "Profilni yangilashda xatolik yuz berdi"
+    },
+    "userMenu": {
+        "openMenu": "Profil menyusini ochish",
+        "userFallback": "Foydalanuvchi",
+        "profile": "Shaxsiy kabinet",
+        "myBooks": "Mening kitoblarim",
+        "orders": "Buyurtmalarim",
+        "settings": "Sozlamalar",
+        "logout": "Chiqish"
+    },
+    "loginPage": {
+        "title": "Tizimga kirish",
+        "description": "Ism-familiya va telefon raqami orqali kiring",
+        "otpDescription": "{{phone}} raqamiga yuborilgan kodni kiriting",
+        "fullName": "Ism-familiya",
+        "fullNamePlaceholder": "Ism-familiyangiz",
+        "phone": "Telefon raqami",
+        "sendCode": "Kod yuborish",
+        "otpLabel": "Tasdiqlash kodi",
+        "otpDigitLabel": "Tasdiqlash kodining {{number}}-raqami",
+        "signIn": "Kirish",
+        "changePhone": "Raqamni o'zgartirish",
+        "resendCode": "Kodni qayta yuborish",
+        "nameMinLength": "Ism-familiya kamida 2 ta belgidan iborat bo'lishi kerak",
+        "invalidPhone": "Telefon raqamini to'liq kiriting",
+        "codeSent": "Tasdiqlash kodi telefon raqamiga yuborildi",
+        "sendCodeError": "Telefon raqamiga kod yuborishda xatolik yuz berdi",
+        "enterOtpLength": "{{count}} xonali tasdiqlash kodini kiriting",
+        "welcome": "Xush kelibsiz!",
+        "invalidOtp": "Tasdiqlash kodi noto'g'ri yoki muddati tugagan"
+    },
+    "myBooksPage": {
+        "title": "Mening kitoblarim",
+        "goToCatalog": "Katalogga o'tish",
+        "books": "Kitoblar",
+        "status": "Holat",
+        "signedIn": "Tizimga kirilgan",
+        "guest": "Mehmon",
+        "serverBooks": "Serverdagi kitoblar",
+        "localBooks": "Qurilmadagi kitoblar",
+        "emptyTitle": "Kitoblar yo'q",
+        "emptyAuthenticated": "Serverdagi sevimlilar ro'yxatingiz hozircha bo'sh.",
+        "emptyGuest": "Katalogdan sevimlilarga qo'shgan kitoblaringiz shu yerda ko'rinadi."
+    },
+    "newsPage": {
+        "loading": "Yangiliklar yuklanmoqda...",
+        "title": "Barcha yangiliklar",
+        "description": "Platformamizdagi eng so'nggi yangiliklar, yangi kitoblar va aksiyalardan xabardor bo'ling.",
+        "searchPlaceholder": "Yangilik qidirish...",
+        "clearSearch": "Qidiruvni tozalash",
+        "notFoundTitle": "Yangilik topilmadi",
+        "noSearchResults": "\"{{query}}\" bo'yicha hech qanday yangilik topilmadi",
+        "empty": "Hozircha yangiliklar yo'q",
+        "backToNews": "Yangiliklarga qaytish",
+        "back": "Orqaga"
+    },
+    "publishersPage": {
+        "allPublishers": "Barcha nashriyotlar",
+        "description": "Kitoblar katalogidagi nashriyotlarni ko'ring va ularning kitoblari sonini solishtiring.",
+        "totalPublishers": "{{count}} ta nashriyot",
+        "pageCount": "{{current}} / {{total}} sahifa",
+        "publisherBooksFallback": "Nashriyot kitoblari",
+        "publisherLabel": "Nashriyot",
+        "booksFound": "{{count}} ta kitob topildi",
+        "noBooksTitle": "Kitob topilmadi",
+        "noBooksDescription": "Bu nashriyotga tegishli kitoblar hozircha mavjud emas."
+    },
     "publish": {
         "title": "Nashriyotlar",
-        "label": "Ishonchli nashriyotlar bilan",
+        "label": "Nashriyotlar",
         "desc": " Book.uz vitrinasi uchun saralangan nashriyotlar. Har bir emblem ortida o‘z uslubi, yo‘nalishi va o‘quvchiga mos katalogi bor.",
-        "viewDetails": "Batafsil"
+        "viewDetails": "Batafsil",
+        "viewAll": "Barchasini ko'rish",
+        "booksCount": "{{count}} ta kitob"
+    },
+    "loading": {
+        "message": "Sehrli kitoblar dunyosiga sayohat..."
+    },
+    "breadcrumb": {
+        "home": "Bosh sahifa"
+    },
+    "bookDetail": {
+        "storeFallback": "Do'kon",
+        "unknownAuthor": "Muallif noma'lum",
+        "notFoundTitle": "Kitob topilmadi",
+        "notFoundDescription": "Bu kitob mavjud emas yoki katalogdan olib tashlangan.",
+        "itemsAvailable": "{{count}} dona",
+        "stockAvailable": "{{count}} dona mavjud",
+        "outOfStock": "Mavjud emas",
+        "starRating": "{{count}} yulduz",
+        "script": "Yozuvi",
+        "cyrillic": "Kirill",
+        "latin": "Lotin",
+        "pages": "Betlar soni",
+        "year": "Yili",
+        "publisher": "Nashriyot",
+        "language": "Til",
+        "cover": "Muqova",
+        "paperback": "Yumshoq",
+        "hardcover": "Qattiq",
+        "decreaseQuantity": "Kamaytirish",
+        "increaseQuantity": "Ko'paytirish",
+        "inCart": "Savatda",
+        "addToCart": "Savatga qo'shish",
+        "favorites": "Sevimlilarga",
+        "sameGenreBooks": "Shu janrdagi kitoblar",
+        "tabs": {
+            "description": "Tavsif",
+            "details": "Tafsilotlar",
+            "reviews": "Izohlar"
+        },
+        "aboutBook": "Kitob haqida",
+        "noDescription": "Hozircha bu kitob uchun tavsif kiritilmagan. Keyinroq bu yerda asar mazmuni, uslubi va kimlar uchun tavsiya etilishi haqida ma'lumot chiqadi.",
+        "bookDetails": "Kitob tafsilotlari",
+        "detailsSubtitle": "Asosiy texnik va nashr ma'lumotlari",
+        "author": "Muallif",
+        "category": "Kategoriya",
+        "notProvided": "Kiritilmagan",
+        "totalReviews": "Jami izoh",
+        "userFallback": "Foydalanuvchi",
+        "newReview": "Yangi izoh",
+        "noReviewsTitle": "Hozircha izohlar yo'q",
+        "noReviewsDescription": "Bu kitob haqida birinchi fikrni siz qoldirishingiz mumkin.",
+        "reviewForm": {
+            "success": "Izohingiz qabul qilindi",
+            "error": "Izoh yuborishda xatolik yuz berdi",
+            "loginRequired": "Izoh qoldirish uchun avval tizimga kiring",
+            "commentRequired": "Izoh matnini kiriting",
+            "title": "Fikringizni yozing",
+            "subtitle": "Kitob haqida qisqa taassurotingizni qoldiring.",
+            "placeholder": "Masalan: kitob juda qiziqarli, tavsiya qilaman...",
+            "loginPlaceholder": "Izoh qoldirish uchun avval tizimga kiring...",
+            "helperAuthenticated": "Izohlaringiz boshqa xaridorlarga tanlov qilishda yordam beradi.",
+            "helperGuest": "Izoh yozish va yuborish uchun akkauntingizga kiring.",
+            "sending": "Yuborilmoqda...",
+            "submit": "Izoh qoldirish",
+            "login": "Tizimga kirish"
+        }
+    },
+    "checkoutPage": {
+        "title": "Buyurtmani rasmiylashtirish",
+        "subtitle": "Yetkazib berish ma'lumotlarini tekshiring va buyurtmani tasdiqlang.",
+        "securePayment": "Xavfsiz to'lov",
+        "recipient": "Qabul qiluvchi",
+        "contactDetails": "Aloqa uchun asosiy ma'lumotlar",
+        "fullName": "Ism-familiya",
+        "fullNamePlaceholder": "Masalan: Aziz Karimov",
+        "phone": "Telefon raqami",
+        "phoneFormatError": "Telefon raqami +998 90 123 45 67 formatida bo'lishi kerak.",
+        "phoneExample": "Masalan: +998 90 123 45 67",
+        "deliveryAddress": "Yetkazib berish manzili",
+        "deliveryAddressSubtitle": "Kuryer borishi kerak bo'lgan joy",
+        "region": "Viloyat",
+        "regionsLoading": "Viloyatlar yuklanmoqda...",
+        "regionsError": "Viloyatlar yuklanmadi",
+        "selectRegion": "Viloyatni tanlang",
+        "district": "Tuman",
+        "districtsLoading": "Tumanlar yuklanmoqda...",
+        "districtsError": "Tumanlar yuklanmadi",
+        "selectDistrict": "Tumanni tanlang",
+        "selectRegionFirst": "Avval viloyatni tanlang",
+        "detectingLocation": "Aniqlanmoqda...",
+        "detectLocation": "Manzilni aniqlash",
+        "streetAddress": "Ko'cha, uy, xonadon",
+        "streetAddressPlaceholder": "Amir Temur ko'chasi, 12-uy",
+        "additionalNote": "Qo'shimcha izoh",
+        "additionalNotePlaceholder": "Mo'ljal yoki kuryer uchun qo'shimcha ma'lumot",
+        "deliveryType": "Yetkazib berish turi",
+        "deliveryTypeSubtitle": "Sizga qulay variantni tanlang",
+        "deliveryOptions": {
+            "postOffice": "Pochta orqali",
+            "postToHome": "Pochtadan uyga olib borib berish",
+            "courier": "Kuryer orqali",
+            "pickup": "Do'kondan olib ketish"
+        },
+        "paymentMethod": "To'lov usuli",
+        "paymentMethodSubtitle": "Buyurtma uchun to'lov shakli",
+        "protected": "Himoyalangan",
+        "cash": "Naqd",
+        "orderCreatedRedirect": "Buyurtma muvaffaqiyatli yaratildi. To'lov sahifasiga yo'naltirilmoqda...",
+        "paymentLinkMissing": "{{payment}} to'lov havolasi serverdan qaytmadi",
+        "orderAcceptedUser": "Buyurtma qabul qilindi. Uni buyurtmalaringiz bo'limida ko'rishingiz mumkin.",
+        "orderAcceptedGuest": "Buyurtma qabul qilindi. Operator siz bilan telefon orqali bog'lanadi.",
+        "orderError": "Buyurtma yaratishda xatolik yuz berdi",
+        "geolocationUnsupported": "Brauzeringiz joylashuvni aniqlashni qo'llab-quvvatlamaydi",
+        "locationDetected": "Manzil aniqlandi",
+        "locationError": "Manzilni aniqlashda xatolik yuz berdi",
+        "locationPermissionDenied": "Joylashuvni aniqlash uchun ruxsat berilmadi",
+        "validation": {
+            "emptyCart": "Savat bo'sh",
+            "nameRequired": "Ism-familiyani kiriting",
+            "invalidPhone": "Telefon raqamini to'g'ri kiriting",
+            "locationRequired": "Viloyat va tumanni tanlang",
+            "addressRequired": "Ko'cha, uy va xonadonni kiriting",
+            "paymentRequired": "To'lov usulini tanlang",
+            "productIdMissing": "Savatdagi mahsulot ID si topilmadi. Savatni yangilab, qayta urinib ko'ring"
+        },
+        "summary": "Buyurtma xulosasi",
+        "productCount": "{{count}} ta mahsulot",
+        "unknownBook": "Noma'lum kitob",
+        "emptyCart": "Savat bo'sh",
+        "price": "Narx",
+        "delivery": "Yetkazib berish",
+        "free": "Bepul",
+        "promoCode": "Promokod",
+        "totalPayment": "Jami to'lov",
+        "paymentProtected": "To'lov va buyurtma ma'lumotlari himoyalangan.",
+        "submitting": "Yuborilmoqda...",
+        "confirmOrder": "Buyurtmani tasdiqlash"
+    },
+    "cartPage": {
+        "title": "Tanlangan kitoblar",
+        "subtitle": "Miqdorni tekshiring, kerak bo'lmagan kitoblarni olib tashlang va to'lovga o'ting.",
+        "productCount": "{{count}} ta mahsulot",
+        "continueShopping": "Xaridni davom ettirish",
+        "clearAll": "Hammasini tozalash",
+        "unknownBook": "Noma'lum kitob",
+        "stockCount": "Omborda: {{count}} ta",
+        "remove": "Olib tashlash",
+        "emptyTitle": "Savat bo'sh",
+        "emptyDescription": "Katalogdan kitob qo'shsangiz, shu yerda ko'rinadi.",
+        "decreaseQuantity": "Kamaytirish",
+        "increaseQuantity": "Ko'paytirish",
+        "summary": "Buyurtma xulosasi",
+        "products": "Mahsulotlar",
+        "discount": "Chegirma",
+        "delivery": "Yetkazib berish",
+        "amountDue": "To'lov uchun",
+        "promoCode": "Promo kod",
+        "promoPlaceholder": "Masalan: BOOKUZ10",
+        "apply": "Qo'llash",
+        "securePayment": "Xavfsiz to'lov",
+        "securePaymentDescription": "To'lov ma'lumotlari himoyalangan kanal orqali qayta ishlanadi.",
+        "fastDelivery": "Tezkor yetkazib berish",
+        "fastDeliveryDescription": "Toshkent bo'ylab 24 soat ichida, viloyatlarga esa qisqa muddatda.",
+        "checkout": "Buyurtmani rasmiylashtirish"
+    },
+    "catalogPage": {
+        "filters": "Filterlar",
+        "clear": "Tozalash",
+        "search": "Qidiruv",
+        "searchPlaceholder": "Kitob nomi bo'yicha qidirish",
+        "language": "Til",
+        "languages": {
+            "all": "Barcha tillar",
+            "uz": "O'zbekcha",
+            "kr": "Kirilcha",
+            "ru": "Ruscha",
+            "en": "Inglizcha"
+        },
+        "genre": "Janr",
+        "selectGenre": "Janrni tanlang",
+        "author": "Muallif",
+        "selectAuthor": "Muallifni tanlang",
+        "publisher": "Nashriyot",
+        "selectPublisher": "Nashriyotni tanlang",
+        "priceRange": "Narx diapazoni",
+        "priceMin": "0 so'm",
+        "priceMax": "1 000 000 so'm",
+        "thousandPrice": "{{value}} ming",
+        "millionPrice": "{{value}} mln",
+        "all": "Barchasi",
+        "selectedCount": "{{count}} ta tanlandi",
+        "searchShort": "Qidirish...",
+        "searching": "Qidirilmoqda...",
+        "notFound": "Topilmadi",
+        "resultsPanel": "Natijalar paneli",
+        "booksFound": "{{count}} ta kitob topildi",
+        "gridView": "Katak ko'rinishi",
+        "listView": "Ro'yxat ko'rinishi",
+        "loadErrorTitle": "Katalog yuklanmadi",
+        "loadErrorDescription": "API yoki tarmoq bilan bog'liq vaqtinchalik muammo bo'lishi mumkin.",
+        "retry": "Qayta urinish",
+        "emptyTitle": "Natija topilmadi",
+        "emptyDescription": "Tanlangan filterlar bo'yicha kitob topilmadi. Filterlarni soddalashtirib qayta urinib ko'ring.",
+        "clearFilters": "Filterlarni tozalash"
+    },
+    "aboutPage": {
+        "badge": "BIZ HAQIMIZDA",
+        "branchFallback": "Filial",
+        "hero": {
+            "titleFirst": "Kitobxonlar uchun",
+            "titleSecond": "eng yaxshi platforma",
+            "description": "BOOK.UZ — O'zbekistonning eng katta raqamli kutubxonasi. Biz {{count}}+ kitob bilan sizga eng yaxshi o'qish tajribasini taqdim etamiz.",
+            "cta": "Kitoblarni ko'rish"
+        },
+        "tabs": {
+            "history": "Tarix",
+            "values": "Qadriyatlar"
+        },
+        "statistics": {
+            "books": "Kitoblar",
+            "users": "Foydalanuvchilar",
+            "rating": "O'rtacha reyting",
+            "branches": "Filiallar"
+        },
+        "valuesTitleBefore": "Bizning",
+        "valuesTitleHighlight": "qadriyatlarimiz",
+        "historyTitleBefore": "Bizning",
+        "historyTitleHighlight": "tariximiz",
+        "mission": {
+            "title": "Bizning vazifamiz",
+            "description": "O'zbekistonda kitobxonlik madaniyatini rivojlantirish va har bir insonga sifatli kitoblarni qulay narxlarda taqdim etish. Biz orqali millionlab odamlar bilim olish va zavqlanish imkoniyatiga ega bo'ladi."
+        },
+        "vision": {
+            "title": "Bizning maqsadimiz",
+            "description": "Markaziy Osiyodagi eng yirik raqamli kutubxonaga aylanish va 5 yil ichida 10 milliondan ortiq foydalanuvchiga xizmat ko'rsatish. Innovatsion texnologiyalar orqali kitob o'qishni yanada qulay va maroqli qilish."
+        },
+        "contact": {
+            "addressTitle": "Manzil",
+            "addressLineOne": "Toshkent sh., Chilonzor tumani",
+            "addressLineTwo": "19-kvartal, 45-uy",
+            "phone": "Telefon",
+            "email": "Email"
+        },
+        "map": {
+            "branches": "{{count}} ta filial xaritada",
+            "country": "O'zbekiston",
+            "empty": "Hozircha filiallar mavjud emas"
+        }
     },
     "nav": {
         "books": "Kitoblar",

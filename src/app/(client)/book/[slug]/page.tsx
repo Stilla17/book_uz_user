@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useParams } from 'next/navigation';
 
+import { BookStructuredData } from '@/components/seo/StructuredData';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import DottedLine from '@/components/shared/DottedLine';
 import { Loading } from '@/components/shared/Loading';
@@ -21,7 +22,8 @@ import { getImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
-import { Eye, Heart, Minus, PackageCheck, Plus, ShoppingCart, Star, Store } from 'lucide-react';
+import { Eye, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
@@ -32,6 +34,7 @@ type DetailBook = Book & {
 
 // ==================== MAIN COMPONENT ====================
 export default function BookDetailPage() {
+    const { t, i18n } = useTranslation();
     const params = useParams();
     const slug = params?.slug as string;
     const [selectedQuantity, setSelectedQuantity] = useState(1);
@@ -60,7 +63,8 @@ export default function BookDetailPage() {
     const cartItem = useMemo(() => cartItems.find((item) => item.book._id === book?._id), [book?._id, cartItems]);
     const cartQuantity = cartItem?.quantity ?? 0;
     const hiddenBranchNames = ['solnechniy', 'yangi asr avlodi'];
-    const formatBranchName = (name?: string) => (name || "Do'kon").replace(/^\s*\d+\s*/, '');
+    const formatBranchName = (name?: string) => (name || t('bookDetail.storeFallback')).replace(/^\s*\d+\s*/, '');
+    console.log(book);
 
     const availableBranchStocks = useMemo(
         () =>
@@ -92,10 +96,10 @@ export default function BookDetailPage() {
             title: getLocalizedText(book?.title),
             image: book?.images?.[0] || book?.image,
             category: getCategoryLabel(book?.category),
-            author: getAuthor(book?.authorName) || 'Muallif noma’lum',
+            author: getAuthor(book?.authorName) || t('bookDetail.unknownAuthor'),
             description: getLocalizedText(book?.description)
         }),
-        [book]
+        [book, i18n.language, t]
     );
 
     const breadcrumbItems = useMemo<Array<{ label: string; path?: string }>>(() => {
@@ -109,7 +113,7 @@ export default function BookDetailPage() {
                 label: bookView.title
             }
         ];
-    }, [book, bookView.title]);
+    }, [book, bookView.category, bookView.title]);
 
     const getCartBook = () => {
         if (!book) return null;
@@ -188,10 +192,10 @@ export default function BookDetailPage() {
             <div className='min-h-screen py-16 dark:bg-slate-900'>
                 <div className='container mx-auto max-w-3xl px-4 text-center'>
                     <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 dark:border-slate-700 dark:bg-slate-800'>
-                        <h1 className='text-2xl font-black text-slate-900 dark:text-white'>Kitob topilmadi</h1>
-                        <p className='mt-3 text-slate-500 dark:text-slate-400'>
-                            Bu kitob mavjud emas yoki katalogdan olib tashlangan.
-                        </p>
+                        <h1 className='text-2xl font-black text-slate-900 dark:text-white'>
+                            {t('bookDetail.notFoundTitle')}
+                        </h1>
+                        <p className='mt-3 text-slate-500 dark:text-slate-400'>{t('bookDetail.notFoundDescription')}</p>
                     </div>
                 </div>
             </div>
@@ -200,6 +204,8 @@ export default function BookDetailPage() {
 
     return (
         <div className='min-h-screen py-4 sm:py-6 dark:bg-slate-900'>
+            <BookStructuredData book={book} />
+
             <div className='container mx-auto max-w-7xl px-3 sm:px-4'>
                 <BreadCrumb items={breadcrumbItems} />
 
@@ -238,7 +244,7 @@ export default function BookDetailPage() {
                                                     </div>
 
                                                     <span className='shrink-0 rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-600 dark:bg-green-500/10 dark:text-green-400'>
-                                                        {available} dona
+                                                        {t('bookDetail.itemsAvailable', { count: available })}
                                                     </span>
                                                 </div>
                                             </div>
@@ -248,12 +254,12 @@ export default function BookDetailPage() {
                             </div>
                         ) : isBookAvailable && !hasBranchStocks ? (
                             <div className='mt-5 rounded-lg border border-green-100 bg-green-50/70 p-3 text-sm font-semibold text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'>
-                                {availableStock} dona mavjud
+                                {t('bookDetail.stockAvailable', { count: availableStock })}
                             </div>
                         ) : (
                             <span className='flex items-center gap-2 text-sm text-red-500'>
                                 <span className='h-3 w-3 rounded-full bg-red-500'></span>
-                                Mavjud emas
+                                {t('bookDetail.outOfStock')}
                             </span>
                         )}
                     </div>
@@ -274,7 +280,7 @@ export default function BookDetailPage() {
                                             <button
                                                 key={rating}
                                                 type='button'
-                                                aria-label={`${rating} yulduz`}
+                                                aria-label={t('bookDetail.starRating', { count: rating })}
                                                 onClick={() => rateBook(rating)}
                                                 className='text-yellow-400 transition hover:scale-110'>
                                                 <Star
@@ -301,17 +307,27 @@ export default function BookDetailPage() {
                         <div className='mt-4'>
                             <DottedLine label='ISBN' value={book?.barcode} />
                             <DottedLine
-                                label='Yozuvi'
-                                value={book?.contentLanguage === 'cyrillic' ? 'Kirill' : 'Lotin'}
+                                label={t('bookDetail.script')}
+                                value={
+                                    book?.contentLanguage === 'cyrillic'
+                                        ? t('bookDetail.cyrillic')
+                                        : t('bookDetail.latin')
+                                }
                             />
                             <DottedLine
-                                label='Betlar soni'
+                                label={t('bookDetail.pages')}
                                 value={book?.numberOfPage ? String(book.numberOfPage) : undefined}
                             />
-                            <DottedLine label='Yili' value={book?.year ? String(book.year) : undefined} />
-                            <DottedLine label='Nashryot' value={book?.publisherName} />
-                            <DottedLine label='Til' value={book?.language?.toUpperCase()} />
-                            <DottedLine label='Muqova' value={book?.cover == 'paper' ? 'Yumshoq' : 'Qattiq'} />
+                            <DottedLine
+                                label={t('bookDetail.year')}
+                                value={book?.year ? String(book.year) : undefined}
+                            />
+                            <DottedLine label={t('bookDetail.publisher')} value={book?.publisherName} />
+                            <DottedLine label={t('bookDetail.language')} value={book?.language?.toUpperCase()} />
+                            <DottedLine
+                                label={t('bookDetail.cover')}
+                                value={book?.cover === 'paper' ? t('bookDetail.paperback') : t('bookDetail.hardcover')}
+                            />
                         </div>
 
                         <div className='mt-8 rounded-3xl'>
@@ -330,7 +346,7 @@ export default function BookDetailPage() {
                                         </div>
                                     ) : null}
                                     <div className='flex min-w-0 items-end gap-3'>
-                                        <span className='break-words text-3xl font-black tracking-tight text-[#ef7f1a] sm:text-4xl'>
+                                        <span className='text-3xl font-black tracking-tight break-words text-[#ef7f1a] sm:text-4xl'>
                                             {formatPrice(priceInfo.price)}
                                         </span>
                                     </div>
@@ -340,7 +356,7 @@ export default function BookDetailPage() {
                                     <button
                                         type='button'
                                         onClick={decrementCartQuantity}
-                                        aria-label='Kamaytirish'
+                                        aria-label={t('bookDetail.decreaseQuantity')}
                                         disabled={!isBookAvailable || (cartQuantity === 0 && selectedQuantity <= 1)}
                                         className='flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-[#ef7f1a] disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800'>
                                         <Minus size={18} />
@@ -352,7 +368,7 @@ export default function BookDetailPage() {
 
                                     <button
                                         type='button'
-                                        aria-label='Ko‘paytirish'
+                                        aria-label={t('bookDetail.increaseQuantity')}
                                         disabled={!isBookAvailable || !stockLimit || displayedQuantity >= stockLimit}
                                         onClick={isBookAvailable ? incrementCartQuantity : undefined}
                                         className='flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-[#ef7f1a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900 dark:hover:bg-orange-100'>
@@ -368,10 +384,10 @@ export default function BookDetailPage() {
                                     className='h-12 rounded-2xl bg-[#ef7f1a] text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] sm:h-14 sm:text-base dark:shadow-none'>
                                     <ShoppingCart size={20} />
                                     {!isBookAvailable
-                                        ? 'Mavjud emas'
+                                        ? t('bookDetail.outOfStock')
                                         : cartQuantity > 0
-                                          ? 'Savatda'
-                                          : "Savatga qo'shish"}
+                                          ? t('bookDetail.inCart')
+                                          : t('bookDetail.addToCart')}
                                 </Button>
                                 <Button
                                     variant='outline'
@@ -379,7 +395,7 @@ export default function BookDetailPage() {
                                     onClick={toggleFavorite}
                                     className={`h-12 rounded-2xl border-slate-200 bg-white/80 px-4 text-sm font-bold backdrop-blur hover:border-[#ef7f1a] hover:text-[#ef7f1a] sm:h-14 sm:px-5 sm:text-base dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-slate-500 dark:hover:text-white`}>
                                     <Heart className={isBookmarked ? 'fill-red-500 text-red-500' : ''} size={20} />
-                                    Sevimlilarga
+                                    {t('bookDetail.favorites')}
                                 </Button>
                             </div>
                         </div>

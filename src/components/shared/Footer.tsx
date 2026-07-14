@@ -144,12 +144,14 @@ export const Footer = () => {
                             </a>
 
                             <a
-                                href='mailto:support@book.uz'
+                                href='https://t.me/bookuzbot'
+                                target='_blank'
+                                rel='noreferrer'
                                 className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-2'>
                                 <div className='grid h-7 w-7 place-items-center rounded-lg bg-white/10'>
                                     <Mail size={12} className='text-white' />
                                 </div>
-                                <div className='text-xs font-bold text-white'>support@book.uz</div>
+                                <div className='text-xs font-bold text-white'>@bookuzbot</div>
                             </a>
                         </div>
                     </div>
