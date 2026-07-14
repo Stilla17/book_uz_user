@@ -1,6 +1,6 @@
 ﻿import { CreateCommentPayload, OrderPayload, Product, PublisherItems } from '@/types';
 
-import axios from 'axios';
+import axios, { create } from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const AUTH_SESSION_KEY = 'bookuz:auth-session';
@@ -12,7 +12,7 @@ export const setAuthSession = (value: boolean) => {
     value ? localStorage.setItem(AUTH_SESSION_KEY, 'true') : localStorage.removeItem(AUTH_SESSION_KEY);
 };
 
-export const api = axios.create({
+export const api = create({
     baseURL: API_BASE_URL,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true

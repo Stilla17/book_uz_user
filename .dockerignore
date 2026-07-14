@@ -1,5 +1,11 @@
 node_modules
 .next
+build
+.npm-cache
+.env
+.env.*
 npm-debug.log
+yarn-debug.log*
+yarn-error.log*
 .git
 .gitignore
