@@ -62,13 +62,26 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                             Sayt bo‘limlari, katalog, qidiruv va sozlamalar.
                         </SheetDescription>
 
-                        <div className={` ${getBorderColor()} flex justify-between border-b p-4 sm:p-5`}>
-                            <Link href='/' className='group'>
-                                <img src='/images/Logo.png' alt='Logo' className='h-auto w-22 object-contain sm:w-36' />
+                        <div
+                            className={`flex min-h-16 items-center justify-between border-b px-4 py-3 sm:px-5 ${getBorderColor()}`}>
+                            <Link
+                                href='/'
+                                aria-label='Bosh sahifa'
+                                onClick={() => setMobileOpen(false)}
+                                className='inline-flex items-center'>
+                                <img
+                                    src='/images/Logo.png'
+                                    alt='Book.uz'
+                                    className='h-20 w-auto max-w-46 object-cover sm:h-20'
+                                />
                             </Link>
 
                             <SheetClose asChild>
-                                <Button variant='ghost' className='h-10 w-10 rounded-xl p-0'>
+                                <Button
+                                    type='button'
+                                    variant='ghost'
+                                    aria-label='Menyuni yopish'
+                                    className='h-10 w-10 shrink-0 rounded-xl p-0'>
                                     <X size={18} className={getTextColor()} />
                                 </Button>
                             </SheetClose>

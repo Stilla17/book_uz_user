@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 export const AboutSection = () => {
     const { t, i18n } = useTranslation();
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
-    const { data: apiBranches = [] } = useBranchUserQuery();
+    const { data: apiBranches } = useBranchUserQuery();
     const { data: book } = useBookCount();
     const { data: publishersData } = useQuery({
         queryKey: ['publishers-count'],
@@ -30,12 +30,16 @@ export const AboutSection = () => {
     const publishersCount = publishersData?.pagination?.total ?? 0;
     const booksCount = book?.pagination?.total ?? 0;
 
-    const branches = apiBranches
-        .map((branch) => ({
-            name: branch.branchName ?? branch.name ?? t('aboutSection.branchFallback'),
-            coords: [Number(branch.latitude), Number(branch.longitude)] as [number, number]
-        }))
-        .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1]));
+    const branches = useMemo(
+        () =>
+            (apiBranches ?? [])
+                .map((branch) => ({
+                    name: branch.branchName ?? branch.name ?? t('aboutSection.branchFallback'),
+                    coords: [Number(branch.latitude), Number(branch.longitude)] as [number, number]
+                }))
+                .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1])),
+        [apiBranches, t]
+    );
 
     const stats = [
         {

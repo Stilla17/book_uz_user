@@ -61,6 +61,7 @@ const BranchCoordinatePreview = ({
         mapRef.current = map;
 
         return () => {
+            map.stop();
             markerRef.current = null;
             mapRef.current = null;
             map.remove();
@@ -89,6 +90,7 @@ const BranchCoordinatePreview = ({
         markerRef.current
             .bindPopup(`<strong>${name?.trim() || 'Yangi filial'}</strong><br/>${position[0]}, ${position[1]}`)
             .openPopup();
+        map.stop();
         map.flyTo(position, 13, { duration: 0.5 });
     }, [isValid, latitude, longitude, name]);
 

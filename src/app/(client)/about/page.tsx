@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -39,13 +39,17 @@ export default function AboutPage() {
     ];
     const [activeTab, setActiveTab] = useState<'history' | 'values'>('history');
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
-    const { data: apiBranches = [] } = useBranchUserQuery();
-    const branches = apiBranches
-        .map((branch) => ({
-            name: branch.branchName ?? branch.name ?? t('aboutPage.branchFallback'),
-            coords: [Number(branch.latitude), Number(branch.longitude)] as [number, number]
-        }))
-        .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1]));
+    const { data: apiBranches } = useBranchUserQuery();
+    const branches = useMemo(
+        () =>
+            (apiBranches ?? [])
+                .map((branch) => ({
+                    name: branch.branchName ?? branch.name ?? t('aboutPage.branchFallback'),
+                    coords: [Number(branch.latitude), Number(branch.longitude)] as [number, number]
+                }))
+                .filter((branch) => Number.isFinite(branch.coords[0]) && Number.isFinite(branch.coords[1])),
+        [apiBranches, t]
+    );
     const { data: book } = useBookCount();
     const booksCount = book?.pagination?.total ?? 0;
     const statisticKeys = ['books', 'users', 'rating', 'branches'] as const;

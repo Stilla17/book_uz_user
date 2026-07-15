@@ -137,7 +137,7 @@ export const Navbar = () => {
             <div
                 className={`container mx-auto flex h-16 items-center justify-between gap-2 px-3 sm:px-4 md:h-20 md:gap-4 ${getBgColor('card')}`}>
                 {/* Chap qism - Logo va Katalog */}
-                <div className='flex items-center gap-2 md:gap-4'>
+                <div className='flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start md:gap-4'>
                     {/* Mobile burger */}
                     <NavbarMobile
                         cartCount={cartDisplayCount}

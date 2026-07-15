@@ -51,6 +51,7 @@ export const BranchMap = ({ focusRequest, branches = [] }: BranchMapProps) => {
 
             marker.bindPopup(`<strong>${branch.name}</strong>`);
             marker.on('click', () => {
+                map.stop();
                 map.flyTo(branch.coords, 11, { duration: 0.8 });
             });
             return marker;
@@ -62,6 +63,7 @@ export const BranchMap = ({ focusRequest, branches = [] }: BranchMapProps) => {
         }
 
         return () => {
+            map.stop();
             markersRef.current = {};
             mapRef.current = null;
             map.remove();
@@ -76,6 +78,7 @@ export const BranchMap = ({ focusRequest, branches = [] }: BranchMapProps) => {
         if (!map || !marker) return;
 
         const latLng = marker.getLatLng();
+        map.stop();
         map.flyTo(latLng, 11, { duration: 0.8 });
         marker.openPopup();
     }, [focusRequest]);
