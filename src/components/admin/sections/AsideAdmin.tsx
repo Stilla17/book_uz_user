@@ -20,7 +20,7 @@ const AsideAdmin = () => {
             }`}>
             <div className='mb-5 flex min-h-0 flex-1 flex-col gap-7'>
                 <div className={`flex items-center ${isSidebarOpen ? 'justify-between gap-3' : 'flex-col gap-6'}`}>
-                    <Link href='/admin' aria-label='Admin home'>
+                    <Link href='/' aria-label='Admin home'>
                         <Image src={logo} alt='Book uz logo' priority />
                     </Link>
 

@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { useOrderIdQuery } from '@/components/admin/hooks/queries/order';
 import { orderStatusConfig, paymentStatusConfig } from '@/data';
-import { getAuthor, getLocalizedText } from '@/utils/book-formatters';
+import { getBookAuthorName, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 import { getOrderItemPrice, getOrderItemProduct, getOrderItemsQuantity, getOrderProductsTotal } from '@/utils/order';
@@ -138,7 +138,7 @@ const AdminOrderDetailPage = () => {
                                                                 </p>
                                                                 <p className='mt-1 text-xs font-bold text-[#9d907e] dark:text-slate-500'>
                                                                     {product
-                                                                        ? getAuthor(product.author)
+                                                                        ? getBookAuthorName(product)
                                                                         : 'Mahsulot ma’lumoti yuklanmagan'}
                                                                 </p>
                                                             </div>
@@ -182,7 +182,7 @@ const AdminOrderDetailPage = () => {
                                 <div>
                                     <p className='font-black text-[#2f2a25] dark:text-white'>{orderData?.guestName}</p>
                                     <p className='mt-1 text-xs font-bold text-[#9d907e] dark:text-slate-500'>
-                                        {orderData?.items.map((item) => item.quantity)} ta buyurtma
+                                        {orderData?.items.length} ta buyurtma
                                     </p>
                                 </div>
                             </div>

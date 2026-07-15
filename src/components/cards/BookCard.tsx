@@ -16,7 +16,7 @@ import { type BookCardProps } from '@/types/book';
 import { getBookAuthorName, getBookPriceInfo, getBookTitle } from '@/utils/book-formatters';
 import { addGuestCart, saveCartPriceOverride } from '@/utils/cartStorage';
 import { formatPriceNumber } from '@/utils/currency';
-import { getImageUrl } from '@/utils/image';
+import { getLatestImageUrl } from '@/utils/image';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { BookOpen, Eye, Heart, ShoppingCart, Star } from 'lucide-react';
@@ -41,6 +41,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
 
     const { isBookmarked, favoriteLoading, toggleFavorite, user } = useBookWishlist(book, { onWishlistChange });
     const priceInfo = getBookPriceInfo(book);
+    const bookImageUrl = getLatestImageUrl(book.images) || getLatestImageUrl(book.image);
 
     const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
@@ -59,7 +60,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                 oldPrice: priceInfo.oldPrice,
                 discountPrice: priceInfo.price,
                 discount: priceInfo.discount,
-                images: book.image ?? book.images?.[0] ?? '',
+                images: bookImageUrl ?? '',
                 stock: book.stock ?? 0,
                 publisher: book.publisher,
                 publisherId: book.publisherId,
@@ -94,7 +95,6 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
     };
 
     const bookHref = `/book/${slug ?? book.slug ?? book._id}`;
-    const bookImageUrl = getImageUrl(book.image ?? book.images);
     const prefetchBook = () => {
         const bookSlug = slug ?? book.slug ?? book._id;
 

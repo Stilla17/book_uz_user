@@ -18,7 +18,7 @@ import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getBookPriceInfo, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
-import { getImageUrl } from '@/utils/image';
+import { getImageUrl, getLatestImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
@@ -103,7 +103,7 @@ export default function BookDetailPage() {
     const bookView = useMemo(
         () => ({
             title: getLocalizedText(book?.title),
-            image: book?.images?.[0] || book?.image,
+            image: getLatestImageUrl(book?.images) || getLatestImageUrl(book?.image),
             category: getCategoryLabel(book?.category),
             author: getAuthor(book?.authorName) || t('bookDetail.unknownAuthor'),
             description: getLocalizedText(book?.description)
@@ -135,7 +135,7 @@ export default function BookDetailPage() {
             oldPrice: priceInfo.oldPrice,
             discountPrice: priceInfo.price,
             discount: priceInfo.discount,
-            images: book.image ?? book.images?.[0] ?? '',
+            images: bookView.image ?? '',
             stock: stockLimit ?? 0,
             publisher: book.publisher,
             publisherId: book.publisherId,
