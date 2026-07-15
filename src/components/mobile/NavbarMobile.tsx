@@ -62,11 +62,9 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                             Sayt bo‘limlari, katalog, qidiruv va sozlamalar.
                         </SheetDescription>
 
-                        <div className={`border-b p-4 sm:p-5 ${getBorderColor()} flex items-center justify-between`}>
-                            <Link href='/' className='group flex min-w-fit flex-col items-center gap-1 pt-2'>
-                                <div className='mt-1 flex items-center text-xl leading-none font-black tracking-tighter md:text-2xl'>
-                                    <img src='/images/Logo.png' alt='Logo' />
-                                </div>
+                        <div className={` ${getBorderColor()} flex justify-between border-b p-4 sm:p-5`}>
+                            <Link href='/' className='group'>
+                                <img src='/images/Logo.png' alt='Logo' className='h-auto w-22 object-contain sm:w-36' />
                             </Link>
 
                             <SheetClose asChild>
