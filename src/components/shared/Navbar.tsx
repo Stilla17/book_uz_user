@@ -226,8 +226,8 @@ export const Navbar = () => {
                                                 );
                                             })}
                                         </div>
-
                                         <div className='min-h-[360px] overflow-y-auto p-4'>
+
                                             {activeCategory ? (
                                                 <>
                                                     <div className='mb-4 flex items-start justify-between gap-4'>

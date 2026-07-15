@@ -32,6 +32,17 @@ type DetailBook = Book & {
     subgenre?: string | { _id?: string };
 };
 
+const hiddenBranchNames = ['solnechniy', 'yangi asr avlodi', 'book uz sklad', 'mitti olam', 'ko rgazma 28 06'];
+
+const normalizeBranchName = (name?: string) =>
+    (name ?? '')
+        .trim()
+        .toLocaleLowerCase('uz-UZ')
+        .replace(/[ʻʼ’‘`´']/g, ' ')
+        .replace(/[^\p{L}\p{N}]+/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
 // ==================== MAIN COMPONENT ====================
 export default function BookDetailPage() {
     const { t, i18n } = useTranslation();
@@ -62,14 +73,12 @@ export default function BookDetailPage() {
     const { cartItems, addItem, updateQuantity, removeItem } = useBookCart({ loadOnMount: false });
     const cartItem = useMemo(() => cartItems.find((item) => item.book._id === book?._id), [book?._id, cartItems]);
     const cartQuantity = cartItem?.quantity ?? 0;
-    const hiddenBranchNames = ['solnechniy', 'yangi asr avlodi'];
     const formatBranchName = (name?: string) => (name || t('bookDetail.storeFallback')).replace(/^\s*\d+\s*/, '');
-    console.log(book);
 
     const availableBranchStocks = useMemo(
         () =>
             book?.branchStocks?.filter((item) => {
-                const storeName = (item.storeName ?? '').trim().toLowerCase();
+                const storeName = normalizeBranchName(item.storeName);
                 return (item.available ?? 0) > 0 && !hiddenBranchNames.some((name) => storeName.includes(name));
             }) ?? [],
         [book?.branchStocks]

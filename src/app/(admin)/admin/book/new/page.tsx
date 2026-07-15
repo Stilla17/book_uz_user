@@ -238,8 +238,8 @@ const AdminNewBookPage = () => {
             return;
         }
 
-        if (!categoryValue || !subCategoryValue || !authorValue || !publisherValue) {
-            toast.error('Kategoriya, subkategoriya, muallif va nashriyotni tanlang');
+        if (!categoryValue || !authorValue || !publisherValue) {
+            toast.error('Kategoriya, muallif va nashriyotni tanlang');
             return;
         }
 
@@ -263,9 +263,11 @@ const AdminNewBookPage = () => {
         appendText(formData, 'slug', values.slug);
         tags.forEach((tag) => formData.append('tegs', tag));
         formData.append('category', categoryValue);
-        formData.append('subCategoryId', subCategoryValue);
-        formData.append('subCategory', subCategoryValue);
-        formData.append('subgenre', subCategoryValue);
+        if(subCategoryValue){
+            formData.append('subCategoryId', subCategoryValue);
+            formData.append('subCategory', subCategoryValue);
+            formData.append('subgenre', subCategoryValue);
+        }
         formData.append('author', authorValue);
         formData.append('publisher', publisherValue);
         formData.append('language', values.language);
