@@ -1,18 +1,33 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-import { useOrderIdQuery } from '@/components/admin/hooks/queries/order';
+import { useOrderIdQuery, useUpdateOrderStatus } from '@/components/admin/hooks/queries/order';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { orderStatusConfig, paymentStatusConfig } from '@/data';
+import type { OrderStatus } from '@/types/orders';
 import { getBookAuthorName, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
 import { getOrderItemPrice, getOrderItemProduct, getOrderItemsQuantity, getOrderProductsTotal } from '@/utils/order';
 
 import dayjs from 'dayjs';
-import { ArrowLeft, Banknote, BookOpen, Copy, Truck, UserRound } from 'lucide-react';
+import { ArrowLeft, Banknote, BookOpen, Check, ClipboardCheck, Copy, Loader2, Truck, UserRound } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const orderStatusOptions: Array<{ value: OrderStatus; label: string }> = [
+    { value: 'PENDING', label: 'Kutilmoqda' },
+    { value: 'CONFIRMED', label: 'Qabul qilindi' },
+    { value: 'PROCESSING', label: 'Jarayonda' },
+    { value: 'PACKED', label: 'Tayyorlanmoqda' },
+    { value: 'SHIPPED', label: "Yo'lga chiqdi" },
+    { value: 'DELIVERING', label: "Yo'lda" },
+    { value: 'DELIVERED', label: 'Yetkazib berildi' },
+    { value: 'CANCELLED', label: 'Bekor qilindi' }
+];
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
     <div className='flex items-start justify-between gap-4 border-b border-[#eadfce] py-3 last:border-0 dark:border-slate-800'>
@@ -33,12 +48,18 @@ const getDeliveryLabel = (deliveryType?: string, postDeliveryType?: string) => {
 const AdminOrderDetailPage = () => {
     const searchParams = useSearchParams();
     const id = searchParams.get('id') ?? '';
+    const [selectedStatus, setSelectedStatus] = useState<OrderStatus | ''>('');
     const { data: orderData, isLoading: isDetailLoading } = useOrderIdQuery(id);
+    const { mutate: updateOrderStatus, isPending: isUpdatingStatus } = useUpdateOrderStatus();
     const statusConfig = orderData ? orderStatusConfig[orderData.status] : null;
     const paymentStatusLabel = orderData
         ? paymentStatusConfig[orderData.paymentStatus]?.label || orderData.paymentStatus || "Noma'lum"
         : '';
     const productsTotal = getOrderProductsTotal(orderData?.items);
+
+    useEffect(() => {
+        if (orderData?.status) setSelectedStatus(orderData.status);
+    }, [orderData?.status]);
 
     const handleCopyLocation = async () => {
         const address = orderData?.shippingAddress;
@@ -60,6 +81,18 @@ const AdminOrderDetailPage = () => {
             console.error('Havolani nusxalashda xatolik:', error);
             toast.error('Manzilni nusxalashda xatolik yuz berdi.');
         }
+    };
+
+    const handleChangeOrderStatus = () => {
+        if (!orderData || !selectedStatus || selectedStatus === orderData.status) return;
+
+        updateOrderStatus(
+            { orderId: orderData._id, status: selectedStatus },
+            {
+                onSuccess: () => toast.success('Buyurtma holati yangilandi'),
+                onError: () => toast.error("Buyurtma holatini o'zgartirib bo'lmadi")
+            }
+        );
     };
 
     return (
@@ -246,6 +279,71 @@ const AdminOrderDetailPage = () => {
                 </div>
 
                 <aside className='space-y-5'>
+                    <section className='rounded-[24px] bg-base-100 p-5 shadow-sm ring-1 ring-base-300'>
+                        <div className='flex items-start justify-between gap-4'>
+                            <div className='flex items-center gap-2'>
+                                <span className='grid size-9 place-items-center rounded-xl bg-warning/10 text-warning'>
+                                    <ClipboardCheck size={19} />
+                                </span>
+                                <div>
+                                    <h3 className='text-lg font-black text-base-content'>Buyurtma holati</h3>
+                                    <p className='mt-0.5 text-xs font-semibold text-admin-subtle'>
+                                        Buyurtmaning joriy bosqichini tanlang
+                                    </p>
+                                </div>
+                            </div>
+                            {statusConfig && (
+                                <span
+                                    className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black ring-1 ${statusConfig.className}`}>
+                                    {statusConfig.label}
+                                </span>
+                            )}
+                        </div>
+
+                        <label className='mt-5 block'>
+                            <span className='mb-2 block text-xs font-black tracking-wide text-admin-subtle uppercase'>
+                                Yangi holat
+                            </span>
+                            <Select
+                                value={selectedStatus || undefined}
+                                disabled={isDetailLoading || isUpdatingStatus}
+                                onValueChange={(value) => setSelectedStatus(value as OrderStatus)}>
+                                <SelectTrigger className='h-12 w-full border-base-300 bg-base-200 font-black text-base-content shadow-none focus:border-warning focus:ring-4 focus:ring-warning/10'>
+                                    <SelectValue placeholder='Holatni tanlang' />
+                                </SelectTrigger>
+                                <SelectContent className='border-[#eadfce] bg-[#fffaf2]'>
+                                    {orderStatusOptions.map((option) => (
+                                        <SelectItem
+                                            key={option.value}
+                                            value={option.value}
+                                            className='font-bold focus:bg-[#f2e7d8] focus:text-[#2f2a25]'>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </label>
+
+                        <button
+                            type='button'
+                            onClick={handleChangeOrderStatus}
+                            disabled={
+                                isDetailLoading ||
+                                isUpdatingStatus ||
+                                !orderData ||
+                                !selectedStatus ||
+                                selectedStatus === orderData.status
+                            }
+                            className='mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-warning px-4 text-sm font-black text-warning-content shadow-sm transition hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50'>
+                            {isUpdatingStatus ? (
+                                <Loader2 size={18} className='animate-spin' />
+                            ) : (
+                                <Check size={18} strokeWidth={3} />
+                            )}
+                            Holatni saqlash
+                        </button>
+                    </section>
+
                     <section className='rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                         <div className='flex items-center gap-2'>
                             <Banknote size={20} className='text-[#ef7f1a]' />

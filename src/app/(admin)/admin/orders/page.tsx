@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { useOrderQuery, useUpdateOrderStatus } from '@/components/admin/hooks/queries/order';
+import { useOrderQuery } from '@/components/admin/hooks/queries/order';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
@@ -18,7 +18,6 @@ import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
 import { Banknote, Clock3, Search, ShoppingBag } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 export type StatusFilter = 'ALL' | OrderStatus;
 type OrderSortKey = 'customer' | 'date' | 'amount' | 'payment';
@@ -37,8 +36,6 @@ const AdminOrdersPage = () => {
     const [page, setPage] = useState(urlPage);
     const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<OrderSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { mutate: updateOrderStatus, isPending: isUpdatingStatus, variables: updatingStatus } =
-        useUpdateOrderStatus();
     const {
         data: orders,
         isFetching,
@@ -119,27 +116,6 @@ const AdminOrdersPage = () => {
         { label: 'Yetkazildi', value: 'DELIVERED' },
         { label: 'Bekor qilindi', value: 'CANCELLED' }
     ];
-    const statusOptions: Array<{ label: string; value: OrderStatus }> = [
-        { label: 'Kutilmoqda', value: 'PENDING' },
-        { label: 'Qabul qilindi', value: 'CONFIRMED' },
-        { label: 'Tayyorlanmoqda', value: 'PROCESSING' },
-        { label: 'Qadoqlandi', value: 'PACKED' },
-        { label: "Yo'lda", value: 'SHIPPED' },
-        { label: 'Yetkazilmoqda', value: 'DELIVERING' },
-        { label: 'Yetkazildi', value: 'DELIVERED' },
-        { label: 'Bekor qilindi', value: 'CANCELLED' }
-    ];
-
-    const handleStatusChange = (orderId: string, status: OrderStatus) => {
-        updateOrderStatus(
-            { orderId, status },
-            {
-                onSuccess: () => toast.success('Buyurtma holati yangilandi'),
-                onError: () => toast.error("Buyurtma holatini o'zgartirib bo'lmadi")
-            }
-        );
-    };
-
     return (
         <div className='space-y-5'>
             <StatsCardsAdmin stats={stats} isLoading={isLoading} />
@@ -297,21 +273,15 @@ const AdminOrdersPage = () => {
                                                     </span>
                                                 </Link>
                                             </td>
-                                            <td className='px-4 py-4'>
-                                                <select
-                                                    aria-label={`${order.orderNumber || order._id} buyurtma holati`}
-                                                    value={order.status}
-                                                    disabled={isUpdatingStatus && updatingStatus?.orderId === order._id}
-                                                    onChange={(event) =>
-                                                        handleStatusChange(order._id, event.target.value as OrderStatus)
-                                                    }
-                                                    className={`h-9 min-w-36 rounded-xl border-0 px-3 text-xs font-black outline-none ring-1 disabled:cursor-wait disabled:opacity-60 ${statusConfig.className}`}>
-                                                    {statusOptions.map((status) => (
-                                                        <option key={status.value} value={status.value}>
-                                                            {status.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                            <td className='p-0'>
+                                                <Link
+                                                    href={`/admin/orders/slug?id=${order._id}`}
+                                                    className='block px-4 py-4'>
+                                                    <span
+                                                        className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${statusConfig.className}`}>
+                                                        {statusConfig.label}
+                                                    </span>
+                                                </Link>
                                             </td>
                                         </tr>
                                     );
