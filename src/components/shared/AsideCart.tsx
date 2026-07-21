@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import { FREE_DELIVERY_MIN_TOTAL } from '@/helpers/checkout';
 import { calculatePromoDiscount } from '@/helpers/promoDiscount';
 import { UserService } from '@/services/api';
 import { PromoServiceUser } from '@/services/promo.service';
@@ -39,7 +40,8 @@ const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => 
         queryKey: ['settings', 'delivery'],
         queryFn: UserService.getDeliverySettings
     });
-    const deliveryPrice = totalQuantity > 0 ? (deliverySettings?.deliveryFee ?? 20000) : 0;
+    const deliveryPrice =
+        totalQuantity > 0 && totalPrice < FREE_DELIVERY_MIN_TOTAL ? (deliverySettings?.deliveryFee ?? 20000) : 0;
     const paymentTotal = Math.max(0, totalPrice + deliveryPrice - discountAmount);
 
     const { data: promos = [] } = useQuery<Coupon[]>({
@@ -98,7 +100,7 @@ const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => 
                     <div className='flex items-center justify-between text-sm text-slate-500 dark:text-slate-400'>
                         <span>{t('cartPage.delivery')}</span>
                         <span className='font-semibold text-slate-900 dark:text-white'>
-                            {formatCartPrice(deliveryPrice)}
+                            {deliveryPrice === 0 ? t('checkoutPage.free') : formatCartPrice(deliveryPrice)}
                         </span>
                     </div>
                 </div>

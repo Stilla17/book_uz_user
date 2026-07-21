@@ -15,7 +15,7 @@ const AsideAdmin = () => {
 
     return (
         <aside
-            className={`hidden min-h-0 shrink-0 flex-col border-r border-[#eadfce] bg-[#fff8ee] px-3 py-5 transition-[width] duration-300 ease-out md:flex dark:border-slate-800 dark:bg-slate-950 ${
+            className={`hidden min-h-0 shrink-0 flex-col border-r border-base-300 bg-admin-header px-3 py-5 transition-[width] duration-300 ease-out md:flex ${
                 isSidebarOpen ? 'w-64' : 'w-20'
             }`}>
             <div className='mb-5 flex min-h-0 flex-1 flex-col gap-7'>
@@ -27,7 +27,7 @@ const AsideAdmin = () => {
                     <button
                         type='button'
                         onClick={() => setIsSidebarOpen((value) => !value)}
-                        className='grid size-10 shrink-0 place-items-center rounded-2xl bg-white text-[#928675] shadow-sm ring-1 ring-[#eadfce] transition hover:text-[#ef7f1a] dark:bg-slate-900 dark:text-slate-400 dark:ring-slate-800 dark:hover:text-white'
+                        className='grid size-10 shrink-0 place-items-center rounded-2xl bg-admin-white text-admin-quiet shadow-sm ring-1 ring-base-300 transition hover:text-primary'
                         aria-label={isSidebarOpen ? 'Sidebarni yopish' : 'Sidebarni ochish'}
                         title={isSidebarOpen ? 'Yopish' : 'Ochish'}>
                         {isSidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
@@ -45,8 +45,8 @@ const AsideAdmin = () => {
                                 isSidebarOpen ? 'justify-start gap-3 px-3' : 'justify-center'
                             } ${
                                 pathname === href || (href !== '/admin' && pathname.startsWith(href))
-                                    ? 'bg-[#ef7f1a] text-white'
-                                    : 'bg-white text-[#928675] shadow-sm hover:bg-[#fff1df] hover:text-[#ef7f1a] dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white'
+                                    ? 'bg-warning text-white'
+                                    : 'bg-admin-white text-admin-quiet shadow-sm hover:bg-admin-soft-bg hover:text-warning'
                             }`}>
                             <Icon size={19} className='shrink-0' />
                             <span
@@ -62,7 +62,7 @@ const AsideAdmin = () => {
 
             <Link
                 href='/admin/support'
-                className={`flex items-center justify-center rounded-2xl bg-[#285c7f] text-white shadow-lg transition-all duration-300 ${
+                className={`flex items-center justify-center rounded-2xl bg-secondary text-secondary-content shadow-lg transition-all duration-300 ${
                     isSidebarOpen ? 'h-12 gap-3 px-4' : 'h-32 w-11 self-center'
                 }`}>
                 <span

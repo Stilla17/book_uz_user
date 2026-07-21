@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { useOrderQuery } from '@/components/admin/hooks/queries/order';
+import { useOrderQuery, useUpdateOrderStatus } from '@/components/admin/hooks/queries/order';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
@@ -18,6 +18,7 @@ import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
 import { Banknote, Clock3, Search, ShoppingBag } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export type StatusFilter = 'ALL' | OrderStatus;
 type OrderSortKey = 'customer' | 'date' | 'amount' | 'payment';
@@ -36,6 +37,8 @@ const AdminOrdersPage = () => {
     const [page, setPage] = useState(urlPage);
     const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<OrderSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
+    const { mutate: updateOrderStatus, isPending: isUpdatingStatus, variables: updatingStatus } =
+        useUpdateOrderStatus();
     const {
         data: orders,
         isFetching,
@@ -116,21 +119,41 @@ const AdminOrdersPage = () => {
         { label: 'Yetkazildi', value: 'DELIVERED' },
         { label: 'Bekor qilindi', value: 'CANCELLED' }
     ];
+    const statusOptions: Array<{ label: string; value: OrderStatus }> = [
+        { label: 'Kutilmoqda', value: 'PENDING' },
+        { label: 'Qabul qilindi', value: 'CONFIRMED' },
+        { label: 'Tayyorlanmoqda', value: 'PROCESSING' },
+        { label: 'Qadoqlandi', value: 'PACKED' },
+        { label: "Yo'lda", value: 'SHIPPED' },
+        { label: 'Yetkazilmoqda', value: 'DELIVERING' },
+        { label: 'Yetkazildi', value: 'DELIVERED' },
+        { label: 'Bekor qilindi', value: 'CANCELLED' }
+    ];
+
+    const handleStatusChange = (orderId: string, status: OrderStatus) => {
+        updateOrderStatus(
+            { orderId, status },
+            {
+                onSuccess: () => toast.success('Buyurtma holati yangilandi'),
+                onError: () => toast.error("Buyurtma holatini o'zgartirib bo'lmadi")
+            }
+        );
+    };
 
     return (
         <div className='space-y-5'>
             <StatsCardsAdmin stats={stats} isLoading={isLoading} />
 
-            <section className='overflow-hidden rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 xl:flex-row xl:items-center xl:justify-between dark:border-slate-800'>
-                    <label className='flex h-11 min-w-0 items-center gap-2 rounded-2xl bg-[#f2e7d8] px-4 text-[#817466] xl:max-w-sm xl:flex-1 dark:bg-slate-900 dark:text-slate-300'>
+            <section className='overflow-hidden rounded-[24px] bg-base-100 shadow-sm ring-1 ring-base-300'>
+                <div className='flex flex-col gap-3 border-b border-base-300 p-4 xl:flex-row xl:items-center xl:justify-between'>
+                    <label className='flex h-11 min-w-0 items-center gap-2 rounded-2xl bg-base-200 px-4 text-admin-dim xl:max-w-sm xl:flex-1'>
                         <Search size={18} className='shrink-0' />
                         <input
                             type='search'
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             placeholder='ID, mijoz yoki telefon raqami'
-                            className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-[#9d907e] dark:placeholder:text-slate-500'
+                            className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-admin-subtle'
                         />
                     </label>
 
@@ -144,7 +167,9 @@ const AdminOrdersPage = () => {
                                     setPage(1);
                                 }}
                                 className={`h-10 rounded-xl px-4 text-sm font-black ${
-                                    active === filter.value ? 'bg-[#ef7f1a] text-white' : 'bg-white text-[#817466]'
+                                    active === filter.value
+                                        ? 'bg-warning text-warning-content'
+                                        : 'bg-admin-white text-admin-dim ring-1 ring-base-300'
                                 }`}>
                                 {filter.label}
                             </button>
@@ -155,7 +180,7 @@ const AdminOrdersPage = () => {
                 <div className='overflow-x-auto'>
                     <table className='w-full min-w-[1040px] text-left'>
                         <thead>
-                            <tr className='border-b border-[#eadfce] text-xs font-black text-[#9d907e] uppercase dark:border-slate-800 dark:text-slate-500'>
+                            <tr className='border-b border-base-300 text-xs font-black text-admin-subtle uppercase'>
                                 <th className='px-4 py-3'>№</th>
                                 <th className='px-4 py-3'>
                                     <button
@@ -216,7 +241,7 @@ const AdminOrdersPage = () => {
                                     return (
                                         <tr
                                             key={order._id}
-                                            className='border-b border-[#f0e4d3] bg-white transition last:border-0 hover:bg-[#fffaf2] dark:border-slate-900 dark:bg-slate-950 dark:hover:bg-slate-900'>
+                                            className='border-b border-base-300 bg-admin-white transition last:border-0 hover:bg-base-200'>
                                             <td className='p-0'>
                                                 <Link
                                                     href={`/admin/orders/slug?id=${order._id}`}
@@ -272,15 +297,21 @@ const AdminOrdersPage = () => {
                                                     </span>
                                                 </Link>
                                             </td>
-                                            <td className='p-0'>
-                                                <Link
-                                                    href={`/admin/orders/slug?id=${order._id}`}
-                                                    className='block px-4 py-4'>
-                                                    <span
-                                                        className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${statusConfig.className}`}>
-                                                        {statusConfig.label}
-                                                    </span>
-                                                </Link>
+                                            <td className='px-4 py-4'>
+                                                <select
+                                                    aria-label={`${order.orderNumber || order._id} buyurtma holati`}
+                                                    value={order.status}
+                                                    disabled={isUpdatingStatus && updatingStatus?.orderId === order._id}
+                                                    onChange={(event) =>
+                                                        handleStatusChange(order._id, event.target.value as OrderStatus)
+                                                    }
+                                                    className={`h-9 min-w-36 rounded-xl border-0 px-3 text-xs font-black outline-none ring-1 disabled:cursor-wait disabled:opacity-60 ${statusConfig.className}`}>
+                                                    {statusOptions.map((status) => (
+                                                        <option key={status.value} value={status.value}>
+                                                            {status.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </td>
                                         </tr>
                                     );

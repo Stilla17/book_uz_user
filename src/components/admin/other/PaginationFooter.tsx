@@ -23,8 +23,8 @@ const PaginationFooter = ({ pagination, page, updatePage, isFetching }: Paginati
     );
 
     return (
-        <div className='flex flex-col gap-3 border-t border-[#eadfce] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800'>
-            <p className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
+        <div className='flex flex-col gap-3 border-t border-base-300 p-4 sm:flex-row sm:items-center sm:justify-between'>
+            <p className='text-sm font-bold text-admin-muted'>
                 Sahifa {pagination?.page ?? page} / {totalPages}
                 {typeof pagination?.total === 'number' && ` · Jami ${pagination.total.toLocaleString('uz-UZ')} ta`}
             </p>
@@ -34,14 +34,14 @@ const PaginationFooter = ({ pagination, page, updatePage, isFetching }: Paginati
                     disabled={page <= 1 || isFetching}
                     onClick={() => updatePage(1)}
                     aria-label='Birinchi sahifa'
-                    className='size-10 rounded-xl border-[#eadfce] bg-white p-0 font-black dark:border-slate-800 dark:bg-slate-900'>
+                    className='size-10 rounded-xl border-base-300 bg-base-100 p-0 font-black'>
                     <ChevronsLeft size={17} />
                 </Button>
                 <Button
                     variant='outline'
                     disabled={page <= 1 || isFetching}
                     onClick={() => updatePage(page - 1)}
-                    className='h-10 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
+                    className='h-10 rounded-2xl border-base-300 bg-base-100 font-black'>
                     <ArrowLeft size={17} />
                     Oldingi
                 </Button>
@@ -54,8 +54,8 @@ const PaginationFooter = ({ pagination, page, updatePage, isFetching }: Paginati
                         onClick={() => updatePage(pageNumber)}
                         className={`size-10 rounded-xl p-0 font-black ${
                             pageNumber === page
-                                ? 'bg-[#ef7f1a] text-white hover:bg-orange-600'
-                                : 'border-[#eadfce] bg-white dark:border-slate-800 dark:bg-slate-900'
+                                ? 'bg-warning text-warning-content hover:opacity-90'
+                                : 'border-base-300 bg-base-100'
                         }`}>
                         {pageNumber}
                     </Button>
@@ -64,7 +64,7 @@ const PaginationFooter = ({ pagination, page, updatePage, isFetching }: Paginati
                     variant='outline'
                     onClick={() => updatePage(page + 1)}
                     disabled={page >= totalPages || isFetching}
-                    className='h-10 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
+                    className='h-10 rounded-2xl border-base-300 bg-base-100 font-black'>
                     Keyingi
                     <ArrowRight size={17} />
                 </Button>
@@ -73,7 +73,7 @@ const PaginationFooter = ({ pagination, page, updatePage, isFetching }: Paginati
                     disabled={page >= totalPages || isFetching}
                     onClick={() => updatePage(totalPages)}
                     aria-label='Oxirgi sahifa'
-                    className='size-10 rounded-xl border-[#eadfce] bg-white p-0 font-black dark:border-slate-800 dark:bg-slate-900'>
+                    className='size-10 rounded-xl border-base-300 bg-base-100 p-0 font-black'>
                     <ChevronsRight size={17} />
                 </Button>
             </div>

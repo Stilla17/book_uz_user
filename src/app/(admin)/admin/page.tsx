@@ -17,8 +17,6 @@ type AdminOrdersData = {
     };
 };
 
-const confirmedPaymentStatuses = new Set(['PAID', 'CONFIRMED', 'SUCCESS', 'COMPLETED']);
-
 const formatNumber = (value?: number) => Number(value ?? 0).toLocaleString('ru-RU');
 
 const formatCompactAmount = (value?: number) => {
@@ -77,7 +75,7 @@ const fetchOrdersDashboardStats = async () => {
     const revenue = allOrders.reduce((sum, order) => {
         const status = String(order.paymentStatus || '').toUpperCase();
 
-        if (!confirmedPaymentStatuses.has(status)) return sum;
+        if (status !== 'PAID') return sum;
 
         return sum + Number(order.totalAmount || 0);
     }, 0);

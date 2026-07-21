@@ -30,6 +30,7 @@ export const DELIVERY_COST = 20000;
 export const POST_OFFICE_DELIVERY_COST = 40000;
 export const POST_TO_HOME_EXTRA_COST = 20000;
 export const POST_TO_HOME_DELIVERY_COST = POST_OFFICE_DELIVERY_COST + POST_TO_HOME_EXTRA_COST;
+export const FREE_DELIVERY_MIN_TOTAL = 300000;
 
 export const getLocationName = (item?: { name?: LocationName }) => getLocalizedText(item?.name, "Noma'lum");
 
@@ -159,10 +160,11 @@ type BuildOrderPayloadParams = {
     deliveryFee?: number;
 };
 
-export const getDeliveryCost = (selectedDelivery: string, deliveryFee = DELIVERY_COST) => {
+export const getDeliveryCost = (selectedDelivery: string, deliveryFee = DELIVERY_COST, subTotal = 0) => {
     const deliveryType = getDeliveryType(selectedDelivery);
 
     if (deliveryType === 'PICKUP') return 0;
+    if (subTotal >= FREE_DELIVERY_MIN_TOTAL && selectedDelivery !== 'Pochtadan uyga olib borib berish') return 0;
     if (selectedDelivery === 'Pochta orqali') return POST_OFFICE_DELIVERY_COST;
     if (selectedDelivery === 'Pochtadan uyga olib borib berish') return POST_TO_HOME_DELIVERY_COST;
 
@@ -181,7 +183,7 @@ export const buildOrderPayload = ({
     selectedPayment,
     deliveryFee: configuredDeliveryFee
 }: BuildOrderPayloadParams): OrderPayload => {
-    const deliveryFee = getDeliveryCost(selectedDelivery, configuredDeliveryFee);
+    const deliveryFee = getDeliveryCost(selectedDelivery, configuredDeliveryFee, totalPrice);
     const postDeliveryType = getPostDeliveryType(selectedDelivery);
 
     return {

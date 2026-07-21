@@ -1,6 +1,6 @@
 import { StatusFilter } from '@/app/(admin)/admin/orders/page';
 import { Order, OrdersResponse } from '@/types/orders';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { OrderService } from '../../services/order.service';
 
@@ -16,5 +16,17 @@ export const useOrderIdQuery = (id: string) => {
         queryKey: ['orders', 'detail', id],
         queryFn: () => OrderService.getOrderId(id),
         enabled: Boolean(id)
+    });
+};
+
+export const useUpdateOrderStatus = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: OrderService.updateOrderStatus,
+        onSuccess: (order: Order) => {
+            queryClient.invalidateQueries({ queryKey: ['orders'] });
+            queryClient.setQueryData(['orders', 'detail', order._id], order);
+        }
     });
 };

@@ -11,7 +11,8 @@ import { getImageUrl } from '@/utils/image';
 import { getOrderItemPrice, getOrderItemProduct, getOrderItemsQuantity, getOrderProductsTotal } from '@/utils/order';
 
 import dayjs from 'dayjs';
-import { ArrowLeft, Banknote, BookOpen, Check, Truck, UserRound } from 'lucide-react';
+import { ArrowLeft, Banknote, BookOpen, Copy, Truck, UserRound } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
     <div className='flex items-start justify-between gap-4 border-b border-[#eadfce] py-3 last:border-0 dark:border-slate-800'>
@@ -38,6 +39,28 @@ const AdminOrderDetailPage = () => {
         ? paymentStatusConfig[orderData.paymentStatus]?.label || orderData.paymentStatus || "Noma'lum"
         : '';
     const productsTotal = getOrderProductsTotal(orderData?.items);
+
+    const handleCopyLocation = async () => {
+        const address = orderData?.shippingAddress;
+
+        if (!address) return;
+        const fullAddress = [address.street, address.region].filter(Boolean).join(', ');
+
+        if (!fullAddress) {
+            toast.error('Manzil mavjud emas.');
+            return;
+        }
+
+        const yandexUrl = `https://yandex.uz/maps/?text=${encodeURIComponent(fullAddress)}`;
+
+        try {
+            await navigator.clipboard.writeText(yandexUrl);
+            toast.success('Manzil Yandex xaritasi havolasi nusxalandi.');
+        } catch (error) {
+            console.error('Havolani nusxalashda xatolik:', error);
+            toast.error('Manzilni nusxalashda xatolik yuz berdi.');
+        }
+    };
 
     return (
         <div className='space-y-5'>
@@ -174,9 +197,19 @@ const AdminOrderDetailPage = () => {
 
                     <section className='grid gap-5 md:grid-cols-2'>
                         <article className='rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
-                            <div className='flex items-center gap-2'>
-                                <UserRound size={20} className='text-[#ef7f1a]' />
-                                <h3 className='text-lg font-black text-[#2f2a25] dark:text-white'>Mijoz</h3>
+                            <div className='flex items-center justify-between gap-3'>
+                                <div className='flex items-center gap-2'>
+                                    <UserRound size={20} className='text-[#ef7f1a]' />
+                                    <h3 className='text-lg font-black text-[#2f2a25] dark:text-white'>Mijoz</h3>
+                                </div>
+                                <button
+                                    type='button'
+                                    onClick={handleCopyLocation}
+                                    aria-label='Manzilni nusxalash'
+                                    title='Yandex Maps havolasini nusxalash'
+                                    className='grid size-9 place-items-center rounded-xl text-[#817466] transition hover:bg-[#f2e7d8] hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-900'>
+                                    <Copy size={17} />
+                                </button>
                             </div>
                             <div className='mt-5 flex items-center gap-3'>
                                 <div>

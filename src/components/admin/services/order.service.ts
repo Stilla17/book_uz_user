@@ -1,4 +1,5 @@
 import { StatusFilter } from '@/app/(admin)/admin/orders/page';
+import { OrderStatus } from '@/types/orders';
 
 import { api } from './api';
 
@@ -18,6 +19,11 @@ export const OrderService = {
 
     getOrderId: async (id: string) => {
         const response = await api.get(`/admin/orders/${id}`);
+        return response.data.data;
+    },
+
+    updateOrderStatus: async ({ orderId, status }: { orderId: string; status: OrderStatus }) => {
+        const response = await api.patch(`/admin/orders/${orderId}/status`, { status });
         return response.data.data;
     }
 };

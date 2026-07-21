@@ -9,6 +9,26 @@
 @theme inline {
     --font-domaine: var(--font-domaine); /* Faqat DomaineText */
 
+    --color-base-100: var(--admin-base-100);
+    --color-base-200: var(--admin-base-200);
+    --color-base-300: var(--admin-base-300);
+    --color-base-content: var(--admin-base-content);
+    --color-warning: var(--admin-warning);
+    --color-warning-content: var(--admin-warning-content);
+    --color-error: var(--admin-error);
+    --color-error-content: var(--admin-error-content);
+    --color-secondary-content: var(--secondary-foreground);
+    --color-accent-content: var(--accent-foreground);
+    --color-admin-shell: var(--admin-shell);
+    --color-admin-header: var(--admin-header);
+    --color-admin-white: var(--admin-white);
+    --color-admin-soft-bg: var(--admin-soft-bg);
+    --color-admin-muted: var(--admin-muted);
+    --color-admin-soft: var(--admin-soft);
+    --color-admin-quiet: var(--admin-quiet);
+    --color-admin-subtle: var(--admin-subtle);
+    --color-admin-dim: var(--admin-dim);
+
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
@@ -118,6 +138,115 @@
     --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+.admin-theme-scope {
+    --admin-base-100: #fffaf2;
+    --admin-base-200: #f7f0e6;
+    --admin-base-300: #eadfce;
+    --admin-base-content: #2f2a25;
+    --admin-warning: #ef7f1a;
+    --admin-warning-content: #ffffff;
+    --admin-error: #ef4444;
+    --admin-error-content: #ffffff;
+    --admin-shell: #d8ccbd;
+    --admin-header: #fff8ee;
+    --admin-white: #ffffff;
+    --admin-soft-bg: #fff1df;
+    --admin-muted: #8b7e70;
+    --admin-soft: #6f6255;
+    --admin-quiet: #928675;
+    --admin-subtle: #9d907e;
+    --admin-dim: #817466;
+    --primary: #ef7f1a;
+    --primary-foreground: #ffffff;
+    --secondary: #285c7f;
+    --secondary-foreground: #ffffff;
+    --accent: #7c6dc8;
+    --accent-foreground: #ffffff;
+}
+
+/* Eski admin sahifalaridagi qattiq yozilgan ranglarni ham Valentine palitrasiga ulaydi. */
+.admin-theme-scope[data-theme='valentine'] .bg-\[\#fffaf2\],
+.admin-theme-scope[data-theme='valentine'] .bg-\[\#fff8ee\] {
+    background-color: var(--admin-base-100) !important;
+}
+
+.admin-theme-scope[data-theme='valentine'] .bg-\[\#f7f0e6\],
+.admin-theme-scope[data-theme='valentine'] .bg-\[\#f2e7d8\] {
+    background-color: var(--admin-base-200) !important;
+}
+
+.admin-theme-scope[data-theme='valentine'] .border-\[\#eadfce\],
+.admin-theme-scope[data-theme='valentine'] .border-\[\#f0e4d3\] {
+    border-color: var(--admin-base-300) !important;
+}
+
+.admin-theme-scope[data-theme='valentine'] .ring-\[\#eadfce\] {
+    --tw-ring-color: var(--admin-base-300) !important;
+}
+
+.admin-theme-scope[data-theme='valentine'] .text-\[\#2f2a25\] {
+    color: var(--admin-base-content) !important;
+}
+
+.admin-theme-scope[data-theme='valentine'] .text-\[\#8b7e70\],
+.admin-theme-scope[data-theme='valentine'] .text-\[\#9d907e\],
+.admin-theme-scope[data-theme='valentine'] .text-\[\#817466\],
+.admin-theme-scope[data-theme='valentine'] .text-\[\#6f6255\] {
+    color: var(--admin-muted) !important;
+}
+
+.admin-theme-scope[data-theme='dark'] {
+    --admin-base-100: #020617;
+    --admin-base-200: #0f172a;
+    --admin-base-300: #1e293b;
+    --admin-base-content: #f8fafc;
+    --admin-warning: #fb923c;
+    --admin-warning-content: #ffffff;
+    --admin-error: #ef4444;
+    --admin-error-content: #ffffff;
+    --admin-shell: #020617;
+    --admin-header: #020617;
+    --admin-white: #0f172a;
+    --admin-soft-bg: #1e293b;
+    --admin-muted: #94a3b8;
+    --admin-soft: #cbd5e1;
+    --admin-quiet: #94a3b8;
+    --admin-subtle: #64748b;
+    --admin-dim: #cbd5e1;
+    --primary: #fb923c;
+    --primary-foreground: #ffffff;
+    --secondary: #2563eb;
+    --secondary-foreground: #ffffff;
+    --accent: #7c3aed;
+    --accent-foreground: #ffffff;
+}
+
+.admin-theme-scope[data-theme='valentine'] {
+    --admin-base-100: #fff7fb;
+    --admin-base-200: #fce7f3;
+    --admin-base-300: #f9a8d4;
+    --admin-base-content: #4a1730;
+    --admin-warning: #e84393;
+    --admin-warning-content: #ffffff;
+    --admin-error: #e11d48;
+    --admin-error-content: #ffffff;
+    --admin-shell: #f8bfd8;
+    --admin-header: #fff0f7;
+    --admin-white: #fff0f7;
+    --admin-soft-bg: #fce7f3;
+    --admin-muted: #9d5274;
+    --admin-soft: #7a3656;
+    --admin-quiet: #92506e;
+    --admin-subtle: #ad6887;
+    --admin-dim: #7a3656;
+    --primary: #e84393;
+    --primary-foreground: #ffffff;
+    --secondary: #a855f7;
+    --secondary-foreground: #ffffff;
+    --accent: #fb7185;
+    --accent-foreground: #ffffff;
 }
 
 @layer base {

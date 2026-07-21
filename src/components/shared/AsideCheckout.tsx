@@ -32,7 +32,7 @@ const AsideCheckout = ({
     const { t } = useTranslation();
     const { cartItems, totalPrice, totalQuantity } = useBookCart();
     const formatCheckoutPrice = (value?: number) => formatPrice(value, t('bookCard.currency'));
-    const deliveryCost = getDeliveryCost(selectedDelivery, deliveryFee);
+    const deliveryCost = getDeliveryCost(selectedDelivery, deliveryFee, totalPrice);
     const paymentTotal = Math.max(0, totalPrice + deliveryCost - promoDiscount);
 
     return (

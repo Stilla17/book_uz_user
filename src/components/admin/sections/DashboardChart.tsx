@@ -15,6 +15,7 @@ type ChartView = 'summary' | 'branches';
 type SaleRecord = {
     amount: number;
     createdAt: string;
+    status: string;
 };
 
 type BranchSale = {
@@ -122,7 +123,8 @@ const normalizeSales = (response: any, source: 'site' | 'moysklad'): SaleRecord[
     getNestedArray(response)
         .map((item) => ({
             amount: getSaleAmount(item, source),
-            createdAt: getSaleDate(item)
+            createdAt: getSaleDate(item),
+            status: String(source === 'site' ? item?.paymentStatus ?? '' : item?.status ?? '').toUpperCase()
         }))
         .filter((item) => item.amount > 0 && Boolean(item.createdAt));
 
@@ -180,6 +182,7 @@ const fetchMoyskladSales = async (period: ChartPeriod, view: ChartView): Promise
 
 const addSalesToBuckets = (buckets: ChartPoint[], sales: SaleRecord[], key: 'site' | 'moysklad') => {
     sales.forEach((sale) => {
+        if (key === 'site' && sale.status !== 'PAID') return;
         const saleDate = new Date(sale.createdAt);
         if (Number.isNaN(saleDate.getTime())) return;
 
@@ -214,7 +217,9 @@ const DashboardChart = () => {
         return buckets;
     }, [data?.moyskladSales, data?.siteSales, period]);
 
-    const siteTotal = chartData.reduce((sum, item) => sum + item.site, 0);
+    const siteTotal = (data?.siteSales ?? [])
+        .filter((order) => order.status === 'PAID')
+        .reduce((total, order) => total + order.amount, 0);
     const moyskladTotal = chartData.reduce((sum, item) => sum + item.moysklad, 0);
     const branchData = (data?.branchSales ?? []).filter((item) => !isExcludedBranch(item.name)).slice(0, 12);
     const maxValue = Math.max(
@@ -389,7 +394,7 @@ const DashboardChart = () => {
     const option = view === 'branches' ? branchOption : summaryOption;
 
     return (
-        <section className='mt-14 bg-white p-4 dark:bg-slate-950'>
+        <section className='mt-14 bg-admin-white p-4'>
             <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
                 <div>
                     <h2 className='text-lg font-black text-[#2f2a25] dark:text-white'>Savdo tahlili</h2>

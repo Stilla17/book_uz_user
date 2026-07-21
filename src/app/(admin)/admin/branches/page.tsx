@@ -11,7 +11,8 @@ import HeadSection from '@/components/admin/sections/HeadSection';
 import { PublishersSkeleton } from '@/components/ui/skeleton';
 import { matchesTransliteratedSearch } from '@/utils/transliteration';
 
-import { Building2, Edit3, MapPin, Search, Trash2 } from 'lucide-react';
+import { Building2, Copy, Edit3, MapPin, Search, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const AdminBranchesPage = () => {
     const [search, setSearch] = useState('');
@@ -40,6 +41,23 @@ const AdminBranchesPage = () => {
             color: 'bg-[#285c7f]'
         }
     ];
+
+    const handleCopyCoordinates = async (latitude: number | undefined, longitude: number | undefined) => {
+        if (latitude === undefined || longitude === undefined) {
+            toast.error('Koordinatalar mavjud emas.');
+            return;
+        }
+
+        const yandexUrl = `https://yandex.uz/maps/?pt=${longitude},${latitude}&z=16&l=map`;
+
+        try {
+            await navigator.clipboard.writeText(yandexUrl);
+            toast.success('Yandex xaritasi havolasi nusxalandi.');
+        } catch (error) {
+            console.error('Koordinatalarni nusxalashda xatolik yuz berdi:', error);
+            toast.error('Koordinatalarni nusxalashda xatolik yuz berdi.');
+        }
+    };
 
     return (
         <div className='space-y-5'>
@@ -92,6 +110,14 @@ const AdminBranchesPage = () => {
                                 </div>
 
                                 <div className='flex items-center justify-end gap-2'>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleCopyCoordinates(branch.latitude, branch.longitude)}
+                                        aria-label='Koordinatalarni nusxalash'
+                                        title='Yandex Maps havolasini nusxalash'
+                                        className='grid size-9 place-items-center rounded-xl text-[#817466] transition hover:bg-[#f2e7d8] hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-950'>
+                                        <Copy size={17} />
+                                    </button>
                                     <Link
                                         href={`/admin/branches/new?id=${branch._id}`}
                                         className='grid size-9 place-items-center rounded-xl text-[#817466] transition hover:bg-[#f2e7d8] hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-950'
