@@ -143,7 +143,12 @@ export const AuthServiceAPI = {
         setAuthSession(true);
         return response.data;
     },
-    sendPhoneOtp: async (data: { phone: string; name: string }) => {
+    sendPhoneOtp: async (data: {
+        phone: string;
+        mode?: 'login' | 'register';
+        name?: string;
+        birthDate?: string;
+    }) => {
         const response = await api.post('/auth/phone/send-otp', data);
         return response.data;
     },
@@ -153,7 +158,13 @@ export const AuthServiceAPI = {
         setAuthSession(true);
         return response.data;
     },
-    verifyPhoneOtp: async (data: { phone: string; otp: string; wishlist?: unknown[] }) => {
+    verifyPhoneOtp: async (data: {
+        phone: string;
+        otp: string;
+        name?: string;
+        birthDate?: string;
+        wishlist?: unknown[];
+    }) => {
         const response = await api.post('/auth/phone/verify-otp', data);
         accessToken = getAccessTokenFromResponse(response);
         setAuthSession(true);

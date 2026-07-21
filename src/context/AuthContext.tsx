@@ -255,10 +255,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const sendPhoneOtp = async ({ phone, name }: PhoneOtpRequest) => {
+    const sendPhoneOtp = async ({ phone, name, birthDate, mode }: PhoneOtpRequest) => {
         dispatch({ type: 'AUTH_START' });
         try {
-            await AuthServiceAPI.sendPhoneOtp({ phone, name });
+            await AuthServiceAPI.sendPhoneOtp({ phone, name, birthDate, mode });
             dispatch({ type: 'AUTH_SUCCESS', payload: state.user });
         } catch (error: any) {
             dispatch({ type: 'AUTH_FAILURE' });
@@ -266,19 +266,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const verifyPhoneOtp = async ({ phone, otp }: PhoneOtpVerifyRequest) => {
+    const verifyPhoneOtp = async ({ phone, otp, name, birthDate }: PhoneOtpVerifyRequest) => {
         dispatch({ type: 'AUTH_START' });
         try {
             const wishlist = getWishlistFromLocalStorage();
             const res = await AuthServiceAPI.verifyPhoneOtp({
                 phone,
                 otp,
+                name,
+                birthDate,
                 wishlist: wishlist.map((book) => book._id).filter(Boolean)
             });
 
             if (res.success && res.data) {
+                if (name || birthDate) {
+                    await UserService.updateProfile({
+                        ...(name ? { name } : {}),
+                        ...(birthDate ? { birthDate } : {})
+                    });
+                }
                 await syncGuestData();
-                dispatch({ type: 'AUTH_SUCCESS', payload: res.data.user });
+                const authenticatedUser = name || birthDate ? await refreshUser() : res.data.user;
+                dispatch({ type: 'AUTH_SUCCESS', payload: authenticatedUser });
             }
         } catch (error: any) {
             dispatch({ type: 'AUTH_FAILURE' });

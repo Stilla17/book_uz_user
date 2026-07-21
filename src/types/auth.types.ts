@@ -11,6 +11,7 @@ export interface User {
     createdAt?: string;
     updatedAt?: string;
     bio?: string;
+    birthDate?: string;
 }
 
 export interface AuthState {
@@ -40,8 +41,10 @@ export interface LoginPayload {
 }
 
 export interface PhoneOtpRequest {
-    name: string;
     phone: string;
+    mode?: 'login' | 'register';
+    name?: string;
+    birthDate?: string;
 }
 
 export interface PhoneLoginRequest {
@@ -52,6 +55,8 @@ export interface PhoneLoginRequest {
 export interface PhoneOtpVerifyRequest {
     phone: string;
     otp: string;
+    name?: string;
+    birthDate?: string;
 }
 
 export interface LoginResponse {

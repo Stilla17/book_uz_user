@@ -2,12 +2,14 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuth } from '@/hooks/useAuth';
 
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Loader2, Phone, ShieldCheck, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Phone, ShieldCheck } from 'lucide-react';
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { IMaskInput } from 'react-imask';
@@ -26,48 +28,73 @@ const normalizePhone = (value: string) => {
 
 const isValidUzPhone = (value: string) => /^\+998\d{9}$/.test(value);
 
+type LoginType = {
+    phone: string;
+};
+
 export default function LoginPage() {
     const { t } = useTranslation();
     const { sendPhoneOtp, verifyPhoneOtp, isLoading } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
 
-    const [name, setName] = useState('');
-    const [phone, setPhone] = useState('');
+    const {
+        control,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors }
+    } = useForm<LoginType>({
+        defaultValues: {
+            phone: ''
+        }
+    });
+
     const [otpValues, setOtpValues] = useState<string[]>(Array(OTP_LENGTH).fill(''));
     const [otpSent, setOtpSent] = useState(false);
     const otpInputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
+    const phone = watch('phone');
     const normalizedPhone = useMemo(() => normalizePhone(phone), [phone]);
     const otp = useMemo(() => otpValues.join(''), [otpValues]);
+
+    useEffect(() => {
+        const phoneFromRegister = searchParams.get('phone');
+        if (phoneFromRegister) setValue('phone', phoneFromRegister);
+    }, [searchParams, setValue]);
 
     const getErrorMessage = (error: any, fallback: string) =>
         error?.response?.data?.message || error?.message || fallback;
 
-    const requestOtp = async () => {
-        if (name.trim().length < 2) {
-            toast.error(t('loginPage.nameMinLength'));
-            return;
-        }
+    const isUnregisteredPhone = (error: any) => {
+        const status = error?.response?.status;
+        const code = error?.response?.data?.code;
 
-        if (!isValidUzPhone(normalizedPhone)) {
-            toast.error(t('loginPage.invalidPhone'));
-            return;
-        }
+        return status === 404 || code === 'USER_NOT_FOUND' || code === 'PHONE_NOT_REGISTERED';
+    };
+
+    const requestOtp = async (values: LoginType) => {
+        const normalizedPhone = normalizePhone(values.phone);
 
         try {
-            await sendPhoneOtp({ name: name.trim(), phone: normalizedPhone });
+            await sendPhoneOtp({
+                phone: normalizedPhone,
+                mode: 'login'
+            });
             setOtpValues(Array(OTP_LENGTH).fill(''));
             setOtpSent(true);
             toast.success(t('loginPage.codeSent'));
         } catch (error: any) {
+            if (isUnregisteredPhone(error)) {
+                router.push(`/auth/register?phone=${encodeURIComponent(normalizedPhone)}`);
+                return;
+            }
+
             toast.error(getErrorMessage(error, t('loginPage.sendCodeError')));
         }
     };
 
-    const handleSendOtp = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await requestOtp();
-    };
+    const handleSendOtp = handleSubmit(requestOtp);
 
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,7 +105,10 @@ export default function LoginPage() {
         }
 
         try {
-            await verifyPhoneOtp({ phone: normalizedPhone, otp: otp.trim() });
+            await verifyPhoneOtp({
+                phone: normalizedPhone,
+                otp: otp.trim()
+            });
             toast.success(t('loginPage.welcome'));
             const redirect = new URLSearchParams(window.location.search).get('redirect');
             router.push(redirect || '/');
@@ -145,26 +175,6 @@ export default function LoginPage() {
                     <form onSubmit={handleSendOtp} className='space-y-5'>
                         <div className='space-y-2'>
                             <label className='ml-1 text-sm font-bold text-gray-600 dark:text-gray-400'>
-                                {t('loginPage.fullName')}
-                            </label>
-                            <div className='group relative'>
-                                <User
-                                    className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400'
-                                    size={18}
-                                />
-                                <input
-                                    required
-                                    type='text'
-                                    placeholder={t('loginPage.fullNamePlaceholder')}
-                                    className='w-full rounded-2xl border border-gray-200 bg-gray-50 py-4 pr-4 pl-12 text-gray-900 transition-all outline-none placeholder:text-gray-400 focus:border-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-400'
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div className='space-y-2'>
-                            <label className='ml-1 text-sm font-bold text-gray-600 dark:text-gray-400'>
                                 {t('loginPage.phone')}
                             </label>
                             <div className='group relative'>
@@ -172,15 +182,29 @@ export default function LoginPage() {
                                     className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400'
                                     size={18}
                                 />
-                                <IMaskInput
-                                    required
-                                    mask='+998 00 000 00 00'
-                                    inputMode='tel'
-                                    placeholder='+998 90 123 45 67'
-                                    className='w-full rounded-2xl border border-gray-200 bg-gray-50 py-4 pr-4 pl-12 text-gray-900 transition-all outline-none placeholder:text-gray-400 focus:border-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-400'
-                                    value={phone}
-                                    onAccept={(value) => setPhone(String(value))}
+                                <Controller
+                                    name='phone'
+                                    control={control}
+                                    rules={{
+                                        required: t('loginPage.phoneRequired'),
+                                        validate: (value) =>
+                                            isValidUzPhone(normalizePhone(value)) || t('loginPage.invalidPhone')
+                                    }}
+                                    render={({ field }) => (
+                                        <IMaskInput
+                                            required
+                                            mask='+998 00 000 00 00'
+                                            inputMode='tel'
+                                            placeholder='+998 90 123 45 67'
+                                            className='w-full rounded-2xl border border-gray-200 bg-gray-50 py-4 pr-4 pl-12 text-gray-900 transition-all outline-none placeholder:text-gray-400 focus:border-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-400'
+                                            value={field.value}
+                                            onAccept={(value) => field.onChange(String(value))}
+                                            onBlur={field.onBlur}
+                                            inputRef={field.ref}
+                                        />
+                                    )}
                                 />
+                                {errors.phone && <p className='mt-1 text-sm text-red-500'>{errors.phone.message}</p>}
                             </div>
                         </div>
 
@@ -260,12 +284,23 @@ export default function LoginPage() {
                             <button
                                 type='button'
                                 disabled={isLoading}
-                                onClick={requestOtp}
+                                onClick={handleSubmit(requestOtp)}
                                 className='font-semibold text-orange-500 transition-colors hover:text-orange-600 disabled:opacity-60 dark:text-orange-400 dark:hover:text-orange-300'>
                                 {t('loginPage.resendCode')}
                             </button>
                         </div>
                     </form>
+                )}
+
+                {!otpSent && (
+                    <div className='mt-6 border-t border-gray-200 pt-6 text-center dark:border-slate-700'>
+                        <Link
+                            href='/auth/register'
+                            className='flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#ef7f1a] py-3.5 font-bold text-[#ef7f1a] transition-all hover:bg-[#ef7f1a] hover:text-white dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-500 dark:hover:text-white'>
+                            {t('loginPage.register')}
+                            <ArrowRight size={19} />
+                        </Link>
+                    </div>
                 )}
             </motion.div>
         </div>

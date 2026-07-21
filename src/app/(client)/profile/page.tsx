@@ -28,6 +28,7 @@ type ProfileForm = {
     firstName: string;
     lastName: string;
     phone: string;
+    birthDate: string;
 };
 
 const ProfilePage = () => {
@@ -49,7 +50,8 @@ const ProfilePage = () => {
         defaultValues: {
             firstName: '',
             lastName: '',
-            phone: ''
+            phone: '',
+            birthDate: ''
         }
     });
 
@@ -61,7 +63,8 @@ const ProfilePage = () => {
         reset({
             firstName,
             lastName: lastNameParts.join(' '),
-            phone: user.phone ?? ''
+            phone: user.phone ?? '',
+            birthDate: user.birthDate ? dayjs(user.birthDate).format('YYYY-MM-DD') : ''
         });
         setImagePreview(getImageUrl(user.avatar) ?? '');
     }, [user, reset, setImagePreview]);
@@ -78,6 +81,7 @@ const ProfilePage = () => {
 
         formData.append('name', name);
         formData.append('phone', values.phone.trim());
+        formData.append('birthDate', values.birthDate);
 
         if (imageFile) {
             formData.append('avatar', imageFile);
@@ -306,6 +310,16 @@ const ProfilePage = () => {
                                     <label className='block text-[15px] text-[#777777] dark:text-slate-400'>
                                         {t('profilePage.phone')}
                                         <input type='tel' {...register('phone')} className={`mt-1 ${inputClassName}`} />
+                                    </label>
+
+                                    <label className='block text-[15px] text-[#777777] dark:text-slate-400'>
+                                        {t('profilePage.birthDate')}
+                                        <input
+                                            type='date'
+                                            max={dayjs().format('YYYY-MM-DD')}
+                                            {...register('birthDate')}
+                                            className={`mt-1 ${inputClassName}`}
+                                        />
                                     </label>
                                 </div>
 
