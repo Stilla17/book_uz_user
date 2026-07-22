@@ -1,6 +1,7 @@
 import { absoluteImageUrl, getLocalizedText, siteUrl } from '@/lib/seo';
 import type { Book } from '@/types/book';
 import type { NewsItems } from '@/types/news';
+import { getBookAuthorName } from '@/utils/book-formatters';
 
 type NewsWithContent = NewsItems & {
     content?: NewsItems['description'];
@@ -10,13 +11,7 @@ type NewsWithContent = NewsItems & {
 export function BookStructuredData({ book }: { book: Book }) {
     const title = getLocalizedText(book.title, 'Kitob');
     const description = getLocalizedText(book.description);
-    const author =
-        typeof book.authorName === 'string'
-            ? book.authorName
-            : book.authorName?.name ||
-              (typeof book.author === 'object' ? book.author.name : undefined) ||
-              (typeof book.author === 'string' ? book.author : undefined) ||
-              'Book.uz';
+    const author = getBookAuthorName(book) || 'Book.uz';
 
     const structuredData = {
         '@context': 'https://schema.org',

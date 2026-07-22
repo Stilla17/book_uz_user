@@ -9,6 +9,7 @@ import { useUpdateBook } from '@/components/admin/hooks/bookHooks/useUpdateBook'
 import { useBookDetailQuery } from '@/components/admin/hooks/queries/book';
 import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
 import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
+import MultiSearchableSelect from '@/components/admin/other/MultiSearchableSelect';
 import SearchableSelect, { type SearchableOption } from '@/components/admin/other/SearchableSelect';
 import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { Input } from '@/components/ui/input';
@@ -49,7 +50,7 @@ const AdminNewBookPage = () => {
             tags: '',
             category: '',
             subCategoryId: '',
-            author: '',
+            author: [],
             publisher: '',
             language: 'uz',
             contentLanguage: 'latin',
@@ -96,7 +97,15 @@ const AdminNewBookPage = () => {
 
             setValue('category', getBookCategoryId(bookData));
             setValue('subCategoryId', getBookSubCategoryId(bookData));
-            setValue('author', typeof bookData.author === 'string' ? bookData.author : bookData.author?._id || '');
+            const bookAuthors = Array.isArray(bookData.author)
+                ? bookData.author
+                : bookData.author
+                  ? [bookData.author]
+                  : [];
+            setValue(
+                'author',
+                bookAuthors.map((author) => (typeof author === 'string' ? author : author?._id || '')).filter(Boolean)
+            );
             setValue('publisher', getRelationId(bookData.publisher));
 
             setValue('language', bookData.language || 'uz');
@@ -156,7 +165,7 @@ const AdminNewBookPage = () => {
     );
     const categoryId = watch('category');
     const subCategoryId = watch('subCategoryId');
-    const authorId = watch('author');
+    const authorIds = watch('author');
     const publisherId = watch('publisher');
     const language = watch('language');
     const contentLanguage = watch('contentLanguage');
@@ -228,7 +237,9 @@ const AdminNewBookPage = () => {
     const onSubmit = (values: BookFormValues) => {
         const categoryValue = resolveOptionValue(values.category, categoryOptions);
         const subCategoryValue = resolveOptionValue(values.subCategoryId, subCategoryOptions);
-        const authorValue = resolveOptionValue(values.author, authorOptions);
+        const authorValues = Array.from(
+            new Set(values.author.map((author) => resolveOptionValue(author, authorOptions)).filter(Boolean))
+        );
         const publisherValue = resolveOptionValue(values.publisher, publisherOptions);
         const coverValue = values.cover;
         const tags = getNormalizedTags(values.tags);
@@ -238,7 +249,7 @@ const AdminNewBookPage = () => {
             return;
         }
 
-        if (!categoryValue || !authorValue || !publisherValue) {
+        if (!categoryValue || !authorValues.length || !publisherValue) {
             toast.error('Kategoriya, muallif va nashriyotni tanlang');
             return;
         }
@@ -263,12 +274,12 @@ const AdminNewBookPage = () => {
         appendText(formData, 'slug', values.slug);
         tags.forEach((tag) => formData.append('tegs', tag));
         formData.append('category', categoryValue);
-        if(subCategoryValue){
+        if (subCategoryValue) {
             formData.append('subCategoryId', subCategoryValue);
             formData.append('subCategory', subCategoryValue);
             formData.append('subgenre', subCategoryValue);
         }
-        formData.append('author', authorValue);
+        authorValues.forEach((author) => formData.append('author', author));
         formData.append('publisher', publisherValue);
         formData.append('language', values.language);
         formData.append('contentLanguage', values.contentLanguage);
@@ -568,8 +579,8 @@ const AdminNewBookPage = () => {
                             </Field>
 
                             <Field label='Muallif'>
-                                <SearchableSelect
-                                    value={authorId}
+                                <MultiSearchableSelect
+                                    value={authorIds}
                                     name='author'
                                     options={authorOptions}
                                     placeholder={isLoading ? 'Yuklanmoqda...' : 'Tanlang'}

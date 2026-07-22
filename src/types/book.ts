@@ -2,12 +2,14 @@ import { OtherPagination } from '@/services/api';
 
 export type LocalizedText = { uz?: string; ru?: string; en?: string };
 
+export type BookAuthor = { _id?: string; name: string; bio?: string; image?: string; booksCount?: number };
+
 export interface Book {
     _id: string;
     slug?: string;
     title: LocalizedText;
     description?: LocalizedText;
-    author?: string | { _id?: string; name: string; bio?: string; image?: string; booksCount?: number };
+    author?: string | BookAuthor | Array<string | BookAuthor>;
     authorName?: string | { name: string };
     price: number;
     oldPrice?: number;
@@ -144,7 +146,7 @@ export type BookFormValues = {
     slug: string;
     category: string;
     subCategoryId: string;
-    author: string;
+    author: string[];
     publisher: string;
     language: string;
     contentLanguage: 'latin' | 'cyrillic';

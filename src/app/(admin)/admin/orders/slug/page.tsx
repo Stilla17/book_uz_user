@@ -24,7 +24,6 @@ const orderStatusOptions: Array<{ value: OrderStatus; label: string }> = [
     { value: 'PROCESSING', label: 'Jarayonda' },
     { value: 'PACKED', label: 'Tayyorlanmoqda' },
     { value: 'SHIPPED', label: "Yo'lga chiqdi" },
-    { value: 'DELIVERING', label: "Yo'lda" },
     { value: 'DELIVERED', label: 'Yetkazib berildi' },
     { value: 'CANCELLED', label: 'Bekor qilindi' }
 ];
@@ -279,15 +278,15 @@ const AdminOrderDetailPage = () => {
                 </div>
 
                 <aside className='space-y-5'>
-                    <section className='rounded-[24px] bg-base-100 p-5 shadow-sm ring-1 ring-base-300'>
+                    <section className='bg-base-100 ring-base-300 rounded-[24px] p-5 shadow-sm ring-1'>
                         <div className='flex items-start justify-between gap-4'>
                             <div className='flex items-center gap-2'>
-                                <span className='grid size-9 place-items-center rounded-xl bg-warning/10 text-warning'>
+                                <span className='bg-warning/10 text-warning grid size-9 place-items-center rounded-xl'>
                                     <ClipboardCheck size={19} />
                                 </span>
                                 <div>
-                                    <h3 className='text-lg font-black text-base-content'>Buyurtma holati</h3>
-                                    <p className='mt-0.5 text-xs font-semibold text-admin-subtle'>
+                                    <h3 className='text-base-content text-lg font-black'>Buyurtma holati</h3>
+                                    <p className='text-admin-subtle mt-0.5 text-xs font-semibold'>
                                         Buyurtmaning joriy bosqichini tanlang
                                     </p>
                                 </div>
@@ -301,14 +300,14 @@ const AdminOrderDetailPage = () => {
                         </div>
 
                         <label className='mt-5 block'>
-                            <span className='mb-2 block text-xs font-black tracking-wide text-admin-subtle uppercase'>
+                            <span className='text-admin-subtle mb-2 block text-xs font-black tracking-wide uppercase'>
                                 Yangi holat
                             </span>
                             <Select
                                 value={selectedStatus || undefined}
                                 disabled={isDetailLoading || isUpdatingStatus}
                                 onValueChange={(value) => setSelectedStatus(value as OrderStatus)}>
-                                <SelectTrigger className='h-12 w-full border-base-300 bg-base-200 font-black text-base-content shadow-none focus:border-warning focus:ring-4 focus:ring-warning/10'>
+                                <SelectTrigger className='border-base-300 bg-base-200 text-base-content focus:border-warning focus:ring-warning/10 h-12 w-full font-black shadow-none focus:ring-4'>
                                     <SelectValue placeholder='Holatni tanlang' />
                                 </SelectTrigger>
                                 <SelectContent className='border-[#eadfce] bg-[#fffaf2]'>
@@ -334,7 +333,7 @@ const AdminOrderDetailPage = () => {
                                 !selectedStatus ||
                                 selectedStatus === orderData.status
                             }
-                            className='mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-warning px-4 text-sm font-black text-warning-content shadow-sm transition hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50'>
+                            className='bg-warning text-warning-content mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-sm font-black shadow-sm transition hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50'>
                             {isUpdatingStatus ? (
                                 <Loader2 size={18} className='animate-spin' />
                             ) : (
