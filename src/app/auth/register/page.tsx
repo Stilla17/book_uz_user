@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { IMaskInput } from 'react-imask';
 
 const OTP_LENGTH = 4;
+const MINIMUM_REGISTRATION_AGE = 12;
 
 type RegisterForm = {
     name: string;
@@ -31,6 +32,21 @@ const normalizePhone = (value: string) => {
 
 const isValidUzPhone = (value: string) => /^\+998\d{9}$/.test(value);
 
+const getMaximumBirthDate = () => {
+    const today = new Date();
+    const maximumBirthDate = new Date(
+        today.getFullYear() - MINIMUM_REGISTRATION_AGE,
+        today.getMonth(),
+        today.getDate()
+    );
+
+    return [
+        maximumBirthDate.getFullYear(),
+        String(maximumBirthDate.getMonth() + 1).padStart(2, '0'),
+        String(maximumBirthDate.getDate()).padStart(2, '0')
+    ].join('-');
+};
+
 export default function RegisterPage() {
     const { t } = useTranslation();
     const { sendPhoneOtp, verifyPhoneOtp, isLoading } = useAuth();
@@ -39,6 +55,7 @@ export default function RegisterPage() {
     const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
     const [otpSent, setOtpSent] = useState(false);
     const [otpValues, setOtpValues] = useState<string[]>(Array(OTP_LENGTH).fill(''));
+    const maximumBirthDate = useMemo(getMaximumBirthDate, []);
 
     const {
         control,
@@ -60,8 +77,7 @@ export default function RegisterPage() {
         if (otpSent) otpRefs.current[0]?.focus();
     }, [otpSent]);
 
-    const errorMessage = (error: any, fallback: string) =>
-        error?.response?.data?.message || error?.message || fallback;
+    const errorMessage = (error: any, fallback: string) => error?.response?.data?.message || error?.message || fallback;
 
     const isAlreadyRegistered = (error: any) => error?.response?.status === 409;
 
@@ -138,16 +154,21 @@ export default function RegisterPage() {
                 <div className='mb-7 text-center'>
                     <h1 className='text-3xl font-black text-gray-900 dark:text-white'>{t('registerPage.title')}</h1>
                     <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                        {otpSent ? t('loginPage.otpDescription', { phone: normalizePhone(getValues('phone')) }) : t('registerPage.description')}
+                        {otpSent
+                            ? t('loginPage.otpDescription', { phone: normalizePhone(getValues('phone')) })
+                            : t('registerPage.description')}
                     </p>
                 </div>
 
                 {!otpSent ? (
-                    <form onSubmit={handleSubmit(requestOtp)} className='space-y-4'>
+                    <form noValidate onSubmit={handleSubmit(requestOtp)} className='space-y-4'>
                         <label className='block text-sm font-bold text-gray-600 dark:text-gray-300'>
                             {t('loginPage.fullName')}
                             <span className='relative mt-2 block'>
-                                <UserRound className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400' size={18} />
+                                <UserRound
+                                    className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400'
+                                    size={18}
+                                />
                                 <input
                                     {...register('name', {
                                         required: t('loginPage.nameRequired'),
@@ -157,21 +178,36 @@ export default function RegisterPage() {
                                     placeholder={t('loginPage.fullNamePlaceholder')}
                                 />
                             </span>
-                            {errors.name && <span className='mt-1 block text-sm font-normal text-red-500'>{errors.name.message}</span>}
+                            {errors.name && (
+                                <span className='mt-1 block text-sm font-normal text-red-500'>
+                                    {errors.name.message}
+                                </span>
+                            )}
                         </label>
 
                         <label className='block text-sm font-bold text-gray-600 dark:text-gray-300'>
                             {t('loginPage.birthDate')}
                             <span className='relative mt-2 block'>
-                                <CalendarDays className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400' size={18} />
+                                <CalendarDays
+                                    className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-400'
+                                    size={18}
+                                />
                                 <input
                                     type='date'
-                                    max={new Date().toISOString().slice(0, 10)}
-                                    {...register('birthDate', { required: t('loginPage.birthDateRequired') })}
+                                    max={maximumBirthDate}
+                                    {...register('birthDate', {
+                                        required: t('loginPage.birthDateRequired'),
+                                        validate: (value) =>
+                                            value <= maximumBirthDate || t('loginPage.birthDateMinimumAge')
+                                    })}
                                     className={fieldClass}
                                 />
                             </span>
-                            {errors.birthDate && <span className='mt-1 block text-sm font-normal text-red-500'>{errors.birthDate.message}</span>}
+                            {errors.birthDate && (
+                                <span className='mt-1 block text-sm font-normal text-red-500'>
+                                    {errors.birthDate.message}
+                                </span>
+                            )}
                         </label>
 
                         <label className='block text-sm font-bold text-gray-600 dark:text-gray-300'>
@@ -183,7 +219,8 @@ export default function RegisterPage() {
                                     control={control}
                                     rules={{
                                         required: t('loginPage.phoneRequired'),
-                                        validate: (value) => isValidUzPhone(normalizePhone(value)) || t('loginPage.invalidPhone')
+                                        validate: (value) =>
+                                            isValidUzPhone(normalizePhone(value)) || t('loginPage.invalidPhone')
                                     }}
                                     render={({ field }) => (
                                         <IMaskInput
@@ -199,11 +236,23 @@ export default function RegisterPage() {
                                     )}
                                 />
                             </span>
-                            {errors.phone && <span className='mt-1 block text-sm font-normal text-red-500'>{errors.phone.message}</span>}
+                            {errors.phone && (
+                                <span className='mt-1 block text-sm font-normal text-red-500'>
+                                    {errors.phone.message}
+                                </span>
+                            )}
                         </label>
 
-                        <button disabled={isLoading} className='flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ef7f1a] py-4 font-bold text-white disabled:opacity-60'>
-                            {isLoading ? <Loader2 className='animate-spin' /> : <>{t('registerPage.submit')} <ArrowRight size={20} /></>}
+                        <button
+                            disabled={isLoading}
+                            className='flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ef7f1a] py-4 font-bold text-white disabled:opacity-60'>
+                            {isLoading ? (
+                                <Loader2 className='animate-spin' />
+                            ) : (
+                                <>
+                                    {t('registerPage.submit')} <ArrowRight size={20} />
+                                </>
+                            )}
                         </button>
                     </form>
                 ) : (
@@ -212,7 +261,9 @@ export default function RegisterPage() {
                             {otpValues.map((digit, index) => (
                                 <input
                                     key={index}
-                                    ref={(element) => { otpRefs.current[index] = element; }}
+                                    ref={(element) => {
+                                        otpRefs.current[index] = element;
+                                    }}
                                     value={digit}
                                     maxLength={1}
                                     inputMode='numeric'
@@ -225,10 +276,21 @@ export default function RegisterPage() {
                                 />
                             ))}
                         </div>
-                        <button disabled={isLoading} className='flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ef7f1a] py-4 font-bold text-white disabled:opacity-60'>
-                            {isLoading ? <Loader2 className='animate-spin' /> : <>{t('registerPage.confirm')} <ArrowRight size={20} /></>}
+                        <button
+                            disabled={isLoading}
+                            className='flex w-full items-center justify-center gap-2 rounded-2xl bg-[#ef7f1a] py-4 font-bold text-white disabled:opacity-60'>
+                            {isLoading ? (
+                                <Loader2 className='animate-spin' />
+                            ) : (
+                                <>
+                                    {t('registerPage.confirm')} <ArrowRight size={20} />
+                                </>
+                            )}
                         </button>
-                        <button type='button' onClick={() => setOtpSent(false)} className='mx-auto flex items-center gap-1 text-sm font-semibold text-gray-500'>
+                        <button
+                            type='button'
+                            onClick={() => setOtpSent(false)}
+                            className='mx-auto flex items-center gap-1 text-sm font-semibold text-gray-500'>
                             <ArrowLeft size={16} /> {t('registerPage.changeDetails')}
                         </button>
                     </form>
@@ -237,7 +299,9 @@ export default function RegisterPage() {
                 {!otpSent && (
                     <p className='mt-6 text-center text-sm text-gray-500'>
                         {t('registerPage.hasAccount')}{' '}
-                        <Link href='/auth/login' className='font-bold text-[#ef7f1a]'>{t('registerPage.login')}</Link>
+                        <Link href='/auth/login' className='font-bold text-[#ef7f1a]'>
+                            {t('registerPage.login')}
+                        </Link>
                     </p>
                 )}
             </motion.div>

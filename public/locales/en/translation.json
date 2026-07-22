@@ -273,6 +273,7 @@
         "nameRequired": "Enter your full name",
         "birthDateRequired": "Enter your date of birth",
         "birthDateFuture": "The date of birth cannot be in the future",
+        "birthDateMinimumAge": "This date cannot be used. You must be at least 12 years old",
         "phoneRequired": "Enter your phone number",
         "invalidPhone": "Enter the complete phone number",
         "codeSent": "A verification code was sent to your phone number",

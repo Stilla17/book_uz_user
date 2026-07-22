@@ -32,17 +32,6 @@ type DetailBook = Book & {
     subgenre?: string | { _id?: string };
 };
 
-const hiddenBranchNames = ['solnechniy', 'yangi asr avlodi', 'book uz sklad', 'mitti olam', 'ko rgazma 28 06'];
-
-const normalizeBranchName = (name?: string) =>
-    (name ?? '')
-        .trim()
-        .toLocaleLowerCase('uz-UZ')
-        .replace(/[ʻʼ’‘`´']/g, ' ')
-        .replace(/[^\p{L}\p{N}]+/gu, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
 // ==================== MAIN COMPONENT ====================
 export default function BookDetailPage() {
     const { t, i18n } = useTranslation();
@@ -75,12 +64,8 @@ export default function BookDetailPage() {
     const cartQuantity = cartItem?.quantity ?? 0;
     const formatBranchName = (name?: string) => (name || t('bookDetail.storeFallback')).replace(/^\s*\d+\s*/, '');
 
-    const availableBranchStocks = useMemo(
-        () =>
-            book?.branchStocks?.filter((item) => {
-                const storeName = normalizeBranchName(item.storeName);
-                return (item.available ?? 0) > 0 && !hiddenBranchNames.some((name) => storeName.includes(name));
-            }) ?? [],
+    const branchStocks = useMemo(
+        () => book?.branchStocks?.filter((item) => Number(item.available ?? 0) !== 0) ?? [],
         [book?.branchStocks]
     );
     const hasBranchStocks = Boolean(book?.branchStocks?.length);
@@ -90,7 +75,10 @@ export default function BookDetailPage() {
         const branchStocks = book.branchStocks ?? [];
 
         if (branchStocks.length > 0) {
-            return branchStocks.reduce((total, item) => total + Math.max(item.available ?? 0, 0), 0);
+            return Math.max(
+                branchStocks.reduce((total, item) => total + Number(item.available ?? 0), 0),
+                0
+            );
         }
 
         return Math.max(book.stock ?? 0, 0);
@@ -233,11 +221,15 @@ export default function BookDetailPage() {
                                 -{priceInfo.discount}%
                             </span>
                         ) : null}
-                        {availableBranchStocks.length ? (
+                        {branchStocks.length ? (
                             <div className='mt-5 space-y-3 border-t border-orange-100 pt-4 dark:border-slate-700'>
+                                <div className='rounded-lg border border-green-100 bg-green-50/70 p-3 text-sm font-semibold text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'>
+                                    {t('bookDetail.stockAvailable', { count: availableStock })}
+                                </div>
                                 <div className='space-y-2'>
-                                    {availableBranchStocks.map((item, index) => {
-                                        const available = Math.max(item.available ?? 0, 0);
+                                    {branchStocks.map((item, index) => {
+                                        const available = Number(item.available ?? 0);
+                                        const isNegative = available < 0;
 
                                         return (
                                             <div
@@ -252,7 +244,12 @@ export default function BookDetailPage() {
                                                         </div>
                                                     </div>
 
-                                                    <span className='shrink-0 rounded-md bg-green-50 px-2.5 py-1 text-sm font-bold text-green-600 dark:bg-green-500/10 dark:text-green-400'>
+                                                    <span
+                                                        className={`shrink-0 rounded-md px-2.5 py-1 text-sm font-bold ${
+                                                            isNegative
+                                                                ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400'
+                                                                : 'bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400'
+                                                        }`}>
                                                         {t('bookDetail.itemsAvailable', { count: available })}
                                                     </span>
                                                 </div>
