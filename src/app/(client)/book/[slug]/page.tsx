@@ -68,7 +68,6 @@ export default function BookDetailPage() {
         () => book?.branchStocks?.filter((item) => Number(item.available ?? 0) !== 0) ?? [],
         [book?.branchStocks]
     );
-    const hasBranchStocks = Boolean(book?.branchStocks?.length);
     const availableStock = useMemo(() => {
         if (!book) return 0;
 
@@ -184,6 +183,35 @@ export default function BookDetailPage() {
         return <Loading />;
     }
 
+    const normalizeStoreName = (value = '') =>
+        value
+            .normalize('NFKC')
+            .trim()
+            .replace(/^\d+\s*/, '') // boshidagi raqamni olib tashlaydi
+            .replace(/\s+/g, ' ')
+            .toLowerCase();
+
+    const hiddenLocationsMoysklad = [
+        "Ko'rgazma 28,06",
+        'Solnechniy',
+        'Yangi asr avlodi',
+        'Oloy bozor',
+        'Yoshlar matbuoti',
+        'Чп склад Янги Аср Авлоди',
+        'Mitti Olam',
+        'Book.uz sklad'
+    ];
+
+    const normalizedHiddenLocationsMoysklad = hiddenLocationsMoysklad.map(normalizeStoreName);
+    const isMoyskladSynced = Boolean(book?.branchStocks?.length);
+    const visibleBranchNameMoysklad = branchStocks.filter(
+        (item) =>
+            !normalizedHiddenLocationsMoysklad.includes(normalizeStoreName(item.storeName)) &&
+            Number(item.available ?? 0) > 0
+    );
+
+    const countStockBranchMoysklad = visibleBranchNameMoysklad.reduce((total, item) => total + item.available, 0);
+
     if (!book) {
         return (
             <div className='min-h-screen py-16 dark:bg-slate-900'>
@@ -221,13 +249,13 @@ export default function BookDetailPage() {
                                 -{priceInfo.discount}%
                             </span>
                         ) : null}
-                        {branchStocks.length ? (
+                        {!isMoyskladSynced ? null : visibleBranchNameMoysklad.length ? (
                             <div className='mt-5 space-y-3 border-t border-orange-100 pt-4 dark:border-slate-700'>
                                 <div className='rounded-lg border border-green-100 bg-green-50/70 p-3 text-sm font-semibold text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'>
-                                    {t('bookDetail.stockAvailable', { count: availableStock })}
+                                    {t('bookDetail.stockAvailable', { count: countStockBranchMoysklad })}
                                 </div>
                                 <div className='space-y-2'>
-                                    {branchStocks.map((item, index) => {
+                                    {visibleBranchNameMoysklad.map((item, index) => {
                                         const available = Number(item.available ?? 0);
                                         const isNegative = available < 0;
 
@@ -257,10 +285,6 @@ export default function BookDetailPage() {
                                         );
                                     })}
                                 </div>
-                            </div>
-                        ) : isBookAvailable && !hasBranchStocks ? (
-                            <div className='mt-5 rounded-lg border border-green-100 bg-green-50/70 p-3 text-sm font-semibold text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'>
-                                {t('bookDetail.stockAvailable', { count: availableStock })}
                             </div>
                         ) : (
                             <span className='flex items-center gap-2 text-sm text-red-500'>

@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 
 import { useDeleteComment, useGetComment, useUpdateCommentStatus } from '@/components/admin/hooks/queries/comment';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
-import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
 import {

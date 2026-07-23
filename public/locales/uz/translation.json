@@ -259,7 +259,7 @@
         "changeDetails": "Ma’lumotlarni o‘zgartirish",
         "success": "Ro‘yxatdan muvaffaqiyatli o‘tdingiz!",
         "alreadyRegistered": "Bu telefon raqami avval ro‘yxatdan o‘tgan",
-        "hasAccount": "Hisobingiz bormi?",
+        "hasAccount": "Ro'yxatdan o'tganmisiz?",
         "login": "Kirish"
     },
     "loginPage": {
@@ -282,7 +282,7 @@
         "nameRequired": "Ism-familiyangizni kiriting",
         "birthDateRequired": "Tug‘ilgan kuningizni kiriting",
         "birthDateFuture": "Kelajakdagi sanani tanlab bo‘lmaydi",
-        "birthDateMinimumAge": "Bunday sana kiritish mumkin emas. Yosh kamida 12 bo‘lishi kerak",
+        "birthDateMinimumAge": "Aniq yoshingizni kiriting",
         "phoneRequired": "Telefon raqamingizni kiriting",
         "invalidPhone": "Telefon raqamini to'liq kiriting",
         "codeSent": "Tasdiqlash kodi telefon raqamiga yuborildi",
@@ -498,17 +498,17 @@
         "checkout": "Buyurtmani rasmiylashtirish"
     },
     "catalogPage": {
-        "filters": "Filterlar",
+        "filters": "Filtrlar",
         "clear": "Tozalash",
         "search": "Qidiruv",
         "searchPlaceholder": "Kitob nomi bo'yicha qidirish",
         "language": "Til",
         "languages": {
             "all": "Barcha tillar",
-            "uz": "O'zbekcha",
-            "kr": "Kirilcha",
-            "ru": "Ruscha",
-            "en": "Inglizcha"
+            "uz": "Lotin",
+            "kr": "Kirill",
+            "ru": "Rus",
+            "en": "Ingliz"
         },
         "genre": "Janr",
         "selectGenre": "Janrni tanlang",
@@ -516,7 +516,7 @@
         "selectAuthor": "Muallifni tanlang",
         "publisher": "Nashriyot",
         "selectPublisher": "Nashriyotni tanlang",
-        "priceRange": "Narx diapazoni",
+        "priceRange": "Narx oralig'i",
         "priceMin": "0 so'm",
         "priceMax": "1 000 000 so'm",
         "thousandPrice": "{{value}} ming",
@@ -535,7 +535,7 @@
         "retry": "Qayta urinish",
         "emptyTitle": "Natija topilmadi",
         "emptyDescription": "Tanlangan filterlar bo'yicha kitob topilmadi. Filterlarni soddalashtirib qayta urinib ko'ring.",
-        "clearFilters": "Filterlarni tozalash"
+        "clearFilters": "Filtrlarni tozalash"
     },
     "aboutPage": {
         "badge": "BIZ HAQIMIZDA",

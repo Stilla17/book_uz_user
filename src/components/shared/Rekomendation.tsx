@@ -52,14 +52,34 @@ const getGenreValue = (book: RecommendationBook, categories: Category[]) => {
     return '';
 };
 
+const getCategoryValue = (book: RecommendationBook) => {
+    const categoryValues = Array.isArray(book.category) ? book.category : [book.category];
+
+    for (const category of categoryValues) {
+        const value = getRelationValue(category);
+        if (value) return value;
+    }
+
+    return '';
+};
+
 export default function Rekomendation({ book }: RekomendationProps) {
     const { t } = useTranslation();
     const { data: categories = [], isLoading: categoriesLoading } = usePublicCategoriesQuery();
     const genreValue = useMemo(() => getGenreValue(book, categories), [book, categories]);
+    const categoryValue = useMemo(() => getCategoryValue(book), [book]);
+    const recommendationFilter = genreValue
+        ? { key: 'subgenre', value: genreValue }
+        : { key: 'category', value: categoryValue };
     const { data: genreBooksData, isLoading: genreBooksLoading } = useQuery({
-        queryKey: ['genre-recommendations', genreValue, book._id],
-        queryFn: () => bookService.getAllProducts({ subgenre: genreValue, page: 1, limit: 12 }),
-        enabled: Boolean(genreValue),
+        queryKey: ['genre-recommendations', recommendationFilter.key, recommendationFilter.value, book._id],
+        queryFn: () =>
+            bookService.getAllProducts({
+                [recommendationFilter.key]: recommendationFilter.value,
+                page: 1,
+                limit: 12
+            }),
+        enabled: Boolean(recommendationFilter.value),
         staleTime: 5 * 60 * 1000
     });
     const genreBooks = useMemo(

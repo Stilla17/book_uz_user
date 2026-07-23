@@ -1,6 +1,7 @@
 import { AdminComment, CommentStatus } from '@/types/comment';
 
 export const getCommentBookTitle = (comment: AdminComment) => {
+    if (!comment.book) return 'Kitob topilmadi';
     if (typeof comment.book === 'string') return 'Kitob';
 
     const title = comment.book.title;

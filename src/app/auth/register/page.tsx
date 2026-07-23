@@ -194,7 +194,6 @@ export default function RegisterPage() {
                                 />
                                 <input
                                     type='date'
-                                    max={maximumBirthDate}
                                     {...register('birthDate', {
                                         required: t('loginPage.birthDateRequired'),
                                         validate: (value) =>

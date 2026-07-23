@@ -22,7 +22,7 @@ export type PopulatedUser = {
 
 export type AdminComment = {
     _id: string;
-    book: string | PopulatedBook;
+    book: string | PopulatedBook | null;
     user?: string | PopulatedUser;
     name: string;
     text: string;

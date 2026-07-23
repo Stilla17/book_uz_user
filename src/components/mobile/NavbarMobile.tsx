@@ -144,27 +144,6 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                 )}
                             </div>
 
-                            {/* Bottom Navigation (Mobile) */}
-                            <div className='space-y-2'>
-                                <div className={`text-sm font-extrabold ${getTextColor()}`}>Bo‘limlar</div>
-                                <div className='grid grid-cols-2 gap-2'>
-                                    {bottomNav.map((item) => (
-                                        <Link
-                                            key={item.label}
-                                            href={item.href}
-                                            onClick={() => setMobileOpen(false)}
-                                            className={`flex items-center gap-2 rounded-xl border p-3 ${getBorderColor()} transition-all hover:border-[#005CB9] dark:hover:border-blue-400 ${
-                                                item.highlight ? 'bg-[#FF8A00]/10' : getBgColor('card')
-                                            }`}>
-                                            <span className={item.color ?? ''}>{item.icon}</span>
-                                            <span className={`min-w-0 truncate text-xs font-bold ${getTextColor()}`}>
-                                                {item.label}
-                                            </span>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-
                             {/* Mobile kategoriyalar */}
                             <div className='space-y-2'>
                                 <div className='flex items-center justify-between'>

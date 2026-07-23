@@ -27,7 +27,7 @@ import NavIcon from './NavIcon';
 import NavbarFooter from './NavbarFooter';
 import NavbarHeader from './NavbarHeader';
 import UserDropdown from './UserDropdown';
-import { BookOpen, ChevronDown, Grid3x3, Menu, ShoppingCart, User } from 'lucide-react';
+import { BookOpen, ChevronDown, Grid3x3, Menu, Search, ShoppingCart, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // Kategoriya interfeysi
@@ -145,6 +145,34 @@ export const Navbar = () => {
                         userFirstName={getUserFirstName(user)}
                     />
 
+                    {/* Mobile search */}
+                    <form onSubmit={submitSearch} className='relative min-w-0 flex-1 sm:hidden'>
+                        <Search
+                            size={17}
+                            className='pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-slate-400'
+                        />
+                        <Input
+                            value={searchQuery}
+                            placeholder={t('searchPlaceholder')}
+                            onChange={(event) => {
+                                setSearchQuery(event.target.value);
+                                setShowSearchDropdown(event.target.value.trim().length >= 2);
+                            }}
+                            onFocus={() => setShowSearchDropdown(searchQuery.trim().length >= 2)}
+                            className={`h-10 w-full rounded-xl pr-3 pl-9 text-sm ${getBgColor(
+                                'muted'
+                            )} border ${getBorderColor()} focus-visible:ring-0`}
+                        />
+
+                        {showSearchDropdown && (
+                            <SearchDropdown
+                                searchQuery={searchQuery}
+                                setSearchQuery={setSearchQuery}
+                                onClose={() => setShowSearchDropdown(false)}
+                            />
+                        )}
+                    </form>
+
                     {/* LOGO */}
                     <Link href='/' className='group hidden items-center gap-2 sm:flex'>
                         <Image src='/images/Logo.png' alt='Logo' width={80} height={80} />
@@ -195,7 +223,7 @@ export const Navbar = () => {
                                     </div>
 
                                     <div className='grid max-h-[62vh] grid-cols-[260px_minmax(0,1fr)] overflow-hidden'>
-                                        <div className='max-h-[62vh] overflow-y-auto border-r border-slate-200 bg-slate-50/70 p-2 [scrollbar-color:#cbd5e1_transparent] [scrollbar-width:thin] dark:border-slate-800 dark:bg-slate-950/40 dark:[scrollbar-color:#334155_transparent]'>
+                                        <div className='max-h-[62vh] [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] overflow-y-auto border-r border-slate-200 bg-slate-50/70 p-2 dark:[scrollbar-color:#334155_transparent] dark:border-slate-800 dark:bg-slate-950/40'>
                                             {categories.map((category) => {
                                                 const isActive = activeCategory?._id === category._id;
                                                 const subgenres = category.subgenres?.length
@@ -227,7 +255,6 @@ export const Navbar = () => {
                                             })}
                                         </div>
                                         <div className='min-h-[360px] overflow-y-auto p-4'>
-
                                             {activeCategory ? (
                                                 <>
                                                     <div className='mb-4 flex items-start justify-between gap-4'>
@@ -247,7 +274,6 @@ export const Navbar = () => {
                                                                     : "Bu janrda bo'limlar hali yo'q"}
                                                             </p>
                                                         </div>
-                                                       
                                                     </div>
 
                                                     {activeSubgenres.length > 0 ? (
