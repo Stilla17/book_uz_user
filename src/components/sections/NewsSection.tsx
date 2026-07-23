@@ -9,6 +9,7 @@ import { NewsItem, formatDate, normalizeNewsResponse } from '@/helpers/newsSecti
 import { getText } from '@/utils/book-formatters';
 import { api } from '@/services/api';
 import { getImageUrl } from '@/utils/image';
+import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Calendar, ChevronRight, Eye, Megaphone } from 'lucide-react';
@@ -20,19 +21,32 @@ import { useTranslation } from 'react-i18next';
 
 const NEWS_VIEWS_STORAGE_KEY = 'news_views';
 const NEWS_VIEWS_EVENT = 'news-views-change';
+const NEWS_PREVIEW_LIMIT = 8;
+
+const getNewsPreview = async (signal?: AbortSignal) => {
+    const response = await api.get('/news', {
+        params: {
+            active: true,
+            page: 1,
+            limit: NEWS_PREVIEW_LIMIT
+        },
+        signal
+    });
+
+    return normalizeNewsResponse(response.data);
+};
 
 export const NewsSection = () => {
     const { t, i18n } = useTranslation();
-    const [news, setNews] = useState<NewsItem[]>([]);
-    const [loading, setLoading] = useState(true);
     const [savedViews, setSavedViews] = useState<Record<string, number>>({});
+    const { data: news = [], isLoading: loading } = useQuery<NewsItem[]>({
+        queryKey: ['public-news', 'preview', NEWS_PREVIEW_LIMIT],
+        queryFn: ({ signal }) => getNewsPreview(signal),
+        staleTime: 10 * 60 * 1000,
+        gcTime: 30 * 60 * 1000
+    });
 
     const language = i18n.resolvedLanguage?.split('-')[0] || i18n.language?.split('-')[0] || 'uz';
-
-    // Yangiliklarni yuklash
-    useEffect(() => {
-        loadNews();
-    }, []);
 
     useEffect(() => {
         const loadSavedViews = () => {
@@ -52,26 +66,6 @@ export const NewsSection = () => {
             window.removeEventListener(NEWS_VIEWS_EVENT, loadSavedViews);
         };
     }, []);
-
-    const loadNews = async () => {
-        try {
-            setLoading(true);
-            const response = await api.get('/news', {
-                params: {
-                    active: true,
-                    page: 1,
-                    limit: 8
-                }
-            });
-
-            setNews(normalizeNewsResponse(response.data));
-        } catch (error) {
-            console.error('Yangiliklar yuklanmadi:', error);
-            setNews([]);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const getNewsViews = (item: NewsItem) => {
         const apiViews = item.views ?? item.viewsCount ?? item.viewCount ?? 0;

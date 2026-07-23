@@ -22,6 +22,16 @@ const lato = Lato({
     variable: '--font-lato' // CSS o'zgaruvchisi sifatida ishlatish uchun
 });
 
+const getApiOrigin = () => {
+    try {
+        return new URL(process.env.NEXT_PUBLIC_API_URL || '').origin;
+    } catch {
+        return null;
+    }
+};
+
+const apiOrigin = getApiOrigin();
+
 export const metadata: Metadata = {
     metadataBase: new URL('https://book.uz'),
     title: "Book.uz - O'zbekistondagi eng katta onlayn kitob do'koni",
@@ -127,6 +137,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
     return (
         <html lang='uz' suppressHydrationWarning>
+            <head>
+                {apiOrigin ? (
+                    <>
+                        <link rel='preconnect' href={apiOrigin} crossOrigin='anonymous' />
+                        <link rel='dns-prefetch' href={apiOrigin} />
+                    </>
+                ) : null}
+            </head>
             <body
                 className={`${lato.className} ${lato.variable} bg-background min-h-screen font-sans text-gray-900 antialiased transition-colors duration-300 dark:bg-slate-900 dark:text-white`}>
                 <ProviderRedux>

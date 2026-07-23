@@ -22,7 +22,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
     const router = useRouter();
     const [showResults, setShowResults] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const debouncedQuery = useDebounce(searchQuery, 500);
+    const debouncedQuery = useDebounce(searchQuery, 250);
     const { data: results, isFetching: loading } = useSearchSuggestionsQuery(debouncedQuery);
 
     useEffect(() => {

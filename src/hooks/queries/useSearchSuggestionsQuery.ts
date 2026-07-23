@@ -25,7 +25,9 @@ export const useSearchSuggestionsQuery = (query: string) => {
 
             return response.data?.success ? (response.data.data as SearchResults) : emptyResults;
         },
-        enabled: search.length > 0,
-        placeholderData: emptyResults
+        enabled: search.length >= 2,
+        placeholderData: emptyResults,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 15 * 60 * 1000
     });
 };
