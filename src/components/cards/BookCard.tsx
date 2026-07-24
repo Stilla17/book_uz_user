@@ -94,9 +94,9 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
         toggleFavorite();
     };
 
-    const bookHref = `/book/${slug ?? book.slug ?? book._id}`;
+    const bookHref = `/book/${slug || book.slug || book._id}`;
     const prefetchBook = () => {
-        const bookSlug = slug ?? book.slug ?? book._id;
+        const bookSlug = slug || book.slug || book._id;
 
         queryClient.prefetchQuery({
             queryKey: ['book', bookSlug],

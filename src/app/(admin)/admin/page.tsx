@@ -2,6 +2,7 @@
 
 import DashboardChart from '@/components/admin/sections/DashboardChart';
 import { api } from '@/components/admin/services/api';
+import { isOrderRevenueEligible } from '@/utils/order';
 import { useQuery } from '@tanstack/react-query';
 
 import { BookOpen, CircleDollarSign, PackageCheck, Users } from 'lucide-react';
@@ -10,6 +11,8 @@ type AdminOrdersData = {
     orders?: Array<{
         totalAmount?: number;
         paymentStatus?: string;
+        paymentType?: string;
+        status?: string;
     }>;
     pagination?: {
         total?: number;
@@ -73,9 +76,7 @@ const fetchOrdersDashboardStats = async () => {
         ...restResponses.flatMap((response) => response.data.data?.orders ?? [])
     ];
     const revenue = allOrders.reduce((sum, order) => {
-        const status = String(order.paymentStatus || '').toUpperCase();
-
-        if (status !== 'PAID') return sum;
+        if (!isOrderRevenueEligible(order)) return sum;
 
         return sum + Number(order.totalAmount || 0);
     }, 0);

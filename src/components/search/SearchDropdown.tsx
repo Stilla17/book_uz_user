@@ -88,7 +88,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                 {results!.products.map((product) => (
                                     <Link
                                         key={product._id}
-                                        href={`/book/${product.slug}`}
+                                        href={`/book/${product.slug || product._id}`}
                                         onClick={handleItemClick}
                                         className='group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50'>
                                         <div className='relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-lg'>

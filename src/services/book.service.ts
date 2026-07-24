@@ -118,7 +118,7 @@ export const bookService = {
     // Bitta kitobni olish
     async getBookById(id: string): Promise<Book | null> {
         try {
-            const response = await api.get(`/products/${id}`);
+            const response = await api.get(`/products/${encodeURIComponent(id)}`);
             return response.data.data || null;
         } catch (error) {
             console.error('Error fetching book:', error);

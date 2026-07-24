@@ -316,7 +316,7 @@ const AdminBookPage = () => {
                                             <td className='px-4 py-4'>
                                                 <div className='flex justify-end gap-2'>
                                                     <Button size='icon-sm' variant='ghost' className='rounded-xl'>
-                                                        <Link href={`/admin/book/${book.slug}`}>
+                                                        <Link href={`/admin/book/${book.slug || book._id}`}>
                                                             <Eye size={17} />
                                                         </Link>
                                                     </Button>

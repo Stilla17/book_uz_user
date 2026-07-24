@@ -26,6 +26,7 @@ import {
 import { filterService } from '@/services/filter.service';
 import { BookFormValues } from '@/types/book';
 import { getLatestImageUrl } from '@/utils/image';
+import { slugifyBookSlug } from '@/utils/slug';
 import { useQuery } from '@tanstack/react-query';
 
 import { BookOpen, FileText, ImagePlus, Loader, Sparkles, Upload, X } from 'lucide-react';
@@ -33,7 +34,7 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 const AdminNewBookPage = () => {
-    const { handleSubmit, register, setValue, watch, reset } = useForm<BookFormValues>({
+    const { handleSubmit, register, setValue, getValues, watch, reset } = useForm<BookFormValues>({
         defaultValues: {
             title: {
                 uz: '',
@@ -235,6 +236,7 @@ const AdminNewBookPage = () => {
     const isMongoId = (value: string | null) => Boolean(value && /^[0-9a-fA-F]{24}$/.test(value));
 
     const onSubmit = (values: BookFormValues) => {
+        const normalizedSlug = slugifyBookSlug(values.slug || values.title.uz);
         const categoryValue = resolveOptionValue(values.category, categoryOptions);
         const subCategoryValue = resolveOptionValue(values.subCategoryId, subCategoryOptions);
         const authorValues = Array.from(
@@ -246,6 +248,11 @@ const AdminNewBookPage = () => {
 
         if (!values.title.uz.trim()) {
             toast.error('Kitob nomi (UZ) majburiy');
+            return;
+        }
+
+        if (!normalizedSlug) {
+            toast.error("Slugni lotin harflari yoki raqamlar bilan kiriting");
             return;
         }
 
@@ -271,7 +278,7 @@ const AdminNewBookPage = () => {
         appendText(formData, 'barcode', values.isbn);
         appendText(formData, 'isbn', values.isbn);
         appendText(formData, 'details[isbn]', values.isbn);
-        appendText(formData, 'slug', values.slug);
+        formData.append('slug', normalizedSlug);
         tags.forEach((tag) => formData.append('tegs', tag));
         formData.append('category', categoryValue);
         if (subCategoryValue) {
@@ -375,7 +382,16 @@ const AdminNewBookPage = () => {
                                 <Input
                                     className={inputClass}
                                     placeholder='Masalan: Oq kema'
-                                    {...register('title.uz', { required: true })}
+                                    {...register('title.uz', {
+                                        required: true,
+                                        onBlur: (event) => {
+                                            if (!getValues('slug').trim()) {
+                                                setValue('slug', slugifyBookSlug(event.target.value), {
+                                                    shouldDirty: true
+                                                });
+                                            }
+                                        }
+                                    })}
                                 />
                             </Field>
                             <Field label='Kitob nomi (RU)'>
@@ -425,7 +441,18 @@ const AdminNewBookPage = () => {
                                 />
                             </Field>
                             <Field label='Slug'>
-                                <Input type='text' className={inputClass} placeholder='oq-kema' {...register('slug')} />
+                                <Input
+                                    type='text'
+                                    className={inputClass}
+                                    placeholder='oq-kema'
+                                    {...register('slug', {
+                                        required: true,
+                                        onBlur: (event) =>
+                                            setValue('slug', slugifyBookSlug(event.target.value), {
+                                                shouldDirty: true
+                                            })
+                                    })}
+                                />
                             </Field>
                             <Field label='Teglar'>
                                 <Input

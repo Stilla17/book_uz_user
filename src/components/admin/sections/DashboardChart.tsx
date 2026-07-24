@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 
 import { api } from '@/components/admin/services/api';
 import { formatPrice } from '@/utils/currency';
+import { isOrderRevenueEligible } from '@/utils/order';
 import { useQuery } from '@tanstack/react-query';
 
 import type { EChartsOption } from 'echarts';
@@ -124,7 +125,13 @@ const normalizeSales = (response: any, source: 'site' | 'moysklad'): SaleRecord[
         .map((item) => ({
             amount: getSaleAmount(item, source),
             createdAt: getSaleDate(item),
-            status: String(source === 'site' ? item?.paymentStatus ?? '' : item?.status ?? '').toUpperCase()
+            status: String(
+                source === 'site'
+                    ? isOrderRevenueEligible(item)
+                        ? 'PAID'
+                        : item?.paymentStatus ?? ''
+                    : item?.status ?? ''
+            ).toUpperCase()
         }))
         .filter((item) => item.amount > 0 && Boolean(item.createdAt));
 

@@ -14,6 +14,7 @@ import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { OrderStatus } from '@/types/orders';
+import { isOrderRevenueEligible } from '@/utils/order';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
@@ -21,12 +22,6 @@ import { Banknote, Clock3, Search, ShoppingBag } from 'lucide-react';
 
 export type StatusFilter = 'ALL' | OrderStatus;
 type OrderSortKey = 'customer' | 'date' | 'amount' | 'payment';
-
-const confirmedPaymentStatuses = new Set(['PAID', 'CONFIRMED', 'SUCCESS', 'COMPLETED']);
-
-const isConfirmedPayment = (paymentStatus?: string) => {
-    return confirmedPaymentStatuses.has(String(paymentStatus || '').toUpperCase());
-};
 
 const AdminOrdersPage = () => {
     const [active, setActive] = useState<StatusFilter>('ALL');
@@ -63,7 +58,7 @@ const AdminOrdersPage = () => {
         0
     );
     const confirmedPaymentTotal = orders?.orders.reduce((sum, item) => {
-        if (!isConfirmedPayment(item.paymentStatus)) return sum;
+        if (!isOrderRevenueEligible(item)) return sum;
 
         return item.totalAmount + sum;
     }, 0);
@@ -208,7 +203,10 @@ const AdminOrdersPage = () => {
                                         className:
                                             'bg-slate-50 text-slate-700 ring-slate-100 dark:bg-slate-500/10 dark:text-slate-300 dark:ring-slate-500/20'
                                     };
-                                    const paymentConfig = paymentStatusConfig[order.paymentStatus] ?? {
+                                    const displayedPaymentStatus = isOrderRevenueEligible(order)
+                                        ? 'PAID'
+                                        : order.paymentStatus;
+                                    const paymentConfig = paymentStatusConfig[displayedPaymentStatus] ?? {
                                         label: order.paymentStatus || "To'lov holati noma'lum",
                                         className:
                                             'bg-slate-50 text-slate-700 ring-slate-100 dark:bg-slate-500/10 dark:text-slate-300 dark:ring-slate-500/20'

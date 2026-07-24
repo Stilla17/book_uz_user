@@ -26,6 +26,8 @@ export const useUpdateOrderStatus = () => {
         mutationFn: OrderService.updateOrderStatus,
         onSuccess: (order: Order) => {
             queryClient.invalidateQueries({ queryKey: ['orders'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard-stats'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard', 'sales-chart'] });
             queryClient.setQueryData(['orders', 'detail', order._id], order);
         }
     });

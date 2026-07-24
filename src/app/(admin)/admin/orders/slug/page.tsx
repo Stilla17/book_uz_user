@@ -12,7 +12,13 @@ import type { OrderStatus } from '@/types/orders';
 import { getBookAuthorName, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getImageUrl } from '@/utils/image';
-import { getOrderItemPrice, getOrderItemProduct, getOrderItemsQuantity, getOrderProductsTotal } from '@/utils/order';
+import {
+    getOrderItemPrice,
+    getOrderItemProduct,
+    getOrderItemsQuantity,
+    getOrderProductsTotal,
+    isOrderRevenueEligible
+} from '@/utils/order';
 
 import dayjs from 'dayjs';
 import { ArrowLeft, Banknote, BookOpen, Check, ClipboardCheck, Copy, Loader2, Truck, UserRound } from 'lucide-react';
@@ -51,9 +57,10 @@ const AdminOrderDetailPage = () => {
     const { data: orderData, isLoading: isDetailLoading } = useOrderIdQuery(id);
     const { mutate: updateOrderStatus, isPending: isUpdatingStatus } = useUpdateOrderStatus();
     const statusConfig = orderData ? orderStatusConfig[orderData.status] : null;
-    const paymentStatusLabel = orderData
-        ? paymentStatusConfig[orderData.paymentStatus]?.label || orderData.paymentStatus || "Noma'lum"
-        : '';
+    const displayedPaymentStatus = orderData && isOrderRevenueEligible(orderData) ? 'PAID' : orderData?.paymentStatus;
+    const paymentStatusLabel = displayedPaymentStatus
+        ? paymentStatusConfig[displayedPaymentStatus]?.label || displayedPaymentStatus
+        : "Noma'lum";
     const productsTotal = getOrderProductsTotal(orderData?.items);
 
     useEffect(() => {
