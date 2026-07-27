@@ -128,6 +128,7 @@ export interface Genre {
 }
 
 export interface CreateSubgenreData {
+    _id?: string;
     slug: string;
     title: MultiLangField;
     order?: number;

@@ -10,6 +10,8 @@ type MultiSearchableSelectProps = {
     options: SearchableOption[];
     placeholder: string;
     name: string;
+    selectedLabel?: string;
+    itemLabel?: string;
     disabled?: boolean;
     onChange: (value: string[]) => void;
 };
@@ -19,6 +21,8 @@ const MultiSearchableSelect = ({
     options,
     placeholder,
     name,
+    selectedLabel = 'muallif',
+    itemLabel = 'muallif',
     disabled,
     onChange
 }: MultiSearchableSelectProps) => {
@@ -49,7 +53,7 @@ const MultiSearchableSelect = ({
                 onClick={() => setIsOpen((current) => !current)}
                 className='flex min-h-12 w-full max-w-full min-w-0 items-center justify-between gap-3 rounded-2xl border border-[#eadfce] bg-white px-4 py-2.5 text-left text-sm font-semibold text-[#2f2a25] shadow-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-900 dark:text-white'>
                 <span className={selectedOptions.length ? 'min-w-0 flex-1' : 'min-w-0 flex-1 truncate text-[#9d907e]'}>
-                    {selectedOptions.length ? `${selectedOptions.length} ta muallif tanlandi` : placeholder}
+                    {selectedOptions.length ? `${selectedOptions.length} ta ${selectedLabel} tanlandi` : placeholder}
                 </span>
                 <Search size={16} className='shrink-0 text-[#9d907e]' />
             </button>
@@ -64,7 +68,7 @@ const MultiSearchableSelect = ({
                             <button
                                 type='button'
                                 onClick={() => toggleOption(option.value)}
-                                aria-label={`${option.label} muallifini olib tashlash`}
+                                aria-label={`${option.label} ${itemLabel}ini olib tashlash`}
                                 className='shrink-0 rounded-md p-0.5 transition hover:bg-black/10 dark:hover:bg-white/10'>
                                 <X size={13} />
                             </button>

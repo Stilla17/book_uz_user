@@ -17,6 +17,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 type SubgenreForm = {
+    _id?: string;
     title: {
         uz: string;
         ru: string;
@@ -100,6 +101,7 @@ const AdminNewGenrePage = () => {
                 slug: genreData.slug || '',
                 subgenres: genreData.subgenres.length
                     ? genreData.subgenres.map((subgenre) => ({
+                          _id: subgenre._id,
                           title: subgenre.title,
                           slug: subgenre.slug || ''
                       }))
@@ -261,6 +263,8 @@ const AdminNewGenrePage = () => {
                                 <div
                                     key={subgenre.id}
                                     className='rounded-[22px] bg-white p-4 ring-1 ring-[#eadfce] dark:bg-slate-900 dark:ring-slate-800'>
+                                    <input type='hidden' {...register(`subgenres.${index}._id`)} />
+
                                     <div className='mb-3 flex items-center justify-between gap-3'>
                                         <p className='text-sm font-black text-[#6f6255] dark:text-slate-300'>
                                             Subjanr {index + 1}

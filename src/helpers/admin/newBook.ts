@@ -9,30 +9,37 @@ export const getRelationId = (value: unknown) => {
     return '';
 };
 
-export const getBookSubCategoryId = (book: Book) => {
+export const getBookSubCategoryIds = (book: Book) => {
     const maybeBook = book as Book & {
+        subCategoryIds?: Array<string | { _id?: string }>;
         subCategoryId?: string | { _id?: string };
         subCategory?: string | { _id?: string };
         subgenre?: string | { _id?: string };
     };
 
-    return (
+    const ids = (maybeBook.subCategoryIds ?? []).map(getRelationId).filter(Boolean);
+    const fallback =
         getRelationId(maybeBook.subCategoryId) ||
         getRelationId(maybeBook.subCategory) ||
-        getRelationId(maybeBook.subgenre)
-    );
+        getRelationId(maybeBook.subgenre);
+
+    return Array.from(new Set(ids.length ? ids : fallback ? [fallback] : []));
 };
 
-export const getBookCategoryId = (book: Book) => {
+export const getBookCategoryIds = (book: Book) => {
     const maybeBook = book as Book & {
+        categories?: Array<string | { _id?: string }>;
         category?: Array<{ _id?: string }> | string | { _id?: string };
     };
 
-    if (Array.isArray(maybeBook.category)) {
-        return maybeBook.category[0]?._id || '';
+    const categoryValues = maybeBook.categories?.length ? maybeBook.categories : maybeBook.category;
+    if (Array.isArray(categoryValues)) {
+        return Array.from(new Set(categoryValues.map(getRelationId).filter(Boolean)));
     }
 
-    return getRelationId(maybeBook.category);
+    const fallback = getRelationId(categoryValues);
+
+    return fallback ? [fallback] : [];
 };
 
 export const getTextValue = (value: unknown) => {

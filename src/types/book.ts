@@ -41,6 +41,9 @@ export interface Book {
     format?: 'ebook' | 'audio' | 'paper';
     isWishlisted?: boolean;
     category?: Array<{ _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }>;
+    categories?: Array<string | { _id?: string; name?: string; title?: LocalizedText }>;
+    subCategoryId?: string | { _id?: string };
+    subCategoryIds?: Array<string | { _id?: string }>;
     contentLanguage?: string;
     numberOfPage?: number;
     year?: number;
@@ -144,8 +147,8 @@ export type BookFormValues = {
     };
     isbn: string;
     slug: string;
-    category: string;
-    subCategoryId: string;
+    category: string[];
+    subCategoryIds: string[];
     author: string[];
     publisher: string;
     language: string;

@@ -17,8 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import {
     getBookBarcode,
-    getBookCategoryId,
-    getBookSubCategoryId,
+    getBookCategoryIds,
+    getBookSubCategoryIds,
     getCategorySubCategories,
     getRelationId,
     getSubCategoryValue
@@ -49,8 +49,8 @@ const AdminNewBookPage = () => {
             isbn: '',
             slug: '',
             tags: '',
-            category: '',
-            subCategoryId: '',
+            category: [],
+            subCategoryIds: [],
             author: [],
             publisher: '',
             language: 'uz',
@@ -96,8 +96,8 @@ const AdminNewBookPage = () => {
             setValue('oldPrice', bookData.oldPrice);
             setValue('discount', bookData.discount);
 
-            setValue('category', getBookCategoryId(bookData));
-            setValue('subCategoryId', getBookSubCategoryId(bookData));
+            setValue('category', getBookCategoryIds(bookData));
+            setValue('subCategoryIds', getBookSubCategoryIds(bookData));
             const bookAuthors = Array.isArray(bookData.author)
                 ? bookData.author
                 : bookData.author
@@ -169,8 +169,8 @@ const AdminNewBookPage = () => {
         () => publishers.map((publisher) => ({ value: publisher._id, label: publisher.name })),
         [publishers]
     );
-    const categoryId = watch('category');
-    const subCategoryId = watch('subCategoryId');
+    const categoryIds = watch('category');
+    const subCategoryIds = watch('subCategoryIds');
     const authorIds = watch('author');
     const publisherId = watch('publisher');
     const language = watch('language');
@@ -178,25 +178,30 @@ const AdminNewBookPage = () => {
     const cover = watch('cover');
     const format = watch('format');
     const isActive = watch('isActive');
-    const selectedCategory = categories.find((category) => category._id === categoryId || category.slug === categoryId);
+    const selectedCategories = categories.filter(
+        (category) => categoryIds.includes(category._id) || categoryIds.includes(category.slug)
+    );
     const subCategoryOptions = useMemo<SearchableOption[]>(
         () =>
-            getCategorySubCategories(selectedCategory)
-                .map((subCategory) => ({
-                    value: getSubCategoryValue(subCategory),
-                    label:
-                        subCategory.title?.uz ||
-                        subCategory.title?.ru ||
-                        subCategory.title?.en ||
-                        subCategory.name ||
-                        subCategory.slug ||
-                        'Subkategoriya'
-                }))
+            selectedCategories
+                .flatMap((category) =>
+                    getCategorySubCategories(category).map((subCategory) => ({
+                        value: getSubCategoryValue(subCategory),
+                        label: `${category.title?.uz || category.title?.ru || category.title?.en || 'Kategoriya'} — ${
+                            subCategory.title?.uz ||
+                            subCategory.title?.ru ||
+                            subCategory.title?.en ||
+                            subCategory.name ||
+                            subCategory.slug ||
+                            'Subkategoriya'
+                        }`
+                    }))
+                )
                 .filter(
                     (option, index, options) =>
                         Boolean(option.value) && options.findIndex((item) => item.value === option.value) === index
                 ),
-        [selectedCategory]
+        [selectedCategories]
     );
 
     const appendText = (formData: FormData, key: string, value?: string | null) => {
@@ -242,8 +247,16 @@ const AdminNewBookPage = () => {
 
     const onSubmit = (values: BookFormValues) => {
         const normalizedSlug = slugifyBookSlug(values.slug || values.title.uz);
-        const categoryValue = resolveOptionValue(values.category, categoryOptions);
-        const subCategoryValue = resolveOptionValue(values.subCategoryId, subCategoryOptions);
+        const categoryValues = Array.from(
+            new Set(values.category.map((category) => resolveOptionValue(category, categoryOptions)).filter(Boolean))
+        );
+        const subCategoryValues = Array.from(
+            new Set(
+                values.subCategoryIds
+                    .map((subCategory) => resolveOptionValue(subCategory, subCategoryOptions))
+                    .filter(Boolean)
+            )
+        );
         const authorValues = Array.from(
             new Set(values.author.map((author) => resolveOptionValue(author, authorOptions)).filter(Boolean))
         );
@@ -261,8 +274,22 @@ const AdminNewBookPage = () => {
             return;
         }
 
-        if (!categoryValue || !authorValues.length || !publisherValue) {
+        if (!categoryValues.length || !authorValues.length || !publisherValue) {
             toast.error('Kategoriya, muallif va nashriyotni tanlang');
+            return;
+        }
+
+        const missingSubCategory = selectedCategories.some((category) => {
+            const categorySubCategoryIds = getCategorySubCategories(category).map(getSubCategoryValue).filter(Boolean);
+
+            return (
+                categorySubCategoryIds.length > 0 &&
+                !categorySubCategoryIds.some((subCategoryId) => subCategoryValues.includes(subCategoryId))
+            );
+        });
+
+        if (missingSubCategory) {
+            toast.error('Har bir tanlangan kategoriya uchun kamida bitta subkategoriya tanlang');
             return;
         }
 
@@ -285,11 +312,18 @@ const AdminNewBookPage = () => {
         appendText(formData, 'details[isbn]', values.isbn);
         formData.append('slug', normalizedSlug);
         tags.forEach((tag) => formData.append('tegs', tag));
-        formData.append('category', categoryValue);
-        if (subCategoryValue) {
-            formData.append('subCategoryId', subCategoryValue);
-            formData.append('subCategory', subCategoryValue);
-            formData.append('subgenre', subCategoryValue);
+        categoryValues.forEach((category) => formData.append('categories', category));
+        formData.append('category', categoryValues[0]);
+        subCategoryValues.forEach((subCategory) => formData.append('subCategoryIds', subCategory));
+        const primaryCategory = selectedCategories.find(
+            (category) => category._id === categoryValues[0] || category.slug === categoryValues[0]
+        );
+        const primarySubCategoryIds = getCategorySubCategories(primaryCategory).map(getSubCategoryValue);
+        const primarySubCategory = subCategoryValues.find((subCategory) =>
+            primarySubCategoryIds.includes(subCategory)
+        );
+        if (primarySubCategory) {
+            formData.append('subCategoryId', primarySubCategory);
         }
         authorValues.forEach((author) => formData.append('author', author));
         formData.append('publisher', publisherValue);
@@ -586,27 +620,43 @@ const AdminNewBookPage = () => {
 
                         <div className='grid gap-4'>
                             <Field label='Kategoriya'>
-                                <SearchableSelect
-                                    value={categoryId}
+                                <MultiSearchableSelect
+                                    value={categoryIds}
                                     name='category'
                                     options={categoryOptions}
                                     placeholder={isLoading ? 'Yuklanmoqda...' : 'Tanlang'}
+                                    selectedLabel='kategoriya'
+                                    itemLabel='kategoriya'
                                     disabled={isLoading}
                                     onChange={(value) => {
                                         setValue('category', value);
-                                        setValue('subCategoryId', '');
+                                        const allowedSubCategoryIds = categories
+                                            .filter(
+                                                (category) =>
+                                                    value.includes(category._id) || value.includes(category.slug)
+                                            )
+                                            .flatMap(getCategorySubCategories)
+                                            .map(getSubCategoryValue);
+                                        setValue(
+                                            'subCategoryIds',
+                                            subCategoryIds.filter((subCategoryId) =>
+                                                allowedSubCategoryIds.includes(subCategoryId)
+                                            )
+                                        );
                                     }}
                                 />
                             </Field>
 
                             <Field label='Subkategoriya'>
-                                <SearchableSelect
-                                    value={subCategoryId}
-                                    name='subCategoryId'
+                                <MultiSearchableSelect
+                                    value={subCategoryIds}
+                                    name='subCategoryIds'
                                     options={subCategoryOptions}
-                                    placeholder={categoryId ? 'Tanlang' : 'Avval kategoriya tanlang'}
-                                    disabled={isLoading || !categoryId}
-                                    onChange={(value) => setValue('subCategoryId', value)}
+                                    placeholder={categoryIds.length ? 'Tanlang' : 'Avval kategoriya tanlang'}
+                                    selectedLabel='subkategoriya'
+                                    itemLabel='subkategoriya'
+                                    disabled={isLoading || !categoryIds.length}
+                                    onChange={(value) => setValue('subCategoryIds', value)}
                                 />
                             </Field>
 
