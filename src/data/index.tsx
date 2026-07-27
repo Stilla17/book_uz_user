@@ -1,4 +1,5 @@
 import { OrderStatus, PaymentStatus } from '@/types/orders';
+
 import { Heart, Mail, PackageCheck, Settings, ShoppingBag, Truck, User } from 'lucide-react';
 
 export const deliveryOptions = [
@@ -35,10 +36,10 @@ export const paymentOptions = [
         icon: './images/click_white_logo.png',
         title: 'Click'
     },
-    {
-        icon: './images/xazna_logo.png',
-        title: 'Xazna'
-    },
+    // {
+    //     icon: './images/xazna_logo.png',
+    //     title: 'Xazna'
+    // },
     {
         icon: '',
         title: 'Naqd'
@@ -52,7 +53,6 @@ export const LANGUAGE_OPTIONS = [
     { value: 'ru', label: 'Ruscha' },
     { value: 'en', label: 'Inglizcha' }
 ] as const;
-
 
 export const orderStatusConfig: Record<OrderStatus, { label: string; className: string }> = {
     DELIVERED: {
