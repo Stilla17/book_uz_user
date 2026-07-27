@@ -168,7 +168,15 @@ const AdminBookDetailPage = () => {
                         <InfoItem label='Yozuv' value={book.contentLanguage === 'cyrillic' ? 'Kirill' : 'Lotin'} />
                         <InfoItem
                             label='Muqova'
-                            value={book.cover === 'paper' ? 'Yumshoq' : book.cover ? 'Qattiq' : '-'}
+                            value={
+                                book.cover === 'softcover' ||
+                                book.cover === 'paperback' ||
+                                book.cover === 'paper'
+                                    ? 'Yumshoq'
+                                    : book.cover
+                                      ? 'Qattiq'
+                                      : '-'
+                            }
                         />
                         <InfoItem label='Format' value={book.format || 'paper'} />
                     </div>

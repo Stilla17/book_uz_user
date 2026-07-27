@@ -150,7 +150,7 @@ export type BookFormValues = {
     publisher: string;
     language: string;
     contentLanguage: 'latin' | 'cyrillic';
-    cover: 'hardcover' | 'paper';
+    cover: 'hardcover' | 'softcover';
     format: 'paper' | 'ebook' | 'audio';
     pages: number;
     publishedYear: number;

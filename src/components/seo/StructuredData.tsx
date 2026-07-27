@@ -26,7 +26,10 @@ export function BookStructuredData({ book }: { book: Book }) {
         inLanguage: book.language || 'uz',
         publisher: book.publisherName || book.publisher || 'Book.uz',
         isbn: book.isbn || book.barcode,
-        bookFormat: book.cover === 'paper' ? 'Paperback' : 'Hardcover',
+        bookFormat:
+            book.cover === 'softcover' || book.cover === 'paperback' || book.cover === 'paper'
+                ? 'Paperback'
+                : 'Hardcover',
         numberOfPages: book.numberOfPage || book.pages,
         offers: {
             '@type': 'Offer',

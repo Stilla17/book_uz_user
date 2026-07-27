@@ -111,7 +111,12 @@ const AdminNewBookPage = () => {
 
             setValue('language', bookData.language || 'uz');
             setValue('contentLanguage', (bookData.contentLanguage as BookFormValues['contentLanguage']) || 'latin');
-            setValue('cover', (bookData.cover as BookFormValues['cover']) || 'hardcover');
+            setValue(
+                'cover',
+                bookData.cover === 'softcover' || bookData.cover === 'paperback' || bookData.cover === 'paper'
+                    ? 'softcover'
+                    : 'hardcover'
+            );
             setValue('format', bookData.format || 'paper');
 
             setValue('pages', bookData.pages || bookData.numberOfPage || bookData.details?.pages || 0);
@@ -507,7 +512,7 @@ const AdminNewBookPage = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value='hardcover'>Qattiq</SelectItem>
-                                        <SelectItem value='paper'>Yumshoq</SelectItem>
+                                        <SelectItem value='softcover'>Yumshoq</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </Field>

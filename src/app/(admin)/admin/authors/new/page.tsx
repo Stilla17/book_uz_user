@@ -39,6 +39,15 @@ const slugify = (value: string) =>
 
 const formatDateInputValue = (value?: string) => (value ? value.slice(0, 10) : '');
 
+const isValidDateInput = (value: string) => {
+    if (!value) return true;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+    const date = new Date(`${value}T00:00:00Z`);
+
+    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+};
+
 const AdminNewAuthorPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -47,7 +56,11 @@ const AdminNewAuthorPage = () => {
 
     const { mutate: createAuthor, isPending: isCreatePanding } = useCreateAuthor();
     const { mutate: updateAuthor, isPending: isUpdatePending } = useUpdateAuthor();
-    const { data: authorData, isLoading: isDetailLoading } = useAuthorDetailQuery(id);
+    const {
+        data: authorData,
+        isLoading: isDetailLoading,
+        isError: isDetailError
+    } = useAuthorDetailQuery(id);
     const { imageFile, imagePreview, setImagePreview, handleImageChange, clearImagePreview } = useImagePreview();
 
     const isPending = id ? isUpdatePending : isCreatePanding;
@@ -97,24 +110,51 @@ const AdminNewAuthorPage = () => {
         if (!getValues('slug')) setValue('slug', slugify(value));
     };
 
+    const getErrorMessage = (error: unknown, fallback: string) => {
+        const maybeError = error as { response?: { data?: { message?: string | string[] } } };
+        const message = maybeError.response?.data?.message;
+
+        return Array.isArray(message) ? message.join(', ') : message || fallback;
+    };
+
     const onSubmit = (values: AuthorFormValues) => {
+        if (!isValidDateInput(values.birthDate) || !isValidDateInput(values.deathDate)) {
+            toast.error("Sanani YYYY-MM-DD formatida to'g'ri kiriting");
+            return;
+        }
+
+        if (values.birthDate && values.deathDate && values.deathDate < values.birthDate) {
+            toast.error("Vafot etgan sana tug'ilgan sanadan oldin bo'lishi mumkin emas");
+            return;
+        }
+
         const formData = new FormData();
 
         formData.append('name', values.name);
         formData.append('slug', values.slug);
         formData.append('bio', JSON.stringify(values.bio));
-        formData.append('birthDate', values.birthDate);
+        if (values.birthDate) formData.append('birthDate', values.birthDate);
         if (values.deathDate) formData.append('deathDate', values.deathDate);
         if (imageFile) formData.append('image', imageFile);
 
         if (id) {
+            const updateId = authorData?._id;
+
+            if (!updateId || !/^[0-9a-fA-F]{24}$/.test(updateId)) {
+                toast.error("Muallif topilmadi. Ro'yxatga qaytib, qaytadan tahrirlashni oching.");
+                return;
+            }
+
             updateAuthor(
-                { id, formData },
+                { id: updateId, formData },
                 {
                     onSuccess: () => {
                         toast.success('Muallif muvaffaqiyatli yangilandi');
                         router.push('/admin/authors');
                         router.refresh();
+                    },
+                    onError: (error: unknown) => {
+                        toast.error(getErrorMessage(error, "Muallifni yangilashda xatolik yuz berdi"));
                     }
                 }
             );
@@ -154,6 +194,12 @@ const AdminNewAuthorPage = () => {
                     </div>
                 )}
 
+                {isEdit && isDetailError && (
+                    <div className='rounded-[24px] bg-red-50 p-5 text-sm font-semibold text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20'>
+                        Muallif topilmadi yoki o'chirilgan. Mualliflar ro'yxatiga qaytib, sahifani yangilang.
+                    </div>
+                )}
+
                 <section className='rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                     <SectionTitle icon={UserRound} title="Asosiy ma'lumotlar" />
 
@@ -181,11 +227,11 @@ const AdminNewAuthorPage = () => {
                         </Field>
 
                         <Field label="Tug'ilgan sana">
-                            <Input className={inputClass} {...register('birthDate')} />
+                            <Input type='date' className={inputClass} {...register('birthDate')} />
                         </Field>
 
                         <Field label='Vafot etgan sana' hint="Agar muallif hayot bo'lsa, bo'sh qoldiring.">
-                            <Input className={inputClass} {...register('deathDate')} />
+                            <Input type='date' className={inputClass} {...register('deathDate')} />
                         </Field>
                     </div>
                 </section>

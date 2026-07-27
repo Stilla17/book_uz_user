@@ -356,7 +356,13 @@ export default function BookDetailPage() {
                             <DottedLine label={t('bookDetail.language')} value={book?.language?.toUpperCase()} />
                             <DottedLine
                                 label={t('bookDetail.cover')}
-                                value={book?.cover === 'paper' ? t('bookDetail.paperback') : t('bookDetail.hardcover')}
+                                value={
+                                    book?.cover === 'softcover' ||
+                                    book?.cover === 'paperback' ||
+                                    book?.cover === 'paper'
+                                        ? t('bookDetail.paperback')
+                                        : t('bookDetail.hardcover')
+                                }
                             />
                         </div>
 
