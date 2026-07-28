@@ -196,6 +196,7 @@ export default function BookDetailPage() {
         'Solnechniy',
         'Yangi asr avlodi',
         'Oloy bozor',
+        'Toshkent - Oloy bozor',
         'Yoshlar matbuoti',
         'Чп склад Янги Аср Авлоди',
         'Mitti Olam',
