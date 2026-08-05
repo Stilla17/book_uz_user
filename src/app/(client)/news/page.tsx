@@ -8,12 +8,12 @@ import Link from 'next/link';
 import { Pagination, PaginationNextIcon, PaginationPreviousIcon } from '@/components/shared/Pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { publicNewsQueryOptions, usePublicNewsQuery } from '@/hooks/queries/useNewsQueries';
 import { useDebounce } from '@/hooks/useDebounce';
-import { api } from '@/services/api';
-import type { NewsItems, NewsResponse } from '@/types/news';
+import type { NewsItems } from '@/types/news';
 import { getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import dayjs from 'dayjs';
 import { ArrowUpRight, Calendar, Eye, Megaphone, Newspaper, Search, X } from 'lucide-react';
@@ -39,19 +39,6 @@ const getNewsViews = (item: NewsItems) => {
     return Math.max(apiViews, savedViews);
 };
 
-const getPublicNews = async (page: number, search: string): Promise<NewsResponse> => {
-    const response = await api.get('/news', {
-        params: {
-            active: true,
-            page,
-            limit: PAGE_LIMIT,
-            search
-        }
-    });
-
-    return response.data.data;
-};
-
 const NewsPage = () => {
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
@@ -59,12 +46,7 @@ const NewsPage = () => {
     const queryClient = useQueryClient();
     const debouncedSearch = useDebounce(searchInput, 400).trim();
 
-    const { data, isLoading } = useQuery({
-        queryKey: ['public-news', page, debouncedSearch],
-        queryFn: () => getPublicNews(page, debouncedSearch),
-        placeholderData: (previousData) => previousData,
-        staleTime: 5 * 60 * 1000
-    });
+    const { data, isLoading } = usePublicNewsQuery(page, debouncedSearch, PAGE_LIMIT);
 
     const news = data?.news ?? [];
     const pagination = data?.pagination ?? { page: 1, limit: PAGE_LIMIT, total: 0, pages: 1 };
@@ -72,11 +54,7 @@ const NewsPage = () => {
     useEffect(() => {
         if (!data || page >= pagination.pages) return;
 
-        queryClient.prefetchQuery({
-            queryKey: ['public-news', page + 1, debouncedSearch],
-            queryFn: () => getPublicNews(page + 1, debouncedSearch),
-            staleTime: 5 * 60 * 1000
-        });
+        queryClient.prefetchQuery(publicNewsQueryOptions(page + 1, debouncedSearch, PAGE_LIMIT));
     }, [data, debouncedSearch, page, pagination.pages, queryClient]);
 
     const handleSearch = (value: string) => {

@@ -5,8 +5,7 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 
 import PublisherCard from '@/components/cards/PublisherCard';
-import { ClientService } from '@/services/api';
-import { useQuery } from '@tanstack/react-query';
+import { usePublishersQuery } from '@/hooks/queries/usePublisherQueries';
 
 import { motion } from 'framer-motion';
 import { Building2, ChevronRight } from 'lucide-react';
@@ -18,12 +17,7 @@ const PREVIEW_REQUEST_LIMIT = 12;
 const Publishers = () => {
     const { t } = useTranslation();
 
-    const { data } = useQuery({
-        queryKey: ['publishers-preview', PREVIEW_REQUEST_LIMIT],
-        queryFn: () => ClientService.getPublishers({ page: 1, limit: PREVIEW_REQUEST_LIMIT }),
-        staleTime: 10 * 60 * 1000,
-        gcTime: 30 * 60 * 1000
-    });
+    const { data } = usePublishersQuery(1, PREVIEW_REQUEST_LIMIT);
     const publishers = useMemo(
         () =>
             [...(data?.publishers ?? [])]

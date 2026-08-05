@@ -2,14 +2,13 @@
 
 import React, { useMemo, useRef } from 'react';
 
-import { getRequestParams, getSectionConfig, mapProductToBook } from '@/helpers/bookSection';
-import { bookService } from '@/services/book.service';
+import { getSectionConfig } from '@/helpers/bookSection';
+import { useBookSectionQuery } from '@/hooks/queries/useBookQueries';
 import type { Book } from '@/types/book';
 import type { BookSectionProps } from '@/types/section.types';
 
 import { BookCard } from '../cards/BookCard';
 import { BookCardSkeleton } from '../cards/BookCardSkeleton';
-import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Award, BookOpen, ChevronRight, Flame, Headphones, Sparkles, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -26,22 +25,7 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
     const { t } = useTranslation();
 
     const hasStaticBooks = Boolean(books?.length);
-    const { data: fetchedBooks = [], isLoading } = useQuery({
-        queryKey: ['book-section', type],
-        queryFn: async () => {
-            if (type === 'new') {
-                const products = await bookService.getNewArrivals();
-                return products.map((product) => mapProductToBook(product, type));
-            }
-
-            const response = await bookService.getAllProducts(getRequestParams(type));
-            return response.products.map((product) => mapProductToBook(product, type));
-        },
-        enabled: !hasStaticBooks,
-        staleTime: 5 * 60 * 1000,
-        gcTime: 15 * 60 * 1000,
-        refetchOnWindowFocus: false
-    });
+    const { data: fetchedBooks = [], isLoading } = useBookSectionQuery(type, !hasStaticBooks);
 
     const loading = !hasStaticBooks && isLoading;
     const displayBooks: Book[] = useMemo(

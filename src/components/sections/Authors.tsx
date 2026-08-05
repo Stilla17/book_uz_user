@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 
-import { api } from '@/services/api';
+import { useTopAuthorsQuery } from '@/hooks/queries/useAuthorQueries';
 import { getImageUrl } from '@/utils/image';
-import { useQuery } from '@tanstack/react-query';
 
 import { BookOpenText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -22,16 +21,6 @@ type AuthorItem = {
     bookCount?: number;
 };
 
-type AuthorsResponse = {
-    authors?: AuthorItem[];
-    pagination?: {
-        total?: number;
-        page?: number;
-        pages?: number;
-        limit?: number;
-    };
-};
-
 const TOP_AUTHORS_LIMIT = 20;
 const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
 
@@ -39,18 +28,7 @@ const getAuthorBooksCount = (author: AuthorItem) => author.booksCount ?? author.
 
 const Authors = () => {
     const { t } = useTranslation();
-    const { data, isLoading } = useQuery({
-        queryKey: ['authors-preview', 'top', TOP_AUTHORS_LIMIT],
-        queryFn: async () => {
-            const response = await api.get('/authors/top', {
-                params: { limit: TOP_AUTHORS_LIMIT }
-            });
-            return response.data?.data as AuthorsResponse;
-        },
-        staleTime: 10 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
-        refetchOnWindowFocus: false
-    });
+    const { data, isLoading } = useTopAuthorsQuery(TOP_AUTHORS_LIMIT);
 
     const authors = (data?.authors ?? []).slice(0, TOP_AUTHORS_LIMIT);
 

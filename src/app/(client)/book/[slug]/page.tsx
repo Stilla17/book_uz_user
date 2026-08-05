@@ -14,12 +14,13 @@ import { Button } from '@/components/ui/button';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { useBookStats } from '@/hooks/bookHooks/useBookStats';
 import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
+import { useBookDetailQuery } from '@/hooks/queries/useBookQueries';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getBookPriceInfo, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getBookImageUrl, getImageUrl } from '@/utils/image';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Eye, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
@@ -40,14 +41,7 @@ export default function BookDetailPage() {
     const queryClient = useQueryClient();
     const [selectedQuantity, setSelectedQuantity] = useState(1);
 
-    const { data: book, isLoading: bookLoading } = useQuery<DetailBook | null>({
-        queryKey: ['book', slug],
-        queryFn: () => bookService.getBookById(slug) as Promise<DetailBook | null>,
-        enabled: !!slug,
-        staleTime: 5 * 60 * 1000,
-        retry: false,
-        refetchOnWindowFocus: false
-    });
+    const { data: book, isLoading: bookLoading } = useBookDetailQuery<DetailBook>(slug);
 
     const viewedBookRef = useRef<string | null>(null);
     const { viewsCount, ratingAvg, ratingCount, userRating, incrementViews, rateBook } = useBookStats({

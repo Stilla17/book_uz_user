@@ -4,11 +4,10 @@ import { useMemo } from 'react';
 
 import { BookCard } from '@/components/cards/BookCard';
 import { BookCardSkeleton } from '@/components/cards/BookCardSkeleton';
+import { useBookRecommendationsQuery } from '@/hooks/queries/useBookQueries';
 import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
-import { bookService } from '@/services/book.service';
 import type { Category } from '@/types';
 import type { Book } from '@/types/book';
-import { useQuery } from '@tanstack/react-query';
 
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
@@ -68,20 +67,14 @@ export default function Rekomendation({ book }: RekomendationProps) {
     const { data: categories = [], isLoading: categoriesLoading } = usePublicCategoriesQuery();
     const genreValue = useMemo(() => getGenreValue(book, categories), [book, categories]);
     const categoryValue = useMemo(() => getCategoryValue(book), [book]);
-    const recommendationFilter = genreValue
+    const recommendationFilter: { key: 'subgenre' | 'category'; value: string } = genreValue
         ? { key: 'subgenre', value: genreValue }
         : { key: 'category', value: categoryValue };
-    const { data: genreBooksData, isLoading: genreBooksLoading } = useQuery({
-        queryKey: ['genre-recommendations', recommendationFilter.key, recommendationFilter.value, book._id],
-        queryFn: () =>
-            bookService.getAllProducts({
-                [recommendationFilter.key]: recommendationFilter.value,
-                page: 1,
-                limit: 12
-            }),
-        enabled: Boolean(recommendationFilter.value),
-        staleTime: 5 * 60 * 1000
-    });
+    const { data: genreBooksData, isLoading: genreBooksLoading } = useBookRecommendationsQuery(
+        recommendationFilter.key,
+        recommendationFilter.value,
+        book._id
+    );
     const genreBooks = useMemo(
         () => (genreBooksData?.products ?? []).filter((item) => item._id !== book._id),
         [book._id, genreBooksData?.products]

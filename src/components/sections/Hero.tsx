@@ -1,8 +1,8 @@
 'use client';
 
+import { useHeroBannersQuery } from '@/hooks/queries/useBannerQueries';
 import { userBannerService } from '@/services/userBanner.service';
 import { getImageUrl } from '@/utils/image';
-import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Eye } from 'lucide-react';
@@ -14,10 +14,7 @@ import { Autoplay, EffectFade, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 export const Hero = () => {
-    const { data: banners = [], isLoading } = useQuery({
-        queryKey: ['user-banners', 'hero'],
-        queryFn: () => userBannerService.getHeroBanners()
-    });
+    const { data: banners = [], isLoading } = useHeroBannersQuery();
 
     // Banner ko'rilganligini qayd etish
     const handleSlideChange = (swiper: any) => {

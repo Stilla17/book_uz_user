@@ -127,6 +127,7 @@ export type BookCardProps = {
     book: Book;
     slug?: string;
     onWishlistChange?: (bookId: string, isWishlisted: boolean) => void;
+    freeDeliveryEligible?: boolean;
 };
 
 // ------------------------------Admin Book-------------------------------------

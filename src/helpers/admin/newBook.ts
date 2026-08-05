@@ -1,5 +1,30 @@
 import { Book, Category, SubCategory } from "@/types";
 
+export type BookContentLanguage = 'latin' | 'cyrillic';
+
+export const getBookContentLanguage = (book: Book): BookContentLanguage => {
+    const maybeBook = book as Book & {
+        content_language?: unknown;
+        writing?: unknown;
+        script?: unknown;
+        details?: Book['details'] & { contentLanguage?: unknown; content_language?: unknown };
+    };
+    const rawValue =
+        maybeBook.contentLanguage ??
+        maybeBook.content_language ??
+        maybeBook.writing ??
+        maybeBook.script ??
+        maybeBook.details?.contentLanguage ??
+        maybeBook.details?.content_language;
+    const normalizedValue = typeof rawValue === 'string' ? rawValue.trim().toLowerCase() : '';
+
+    if (['cyrillic', 'kiril', 'kirill', 'kr', 'cyrl'].includes(normalizedValue)) return 'cyrillic';
+    if (['latin', 'lotin', 'uz', 'latn'].includes(normalizedValue)) return 'latin';
+
+    const title = typeof book.title === 'string' ? book.title : book.title?.uz || '';
+    return /[А-Яа-яЁёЎўҚқҒғҲҳ]/.test(title) ? 'cyrillic' : 'latin';
+};
+
 export const getRelationId = (value: unknown) => {
     if (typeof value === 'string') return value;
     if (value && typeof value === 'object' && '_id' in value) {

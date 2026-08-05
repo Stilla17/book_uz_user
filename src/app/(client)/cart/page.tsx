@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import Link from 'next/link';
 
+import { BookCard } from '@/components/cards/BookCard';
 import AsideCart from '@/components/shared/AsideCart';
 import QuantityControl from '@/components/shared/QuantityControl';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
+import { useAllBooksQuery } from '@/hooks/queries/useBookQueries';
 import { setLoading } from '@/store/features/globalSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { getText } from '@/utils/book-formatters';
@@ -24,7 +26,25 @@ export default function CartPage() {
     const { cartItems, loadingCart, authLoading, totalPrice, totalQuantity, updateQuantity, removeItem, clearItems } =
         useBookCart();
 
-        
+    const { data, isLoading: booksLoading } = useAllBooksQuery({
+        page: 1,
+        limit: 10000,
+        minPrice: 20_000
+    });
+
+    // Yangi asr Nashryoti boyicha bosin
+
+    const randomBooks = useMemo(() => {
+        const books = (data?.products ?? []).filter(
+            (book) => Number(book.price) >= 20_000 && book.stock && book.stock > 0
+        );
+
+        for (let i = books.length - 1; i > 0; i--) {
+            const randomIndex = Math.floor(Math.random() * (i + 1));
+            [books[i], books[randomIndex]] = [books[randomIndex], books[i]];
+        }
+        return books.slice(0, 5);
+    }, [data?.products]);
 
     useEffect(() => {
         dispatch(setLoading(authLoading || loadingCart));
@@ -152,6 +172,25 @@ export default function CartPage() {
 
                     <AsideCart cartItems={cartItems} totalPrice={totalPrice} totalQuantity={totalQuantity} />
                 </div>
+
+                <div className='mt-12 mb-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
+                    <p className='text-center text-xl font-semibold text-green-500 dark:text-slate-400'>
+                        Pastdagi kitoblardan birini sotib oling va TOSHKENT bo'ylab bepul yetkazib berish imkoniyatini
+                        qo'lga kiriting!!!
+                    </p>
+                </div>
+
+                {booksLoading ? (
+                    <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
+                        <p className='text-sm text-slate-500 dark:text-slate-400'>{t('cartPage.loadingBooks')}</p>
+                    </div>
+                ) : (
+                    <div className='grid w-full grid-cols-1 gap-4 min-[420px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 [&>*]:min-w-0'>
+                        {randomBooks.map((book) => (
+                            <BookCard key={book._id} book={book} slug={book.slug} freeDeliveryEligible />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

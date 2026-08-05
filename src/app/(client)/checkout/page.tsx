@@ -24,11 +24,16 @@ import {
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { useCreateOrder } from '@/hooks/orderHooks/useCreateOrder';
 import { useAuth } from '@/hooks/useAuth';
+import {
+    useDeliverySettingsQuery,
+    useDistrictsQuery,
+    useRegionsQuery
+} from '@/hooks/queries/useCheckoutQueries';
 import { UserService } from '@/services/api';
 import { resetCheckout, updateField } from '@/store/features/checkoutSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { matchesTransliteratedSearch } from '@/utils/transliteration';
-import { useQuery } from '@tanstack/react-query';
+import { getFreeDeliveryBookIds } from '@/utils/cartStorage';
 
 import axios from 'axios';
 import {
@@ -81,10 +86,7 @@ const CheckoutPage = () => {
         checkout.deliveryMethod || deliveryOptions[0]?.title || 'Kuryer'
     );
     const phone = watch('clientPhone');
-    const { data: deliverySettings } = useQuery({
-        queryKey: ['settings', 'delivery'],
-        queryFn: UserService.getDeliverySettings
-    });
+    const { data: deliverySettings } = useDeliverySettingsQuery();
     const deliveryFee = deliverySettings?.deliveryFee ?? DELIVERY_COST;
     const getDeliveryOptionLabel = (title: string) => {
         const labelKeys: Record<string, string> = {
@@ -98,6 +100,11 @@ const CheckoutPage = () => {
     };
 
     const isRegionalDelivery = Boolean(selectedRegion) && selectedRegion !== 'toshkent_shahri';
+    const hasFreeDeliveryBook = useMemo(() => {
+        const freeDeliveryBookIds = new Set(getFreeDeliveryBookIds());
+        return cartItems.some((item) => freeDeliveryBookIds.has(item.book._id));
+    }, [cartItems]);
+    const isFreeDelivery = selectedRegion === 'toshkent_shahri' && hasFreeDeliveryBook;
     const availablePaymentOptions = useMemo(
         () => (isRegionalDelivery ? paymentOptions.filter((option) => option.title !== 'Naqd') : paymentOptions),
         [isRegionalDelivery]
@@ -141,19 +148,13 @@ const CheckoutPage = () => {
         data: regions,
         isLoading: regionsLoading,
         error: regionsError
-    } = useQuery<RegionItem[]>({
-        queryKey: ['regions'],
-        queryFn: UserService.getRegions
-    });
+    } = useRegionsQuery();
 
     const {
         data: districts,
         isLoading: districtsLoading,
         error: districtsError
-    } = useQuery<DistrictItem[]>({
-        queryKey: ['districts'],
-        queryFn: UserService.getDistricts
-    });
+    } = useDistrictsQuery();
 
     const filteredDistricts = useMemo(() => {
         if (!selectedRegion) return [];
@@ -237,7 +238,8 @@ const CheckoutPage = () => {
                 selectedDistrictItem: selectedDistrictItem!,
                 selectedDelivery,
                 selectedPayment,
-                deliveryFee
+                deliveryFee,
+                freeDelivery: isFreeDelivery
             });
             const response = await createOrder.mutateAsync(payload);
             const orderId = getOrderId(response);
@@ -748,6 +750,7 @@ const CheckoutPage = () => {
                         promoCode={promoCode}
                         selectedDelivery={selectedDelivery}
                         deliveryFee={deliveryFee}
+                        freeDelivery={isFreeDelivery}
                     />
                 </div>
             </div>

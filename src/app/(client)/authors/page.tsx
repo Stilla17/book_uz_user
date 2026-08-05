@@ -6,54 +6,17 @@ import Link from 'next/link';
 
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import { Pagination } from '@/components/shared/Pagination';
-import { api } from '@/services/api';
-import type { AuthorItems, AuthorResponse } from '@/types/author.types';
+import { useAllAuthorsQuery } from '@/hooks/queries/useAuthorQueries';
+import type { AuthorItems } from '@/types/author.types';
 import { getImageUrl } from '@/utils/image';
-import { fetchAllAndSortByCount, paginateCollection } from '@/utils/paginated-collection';
-import { useQuery } from '@tanstack/react-query';
+import { paginateCollection } from '@/utils/paginated-collection';
 
 import { motion } from 'framer-motion';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const AUTHORS_PER_PAGE = 12;
-const AUTHORS_FETCH_LIMIT = 100;
 const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
-
-const getAuthorsResponse = (response: any, page: number): AuthorResponse => {
-    const data = response?.data?.data ?? response?.data ?? {};
-    const authors = Array.isArray(data) ? data : (data.authors ?? []);
-    const pagination = data.pagination ?? data;
-
-    return {
-        authors,
-        pagination: {
-            page: Number(pagination?.page ?? pagination?.currentPage ?? page),
-            limit: Number(pagination?.limit ?? AUTHORS_PER_PAGE),
-            total: Number(pagination?.total ?? pagination?.totalItems ?? authors.length),
-            pages: Number(pagination?.pages ?? pagination?.totalPages ?? 1)
-        }
-    };
-};
-
-const getAllAuthors = async () => {
-    return fetchAllAndSortByCount({
-        fetchPage: getAuthorsPage,
-        getItems: (response) => response.authors,
-        getTotalPages: (response) => response.pagination.pages,
-        getCount: (author) => author.booksCount,
-        getName: (author) => author.name,
-        fetchLimit: AUTHORS_FETCH_LIMIT
-    });
-};
-
-const getAuthorsPage = async (page: number, limit = AUTHORS_FETCH_LIMIT) => {
-    const response = await api.get('/authors', {
-        params: { page, limit }
-    });
-
-    return getAuthorsResponse(response, page);
-};
 
 const AuthorsPage = () => {
     const { t } = useTranslation();
@@ -63,11 +26,7 @@ const AuthorsPage = () => {
         data: allAuthors = [],
         isLoading,
         isFetching
-    } = useQuery({
-        queryKey: ['authors', 'books-count-desc'],
-        queryFn: getAllAuthors,
-        staleTime: 5 * 60 * 1000
-    });
+    } = useAllAuthorsQuery();
 
     const {
         items: authors,

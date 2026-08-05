@@ -1,8 +1,7 @@
 import React from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserService } from '@/services/api';
-import { useQuery } from '@tanstack/react-query';
+import { useBookCommentsQuery } from '@/hooks/queries/useCommentQueries';
 
 import FormComment from './FormComment';
 import dayjs from 'dayjs';
@@ -113,12 +112,10 @@ const TabPanel = ({
 }: TabPanelProps) => {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = React.useState('description');
-    const { data: commentsData, isLoading: commentsLoading } = useQuery({
-        queryKey: ['comments', bookId],
-        queryFn: () => UserService.getComments(bookId!),
-        enabled: !!bookId && activeTab === 'reviews',
-        staleTime: 5 * 60 * 1000
-    });
+    const { data: commentsData, isLoading: commentsLoading } = useBookCommentsQuery(
+        bookId,
+        activeTab === 'reviews'
+    );
 
     const comments = getCommentList(commentsData).filter(
         (comment) => !comment.status || ['approved', 'aproved'].includes(comment.status)

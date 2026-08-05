@@ -8,19 +8,16 @@ import { useParams, useRouter } from 'next/navigation';
 
 import { NewsStructuredData } from '@/components/seo/StructuredData';
 import { Button } from '@/components/ui/button';
+import { type NewsDetailResponse, useNewsDetailQuery } from '@/hooks/queries/useNewsQueries';
 import { api } from '@/services/api';
 import type { NewsItems, NewsResponse } from '@/types/news';
 import { getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import dayjs from 'dayjs';
 import { ArrowLeft, Calendar, Eye, Megaphone, Newspaper } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-type NewsDetailResponse = NewsItems & {
-    content?: NewsItems['description'];
-};
 
 const NEWS_VIEWS_STORAGE_KEY = 'news_views';
 const NEWS_VIEWS_EVENT = 'news-views-change';
@@ -56,11 +53,6 @@ const writeNewsViews = (newsId: string, slug: string, views: number) => {
     }
 };
 
-const getNewsDetail = async (slug: string): Promise<NewsDetailResponse> => {
-    const response = await api.get(`/news/${slug}`);
-    return response.data.data;
-};
-
 const NewsDetailPage = () => {
     const { t } = useTranslation();
     const params = useParams();
@@ -69,11 +61,7 @@ const NewsDetailPage = () => {
     const slug = params?.slug as string;
     const viewedRef = useRef('');
 
-    const { data: news, isLoading } = useQuery({
-        queryKey: ['news', 'detail', slug],
-        queryFn: () => getNewsDetail(slug),
-        enabled: Boolean(slug)
-    });
+    const { data: news, isLoading } = useNewsDetailQuery(slug);
 
     useEffect(() => {
         if (!slug || !news?._id || viewedRef.current === news._id) return;

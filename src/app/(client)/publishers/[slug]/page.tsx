@@ -8,9 +8,12 @@ import { BookCard } from '@/components/cards/BookCard';
 import { BookCardSkeleton } from '@/components/cards/BookCardSkeleton';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import { Pagination } from '@/components/shared/Pagination';
-import { ClientService } from '@/services/api';
+import {
+    publisherProductsQueryOptions,
+    usePublisherProductsQuery
+} from '@/hooks/queries/usePublisherQueries';
 import { mapProductToCardBook } from '@/utils/book-formatters';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Building2, Search } from 'lucide-react';
@@ -25,13 +28,7 @@ const PublisherBooksPage = () => {
     const [page, setPage] = useState(1);
     const queryClient = useQueryClient();
 
-    const { data, isLoading } = useQuery({
-        queryKey: ['publisher-products', slug, page, PAGE_LIMIT],
-        queryFn: () => ClientService.getPublisherProducts(slug, { page, limit: PAGE_LIMIT }),
-        enabled: Boolean(slug),
-        placeholderData: (previousData) => previousData,
-        staleTime: 5 * 60 * 1000
-    });
+    const { data, isLoading } = usePublisherProductsQuery(slug, page, PAGE_LIMIT);
 
     const publisher = data?.publisher;
     const products = data?.products ?? [];
@@ -43,11 +40,7 @@ const PublisherBooksPage = () => {
     useEffect(() => {
         if (!slug || !data || page >= totalPages) return;
 
-        queryClient.prefetchQuery({
-            queryKey: ['publisher-products', slug, page + 1, PAGE_LIMIT],
-            queryFn: () => ClientService.getPublisherProducts(slug, { page: page + 1, limit: PAGE_LIMIT }),
-            staleTime: 5 * 60 * 1000
-        });
+        queryClient.prefetchQuery(publisherProductsQueryOptions(slug, page + 1, PAGE_LIMIT));
     }, [data, page, queryClient, slug, totalPages]);
 
     const handlePageChange = (nextPage: number) => {

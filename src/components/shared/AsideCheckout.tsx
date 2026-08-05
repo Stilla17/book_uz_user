@@ -18,6 +18,7 @@ interface AsideCheckoutProps {
     promoDiscount?: number;
     selectedDelivery: string;
     deliveryFee?: number;
+    freeDelivery?: boolean;
 }
 
 const AsideCheckout = ({
@@ -27,12 +28,13 @@ const AsideCheckout = ({
     promoCode,
     promoDiscount = 0,
     selectedDelivery,
-    deliveryFee
+    deliveryFee,
+    freeDelivery = false
 }: AsideCheckoutProps) => {
     const { t } = useTranslation();
     const { cartItems, totalPrice, totalQuantity } = useBookCart();
     const formatCheckoutPrice = (value?: number) => formatPrice(value, t('bookCard.currency'));
-    const deliveryCost = getDeliveryCost(selectedDelivery, deliveryFee, totalPrice);
+    const deliveryCost = getDeliveryCost(selectedDelivery, deliveryFee, totalPrice, freeDelivery);
     const paymentTotal = Math.max(0, totalPrice + deliveryCost - promoDiscount);
 
     return (

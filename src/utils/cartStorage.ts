@@ -2,6 +2,41 @@ import { CartItem } from '@/store/features/cartSlice';
 
 const CART_KEY = 'guest_cart';
 const CART_PRICE_OVERRIDES_KEY = 'cart_price_overrides';
+const FREE_DELIVERY_BOOK_IDS_KEY = 'free_delivery_book_ids';
+
+export const getFreeDeliveryBookIds = (): string[] => {
+    if (typeof window === 'undefined') return [];
+
+    try {
+        const value = JSON.parse(localStorage.getItem(FREE_DELIVERY_BOOK_IDS_KEY) || '[]');
+        return Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string' && Boolean(id)) : [];
+    } catch {
+        return [];
+    }
+};
+
+export const markFreeDeliveryBook = (productId: string) => {
+    if (typeof window === 'undefined' || !productId) return;
+
+    localStorage.setItem(
+        FREE_DELIVERY_BOOK_IDS_KEY,
+        JSON.stringify(Array.from(new Set([...getFreeDeliveryBookIds(), productId])))
+    );
+};
+
+export const removeFreeDeliveryBook = (productId: string) => {
+    if (typeof window === 'undefined') return;
+
+    const ids = getFreeDeliveryBookIds().filter((id) => id !== productId);
+    ids.length
+        ? localStorage.setItem(FREE_DELIVERY_BOOK_IDS_KEY, JSON.stringify(ids))
+        : localStorage.removeItem(FREE_DELIVERY_BOOK_IDS_KEY);
+};
+
+export const clearFreeDeliveryBooks = () => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(FREE_DELIVERY_BOOK_IDS_KEY);
+};
 
 export const getCartFromLocalStotage = (): CartItem[] => {
     if (typeof window === 'undefined') return [];

@@ -7,8 +7,7 @@ import Link from 'next/link';
 import { useBranchUserQuery } from '@/components/admin/hooks/queries/branch';
 import { BranchMap } from '@/components/map/Map';
 import { useBookCount } from '@/hooks/bookHooks/useBookCount';
-import { ClientService } from '@/services/api';
-import { useQuery } from '@tanstack/react-query';
+import { usePublishersCountQuery } from '@/hooks/queries/usePublisherQueries';
 
 import { Book, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -18,14 +17,7 @@ export const AboutSection = () => {
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
     const { data: apiBranches } = useBranchUserQuery();
     const { data: book } = useBookCount();
-    const { data: publishersData } = useQuery({
-        queryKey: ['publishers-count'],
-        queryFn: () =>
-            ClientService.getPublishers({
-                page: 1,
-                limit: 1
-            })
-    });
+    const { data: publishersData } = usePublishersCountQuery();
 
     const publishersCount = publishersData?.pagination?.total ?? 0;
     const booksCount = book?.pagination?.total ?? 0;

@@ -4,14 +4,12 @@ import Link from 'next/link';
 
 import { FREE_DELIVERY_MIN_TOTAL } from '@/helpers/checkout';
 import { calculatePromoDiscount } from '@/helpers/promoDiscount';
-import { UserService } from '@/services/api';
-import { PromoServiceUser } from '@/services/promo.service';
+import { useDeliverySettingsQuery, usePromosQuery } from '@/hooks/queries/useCheckoutQueries';
 import type { CartItem } from '@/store/features/cartSlice';
 import { clearPromo, setPromo } from '@/store/features/checkoutSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { Coupon } from '@/types';
 import { formatPrice } from '@/utils/currency';
-import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '../ui/button';
 import { motion } from 'framer-motion';
@@ -36,18 +34,12 @@ const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => 
     const [matchedPromo, setMatchedPromo] = useState<Coupon | null>(null);
     const [discountAmount, setDiscountAmount] = useState(0);
     const dispatch = useAppDispatch();
-    const { data: deliverySettings } = useQuery({
-        queryKey: ['settings', 'delivery'],
-        queryFn: UserService.getDeliverySettings
-    });
+    const { data: deliverySettings } = useDeliverySettingsQuery();
     const deliveryPrice =
         totalQuantity > 0 && totalPrice < FREE_DELIVERY_MIN_TOTAL ? (deliverySettings?.deliveryFee ?? 20000) : 0;
     const paymentTotal = Math.max(0, totalPrice + deliveryPrice - discountAmount);
 
-    const { data: promos = [] } = useQuery<Coupon[]>({
-        queryKey: ['user-promos'],
-        queryFn: () => PromoServiceUser.getPromos()
-    });
+    const { data: promos = [] } = usePromosQuery();
 
     const onSumbit = (values: PromoForm) => {
         const promo = promos.find((promo) => promo.code.toLowerCase() === values.promoCode.trim().toLowerCase());
@@ -135,29 +127,6 @@ const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => 
                             {t('cartPage.apply')}
                         </Button>
                     </form>
-                </div>
-                <div className='mt-4 space-y-3 rounded-xl bg-slate-50 p-4 dark:bg-slate-950'>
-                    <div className='flex items-start gap-3'>
-                        <ShieldCheck size={18} className='mt-0.5 text-emerald-600' />
-                        <div>
-                            <p className='font-semibold text-slate-900 dark:text-white'>
-                                {t('cartPage.securePayment')}
-                            </p>
-                            <p className='mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400'>
-                                {t('cartPage.securePaymentDescription')}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className='flex items-start gap-3'>
-                        <Truck size={18} className='mt-0.5 text-[#ef7f1a]' />
-                        <div>
-                            <p className='font-semibold text-slate-900 dark:text-white'>{t('cartPage.fastDelivery')}</p>
-                            <p className='mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400'>
-                                {t('cartPage.fastDeliveryDescription')}
-                            </p>
-                        </div>
-                    </div>
                 </div>
 
                 <Button className='mt-6 h-14 w-full rounded-xl bg-[#ef7f1a] text-base font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] dark:shadow-none'>

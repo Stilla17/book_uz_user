@@ -158,12 +158,19 @@ type BuildOrderPayloadParams = {
     selectedDelivery: string;
     selectedPayment: string;
     deliveryFee?: number;
+    freeDelivery?: boolean;
 };
 
-export const getDeliveryCost = (selectedDelivery: string, deliveryFee = DELIVERY_COST, subTotal = 0) => {
+export const getDeliveryCost = (
+    selectedDelivery: string,
+    deliveryFee = DELIVERY_COST,
+    subTotal = 0,
+    forceFreeDelivery = false
+) => {
     const deliveryType = getDeliveryType(selectedDelivery);
 
     if (deliveryType === 'PICKUP') return 0;
+    if (forceFreeDelivery) return 0;
     if (subTotal >= FREE_DELIVERY_MIN_TOTAL && selectedDelivery !== 'Pochtadan uyga olib borib berish') return 0;
     if (selectedDelivery === 'Pochta orqali') return POST_OFFICE_DELIVERY_COST;
     if (selectedDelivery === 'Pochtadan uyga olib borib berish') return POST_TO_HOME_DELIVERY_COST;
@@ -181,9 +188,10 @@ export const buildOrderPayload = ({
     selectedDistrictItem,
     selectedDelivery,
     selectedPayment,
-    deliveryFee: configuredDeliveryFee
+    deliveryFee: configuredDeliveryFee,
+    freeDelivery = false
 }: BuildOrderPayloadParams): OrderPayload => {
-    const deliveryFee = getDeliveryCost(selectedDelivery, configuredDeliveryFee, totalPrice);
+    const deliveryFee = getDeliveryCost(selectedDelivery, configuredDeliveryFee, totalPrice, freeDelivery);
     const postDeliveryType = getPostDeliveryType(selectedDelivery);
 
     return {
@@ -191,12 +199,14 @@ export const buildOrderPayload = ({
         items: getOrderItems(cartItems),
         totalAmount: Math.max(0, totalPrice + deliveryFee - (checkout.promoDiscount || 0)),
         deliveryFee,
+        ...(freeDelivery ? { freeDelivery: true } : {}),
         guestName: checkout.clientName.trim(),
         description: checkout.description.trim(),
         couponCode: checkout.promoCode || undefined,
         shippingAddress: {
             city: getLocationName(selectedRegionItem),
             region: getLocationName(selectedDistrictItem),
+            regionId: selectedRegionItem.id,
             street: checkout.address.trim(),
             phone
         },

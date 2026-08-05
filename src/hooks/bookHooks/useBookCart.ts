@@ -11,10 +11,12 @@ import { getBookImageUrl } from '@/utils/image';
 import {
     addGuestCart,
     clearCartPriceOverrides,
+    clearFreeDeliveryBooks,
     clearGuestCart,
     getCartPriceOverride,
     getCartFromLocalStotage,
     removeCartPriceOverride,
+    removeFreeDeliveryBook,
     removeGuestCart,
     saveCartPriceOverride,
     updateGuestCart
@@ -170,6 +172,7 @@ export const useBookCart = ({ loadOnMount = true }: { loadOnMount?: boolean } = 
 
     const removeItem = async (productId: string) => {
         dispatch(removeCart(productId));
+        removeFreeDeliveryBook(productId);
 
         if (isAuthenticated) {
             await UserService.removeFromCart(productId);
@@ -183,6 +186,7 @@ export const useBookCart = ({ loadOnMount = true }: { loadOnMount?: boolean } = 
 
     const clearItems = async () => {
         dispatch(clearCart());
+        clearFreeDeliveryBooks();
 
         if (isAuthenticated) {
             await UserService.clearCart();

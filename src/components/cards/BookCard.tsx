@@ -14,7 +14,7 @@ import { addCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { type BookCardProps } from '@/types/book';
 import { getBookAuthorName, getBookPriceInfo, getBookTitle } from '@/utils/book-formatters';
-import { addGuestCart, saveCartPriceOverride } from '@/utils/cartStorage';
+import { addGuestCart, markFreeDeliveryBook, saveCartPriceOverride } from '@/utils/cartStorage';
 import { formatPriceNumber } from '@/utils/currency';
 import { getBookImageUrl } from '@/utils/image';
 import { useQueryClient } from '@tanstack/react-query';
@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 
 export type { Book } from '@/types/book';
 
-export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
+export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = false }: BookCardProps) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const router = useRouter();
@@ -47,6 +47,7 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
         event.stopPropagation();
 
         if (isBookInCart || addCartMutation.isPending) {
+            if (isBookInCart && freeDeliveryEligible) markFreeDeliveryBook(book._id);
             toast(t('bookCard.alreadyInCart'));
             return;
         }
@@ -76,12 +77,14 @@ export const BookCard = ({ book, onWishlistChange, slug }: BookCardProps) => {
                 {
                     onSuccess: () => {
                         saveCartPriceOverride(book._id, priceInfo.price);
+                        if (freeDeliveryEligible) markFreeDeliveryBook(book._id);
                         dispatch(addCart(cartItem));
                     }
                 }
             );
         } else {
             saveCartPriceOverride(book._id, priceInfo.price);
+            if (freeDeliveryEligible) markFreeDeliveryBook(book._id);
             addGuestCart([cartItem]);
             dispatch(addCart(cartItem));
             queryClient.invalidateQueries({ queryKey: ['cart'] });

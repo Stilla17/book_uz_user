@@ -165,9 +165,11 @@ export interface OrderPayload {
     couponCode?: string;
     totalAmount: number;
     deliveryFee: number;
+    freeDelivery?: boolean;
     shippingAddress: {
         city: string;
         region: string;
+        regionId?: string;
         street: string;
         phone: string;
     };

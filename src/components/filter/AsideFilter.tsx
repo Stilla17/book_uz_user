@@ -2,11 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { LANGUAGE_OPTIONS } from '@/data';
 import { useBookFilterQuery } from '@/hooks/queries/useFilter';
-import { filterService } from '@/services/filter.service';
+import { useAuthorSearchQuery, usePublisherSearchQuery } from '@/hooks/queries/useFilterSearchQueries';
 import { CatalogFilters } from '@/types';
 import type { Category } from '@/types/category.types';
 import { localizeUzbekScript } from '@/utils/uzbek-cyrillic';
-import { useQuery } from '@tanstack/react-query';
 
 import { Slider } from '../ui/slider';
 import MultiFilterSelect from './MultiFilterSelect';
@@ -79,23 +78,8 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
     const [debouncedPublisherSearch, setDebouncedPublisherSearch] = useState('');
     const [priceRange, setPriceRange] = useState<[number, number]>(() => getNormalizedPriceRange(filters));
 
-    const authorSearchQuery = useQuery({
-        queryKey: ['book-filter', 'authors-search', debouncedAuthorSearch],
-        queryFn: () => filterService.searchAuthors(debouncedAuthorSearch),
-        enabled: debouncedAuthorSearch.length >= ENTITY_SEARCH_MIN_LENGTH,
-        staleTime: 10 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
-        refetchOnWindowFocus: false
-    });
-
-    const publisherSearchQuery = useQuery({
-        queryKey: ['book-filter', 'publishers-search', debouncedPublisherSearch],
-        queryFn: () => filterService.searchPublishers(debouncedPublisherSearch),
-        enabled: debouncedPublisherSearch.length >= ENTITY_SEARCH_MIN_LENGTH,
-        staleTime: 10 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
-        refetchOnWindowFocus: false
-    });
+    const authorSearchQuery = useAuthorSearchQuery(debouncedAuthorSearch);
+    const publisherSearchQuery = usePublisherSearchQuery(debouncedPublisherSearch);
 
     const visibleAuthors = useMemo(
         () =>

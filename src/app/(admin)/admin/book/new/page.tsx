@@ -18,6 +18,7 @@ import { Switch } from '@/components/ui/switch';
 import {
     getBookBarcode,
     getBookCategoryIds,
+    getBookContentLanguage,
     getBookSubCategoryIds,
     getCategorySubCategories,
     getRelationId,
@@ -110,7 +111,7 @@ const AdminNewBookPage = () => {
             setValue('publisher', getRelationId(bookData.publisher));
 
             setValue('language', bookData.language || 'uz');
-            setValue('contentLanguage', (bookData.contentLanguage as BookFormValues['contentLanguage']) || 'latin');
+            setValue('contentLanguage', getBookContentLanguage(bookData));
             setValue(
                 'cover',
                 bookData.cover === 'softcover' || bookData.cover === 'paperback' || bookData.cover === 'paper'

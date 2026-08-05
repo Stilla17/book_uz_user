@@ -10,10 +10,10 @@ import AsideFilter from '@/components/filter/AsideFilter';
 import PanelResults, { type CatalogViewMode } from '@/components/filter/PanelResults';
 import { Pagination } from '@/components/shared/Pagination';
 import { buildQueryString, getLanguageParams, parseFilters, parsePage } from '@/helpers/catalog';
-import { bookService } from '@/services/book.service';
+import { catalogProductsQueryOptions, useCatalogProductsQuery } from '@/hooks/queries/useBookQueries';
 import type { CatalogFilters } from '@/types';
 import { mapProductToCardBook } from '@/utils/book-formatters';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { RefreshCcw, Search } from 'lucide-react';
@@ -76,15 +76,7 @@ export default function CatalogPage() {
         isLoading: productsLoading,
         isError,
         refetch
-    } = useQuery({
-        queryKey: ['catalog-products', shouldUseAuthorProducts ? 'author-products' : 'all-products', requestParams],
-        queryFn: () =>
-            shouldUseAuthorProducts && filters.author.length === 1
-                ? bookService.getProductsByAuthor(filters.author[0], { page, limit: PAGE_LIMIT })
-                : bookService.getAllProducts(requestParams),
-        placeholderData: (previousData) => previousData,
-        staleTime: 5 * 60 * 1000
-    });
+    } = useCatalogProductsQuery(requestParams, filters.author[0], shouldUseAuthorProducts);
 
     const products = productsData?.products ?? [];
     const pagination = productsData?.pagination ?? { page: 1, limit: PAGE_LIMIT, total: 0, pages: 1 };
@@ -97,18 +89,9 @@ export default function CatalogPage() {
         if (!productsData || page >= totalPages) return;
 
         const nextRequestParams = { ...requestParams, page: page + 1 };
-        queryClient.prefetchQuery({
-            queryKey: [
-                'catalog-products',
-                shouldUseAuthorProducts ? 'author-products' : 'all-products',
-                nextRequestParams
-            ],
-            queryFn: () =>
-                shouldUseAuthorProducts && filters.author.length === 1
-                    ? bookService.getProductsByAuthor(filters.author[0], { page: page + 1, limit: PAGE_LIMIT })
-                    : bookService.getAllProducts(nextRequestParams),
-            staleTime: 5 * 60 * 1000
-        });
+        queryClient.prefetchQuery(
+            catalogProductsQueryOptions(nextRequestParams, filters.author[0], shouldUseAuthorProducts)
+        );
     }, [filters.author, page, productsData, queryClient, requestParams, shouldUseAuthorProducts, totalPages]);
 
     useEffect(() => {
