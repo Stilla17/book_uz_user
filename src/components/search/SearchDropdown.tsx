@@ -12,13 +12,15 @@ import { getCatalogCategoryHref } from '@/lib/catalog-links';
 import type { SearchDropdownProps, SearchProduct } from '@/types/search.types';
 import { getText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
-import { getImageUrl } from '@/utils/image';
+import { getBookImageUrl } from '@/utils/image';
 
 import { BookOpen, ChevronRight, Grid3x3, Loader2, Search, User, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887';
 
 export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchDropdownProps) => {
+    const { t } = useTranslation();
     const router = useRouter();
     const [showResults, setShowResults] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -63,7 +65,8 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
         if (onClose) onClose();
     };
 
-    const getProductTitle = (product: SearchProduct): string => getText(product.title, "Noma'lum");
+    const getProductTitle = (product: SearchProduct): string =>
+        getText(product.title, t('searchDropdown.unknownBook'));
 
     if (!showResults || debouncedQuery.length < 2) {
         return null;
@@ -76,14 +79,16 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
             {loading ? (
                 <div className='p-8 text-center'>
                     <Loader2 size={24} className='mx-auto mb-2 animate-spin text-[#005CB9]' />
-                    <p className='text-sm text-gray-500'>Qidirilmoqda...</p>
+                    <p className='text-sm text-gray-500'>{t('searchDropdown.searching')}</p>
                 </div>
             ) : (results?.totalCount ?? 0) > 0 ? (
                 <div className='max-h-[80vh] overflow-y-auto'>
                     {/* Products */}
                     {(results?.products?.length ?? 0) > 0 && (
                         <div className='border-b border-gray-100 p-4'>
-                            <h3 className='mb-3 text-xs font-bold text-gray-400 uppercase'>Kitoblar</h3>
+                            <h3 className='mb-3 text-xs font-bold text-gray-400 uppercase'>
+                                {t('searchDropdown.books')}
+                            </h3>
                             <div className='space-y-2'>
                                 {results!.products.map((product) => (
                                     <Link
@@ -93,7 +98,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                         className='group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50'>
                                         <div className='relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-lg'>
                                             <Image
-                                                src={getImageUrl(product.images?.[0]) || FALLBACK_IMAGE}
+                                                src={getBookImageUrl(product) || FALLBACK_IMAGE}
                                                 alt={getProductTitle(product)}
                                                 fill
                                                 className='object-cover'
@@ -116,7 +121,9 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                     {/* Categories */}
                     {(results?.categories?.length ?? 0) > 0 && (
                         <div className='border-b border-gray-100 p-4'>
-                            <h3 className='mb-3 text-xs font-bold text-gray-400 uppercase'>Kategoriyalar</h3>
+                            <h3 className='mb-3 text-xs font-bold text-gray-400 uppercase'>
+                                {t('searchDropdown.categories')}
+                            </h3>
                             <div className='space-y-2'>
                                 {results!.categories.map((category) => (
                                     <Link
@@ -141,7 +148,9 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                     {/* Authors */}
                     {(results?.authors?.length ?? 0) > 0 && (
                         <div className='border-b border-gray-100 p-4'>
-                            <h3 className='mb-3 text-xs font-bold text-gray-400 uppercase'>Mualliflar</h3>
+                            <h3 className='mb-3 text-xs font-bold text-gray-400 uppercase'>
+                                {t('searchDropdown.authors')}
+                            </h3>
                             <div className='space-y-2'>
                                 {results!.authors.map((author) => (
                                     <Link
@@ -169,15 +178,17 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                             type='button'
                             onClick={handleSearch}
                             className='flex w-full items-center justify-between text-sm font-bold text-[#005CB9] transition-colors hover:text-[#FF8A00]'>
-                            <span>Barcha natijalar ({results?.totalCount ?? 0})</span>
+                            <span>{t('searchDropdown.allResults', { count: results?.totalCount ?? 0 })}</span>
                             <ChevronRight size={16} />
                         </button>
                     </div>
                 </div>
             ) : (
                 <div className='p-8 text-center'>
-                    <p className='mb-2 text-sm text-gray-500'>Hech narsa topilmadi</p>
-                    <p className='text-xs text-gray-400'>"{debouncedQuery}" bo'yicha hech qanday natija yo'q</p>
+                    <p className='mb-2 text-sm text-gray-500'>{t('searchDropdown.notFound')}</p>
+                    <p className='text-xs text-gray-400'>
+                        {t('searchDropdown.noResultsFor', { query: debouncedQuery })}
+                    </p>
                 </div>
             )}
         </div>

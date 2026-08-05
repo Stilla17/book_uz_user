@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import Link from 'next/link';
 
@@ -9,13 +9,15 @@ import { Pagination } from '@/components/shared/Pagination';
 import { api } from '@/services/api';
 import type { AuthorItems, AuthorResponse } from '@/types/author.types';
 import { getImageUrl } from '@/utils/image';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchAllAndSortByCount, paginateCollection } from '@/utils/paginated-collection';
+import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const AUTHORS_PER_PAGE = 12;
+const AUTHORS_FETCH_LIMIT = 100;
 const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
 
 const getAuthorsResponse = (response: any, page: number): AuthorResponse => {
@@ -34,9 +36,20 @@ const getAuthorsResponse = (response: any, page: number): AuthorResponse => {
     };
 };
 
-const getAuthorsPage = async (page: number) => {
+const getAllAuthors = async () => {
+    return fetchAllAndSortByCount({
+        fetchPage: getAuthorsPage,
+        getItems: (response) => response.authors,
+        getTotalPages: (response) => response.pagination.pages,
+        getCount: (author) => author.booksCount,
+        getName: (author) => author.name,
+        fetchLimit: AUTHORS_FETCH_LIMIT
+    });
+};
+
+const getAuthorsPage = async (page: number, limit = AUTHORS_FETCH_LIMIT) => {
     const response = await api.get('/authors', {
-        params: { page, limit: AUTHORS_PER_PAGE }
+        params: { page, limit }
     });
 
     return getAuthorsResponse(response, page);
@@ -45,29 +58,23 @@ const getAuthorsPage = async (page: number) => {
 const AuthorsPage = () => {
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
-    const queryClient = useQueryClient();
 
-    const { data, isLoading, isFetching } = useQuery({
-        queryKey: ['authors', page, AUTHORS_PER_PAGE],
-        queryFn: () => getAuthorsPage(page),
-        placeholderData: (previousData) => previousData,
+    const {
+        data: allAuthors = [],
+        isLoading,
+        isFetching
+    } = useQuery({
+        queryKey: ['authors', 'books-count-desc'],
+        queryFn: getAllAuthors,
         staleTime: 5 * 60 * 1000
     });
 
-    const authors = data?.authors ?? [];
-    const totalAuthors = data?.pagination.total ?? authors.length;
-    const totalPages = Math.max(1, data?.pagination.pages ?? 1);
-    const currentPage = Math.min(page, totalPages);
-
-    useEffect(() => {
-        if (!data || page >= totalPages) return;
-
-        queryClient.prefetchQuery({
-            queryKey: ['authors', page + 1, AUTHORS_PER_PAGE],
-            queryFn: () => getAuthorsPage(page + 1),
-            staleTime: 5 * 60 * 1000
-        });
-    }, [data, page, queryClient, totalPages]);
+    const {
+        items: authors,
+        total: totalAuthors,
+        totalPages,
+        currentPage
+    } = paginateCollection(allAuthors, page, AUTHORS_PER_PAGE);
 
     const handlePageChange = (nextPage: number) => {
         setPage(nextPage);

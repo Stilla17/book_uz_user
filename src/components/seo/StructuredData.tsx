@@ -2,6 +2,7 @@ import { absoluteImageUrl, getLocalizedText, siteUrl } from '@/lib/seo';
 import type { Book } from '@/types/book';
 import type { NewsItems } from '@/types/news';
 import { getBookAuthorName } from '@/utils/book-formatters';
+import { getBookImageUrl } from '@/utils/image';
 
 type NewsWithContent = NewsItems & {
     content?: NewsItems['description'];
@@ -22,7 +23,7 @@ export function BookStructuredData({ book }: { book: Book }) {
             name: author
         },
         description,
-        image: absoluteImageUrl(book.images || book.image),
+        image: absoluteImageUrl(getBookImageUrl(book)),
         inLanguage: book.language || 'uz',
         publisher: book.publisherName || book.publisher || 'Book.uz',
         isbn: book.isbn || book.barcode,

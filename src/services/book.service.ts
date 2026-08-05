@@ -126,6 +126,17 @@ export const bookService = {
         }
     },
 
+    async trackView(id: string): Promise<number> {
+        const response = await api.post(`/products/${encodeURIComponent(id)}/view`);
+        const views = Number(response.data?.data?.views);
+
+        if (!Number.isFinite(views) || views < 0) {
+            throw new Error("Ko'rishlar soni API javobida topilmadi");
+        }
+
+        return views;
+    },
+
     // Kategoriya bo'yicha kitoblarni olish
     async getBooksByCategory(categoryId: string, limit = 10): Promise<{ books: Book[] }> {
         try {

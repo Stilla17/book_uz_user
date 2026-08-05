@@ -11,7 +11,7 @@ import { orderStatusConfig, paymentStatusConfig } from '@/data';
 import type { OrderStatus } from '@/types/orders';
 import { getBookAuthorName, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
-import { getImageUrl } from '@/utils/image';
+import { getBookImageUrl } from '@/utils/image';
 import {
     getOrderItemPrice,
     getOrderItemProduct,
@@ -168,9 +168,7 @@ const AdminOrderDetailPage = () => {
                                         orderData.items.map((item, index) => {
                                             const product = getOrderItemProduct(item);
                                             const price = getOrderItemPrice(item);
-                                            const imageUrl = product
-                                                ? getImageUrl(product.image || product.images?.[0])
-                                                : '';
+                                            const imageUrl = getBookImageUrl(product);
 
                                             return (
                                                 <tr

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import type { Book } from '@/types/book';
 import type { NewsItems } from '@/types/news';
+import { getBookImageUrl, getImageUrl, type ImageValue } from '@/utils/image';
 
 export const siteUrl = 'https://book.uz';
 export const siteName = 'Book.uz';
@@ -39,8 +40,8 @@ export const absoluteUrl = (path = '/') => {
     return `${siteUrl}${path.startsWith('/') ? path : `/${path}`}`;
 };
 
-export const absoluteImageUrl = (image?: string | string[] | null) => {
-    const value = Array.isArray(image) ? image.find(Boolean) : image;
+export const absoluteImageUrl = (image?: ImageValue) => {
+    const value = getImageUrl(image);
     if (!value) return absoluteUrl(defaultOgImage);
     if (value.startsWith('http://') || value.startsWith('https://')) return value;
     if (value.startsWith('//')) return `https:${value}`;
@@ -167,7 +168,7 @@ export const createBookMetadata = (book: Book | null, slug: string): Metadata =>
         title: `${title} | Book.uz`,
         description,
         path: `/book/${book.slug || slug}`,
-        image: absoluteImageUrl(book.images || book.image),
+        image: getBookImageUrl(book),
         type: 'book',
         keywords: [...defaultKeywords, title]
     });

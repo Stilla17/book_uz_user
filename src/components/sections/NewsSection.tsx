@@ -46,7 +46,7 @@ export const NewsSection = () => {
         gcTime: 30 * 60 * 1000
     });
 
-    const language = i18n.resolvedLanguage?.split('-')[0] || i18n.language?.split('-')[0] || 'uz';
+    const language = i18n.resolvedLanguage || i18n.language || 'uz';
 
     useEffect(() => {
         const loadSavedViews = () => {

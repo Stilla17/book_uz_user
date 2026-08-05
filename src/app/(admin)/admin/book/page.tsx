@@ -19,7 +19,7 @@ import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getAuthor, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
-import { getLatestImageUrl } from '@/utils/image';
+import { getBookImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import { BookOpen, Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
@@ -256,7 +256,7 @@ const AdminBookPage = () => {
                             ) : (
                                 paginatedBooks.map((book, index) => {
                                     const status = getStockStatus(book.stock);
-                                    const imageUrl = getLatestImageUrl(book.images) || getLatestImageUrl(book.image);
+                                    const imageUrl = getBookImageUrl(book);
                                     const barcode = getBookBarcodes(book);
                                     return (
                                         <tr

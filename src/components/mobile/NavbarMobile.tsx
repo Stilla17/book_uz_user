@@ -48,7 +48,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                         <Button
                             variant='outline'
                             className={`h-11 w-11 rounded-xl border p-0 ${getBorderColor()} ${getBgColor('card')}`}
-                            aria-label='Open menu'>
+                            aria-label={t('mobileNav.openMenu')}>
                             <Menu size={20} className={getTextColor()} />
                         </Button>
                     </SheetTrigger>
@@ -57,16 +57,14 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                         side='left'
                         showCloseButton={false}
                         className={`w-[92vw] max-w-[420px] p-0 sm:w-[420px] ${getBgColor('card')}`}>
-                        <SheetTitle className='sr-only'>Mobil menyu</SheetTitle>
-                        <SheetDescription className='sr-only'>
-                            Sayt bo‘limlari, katalog, qidiruv va sozlamalar.
-                        </SheetDescription>
+                        <SheetTitle className='sr-only'>{t('mobileNav.title')}</SheetTitle>
+                        <SheetDescription className='sr-only'>{t('mobileNav.description')}</SheetDescription>
 
                         <div
                             className={`flex min-h-16 items-center justify-between border-b px-4 py-3 sm:px-5 ${getBorderColor()}`}>
                             <Link
                                 href='/'
-                                aria-label='Bosh sahifa'
+                                aria-label={t('mobileNav.home')}
                                 onClick={() => setMobileOpen(false)}
                                 className='inline-flex items-center'>
                                 <img
@@ -80,7 +78,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                 <Button
                                     type='button'
                                     variant='ghost'
-                                    aria-label='Menyuni yopish'
+                                    aria-label={t('mobileNav.closeMenu')}
                                     className='h-10 w-10 shrink-0 rounded-xl p-0'>
                                     <X size={18} className={getTextColor()} />
                                 </Button>
@@ -152,7 +150,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                         href='/catalog'
                                         onClick={() => setMobileOpen(false)}
                                         className={`text-xs font-bold text-[#005CB9] hover:underline dark:text-blue-400`}>
-                                        Barchasi
+                                        {t('mobileNav.all')}
                                     </Link>
                                 </div>
                             </div>
@@ -161,7 +159,9 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                 href='tel:+998712300050'
                                 className={`flex items-center justify-between rounded-2xl border ${getBorderColor()} ${getBgColor('muted')} p-4`}>
                                 <div className='text-sm'>
-                                    <div className={`font-extrabold ${getTextColor()}`}>Aloqa</div>
+                                    <div className={`font-extrabold ${getTextColor()}`}>
+                                        {t('serviceItems.contact.label')}
+                                    </div>
                                     <div className={`${getTextColor('muted')}`}>+998(71) 230-00-50</div>
                                 </div>
                                 <Phone size={18} className='text-[#005CB9] dark:text-blue-400' />

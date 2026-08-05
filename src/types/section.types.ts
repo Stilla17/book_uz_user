@@ -11,7 +11,7 @@ export interface BookSectionProps {
 
 export interface CategorySectionProps {
     onCategoryClick?: (category: Category) => void;
-    lang?: 'uz' | 'ru' | 'en';
+    lang?: 'uz' | 'uz-Cyrl' | 'ru' | 'en';
     limit?: number;
     showAllLink?: boolean;
 }

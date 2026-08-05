@@ -7,6 +7,7 @@ import { UserService } from '@/services/api';
 import { type CartBook, type CartItem, addCart, clearCart, removeCart, setCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getBookPriceInfo } from '@/utils/book-formatters';
+import { getBookImageUrl } from '@/utils/image';
 import {
     addGuestCart,
     clearCartPriceOverrides,
@@ -36,16 +37,6 @@ const getProductId = (value: any): string => {
     if (typeof value === 'string') return value;
 
     return value?._id || value?.id || value?.productId || value?.product?._id || value?.product?.id || '';
-};
-
-const getProductImage = (book: any) => {
-    if (book?.image) return book.image;
-    if (Array.isArray(book?.images)) return book.images.find((image: unknown) => typeof image === 'string' && image);
-    if (typeof book?.images === 'string') return book.images;
-    if (book?.images && typeof book.images === 'object')
-        return book.images.url || book.images.src || book.images.path || '';
-
-    return '';
 };
 
 const getCartItemPriceInfo = (item: any, book: any) => {
@@ -80,7 +71,7 @@ const normalizeCartItem = (item: any): CartItem | null => {
             oldPrice: priceInfo.oldPrice,
             discountPrice: priceInfo.price,
             discount: priceInfo.discount,
-            images: getProductImage(book),
+            images: getBookImageUrl(book) ?? '',
             stock: book.stock ?? 0,
             publisher: book.publisher,
             publisherId: book.publisherId,

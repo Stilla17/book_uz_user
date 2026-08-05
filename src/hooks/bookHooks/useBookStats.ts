@@ -33,7 +33,9 @@ const mergeStats = (savedStats: BookStats | undefined, fallbackStats: BookStats)
     if (!savedStats) return fallbackStats;
 
     return {
-        viewsCount: Math.max(savedStats.viewsCount ?? 0, fallbackStats.viewsCount),
+        // Views are authoritative on the backend. Do not let an old value from
+        // this browser override the value returned by the API.
+        viewsCount: fallbackStats.viewsCount,
         ratingAvg: savedStats.userRating || savedStats.ratingCount ? savedStats.ratingAvg : fallbackStats.ratingAvg,
         ratingCount:
             savedStats.userRating || savedStats.ratingCount ? savedStats.ratingCount : fallbackStats.ratingCount,
@@ -88,20 +90,17 @@ export const useBookStats = (params: UseBookStatsParams) => {
         };
     }, [loadStats]);
 
-    const incrementViews = useCallback(() => {
+    const incrementViews = useCallback((serverViewsCount?: number) => {
         if (!bookId) return;
 
-        const statsMap = readStatsMap();
-        const currentStats = mergeStats(statsMap[bookId], fallbackStats);
-        const nextStats = {
+        setStats((currentStats) => ({
             ...currentStats,
-            viewsCount: currentStats.viewsCount + 1
-        };
-
-        statsMap[bookId] = nextStats;
-        writeStatsMap(statsMap);
-        setStats(nextStats);
-    }, [bookId, fallbackStats]);
+            viewsCount:
+                typeof serverViewsCount === 'number' && Number.isFinite(serverViewsCount)
+                    ? serverViewsCount
+                    : currentStats.viewsCount
+        }));
+    }, [bookId]);
 
     const rateBook = useCallback(
         (rating: number) => {

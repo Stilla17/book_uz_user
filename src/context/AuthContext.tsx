@@ -17,6 +17,7 @@ import type {
 } from '@/types/auth.types';
 import { clearGuestCart, getCartFromLocalStotage } from '@/utils/cartStorage';
 import { clearGuestWishlist, getWishlistFromLocalStorage } from '@/utils/wishlistStorage';
+import { getBookImageUrl } from '@/utils/image';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -78,7 +79,7 @@ const normalizeCartItem = (item: any): CartItem | null => {
             title: book.title ?? "Noma'lum kitob",
             slug: book.slug,
             price: item?.price ?? book.price ?? 0,
-            images: book.image ?? book.images?.[0] ?? '',
+            images: getBookImageUrl(book) ?? '',
             stock: book.stock ?? 0,
             publisher: book.publisher,
             publisherId: book.publisherId,
@@ -93,12 +94,14 @@ const normalizeWishlistBook = (item: any): WishlistBook | null => {
     const book = item?.book ?? item?.product ?? item;
     if (!book || typeof book !== 'object' || !book._id) return null;
 
+    const image = getBookImageUrl(book);
+
     return {
         _id: book._id,
         title: book.title ?? "Noma'lum kitob",
         slug: book.slug,
         price: book.price ?? 0,
-        images: Array.isArray(book.images) ? book.images : book.image ? [book.image] : [],
+        images: image ? [image] : [],
         stock: book.stock ?? 0
     };
 };

@@ -9,6 +9,7 @@ import { UserService } from '@/services/api';
 import { setWishlist, type WishlistBook } from '@/store/features/wishlistSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getWishlistFromLocalStorage } from '@/utils/wishlistStorage';
+import { getBookImageUrl } from '@/utils/image';
 
 type ServerWishlistBook = {
     _id: string;
@@ -20,6 +21,7 @@ type ServerWishlistBook = {
     ratingAvg?: number;
     ratingCount?: number;
     stock?: number;
+    image?: string;
     images?: string[];
 };
 
@@ -36,13 +38,14 @@ const getArrayData = (response: any) => {
 const normalizeWishlistBook = (item: any): WishlistBook | null => {
     const book = item?.book ?? item?.product ?? item;
     if (!book || typeof book !== 'object' || !book._id) return null;
+    const image = getBookImageUrl(book);
 
     return {
         _id: book._id,
         slug: book.slug,
         title: book.title ?? "Noma'lum kitob",
         price: book.discountPrice && book.discountPrice > 0 ? book.discountPrice : book.price ?? 0,
-        images: Array.isArray(book.images) ? book.images : book.image ? [book.image] : [],
+        images: image ? [image] : [],
         stock: book.stock ?? 0
     };
 };

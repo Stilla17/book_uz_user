@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Book } from '@/types/book';
 import { handleToggleFavorite } from '@/utils/wishlist';
 import { isBookInGuestWishlist } from '@/utils/wishlistStorage';
+import { getBookImageUrl } from '@/utils/image';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useAuth } from '../useAuth';
@@ -15,14 +16,18 @@ type UseBookWishlistOptions = {
     onWishlistChange?: (bookId: string, isWishlisted: boolean) => void;
 };
 
-const mapBookToWishlistBook = (book: Book): WishlistBook => ({
-    _id: book._id,
-    title: book.title,
-    slug: book.slug,
-    price: book.price,
-    images: book.images?.length ? book.images : book.image ? [book.image] : [],
-    stock: book.stock ?? 0
-});
+const mapBookToWishlistBook = (book: Book): WishlistBook => {
+    const image = getBookImageUrl(book);
+
+    return {
+        _id: book._id,
+        title: book.title,
+        slug: book.slug,
+        price: book.price,
+        images: image ? [image] : [],
+        stock: book.stock ?? 0
+    };
+};
 
 export const useBookWishlist = (book?: Book, options?: UseBookWishlistOptions) => {
     const [isBookmarked, setIsBookmarked] = useState(false);

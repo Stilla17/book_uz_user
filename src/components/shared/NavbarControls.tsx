@@ -2,19 +2,21 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { LANGUAGE_STORAGE_KEY } from '../../../i18n';
 import { useTheme } from '@/context/ThemeContext';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { LANGUAGE_STORAGE_KEY } from '../../../i18n';
 import { Button } from '../ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { ChevronDown, Moon, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-type Lang = 'uz' | 'ru' | 'en';
+type Lang = 'uz' | 'uz-Cyrl' | 'ru' | 'en';
 
 const normalizeLanguage = (value?: string): Lang => {
-    const language = value?.split('-')[0];
+    if (value?.toLowerCase() === 'uz-cyrl') return 'uz-Cyrl';
+
+    const language = value?.split('-')[0].toLowerCase();
 
     if (language === 'uz' || language === 'ru' || language === 'en') {
         return language;
@@ -38,7 +40,8 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
 
     const languages = useMemo(
         () => [
-            { key: 'uz' as const, label: 'UZ', name: "O'zbekcha", code: 'uz' },
+            { key: 'uz' as const, label: 'UZ', name: "O'zbekcha (Lotin)", code: 'uz' },
+            { key: 'uz-Cyrl' as const, label: 'ЎЗ', name: 'Ўзбекча (Кирилл)', code: 'uz' },
             { key: 'ru' as const, label: 'RU', name: 'Русский', code: 'ru' },
             { key: 'en' as const, label: 'EN', name: 'English', code: 'gb' }
         ],
@@ -88,7 +91,7 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
                                     alt={currentLang.name}
                                     className='h-4 w-5 rounded-sm object-cover'
                                 />
-                                <span className={`font-extrabold text-sm ${getTextColor()}`}>{currentLang.label}</span>
+                                <span className={`text-sm font-extrabold ${getTextColor()}`}>{currentLang.label}</span>
                             </span>
                             <ChevronDown size={14} className={getTextColor('muted')} />
                         </Button>
@@ -107,7 +110,8 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
                     )}
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className={`min-w-45 p-2 ${isMobile ? `${getBgColor('card')} ${getBorderColor()}` : ''}`}>
+                <DropdownMenuContent
+                    className={`min-w-45 p-2 ${isMobile ? `${getBgColor('card')} ${getBorderColor()}` : ''}`}>
                     {languages.map((langOption) => (
                         <button
                             key={langOption.key}
@@ -147,7 +151,7 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
                             ) : (
                                 <Moon size={18} className={getTextColor()} />
                             )}
-                            <span className={`font-extrabold text-sm ${getTextColor()}`}>
+                            <span className={`text-sm font-extrabold ${getTextColor()}`}>
                                 {theme === 'dark' ? t('lightMode') : t('darkMode')}
                             </span>
                         </span>

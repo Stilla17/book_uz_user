@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { localizeUzbekScript } from '@/utils/uzbek-cyrillic';
 import 'dayjs/locale/en';
 import 'dayjs/locale/ru';
 import 'dayjs/locale/uz-latn';
@@ -43,7 +44,7 @@ export const normalizeNewsResponse = (data: any): NewsItem[] => {
 
 export const formatDate = (dateString?: string, language = 'uz') => {
     if (!dateString) return '';
-    const locale = language === 'uz' ? 'uz-latn' : language === 'ru' ? 'ru' : 'en';
+    const locale = language.startsWith('uz') ? 'uz-latn' : language === 'ru' ? 'ru' : 'en';
 
-    return dayjs(dateString).locale(locale).format('D MMMM YYYY');
+    return localizeUzbekScript(dayjs(dateString).locale(locale).format('D MMMM YYYY'), language);
 };

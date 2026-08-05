@@ -10,7 +10,7 @@ import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
-import { getImageUrl } from '@/utils/image';
+import { getBookImageUrl } from '@/utils/image';
 import { useQuery } from '@tanstack/react-query';
 
 import { ArrowLeft, BookOpen, Edit3, ImageIcon, PackageCheck, Store, Trash2 } from 'lucide-react';
@@ -36,13 +36,11 @@ const AdminBookDetailPage = () => {
         enabled: Boolean(slug)
     });
 
-    console.log(book);
-
     const bookView = useMemo(
         () => ({
             title: getLocalizedText(book?.title, 'Nomsiz kitob'),
             description: getLocalizedText(book?.description, "Tavsif qo'shilmagan."),
-            image: book?.images?.[0] || book?.image,
+            image: getBookImageUrl(book),
             author: getAuthor(book?.authorName || book?.author),
             category: getCategoryLabel(book?.category, "Kategoriya yo'q")
         }),
@@ -117,7 +115,7 @@ const AdminBookDetailPage = () => {
                     <div className='grid aspect-[3/4] place-items-center overflow-hidden rounded-[20px] bg-[#f2e7d8] dark:bg-slate-900'>
                         {bookView.image ? (
                             <img
-                                src={getImageUrl(bookView.image)}
+                                src={bookView.image}
                                 alt={bookView.title}
                                 className='h-full w-full object-cover'
                             />

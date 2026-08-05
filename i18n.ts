@@ -5,6 +5,7 @@ import { initReactI18next } from 'react-i18next';
 import en from './public/locales/en/translation.json';
 import ru from './public/locales/ru/translation.json';
 import uz from './public/locales/uz/translation.json';
+import { transliterateUzbekResource } from './src/utils/uzbek-cyrillic';
 
 export const LANGUAGE_STORAGE_KEY = 'bookuz-language';
 
@@ -15,7 +16,7 @@ const getInitialLanguage = () => {
 
     const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
 
-    if (savedLanguage === 'uz' || savedLanguage === 'ru' || savedLanguage === 'en') {
+    if (savedLanguage === 'uz' || savedLanguage === 'uz-Cyrl' || savedLanguage === 'ru' || savedLanguage === 'en') {
         return savedLanguage;
     }
 
@@ -28,7 +29,9 @@ if (!i18n.isInitialized) {
             en: { translation: en },
             ru: { translation: ru },
             uz: { translation: uz },
+            'uz-Cyrl': { translation: transliterateUzbekResource(uz) },
         },
+        supportedLngs: ['uz', 'uz-Cyrl', 'ru', 'en'],
         lng: getInitialLanguage(),
         fallbackLng: 'uz',
         interpolation: {

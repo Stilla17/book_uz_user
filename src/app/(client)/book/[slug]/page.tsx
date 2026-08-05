@@ -18,8 +18,8 @@ import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getBookPriceInfo, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
-import { getImageUrl, getLatestImageUrl } from '@/utils/image';
-import { useQuery } from '@tanstack/react-query';
+import { getBookImageUrl, getImageUrl } from '@/utils/image';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Eye, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
@@ -37,6 +37,7 @@ export default function BookDetailPage() {
     const { t, i18n } = useTranslation();
     const params = useParams();
     const slug = params?.slug as string;
+    const queryClient = useQueryClient();
     const [selectedQuantity, setSelectedQuantity] = useState(1);
 
     const { data: book, isLoading: bookLoading } = useQuery<DetailBook | null>({
@@ -90,7 +91,7 @@ export default function BookDetailPage() {
     const bookView = useMemo(
         () => ({
             title: getLocalizedText(book?.title),
-            image: getLatestImageUrl(book?.images) || getLatestImageUrl(book?.image),
+            image: getBookImageUrl(book),
             category: getCategoryLabel(book?.category),
             author: getAuthor(book?.authorName) || t('bookDetail.unknownAuthor'),
             description: getLocalizedText(book?.description)
@@ -172,8 +173,39 @@ export default function BookDetailPage() {
         if (!book?._id || viewedBookRef.current === book._id) return;
 
         viewedBookRef.current = book._id;
-        incrementViews();
-    }, [book?._id, incrementViews]);
+        const trackView = async () => {
+            try {
+                const nextViewsCount = await bookService.trackView(book._id);
+
+                incrementViews(nextViewsCount);
+                queryClient.setQueryData<DetailBook | null>(['book', slug], (currentBook) =>
+                    currentBook
+                        ? {
+                              ...currentBook,
+                              views: nextViewsCount,
+                              viewsCount: nextViewsCount
+                          }
+                        : currentBook
+                );
+
+                await Promise.all(
+                    [
+                        ['book-section'],
+                        ['catalog-products'],
+                        ['publisher-products'],
+                        ['genre-recommendations'],
+                        ['search'],
+                        ['wishlist'],
+                        ['top-sales']
+                    ].map((queryKey) => queryClient.invalidateQueries({ queryKey, refetchType: 'none' }))
+                );
+            } catch (error) {
+                console.error("Kitob ko'rishini qayd etib bo'lmadi:", error);
+            }
+        };
+
+        void trackView();
+    }, [book?._id, incrementViews, queryClient, slug]);
 
     useEffect(() => {
         setSelectedQuantity(1);

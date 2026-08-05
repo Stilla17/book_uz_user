@@ -1,7 +1,9 @@
 import type { Book, Product } from '@/types/book';
+import { isUzbekCyrillicLanguage, transliterateUzbekToCyrillic } from '@/utils/uzbek-cyrillic';
 
 export type LocalizedText = string | { uz?: string; ru?: string; en?: string } | null | undefined;
-type Language = 'uz' | 'ru' | 'en';
+type DataLanguage = 'uz' | 'ru' | 'en';
+type Language = DataLanguage | 'uz-Cyrl';
 
 export type TextLike =
     | string
@@ -33,16 +35,17 @@ const fallbackText = {
         ru: 'Неизвестный автор',
         en: 'Unknown author'
     }
-} satisfies Record<string, Record<Language, string>>;
+} satisfies Record<string, Record<DataLanguage, string>>;
 
-const fallbackTranslations: Record<string, Record<Language, string>> = {
+const fallbackTranslations: Record<string, Record<DataLanguage, string>> = {
     "Noma'lum": fallbackText.unknown,
     "Noma'lum kitob": fallbackText.bookTitle,
     'Muallif nomalum': fallbackText.author,
     "Noma'lum muallif": fallbackText.author
 };
 
-const isLanguage = (value?: string | null): value is Language => value === 'uz' || value === 'ru' || value === 'en';
+const isLanguage = (value?: string | null): value is Language =>
+    value === 'uz' || value === 'uz-Cyrl' || value === 'ru' || value === 'en';
 
 const getCurrentLanguage = (): Language => {
     if (typeof window === 'undefined') return 'uz';
@@ -50,12 +53,23 @@ const getCurrentLanguage = (): Language => {
     const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (isLanguage(savedLanguage)) return savedLanguage;
 
-    const documentLanguage = window.document.documentElement.lang.split('-')[0];
+    const documentLanguage = window.document.documentElement.lang;
 
     return isLanguage(documentLanguage) ? documentLanguage : 'uz';
 };
 
-const getFallbackText = (fallback = '') => fallbackTranslations[fallback]?.[getCurrentLanguage()] ?? fallback;
+const toCurrentScript = (value: string, language = getCurrentLanguage()) =>
+    isUzbekCyrillicLanguage(language) ? transliterateUzbekToCyrillic(value) : value;
+
+const getDataLanguage = (language: Language): DataLanguage => (language === 'uz-Cyrl' ? 'uz' : language);
+
+const getFallbackText = (fallback = '') => {
+    const language = getCurrentLanguage();
+    const dataLanguage = getDataLanguage(language);
+    const translatedFallback = fallbackTranslations[fallback]?.[dataLanguage] ?? fallback;
+
+    return toCurrentScript(translatedFallback, language);
+};
 
 const isUnknownFallback = (value: string) => Boolean(fallbackTranslations[value]);
 
@@ -64,11 +78,13 @@ export const getLocalizedText = (value?: LocalizedText, fallback = '') => {
 
     if (!value) return translatedFallback;
     if (typeof value === 'string')
-        return isUnknownFallback(value) ? getFallbackText(value) : value || translatedFallback;
+        return isUnknownFallback(value) ? getFallbackText(value) : toCurrentScript(value || translatedFallback);
 
     const language = getCurrentLanguage();
+    const dataLanguage = getDataLanguage(language);
+    const localizedValue = value[dataLanguage] || value.uz || value.ru || value.en || translatedFallback;
 
-    return value[language] || value.uz || value.ru || value.en || translatedFallback;
+    return toCurrentScript(localizedValue, language);
 };
 
 export const getText = (value: TextLike, fallback: string): string => {
@@ -76,20 +92,21 @@ export const getText = (value: TextLike, fallback: string): string => {
 
     if (!value) return translatedFallback;
     if (typeof value === 'string')
-        return isUnknownFallback(value) ? getFallbackText(value) : value || translatedFallback;
+        return isUnknownFallback(value) ? getFallbackText(value) : toCurrentScript(value || translatedFallback);
 
     const language = getCurrentLanguage();
-    const localizedValue = value[language];
+    const dataLanguage = getDataLanguage(language);
+    const localizedValue = value[dataLanguage];
 
-    if (typeof localizedValue === 'string' && localizedValue) return localizedValue;
-    if (typeof value.uz === 'string' && value.uz) return value.uz;
+    if (typeof localizedValue === 'string' && localizedValue) return toCurrentScript(localizedValue, language);
+    if (typeof value.uz === 'string' && value.uz) return toCurrentScript(value.uz, language);
     if (typeof value.ru === 'string' && value.ru) return value.ru;
     if (typeof value.en === 'string' && value.en) return value.en;
     if (typeof value.name === 'string' && value.name) {
-        return isUnknownFallback(value.name) ? getFallbackText(value.name) : value.name;
+        return isUnknownFallback(value.name) ? getFallbackText(value.name) : toCurrentScript(value.name, language);
     }
     if (typeof value.title === 'string' && value.title) {
-        return isUnknownFallback(value.title) ? getFallbackText(value.title) : value.title;
+        return isUnknownFallback(value.title) ? getFallbackText(value.title) : toCurrentScript(value.title, language);
     }
 
     return translatedFallback;
@@ -109,7 +126,7 @@ export const getCategoryLabel = (category?: CategoryLike, fallback = '') => {
 };
 
 export const getAuthor = (author: unknown): string => {
-    if (typeof author === 'string') return author;
+    if (typeof author === 'string') return toCurrentScript(author);
     if (Array.isArray(author)) {
         return author
             .map((item) => getAuthor(item))
@@ -134,7 +151,7 @@ const getAuthorText = (author: unknown, fallback = fallbackText.author.uz): stri
     if (typeof author === 'string') {
         if (isObjectId(author)) return translatedFallback;
 
-        return isUnknownFallback(author) ? translatedFallback : author;
+        return isUnknownFallback(author) ? translatedFallback : toCurrentScript(author);
     }
 
     if (Array.isArray(author)) {

@@ -9,6 +9,7 @@
         "build": "next build",
         "start": "next start",
         "migrate:product-images": "node scripts/migrate-product-images-to-cloudinary.cjs",
+        "enhance:product-images": "node scripts/migrate-product-images-to-cloudinary.cjs --enhance-products",
         "lint": "eslint src --max-warnings=0",
         "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
         "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""

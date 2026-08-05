@@ -97,6 +97,23 @@ const CheckoutPage = () => {
         return labelKeys[title] ? t(labelKeys[title]) : title;
     };
 
+    const isRegionalDelivery = Boolean(selectedRegion) && selectedRegion !== 'toshkent_shahri';
+    const availablePaymentOptions = useMemo(
+        () => (isRegionalDelivery ? paymentOptions.filter((option) => option.title !== 'Naqd') : paymentOptions),
+        [isRegionalDelivery]
+    );
+
+    useEffect(() => {
+        if (!isRegionalDelivery || selectedPayment !== 'Naqd') return;
+
+        const nextPayment = paymentOptions.find((option) => option.title !== 'Naqd')?.title;
+
+        if (!nextPayment) return;
+
+        setSelectedPayment(nextPayment);
+        dispatch(updateField({ paymentMethod: nextPayment }));
+    }, [dispatch, selectedPayment, isRegionalDelivery]);
+
     useEffect(() => {
         if (!user) return;
 
@@ -201,7 +218,7 @@ const CheckoutPage = () => {
             selectedRegionItem,
             selectedDistrictItem,
             selectedPayment,
-            paymentTitles: paymentOptions.map((option) => option.title)
+            paymentTitles: availablePaymentOptions.map((option) => option.title)
         });
 
         if (validationMessage) {
@@ -682,7 +699,7 @@ const CheckoutPage = () => {
                             </div>
 
                             <div className='mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-                                {paymentOptions.map((option) => {
+                                {availablePaymentOptions.map((option) => {
                                     const isActive = selectedPayment === option.title;
                                     const logoSrc = option.icon.replace('./', '/');
 

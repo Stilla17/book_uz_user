@@ -1,45 +1,47 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import PublisherCard from '@/components/cards/PublisherCard';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import { Pagination } from '@/components/shared/Pagination';
 import { ClientService } from '@/services/api';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchAllAndSortByCount, paginateCollection } from '@/utils/paginated-collection';
+import { useQuery } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
 import { Building2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const PUBLISHERS_PER_PAGE = 12;
+const PUBLISHERS_FETCH_LIMIT = 100;
+
+const getAllPublishers = () =>
+    fetchAllAndSortByCount({
+        fetchPage: (page, limit) => ClientService.getPublishers({ page, limit }),
+        getItems: (response) => response.publishers,
+        getTotalPages: (response) => response.pagination.pages,
+        getCount: (publisher) => publisher.booksCount,
+        getName: (publisher) => publisher.name,
+        fetchLimit: PUBLISHERS_FETCH_LIMIT
+    });
 
 const PublishersPage = () => {
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
-    const queryClient = useQueryClient();
 
-    const { data, isLoading, isFetching } = useQuery({
-        queryKey: ['publishers', page, PUBLISHERS_PER_PAGE],
-        queryFn: () => ClientService.getPublishers({ page, limit: PUBLISHERS_PER_PAGE }),
-        placeholderData: (previousData) => previousData,
+    const { data: allPublishers = [], isLoading, isFetching } = useQuery({
+        queryKey: ['publishers', 'books-count-desc'],
+        queryFn: getAllPublishers,
         staleTime: 5 * 60 * 1000
     });
 
-    const publishers = data?.publishers ?? [];
-    const totalPublishers = data?.pagination.total ?? publishers.length;
-    const totalPages = Math.max(1, data?.pagination.pages ?? 1);
-    const currentPage = Math.min(page, totalPages);
-
-    useEffect(() => {
-        if (!data || page >= totalPages) return;
-
-        queryClient.prefetchQuery({
-            queryKey: ['publishers', page + 1, PUBLISHERS_PER_PAGE],
-            queryFn: () => ClientService.getPublishers({ page: page + 1, limit: PUBLISHERS_PER_PAGE }),
-            staleTime: 5 * 60 * 1000
-        });
-    }, [data, page, queryClient, totalPages]);
+    const {
+        items: publishers,
+        total: totalPublishers,
+        totalPages,
+        currentPage
+    } = paginateCollection(allPublishers, page, PUBLISHERS_PER_PAGE);
 
     const handlePageChange = (nextPage: number) => {
         setPage(nextPage);

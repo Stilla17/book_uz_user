@@ -13,8 +13,7 @@ const NavbarFooter: React.FC = () => {
 
     return (
         <div className={`border-t ${getBorderColor()} ${getBgColor('card')}`}>
-            {/* <div className='no-scrollbar container mx-auto h-11 justify-between overflow-x-auto px-4'> */}
-            <nav className='container mx-auto flex h-11 items-center justify-between gap-4'>
+            <nav className='mx-auto flex h-11 max-w-7xl items-center justify-between gap-4'>
                 {mainNav.map((item) => (
                     <Link
                         key={item.label}
@@ -24,22 +23,6 @@ const NavbarFooter: React.FC = () => {
                     </Link>
                 ))}
             </nav>
-
-            {/* <span className='h-5 w-px shrink-0 bg-slate-200 dark:bg-slate-700' />
-
-                <nav className='flex shrink-0 items-center gap-3 lg:gap-4'>
-                    {bottomNav.map((item) => (
-                        <Link
-                            key={item.label}
-                            href={item.href}
-                            className='flex items-center gap-1 text-xs font-bold whitespace-nowrap text-[#475266] transition-colors hover:text-[#e67600] dark:text-white dark:hover:text-[#e67600]'
-                            title={item.description}>
-                            <span className='text-[#e67600]'>{item.icon}</span>
-                            {t(item.label)}
-                        </Link>
-                    ))}
-                </nav> */}
-            {/* </div> */}
         </div>
     );
 };

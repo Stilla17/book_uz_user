@@ -48,7 +48,7 @@ export const Hero = () => {
         <section className='group relative w-full overflow-hidden'>
             <Swiper
                 modules={[Autoplay, Pagination, Navigation, EffectFade]}
-                spaceBetween={0}
+                spaceBetween={100}
                 slidesPerView={1}
                 autoplay={{
                     delay: 5000,
@@ -59,10 +59,6 @@ export const Hero = () => {
                     clickable: true,
                     dynamicBullets: true,
                     dynamicMainBullets: 4
-                }}
-                navigation={{
-                    nextEl: '.hero-button-next',
-                    prevEl: '.hero-button-prev'
                 }}
                 loop={true}
                 onSlideChange={handleSlideChange}
@@ -88,7 +84,7 @@ export const Hero = () => {
                                     transition={{ duration: 0.5 }}
                                     className='relative flex h-full items-center justify-center px-4 sm:px-6 lg:px-8'
                                     style={{ color: banner.textColor || '#ffffff' }}>
-                                    <div className='mx-auto max-w-4xl text-center'>
+                                    <div className='mx-auto max-w-7xl text-center'>
                                         {/* CTA Buttons */}
                                         {buttonLink && (
                                             <motion.div

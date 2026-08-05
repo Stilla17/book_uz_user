@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import MiniCard from '@/components/shared/MiniCard';
 import { supportStats } from '@/data/support';
 import { useFaq } from '@/hooks/faqsHooks/useFaq';
+import { localizeUzbekScript } from '@/utils/uzbek-cyrillic';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronRight, Clock, Mail, MessageCircle, Phone } from 'lucide-react';
@@ -67,7 +68,9 @@ export const SupportSection = () => {
           : [];
 
     const getLocalizedText = (value: LocalizedText) => {
-        return value?.[currentLanguage] || value?.uz || value?.ru || value?.en || '';
+        const text = value?.[currentLanguage] || value?.uz || value?.ru || value?.en || '';
+
+        return localizeUzbekScript(text, i18n.language);
     };
 
     const translatedStats = supportStats.map((item) => ({

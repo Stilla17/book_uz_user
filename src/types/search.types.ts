@@ -8,7 +8,8 @@ export interface SearchProduct {
     slug: string;
     price: number;
     discountPrice?: number;
-    images: string[];
+    image?: string;
+    images?: string[];
     author?: {
         _id: string;
         name: string;

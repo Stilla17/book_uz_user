@@ -21,17 +21,10 @@ export default function CartPage() {
     const { t } = useTranslation();
     const formatCartPrice = (value?: number) => formatPrice(value, t('bookCard.currency'));
     const dispatch = useAppDispatch();
-    const {
-        cartItems,
-        loadingCart,
-        authLoading,
-        isAuthenticated,
-        totalPrice,
-        totalQuantity,
-        updateQuantity,
-        removeItem,
-        clearItems
-    } = useBookCart();
+    const { cartItems, loadingCart, authLoading, totalPrice, totalQuantity, updateQuantity, removeItem, clearItems } =
+        useBookCart();
+
+        
 
     useEffect(() => {
         dispatch(setLoading(authLoading || loadingCart));

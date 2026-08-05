@@ -15,7 +15,7 @@ import { UserService } from '@/services/api';
 import type { Book } from '@/types/book';
 import { getText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
-import { getImageUrl } from '@/utils/image';
+import { getBookImageUrl, getImageUrl } from '@/utils/image';
 import { getOrderItemProduct } from '@/utils/order';
 
 import dayjs from 'dayjs';
@@ -219,10 +219,7 @@ const ProfilePage = () => {
                                                         {order.items.map((item, index) => {
                                                             const product = getOrderItemProduct(item);
                                                             const image = product
-                                                                ? getImageUrl(
-                                                                      (product as Book).images ||
-                                                                          (product as Book).image
-                                                                  )
+                                                                ? getBookImageUrl(product as Book)
                                                                 : undefined;
 
                                                             return (

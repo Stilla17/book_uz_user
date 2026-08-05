@@ -1,5 +1,6 @@
 import type { User as UserType } from '@/types';
 import type { Category } from '@/types/category.types';
+import { localizeUzbekScript } from '@/utils/uzbek-cyrillic';
 
 type LocalizedTitle = Partial<Record<keyof Category['title'], string>>;
 
@@ -22,8 +23,9 @@ export const getUserFirstName = (user?: UserType | null): string => {
 
 export const getLocalizedTitle = (title: LocalizedTitle | undefined, language: string): string => {
     const currentLanguage = language.split('-')[0] as keyof Category['title'];
+    const value = title?.[currentLanguage] || title?.uz || '';
 
-    return title?.[currentLanguage] || title?.uz || '';
+    return localizeUzbekScript(value, language);
 };
 
 export const getLocalizedCategoryName = (category: Category, language: string): string => {

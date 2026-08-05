@@ -7,6 +7,7 @@ import { getCatalogCategoryHref } from '@/lib/catalog-links';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/types/category.types';
 import type { CategorySectionProps } from '@/types/section.types';
+import { localizeUzbekScript } from '@/utils/uzbek-cyrillic';
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { BookOpen, ChevronRight, Star } from 'lucide-react';
@@ -30,16 +31,25 @@ export const CategorySection = ({
         })
         .slice(0, limit);
 
-    const title = lang === 'uz' ? 'Kategoriyalar' : lang === 'ru' ? 'Категории' : 'Categories';
+    const dataLanguage = lang === 'uz-Cyrl' ? 'uz' : lang;
+    const titleValue = dataLanguage === 'uz' ? 'Kategoriyalar' : dataLanguage === 'ru' ? 'Категории' : 'Categories';
     const subtitle =
-        lang === 'uz'
+        dataLanguage === 'uz'
             ? 'O‘zingizga yoqqan yo‘nalishni tanlang'
-            : lang === 'ru'
+            : dataLanguage === 'ru'
               ? 'Выберите интересующее направление'
               : 'Choose your favorite genre';
 
-    const allText = lang === 'uz' ? 'Hammasi' : lang === 'ru' ? 'Все' : 'All';
-    const viewAllText = lang === 'uz' ? "Hammasini ko'rish" : lang === 'ru' ? 'Посмотреть все' : 'View all';
+    const title = localizeUzbekScript(titleValue, lang);
+    const localizedSubtitle = localizeUzbekScript(subtitle, lang);
+    const allText = localizeUzbekScript(
+        dataLanguage === 'uz' ? 'Hammasi' : dataLanguage === 'ru' ? 'Все' : 'All',
+        lang
+    );
+    const viewAllText = localizeUzbekScript(
+        dataLanguage === 'uz' ? "Hammasini ko'rish" : dataLanguage === 'ru' ? 'Посмотреть все' : 'View all',
+        lang
+    );
 
     const handleCategoryClick = (cat: Category) => {
         if (onCategoryClick) {
@@ -83,7 +93,7 @@ export const CategorySection = ({
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.1 }}
                             className='mt-1 text-sm text-slate-500 md:text-base dark:text-slate-400'>
-                            {subtitle}
+                            {localizedSubtitle}
                         </motion.p>
                     </div>
 
@@ -115,18 +125,26 @@ export const CategorySection = ({
                     ) : categories.length === 0 ? (
                         // Empty state
                         <div className='col-span-full py-12 text-center'>
-                            <p className='text-slate-500 dark:text-slate-400'>Kategoriyalar mavjud emas</p>
+                            <p className='text-slate-500 dark:text-slate-400'>
+                                {localizeUzbekScript('Kategoriyalar mavjud emas', lang)}
+                            </p>
                         </div>
                     ) : (
                         categories.map((cat, index) => {
                             const title = cat.title as
-                                | Partial<Record<typeof lang | 'uz' | 'ru' | 'en', string>>
+                                | Partial<Record<'uz' | 'ru' | 'en', string>>
                                 | string
                                 | undefined;
                             const label =
                                 typeof title === 'string'
                                     ? title
-                                    : title?.[lang] || title?.uz || title?.ru || title?.en || cat.slug || 'Kategoriya';
+                                    : title?.[dataLanguage] ||
+                                      title?.uz ||
+                                      title?.ru ||
+                                      title?.en ||
+                                      cat.slug ||
+                                      'Kategoriya';
+                            const localizedLabel = localizeUzbekScript(label, lang);
                             const slug = cat.slug || '';
                             const bookCount = cat.bookCount || 0;
 
@@ -175,7 +193,7 @@ export const CategorySection = ({
                                                 'group-hover:text-[#00a0e3] dark:group-hover:text-[#ef7f1a]',
                                                 'line-clamp-2 flex-1 transition-colors'
                                             )}>
-                                            {label}
+                                            {localizedLabel}
                                         </h3>
 
                                         {/* Count Badge */}
@@ -188,7 +206,10 @@ export const CategorySection = ({
                                                     'transition-colors'
                                                 )}>
                                                 <BookOpen size={12} />
-                                                <span>{bookCount.toLocaleString()} ta</span>
+                                                <span>
+                                                    {bookCount.toLocaleString()}{' '}
+                                                    {localizeUzbekScript('ta', lang)}
+                                                </span>
                                             </div>
                                         )}
 

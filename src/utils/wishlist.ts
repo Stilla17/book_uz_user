@@ -3,6 +3,7 @@ import { UserService } from '@/services/api';
 import { type WishlistBook } from '@/store/features/wishlistSlice';
 
 import { toggleGuestWishlist } from './wishlistStorage';
+import { getBookImageUrl } from './image';
 
 export const handleToggleFavorite = async (book: Book, userId?: string | null) => {
     const bookId = book._id;
@@ -11,12 +12,13 @@ export const handleToggleFavorite = async (book: Book, userId?: string | null) =
         return UserService.toggleWishlist(bookId);
     }
 
+    const image = getBookImageUrl(book);
     const wishlistBook: WishlistBook = {
         _id: book._id,
         title: book.title,
         slug: book.slug,
         price: book.price,
-        images: book.images?.length ? book.images : book.image ? [book.image] : [],
+        images: image ? [image] : [],
         stock: book.stock ?? 0
     };
 

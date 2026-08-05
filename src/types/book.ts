@@ -1,4 +1,5 @@
 import { OtherPagination } from '@/services/api';
+import type { ImageValue } from '@/utils/image';
 
 export type LocalizedText = { uz?: string; ru?: string; en?: string };
 
@@ -27,8 +28,8 @@ export interface Book {
         reserve: number;
         available: number;
     }>;
-    images?: string[];
-    image?: string;
+    images?: ImageValue;
+    image?: ImageValue;
     barcode?: string | number;
     discount?: number;
     isDiscount?: boolean;

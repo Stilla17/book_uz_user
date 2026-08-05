@@ -25,7 +25,7 @@ import {
 } from '@/helpers/admin/newBook';
 import { filterService } from '@/services/filter.service';
 import { BookFormValues } from '@/types/book';
-import { getLatestImageUrl } from '@/utils/image';
+import { getBookImageUrl } from '@/utils/image';
 import { slugifyBookSlug } from '@/utils/slug';
 import { useQuery } from '@tanstack/react-query';
 
@@ -129,7 +129,7 @@ const AdminNewBookPage = () => {
             const bookTags = Array.isArray(bookData.tegs) ? bookData.tegs : bookData.tags;
             setValue('tags', Array.isArray(bookTags) ? bookTags.join(', ') : '');
 
-            const previewImage = getLatestImageUrl(bookData.images) || getLatestImageUrl(bookData.image);
+            const previewImage = getBookImageUrl(bookData);
             if (previewImage) {
                 setImagePreview(previewImage);
             }
@@ -300,7 +300,7 @@ const AdminNewBookPage = () => {
 
         const formData = new FormData();
 
-        if (imageFile) formData.append('images', imageFile);
+        if (imageFile) formData.append('image', imageFile);
         appendText(formData, 'title[uz]', values.title.uz);
         appendText(formData, 'title[ru]', values.title.ru);
         appendText(formData, 'title[en]', values.title.en);
@@ -361,7 +361,7 @@ const AdminNewBookPage = () => {
                 {
                     onSuccess: (response: unknown) => {
                         const updated = (response as { data?: { image?: string; images?: string[] } })?.data;
-                        const previewImage = getLatestImageUrl(updated?.images) || getLatestImageUrl(updated?.image);
+                        const previewImage = getBookImageUrl(updated);
                         if (previewImage) {
                             setImagePreview(previewImage);
                         }

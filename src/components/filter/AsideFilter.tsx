@@ -5,6 +5,7 @@ import { useBookFilterQuery } from '@/hooks/queries/useFilter';
 import { filterService } from '@/services/filter.service';
 import { CatalogFilters } from '@/types';
 import type { Category } from '@/types/category.types';
+import { localizeUzbekScript } from '@/utils/uzbek-cyrillic';
 import { useQuery } from '@tanstack/react-query';
 
 import { Slider } from '../ui/slider';
@@ -32,14 +33,15 @@ const parsePriceValue = (value: string, fallback: number) => {
 
 const getCategoryLabel = (category: Category, language: string) => {
     const locale = language.split('-')[0] as 'uz' | 'ru' | 'en';
-    return (
+    const value =
         category.title?.[locale] ||
         category.title?.uz ||
         category.title?.ru ||
         category.title?.en ||
         category.slug ||
-        category._id
-    );
+        category._id;
+
+    return localizeUzbekScript(value, language);
 };
 
 const getNormalizedPriceRange = (filters: CatalogFilters): [number, number] => {
@@ -133,12 +135,14 @@ const AsideFilter = ({ filters, onChange, onClear }: AsideFilterProps) => {
                             },
                             ...subgenres.map((subgenre) => ({
                                 value: subgenre._id || subgenre.slug,
-                                label:
+                                label: localizeUzbekScript(
                                     subgenre.title?.[i18n.language.split('-')[0] as 'uz' | 'ru' | 'en'] ||
-                                    subgenre.title?.uz ||
-                                    subgenre.title?.ru ||
-                                    subgenre.title?.en ||
-                                    subgenre.slug
+                                        subgenre.title?.uz ||
+                                        subgenre.title?.ru ||
+                                        subgenre.title?.en ||
+                                        subgenre.slug,
+                                    i18n.language
+                                )
                             }))
                         ].filter((option) => Boolean(option.value && option.label))
                     };
