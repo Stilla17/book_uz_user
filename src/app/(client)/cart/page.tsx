@@ -173,23 +173,27 @@ export default function CartPage() {
                     <AsideCart cartItems={cartItems} totalPrice={totalPrice} totalQuantity={totalQuantity} />
                 </div>
 
-                <div className='mt-12 mb-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
-                    <p className='text-center text-xl font-semibold text-green-500 dark:text-slate-400'>
-                        Pastdagi kitoblardan birini sotib oling va TOSHKENT bo'ylab bepul yetkazib berish imkoniyatini
-                        qo'lga kiriting!!!
-                    </p>
-                </div>
-
-                {booksLoading ? (
-                    <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
-                        <p className='text-sm text-slate-500 dark:text-slate-400'>{t('cartPage.loadingBooks')}</p>
-                    </div>
-                ) : (
-                    <div className='grid w-full grid-cols-1 gap-4 min-[420px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 [&>*]:min-w-0'>
-                        {randomBooks.map((book) => (
-                            <BookCard key={book._id} book={book} slug={book.slug} freeDeliveryEligible />
-                        ))}
-                    </div>
+                {cartItems.length > 0 && (
+                    <>
+                        <div className='mt-12 mb-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
+                            <p className='text-center text-xl font-semibold text-green-500 dark:text-slate-400'>
+                                {t('cartPage.freeDeliveryPromotion')}
+                            </p>
+                        </div>
+                        {booksLoading ? (
+                            <div className='rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
+                                <p className='text-sm text-slate-500 dark:text-slate-400'>
+                                    {t('cartPage.loadingBooks')}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className='grid w-full grid-cols-1 gap-4 min-[420px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 [&>*]:min-w-0'>
+                                {randomBooks.map((book) => (
+                                    <BookCard key={book._id} book={book} slug={book.slug} freeDeliveryEligible />
+                                ))}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

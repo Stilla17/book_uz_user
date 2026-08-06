@@ -486,7 +486,9 @@
         "securePaymentDescription": "Payment details are processed through a secure channel.",
         "fastDelivery": "Fast delivery",
         "fastDeliveryDescription": "Within 24 hours in Tashkent and promptly to other regions.",
-        "checkout": "Proceed to checkout"
+        "checkout": "Proceed to checkout",
+        "freeDeliveryPromotion": "Buy one of the books below and get free delivery across TASHKENT!!!",
+        "loadingBooks": "Loading books..."
     },
     "catalogPage": {
         "filters": "Filters",
