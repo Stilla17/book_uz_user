@@ -126,7 +126,7 @@ const AdminSettingsPage = () => {
                     <div>
                         <h2 className='text-lg font-black text-base-content'>Yetkazib berish narxi</h2>
                         <p className='mt-1 text-sm font-semibold text-admin-muted'>
-                            Bu narx kuryer orqali buyurtmalarga qo'llanadi. Pochta narxlari alohida: 40 000 so'm va uyga olib borish 60 000 so'm.
+                            Bu narx kuryer orqali buyurtmalarga qo'llanadi. Pochta ofisigacha 20 000 so'm, pochtadan uygacha 40 000 so'm.
                         </p>
                     </div>
                 </div>

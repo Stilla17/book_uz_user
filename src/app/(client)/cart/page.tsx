@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 
 import Link from 'next/link';
 
@@ -8,7 +8,7 @@ import { BookCard } from '@/components/cards/BookCard';
 import AsideCart from '@/components/shared/AsideCart';
 import QuantityControl from '@/components/shared/QuantityControl';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
-import { useAllBooksQuery } from '@/hooks/queries/useBookQueries';
+import { useRandomBooksQuery } from '@/hooks/queries/useBookQueries';
 import { setLoading } from '@/store/features/globalSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { getText } from '@/utils/book-formatters';
@@ -25,26 +25,12 @@ export default function CartPage() {
     const dispatch = useAppDispatch();
     const { cartItems, loadingCart, authLoading, totalPrice, totalQuantity, updateQuantity, removeItem, clearItems } =
         useBookCart();
-
-    const { data, isLoading: booksLoading } = useAllBooksQuery({
-        page: 1,
-        limit: 10000,
-        minPrice: 20_000
-    });
-
     // Yangi asr Nashryoti boyicha bosin
 
-    const randomBooks = useMemo(() => {
-        const books = (data?.products ?? []).filter(
-            (book) => Number(book.price) >= 20_000 && book.stock && book.stock > 0
-        );
-
-        for (let i = books.length - 1; i > 0; i--) {
-            const randomIndex = Math.floor(Math.random() * (i + 1));
-            [books[i], books[randomIndex]] = [books[randomIndex], books[i]];
-        }
-        return books.slice(0, 5);
-    }, [data?.products]);
+    const { data: randomBooks = [], isLoading: booksLoading } = useRandomBooksQuery({
+        limit: 5,
+        minPrice: 20_000
+    });
 
     useEffect(() => {
         dispatch(setLoading(authLoading || loadingCart));
@@ -59,6 +45,11 @@ export default function CartPage() {
     return (
         <div className='min-h-screen bg-slate-50 py-5 sm:py-8 dark:bg-slate-950'>
             <div className='container mx-auto max-w-7xl px-3 sm:px-4'>
+                <div className='mb-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
+                    <p className='text-center text-xl font-semibold text-green-500 dark:text-slate-400'>
+                        {t('cartPage.freeDeliveryPromotion')}
+                    </p>
+                </div>
                 <div className='mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-slate-800'>
                     <div>
                         <h1 className='mt-2 text-2xl font-black text-slate-950 sm:text-3xl dark:text-white'>
@@ -173,7 +164,7 @@ export default function CartPage() {
                     <AsideCart cartItems={cartItems} totalPrice={totalPrice} totalQuantity={totalQuantity} />
                 </div>
 
-                {cartItems.length > 0 && (
+                {/* {cartItems.length > 0 && (
                     <>
                         <div className='mt-12 mb-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900'>
                             <p className='text-center text-xl font-semibold text-green-500 dark:text-slate-400'>
@@ -194,7 +185,7 @@ export default function CartPage() {
                             </div>
                         )}
                     </>
-                )}
+                )} */}
             </div>
         </div>
     );

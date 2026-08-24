@@ -157,5 +157,19 @@ export const bookService = {
             console.error('Error searching books:', error);
             return { books: [] };
         }
+    },
+
+    // Random kitoblar olish
+    async getRandomBooks(params?: { limit?: number; minPrice?: number }): Promise<Product[]> {
+        try {
+            const response = await api.get('/products/random', {
+                params
+            });
+
+            return Array.isArray(response.data?.data) ? response.data.data : [];
+        } catch (error) {
+            console.error('Random kitoblarni olishda xatolik:', error);
+            return [];
+        }
     }
 };

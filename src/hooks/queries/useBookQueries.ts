@@ -66,10 +66,15 @@ export const useBookRecommendationsQuery = (filterKey: 'subgenre' | 'category', 
         staleTime: 5 * 60 * 1000
     });
 
-export const useAllBooksQuery = (requestParams: ProductQueryParams) =>
+export const useRandomBooksQuery = (
+    requestParams: ProductQueryParams = {
+        limit: 5,
+        minPrice: 20_000
+    }
+) =>
     useQuery({
-        queryKey: ['all-books', requestParams],
-        queryFn: () => bookService.getAllProducts(requestParams),
+        queryKey: ['random-books', requestParams],
+        queryFn: () => bookService.getRandomBooks(requestParams),
         staleTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false
     });

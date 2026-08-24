@@ -74,7 +74,10 @@
         "subtitle": "Making things convenient for you — fast, secure, and beneficial",
         "items": {
             "s1": { "title": "Delivery", "description": "Fast and reliable delivery throughout Tashkent." },
-            "s4": { "title": "Guarantee and trust", "description": "Order security, return policies, and a reliable control system." },
+            "s4": {
+                "title": "Guarantee and trust",
+                "description": "Order security, return policies, and a reliable control system."
+            },
             "s5": { "title": "Easy payments", "description": "Click, Payme, and Xazna cards are all available." }
         }
     },
@@ -487,7 +490,7 @@
         "fastDelivery": "Fast delivery",
         "fastDeliveryDescription": "Within 24 hours in Tashkent and promptly to other regions.",
         "checkout": "Proceed to checkout",
-        "freeDeliveryPromotion": "Buy one of the books below and get free delivery across TASHKENT!!!",
+        "freeDeliveryPromotion": "Shop for 300,000 UZS or more — get FREE delivery!",
         "loadingBooks": "Loading books..."
     },
     "catalogPage": {
