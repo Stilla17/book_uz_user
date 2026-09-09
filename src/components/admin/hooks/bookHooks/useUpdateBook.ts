@@ -20,7 +20,6 @@ export const useUpdateBook = () => {
                 queryClient.invalidateQueries({ queryKey: ['catalog-products'] }),
                 queryClient.invalidateQueries({ queryKey: ['genre-recommendations'] })
             ]);
-            await queryClient.refetchQueries({ queryKey: ['books'], type: 'active' });
         }
     });
 };

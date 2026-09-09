@@ -39,6 +39,11 @@ export const useBookSectionQuery = (type: BookSectionType, enabled: boolean) =>
                 return products.map((product) => mapProductToBook(product, type));
             }
 
+            if (type === 'views') {
+                const products = await bookService.getMostViewedBooks();
+                return products.map((product) => mapProductToBook(product, type));
+            }
+
             const response = await bookService.getAllProducts(getRequestParams(type));
             return response.products.map((product) => mapProductToBook(product, type));
         },

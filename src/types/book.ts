@@ -168,3 +168,13 @@ export type BookFormValues = {
     isActive: boolean;
     tags: string;
 };
+
+
+export type BookStats = {
+    total: number;
+    active: number;
+    inactive: number;
+    low: number;
+    available: number;
+    out: number;
+};

@@ -58,7 +58,8 @@
         "topSalesLabel": "Top 10",
         "topSalesLoadError": "Top sales could not be loaded.",
         "topSalesEmpty": "Top sales have not been synchronized yet.",
-        "basket": "Basket"
+        "basket": "Basket",
+        "mostViewed": "Eng ko'p ko'rilgan kitoblar"
     },
     "bookCard": {
         "alreadyInCart": "This book is already in your cart",

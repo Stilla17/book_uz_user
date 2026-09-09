@@ -171,5 +171,18 @@ export const bookService = {
             console.error('Random kitoblarni olishda xatolik:', error);
             return [];
         }
+    },
+
+    // eng kop korilgan kitoblar
+    async getMostViewedBooks(limit = 8): Promise<Product[]> {
+        try {
+            const response = await api.get('/products/most-viewed', {
+                params: { limit }
+            });
+            return Array.isArray(response.data?.data) ? response.data.data : [];
+        } catch (error) {
+            console.error("Eng ko'p ko'rilgan kitoblarni olishda xatolik:", error);
+            return [];
+        }
     }
 };

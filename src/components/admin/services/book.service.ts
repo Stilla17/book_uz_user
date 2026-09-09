@@ -1,3 +1,6 @@
+import type { StockFilter } from '@/helpers/admin/newBook';
+import { BookStats } from '@/types/book';
+
 import { api } from './api';
 
 type BookPaginationParams = {
@@ -6,6 +9,7 @@ type BookPaginationParams = {
     search?: string;
     sortBy?: 'price' | 'title';
     sortOrder?: 'asc' | 'desc';
+    stockFilter?: StockFilter;
 };
 
 const getProductFromResponse = (responseData: any) => {
@@ -15,8 +19,8 @@ const getProductFromResponse = (responseData: any) => {
 };
 
 export const BookService = {
-    getAdminBook: async (params?: BookPaginationParams) => {
-        const response = await api.get('/admin/products', { params });
+    getAdminBook: async (params?: BookPaginationParams, signal?: AbortSignal) => {
+        const response = await api.get('/admin/products', { params, signal });
         return response.data.data;
     },
 
@@ -71,5 +75,10 @@ export const BookService = {
 
             return product;
         }
+    },
+
+    getAdminBookStats: async (signal?: AbortSignal) => {
+        const response = await api.get<{ data: BookStats }>('/admin/products/stats', { signal });
+        return response.data.data;
     }
 };

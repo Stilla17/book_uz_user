@@ -1,31 +1,22 @@
 'use client';
 
-import { useMemo } from 'react';
-
 import Link from 'next/link';
 
 import PublisherCard from '@/components/cards/PublisherCard';
-import { usePublishersQuery } from '@/hooks/queries/usePublisherQueries';
+import { useAllPublishersQuery } from '@/hooks/queries/usePublisherQueries';
 
 import { motion } from 'framer-motion';
-import { Building2, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const PREVIEW_PUBLISHERS_LIMIT = 6;
-const PREVIEW_REQUEST_LIMIT = 12;
+const PREVIEW_PUBLISHERS_LIMIT = 9;
 
 const Publishers = () => {
     const { t } = useTranslation();
 
-    const { data } = usePublishersQuery(1, PREVIEW_REQUEST_LIMIT);
-    const publishers = useMemo(
-        () =>
-            [...(data?.publishers ?? [])]
-                .sort((firstPublisher, secondPublisher) => secondPublisher.booksCount - firstPublisher.booksCount)
-                .slice(0, PREVIEW_PUBLISHERS_LIMIT),
-        [data?.publishers]
-    );
-    const totalPublishers = data?.pagination.total ?? publishers.length;
+    const { data: allPublishers = [], isLoading } = useAllPublishersQuery();
+    const publishers = allPublishers.slice(0, PREVIEW_PUBLISHERS_LIMIT);
+    const totalPublishers = allPublishers.length;
 
     return (
         <section className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>

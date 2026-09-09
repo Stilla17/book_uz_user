@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { useDashboardStatsQuery } from '@/components/admin/hooks/queries/dashboard';
 import { useOrderQuery } from '@/components/admin/hooks/queries/order';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
@@ -14,7 +15,6 @@ import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
 import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { OrderStatus } from '@/types/orders';
-import { isOrderRevenueEligible } from '@/utils/order';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
@@ -36,6 +36,7 @@ const AdminOrdersPage = () => {
         isFetching,
         isLoading
     } = useOrderQuery(debouncedSearch, FETCH_PAGINATION_LIMIT, page, active);
+    const { data: dashboardStats, isLoading: isDashboardStatsLoading } = useDashboardStatsQuery();
 
     const pagination = orders?.pagination;
 
@@ -57,12 +58,7 @@ const AdminOrdersPage = () => {
         (sum, item) => (item.paymentStatus.includes('PENDING') ? sum + 1 : sum),
         0
     );
-    const confirmedPaymentTotal = orders?.orders.reduce((sum, item) => {
-        if (!isOrderRevenueEligible(item)) return sum;
-
-        return item.totalAmount + sum;
-    }, 0);
-    const formatterPrice = new Intl.NumberFormat('ru-RU').format(Number(confirmedPaymentTotal));
+    const formatterPrice = new Intl.NumberFormat('ru-RU').format(dashboardStats?.revenue ?? 0);
 
     const sortedOrders = useMemo(() => {
         return sortAdminItems({
@@ -81,7 +77,7 @@ const AdminOrdersPage = () => {
     const stats = [
         {
             label: 'Jami buyurtmalar',
-            value: orders?.orders.length,
+            value: dashboardStats?.ordersTotal ?? 0,
             icon: ShoppingBag,
             color: 'bg-[#ef7f1a]'
         },
@@ -93,7 +89,7 @@ const AdminOrdersPage = () => {
         },
 
         {
-            label: 'Bugungi tushum',
+            label: 'Umumiy sayt savdosi',
             value: formatterPrice + " so'm",
             icon: Banknote,
             color: 'bg-emerald-600'
@@ -113,18 +109,18 @@ const AdminOrdersPage = () => {
     ];
     return (
         <div className='space-y-5'>
-            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
+            <StatsCardsAdmin stats={stats} isLoading={isLoading || isDashboardStatsLoading} />
 
-            <section className='overflow-hidden rounded-[24px] bg-base-100 shadow-sm ring-1 ring-base-300'>
-                <div className='flex flex-col gap-3 border-b border-base-300 p-4 xl:flex-row xl:items-center xl:justify-between'>
-                    <label className='flex h-11 min-w-0 items-center gap-2 rounded-2xl bg-base-200 px-4 text-admin-dim xl:max-w-sm xl:flex-1'>
+            <section className='bg-base-100 ring-base-300 overflow-hidden rounded-[24px] shadow-sm ring-1'>
+                <div className='border-base-300 flex flex-col gap-3 border-b p-4 xl:flex-row xl:items-center xl:justify-between'>
+                    <label className='bg-base-200 text-admin-dim flex h-11 min-w-0 items-center gap-2 rounded-2xl px-4 xl:max-w-sm xl:flex-1'>
                         <Search size={18} className='shrink-0' />
                         <input
                             type='search'
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
                             placeholder='ID, mijoz yoki telefon raqami'
-                            className='h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-admin-subtle'
+                            className='placeholder:text-admin-subtle h-full min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none'
                         />
                     </label>
 
@@ -140,7 +136,7 @@ const AdminOrdersPage = () => {
                                 className={`h-10 rounded-xl px-4 text-sm font-black ${
                                     active === filter.value
                                         ? 'bg-warning text-warning-content'
-                                        : 'bg-admin-white text-admin-dim ring-1 ring-base-300'
+                                        : 'bg-admin-white text-admin-dim ring-base-300 ring-1'
                                 }`}>
                                 {filter.label}
                             </button>
@@ -151,7 +147,7 @@ const AdminOrdersPage = () => {
                 <div className='overflow-x-auto'>
                     <table className='w-full min-w-[1040px] text-left'>
                         <thead>
-                            <tr className='border-b border-base-300 text-xs font-black text-admin-subtle uppercase'>
+                            <tr className='border-base-300 text-admin-subtle border-b text-xs font-black uppercase'>
                                 <th className='px-4 py-3'>№</th>
                                 <th className='px-4 py-3'>
                                     <button
@@ -203,9 +199,7 @@ const AdminOrdersPage = () => {
                                         className:
                                             'bg-slate-50 text-slate-700 ring-slate-100 dark:bg-slate-500/10 dark:text-slate-300 dark:ring-slate-500/20'
                                     };
-                                    const displayedPaymentStatus = isOrderRevenueEligible(order)
-                                        ? 'PAID'
-                                        : order.paymentStatus;
+                                    const displayedPaymentStatus = order.paymentStatus;
                                     const paymentConfig = paymentStatusConfig[displayedPaymentStatus] ?? {
                                         label: order.paymentStatus || "To'lov holati noma'lum",
                                         className:
@@ -215,7 +209,7 @@ const AdminOrdersPage = () => {
                                     return (
                                         <tr
                                             key={order._id}
-                                            className='border-b border-base-300 bg-admin-white transition last:border-0 hover:bg-base-200'>
+                                            className='border-base-300 bg-admin-white hover:bg-base-200 border-b transition last:border-0'>
                                             <td className='p-0'>
                                                 <Link
                                                     href={`/admin/orders/slug?id=${order._id}`}

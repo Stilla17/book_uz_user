@@ -5,7 +5,7 @@ export interface BookSectionProps {
     title: string;
     subtitle?: string;
     books?: Book[];
-    type?: 'default' | 'new' | 'popular' | 'discount' | 'audio' | 'author';
+    type?: 'default' | 'new' | 'popular' | 'discount' | 'audio' | 'author' | 'views';
     viewAllLink?: string;
 }
 

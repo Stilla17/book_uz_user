@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -23,17 +23,13 @@ import {
 } from '@/helpers/checkout';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { useCreateOrder } from '@/hooks/orderHooks/useCreateOrder';
+import { useDeliverySettingsQuery, useDistrictsQuery, useRegionsQuery } from '@/hooks/queries/useCheckoutQueries';
 import { useAuth } from '@/hooks/useAuth';
-import {
-    useDeliverySettingsQuery,
-    useDistrictsQuery,
-    useRegionsQuery
-} from '@/hooks/queries/useCheckoutQueries';
 import { UserService } from '@/services/api';
 import { resetCheckout, updateField } from '@/store/features/checkoutSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { matchesTransliteratedSearch } from '@/utils/transliteration';
 import { getFreeDeliveryBookIds } from '@/utils/cartStorage';
+import { matchesTransliteratedSearch } from '@/utils/transliteration';
 
 import axios from 'axios';
 import {
@@ -61,6 +57,8 @@ type CheckoutFormValues = {
 const CheckoutPage = () => {
     const { t, i18n } = useTranslation();
     const [isGettingLocation, setIsGettingLocation] = useState(false);
+    const [isOrderSubmitting, setIsOrderSubmitting] = useState(false);
+    const orderSubmitLockRef = useRef(false);
     const router = useRouter();
     const dispatch = useAppDispatch();
     const checkout = useAppSelector((state) => state.checkout);
@@ -144,17 +142,9 @@ const CheckoutPage = () => {
         }
     }, [dispatch, getValues, setValue, user]);
 
-    const {
-        data: regions,
-        isLoading: regionsLoading,
-        error: regionsError
-    } = useRegionsQuery();
+    const { data: regions, isLoading: regionsLoading, error: regionsError } = useRegionsQuery();
 
-    const {
-        data: districts,
-        isLoading: districtsLoading,
-        error: districtsError
-    } = useDistrictsQuery();
+    const { data: districts, isLoading: districtsLoading, error: districtsError } = useDistrictsQuery();
 
     const filteredDistricts = useMemo(() => {
         if (!selectedRegion) return [];
@@ -205,6 +195,7 @@ const CheckoutPage = () => {
     }, [dispatch, isTashkentRegion, selectedDelivery]);
 
     const handleSubmitOrder = async (formValues: CheckoutFormValues) => {
+        if (orderSubmitLockRef.current) return;
         setPhoneTouched(true);
 
         const userId = user?._id || user?.id;
@@ -226,6 +217,9 @@ const CheckoutPage = () => {
             toast.error(t(`checkoutPage.validation.${validationMessage}`));
             return;
         }
+
+        orderSubmitLockRef.current = true;
+        setIsOrderSubmitting(true);
 
         try {
             const payload = buildOrderPayload({
@@ -287,6 +281,9 @@ const CheckoutPage = () => {
             router.push(userId ? '/profile?tab=orders' : '/catalog');
         } catch (error: any) {
             toast.error(error?.response?.data?.message || t('checkoutPage.orderError'));
+
+            orderSubmitLockRef.current = false;
+            setIsOrderSubmitting(false);
         }
     };
 
@@ -744,7 +741,7 @@ const CheckoutPage = () => {
 
                     <AsideCheckout
                         disabled={!cartItems.length}
-                        isSubmitting={createOrder.isPending}
+                        isSubmitting={isOrderSubmitting}
                         onConfirm={handleSubmit(handleSubmitOrder)}
                         promoDiscount={promoDiscount}
                         promoCode={promoCode}

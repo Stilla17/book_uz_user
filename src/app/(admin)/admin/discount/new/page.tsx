@@ -5,7 +5,7 @@ import { useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useBookQuery } from '@/components/admin/hooks/queries/book';
-import { useCreateDiscount, useGetDiscounts, useUpdateDiscount } from '@/components/admin/hooks/queries/discount';
+import { useCreateDiscount, useGetDiscountById, useUpdateDiscount } from '@/components/admin/hooks/queries/discount';
 import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
 import MultiValueField from '@/components/admin/other/MultiValueField';
 import type { SearchableOption } from '@/components/admin/other/SearchableSelect';
@@ -14,7 +14,7 @@ import { DiscountForm, DiscountTargetType, DiscountType } from '@/components/adm
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { filterService } from '@/services/filter.service';
-import type { Book, LocalizedText } from '@/types/book';
+import type { Book } from '@/types/book';
 import { getLocalizedText } from '@/utils/book-formatters';
 import { useQuery } from '@tanstack/react-query';
 
@@ -33,6 +33,7 @@ const AdminNewDiscountPage = () => {
             name: '',
             type: 'PERCENT',
             value: 0,
+            remainingDiscountPercentage: 0,
             targetType: 'PRODUCTS',
             products: [],
             publishers: [],
@@ -69,28 +70,29 @@ const AdminNewDiscountPage = () => {
         [filters]
     );
 
-    const { data: discounts = [] } = useGetDiscounts();
-
-    const discountData = useMemo(() => {
-        return discounts.find((d) => d._id === id);
-    }, [discounts, id]);
+    const { data: discountData } = useGetDiscountById(id);
 
     const targetOptions = targetType === 'PRODUCTS' ? bookOptions : publisherOptions;
     const targetValues = targetType === 'PRODUCTS' ? selectedProductIds : selectedPublisherIds;
     const isTargetLoading = targetType === 'PRODUCTS' ? isBooksLoading : isFiltersLoading;
 
     useEffect(() => {
-        if (!discountData) return;
+        if (!isEdit || !discountData) return;
         reset({
-            name: discountData.name || '',
-            type: discountData.type || 'PERCENT',
-            value: discountData.value || 0,
-            targetType: discountData.targetType || 'PRODUCTS',
-            products: (discountData.products ?? []).map((p) => (typeof p === 'string' ? p : (p._id ?? ''))),
-            publishers: (discountData.publishers ?? []).map((p) => (typeof p === 'string' ? p : (p._id ?? ''))),
-            minOrderAmount: discountData.minOrderAmount || 0,
-            startDate: discountData.startDate?.slice(0, 10) || '',
-            endDate: discountData.endDate?.slice(0, 10) || '',
+            name: discountData.name ?? '',
+            type: discountData.type ?? 'PERCENT',
+            value: discountData.value ?? 0,
+            targetType: discountData.targetType ?? 'PRODUCTS',
+            products: (discountData.products ?? [])
+                .map((product) => (typeof product === 'string' ? product : (product._id ?? '')))
+                .filter((id): id is string => Boolean(id)),
+            publishers: (discountData.publishers ?? [])
+                .map((publisher) => (typeof publisher === 'string' ? publisher : publisher._id))
+                .filter((id): id is string => Boolean(id)),
+            remainingDiscountPercentage: discountData.remainingDiscountPercentage ?? 0,
+            minOrderAmount: discountData.minOrderAmount ?? 0,
+            startDate: discountData.startDate?.slice(0, 10) ?? '',
+            endDate: discountData.endDate?.slice(0, 10) ?? '',
             isActive: discountData.isActive ?? true
         });
     }, [isEdit, discountData, reset]);
@@ -98,6 +100,7 @@ const AdminNewDiscountPage = () => {
     const onSubmit = (values: DiscountForm) => {
         const data = {
             ...values,
+            remainingDiscountPercentage: values.remainingDiscountPercentage ?? 0,
             products: values.targetType === 'PRODUCTS' ? values.products : [],
             publishers: values.targetType === 'PUBLISHERS' ? values.publishers : []
         };
@@ -213,6 +216,29 @@ const AdminNewDiscountPage = () => {
                                         />
                                     </Field>
                                 </div>
+
+                                <Field
+                                    label='Qolgan barchasiga chegirma'
+                                    hint="Tanlanmagan qolgan barcha kitoblarga foizli chegirma qo'llaniladi.">
+                                    <div className='relative'>
+                                        <Input
+                                            type='number'
+                                            min={0}
+                                            max={100}
+                                            step={1}
+                                            className={`${inputClass} pr-12`}
+                                            placeholder='Masalan: 10'
+                                            {...register('remainingDiscountPercentage', {
+                                                setValueAs: (value) => (value === '' ? undefined : Number(value)),
+                                                min: 0,
+                                                max: 100
+                                            })}
+                                        />
+                                        <span className='pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 font-bold text-[#9d907e]'>
+                                            %
+                                        </span>
+                                    </div>
+                                </Field>
                             </div>
                         </section>
                     </div>

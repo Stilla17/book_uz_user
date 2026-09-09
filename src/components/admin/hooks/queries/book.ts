@@ -1,4 +1,5 @@
-import { AdminBooksResponse, Book } from '@/types/book';
+import type { StockFilter } from '@/helpers/admin/newBook';
+import { AdminBooksResponse, Book, BookStats } from '@/types/book';
 import { useQuery } from '@tanstack/react-query';
 
 import { BookService } from '../../services/book.service';
@@ -35,14 +36,21 @@ export const useBookListQuery = (
     limit: number,
     keyword = '',
     sortBy?: 'price' | 'title',
-    sortOrder?: 'asc' | 'desc'
+    sortOrder?: 'asc' | 'desc',
+    stockFilter: StockFilter = 'all'
 ) => {
     const search = keyword.trim();
 
     return useQuery<AdminBooksResponse>({
-        queryKey: ['books', 'list', page, limit, search, sortBy, sortOrder],
-        queryFn: () => BookService.getAdminBook({ page, limit, search, sortBy, sortOrder }),
-        placeholderData: (previousData) => previousData
+        queryKey: ['books', 'list', page, limit, search, sortBy, sortOrder, stockFilter],
+        queryFn: ({ signal }) =>
+            BookService.getAdminBook({ page, limit, search, sortBy, sortOrder, stockFilter }, signal),
+        placeholderData: (previousData, previousQuery) =>
+            previousQuery?.queryKey
+                .slice(3)
+                .every((value, index) => value === [limit, search, sortBy, sortOrder, stockFilter][index])
+                ? previousData
+                : undefined
     });
 };
 
@@ -53,3 +61,10 @@ export const useBookDetailQuery = (id: string | null) => {
         enabled: !!id
     });
 };
+
+export const useBookStatsQuery = () =>
+    useQuery<BookStats>({
+        queryKey: ['books', 'stats'],
+        queryFn: ({ signal }) => BookService.getAdminBookStats(signal),
+        staleTime: 60_000
+    });

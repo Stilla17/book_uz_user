@@ -27,7 +27,7 @@ export const useUpdateOrderStatus = () => {
         onSuccess: (order: Order) => {
             queryClient.invalidateQueries({ queryKey: ['orders'] });
             queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard-stats'] });
-            queryClient.invalidateQueries({ queryKey: ['dashboard', 'sales-chart'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard', 'site-sales'] });
             queryClient.setQueryData(['orders', 'detail', order._id], order);
         }
     });

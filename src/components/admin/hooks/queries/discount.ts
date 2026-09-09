@@ -41,3 +41,11 @@ export const useUpdateDiscount = () => {
         }
     });
 };
+
+export const useGetDiscountById = (id?: string | null) => {
+    return useQuery({
+        queryKey: ['admin', 'discounts', id],
+        queryFn: () => DiscountService.getDiscountById(id!),
+        enabled: !!id
+    });
+};

@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
 
-import { ImageIcon, Upload, X } from 'lucide-react';
+import { ImageIcon, Settings2, Upload, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -22,6 +22,7 @@ type BannerFormValues = {
     name: string;
     link: string;
     order: number;
+    isActive?: boolean;
 };
 
 const AdminNewBannerPage = () => {
@@ -39,7 +40,8 @@ const AdminNewBannerPage = () => {
         defaultValues: {
             name: '',
             link: '',
-            order: 1
+            order: 1,
+            isActive: true
         }
     });
 
@@ -49,7 +51,8 @@ const AdminNewBannerPage = () => {
         reset({
             name: bannerData.name || getLocalizedText(bannerData.title),
             link: bannerData.link || bannerData.buttonLink || '',
-            order: bannerData.order || 1
+            order: bannerData.order || 1,
+            isActive: bannerData.isActive || false
         });
 
         if (bannerData.imageUrl) {
@@ -64,6 +67,7 @@ const AdminNewBannerPage = () => {
         formData.append('name', name);
         formData.append('link', values.link);
         formData.append('order', String(values.order || 1));
+        formData.append('isActive', String(values.isActive || false));
         if (imageFile) {
             formData.append('image', imageFile);
         }
@@ -133,6 +137,18 @@ const AdminNewBannerPage = () => {
                                         {...register('order', { valueAsNumber: true })}
                                     />
                                 </Field>
+                                <label className='flex items-center justify-between gap-4 rounded-2xl bg-white p-4 ring-1 ring-[#eadfce] dark:bg-slate-900 dark:ring-slate-800'>
+                                    <span>
+                                        <span className='block text-sm font-black text-[#2f2a25] dark:text-white'>
+                                            Banner xolati
+                                        </span>
+                                    </span>
+                                    <input
+                                        type='checkbox'
+                                        className='size-5 accent-[#ef7f1a]'
+                                        {...register('isActive')}
+                                    />
+                                </label>
                             </div>
                         </section>
                     </div>

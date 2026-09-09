@@ -26,6 +26,9 @@ const Page = () => {
             {/* Yangi kelgan kitoblar */}
             <BookSection title={t('booksSection.newArrivals')} type='new' />
 
+            {/* Eng ko'p ko'rilgan kitoblar */}
+            <BookSection title={t('booksSection.mostViewed')} type='views' />
+
             {/* Haftalik MoySklad top sotuvlar */}
             <TopSalesSection period='week' title={t('booksSection.topWeekTitle')} />
 
@@ -44,10 +47,10 @@ const Page = () => {
             <AboutSection />
 
             {/* Services Section */}
-            <ServicesSection />
+            {/* <ServicesSection /> */}
 
             {/* Support Section */}
-            <SupportSection />
+            {/* <SupportSection /> */}
         </div>
     );
 };

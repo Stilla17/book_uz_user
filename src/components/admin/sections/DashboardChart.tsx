@@ -5,458 +5,309 @@ import { useMemo, useState } from 'react';
 import { api } from '@/components/admin/services/api';
 import { formatPrice } from '@/utils/currency';
 import { isOrderRevenueEligible } from '@/utils/order';
+import {
+    type BranchSales,
+    type SalesPeriod,
+    type SalesPoint,
+    addSaleToBuckets,
+    getAllTimeSalesPoints,
+    getSalesBuckets,
+    toSalesPoints
+} from '@/utils/sales-chart';
 import { useQuery } from '@tanstack/react-query';
 
 import type { EChartsOption } from 'echarts';
 import ReactECharts from 'echarts-for-react';
 
-type ChartPeriod = 'weekly' | 'monthly';
-type ChartView = 'summary' | 'branches';
-
-type SaleRecord = {
-    amount: number;
+type SiteOrder = {
+    totalAmount: number;
     createdAt: string;
-    status: string;
+    status?: string;
+    paymentStatus?: string;
+    paymentType?: string;
 };
-
-type BranchSale = {
-    name: string;
-    amount: number;
-};
-
-type MoyskladSalesResult = {
-    sales: SaleRecord[];
-    branches: BranchSale[];
-    message?: string;
-};
-
-type ChartPoint = {
-    label: string;
-    start: Date;
-    end: Date;
-    site: number;
-    moysklad: number;
-};
-
-const periodOptions: Array<{ value: ChartPeriod; label: string }> = [
-    { value: 'weekly', label: 'Haftalik' },
-    { value: 'monthly', label: 'Oylik' }
+type MoyskladSales = { sales: SalesPoint[]; branches: BranchSales[]; partial?: boolean; message?: string };
+const periods: { value: SalesPeriod; label: string }[] = [
+    { value: 'weekly', label: 'Oxirgi 7 kun' },
+    { value: 'current-month', label: 'Oylik savdo' },
+    { value: 'monthly', label: 'Oxirgi 6 oy' }
 ];
+const cardClass =
+    'min-w-0 rounded-[24px] bg-[#fffaf2] p-4 shadow-sm ring-1 ring-[#eadfce] sm:p-5 dark:bg-slate-950 dark:ring-slate-800';
+const compactAmount = (value: number) =>
+    new Intl.NumberFormat('uz-UZ', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
 
-const viewOptions: Array<{ value: ChartView; label: string }> = [
-    { value: 'summary', label: 'Umumiy' },
-    { value: 'branches', label: 'Filiallar' }
-];
-
-const monthLabels = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn', 'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'];
-const excludedBranchNames = ['solnechniy', 'yoshlar matbuoti', 'yangi asr avlodi'];
-
-const isExcludedBranch = (name: string) =>
-    excludedBranchNames.some((excludedName) => name.trim().toLowerCase().includes(excludedName));
-
-const toDateKey = (date: Date) =>
-    date.toLocaleDateString('uz-UZ', {
-        day: '2-digit',
-        month: '2-digit'
-    });
-
-const toMonthKey = (date: Date) => monthLabels[date.getMonth()];
-
-const getPeriodBuckets = (period: ChartPeriod): ChartPoint[] => {
-    const today = new Date();
-
-    if (period === 'weekly') {
-        return Array.from({ length: 7 }, (_, index) => {
-            const date = new Date(today);
-            date.setDate(today.getDate() - (6 - index));
-            const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            const end = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-
-            return {
-                label: toDateKey(start),
-                start,
-                end,
-                site: 0,
-                moysklad: 0
-            };
-        });
-    }
-
-    return Array.from({ length: 6 }, (_, index) => {
-        const date = new Date(today.getFullYear(), today.getMonth() - (5 - index), 1);
-        const start = new Date(date.getFullYear(), date.getMonth(), 1);
-        const end = new Date(date.getFullYear(), date.getMonth() + 1, 1);
-
-        return {
-            label: toMonthKey(start),
-            start,
-            end,
-            site: 0,
-            moysklad: 0
-        };
-    });
-};
-
-const getNestedArray = (value: any): any[] => {
-    if (Array.isArray(value)) return value;
-    if (Array.isArray(value?.data)) return getNestedArray(value.data);
-    if (Array.isArray(value?.data?.data)) return getNestedArray(value.data.data);
-    if (Array.isArray(value?.orders)) return value.orders;
-    if (Array.isArray(value?.rows)) return value.rows;
-    if (Array.isArray(value?.items)) return value.items;
-    if (Array.isArray(value?.demands)) return value.demands;
-
-    return [];
-};
-
-const getSaleDate = (item: any) => item?.createdAt || item?.moment || item?.date || item?.updatedAt || '';
-
-const getSaleAmount = (item: any, source: 'site' | 'moysklad') => {
-    const value = Number(item?.totalAmount ?? item?.amount ?? item?.total ?? item?.sum ?? item?.sales ?? 0);
-
-    if (!Number.isFinite(value)) return 0;
-    if (source === 'moysklad' && item?.sum !== undefined) return value / 100;
-
-    return value;
-};
-
-const normalizeSales = (response: any, source: 'site' | 'moysklad'): SaleRecord[] =>
-    getNestedArray(response)
-        .map((item) => ({
-            amount: getSaleAmount(item, source),
-            createdAt: getSaleDate(item),
-            status: String(
-                source === 'site'
-                    ? isOrderRevenueEligible(item)
-                        ? 'PAID'
-                        : item?.paymentStatus ?? ''
-                    : item?.status ?? ''
-            ).toUpperCase()
-        }))
-        .filter((item) => item.amount > 0 && Boolean(item.createdAt));
-
-const fetchSiteSales = async () => {
-    const firstResponse = await api.get('/admin/orders', {
-        params: { page: 1, limit: 100 }
-    });
-    const firstData = firstResponse.data.data;
-    const firstOrders = normalizeSales(firstData, 'site');
-    const totalPages = Number(firstData?.pagination?.pages ?? 1);
-
-    if (totalPages <= 1) return firstOrders;
-
-    const restResponses = await Promise.all(
-        Array.from({ length: totalPages - 1 }, (_, index) =>
-            api.get('/admin/orders', {
-                params: { page: index + 2, limit: 100 }
-            })
-        )
-    );
-
-    return [...firstOrders, ...restResponses.flatMap((response) => normalizeSales(response.data.data, 'site'))];
-};
-
-const fetchMoyskladSales = async (period: ChartPeriod, view: ChartView): Promise<MoyskladSalesResult> => {
-    try {
-        const response = await fetch(`/api/moysklad/sales?period=${period}&mode=${view}`, {
-            cache: 'no-store'
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => null);
-
-            return {
-                sales: [],
-                branches: [],
-                message: errorData?.message || "MoySklad ma'lumotlarini olishda xatolik"
-            };
-        }
-
-        const data = await response.json();
-        return {
-            sales: normalizeSales(data?.sales ?? data, 'moysklad'),
-            branches: Array.isArray(data?.branches) ? data.branches : [],
-            message: data?.message
-        };
-    } catch {
-        return {
-            sales: [],
-            branches: [],
-            message: "MoySklad ma'lumotlarini olishda xatolik"
-        };
-    }
-};
-
-const addSalesToBuckets = (buckets: ChartPoint[], sales: SaleRecord[], key: 'site' | 'moysklad') => {
-    sales.forEach((sale) => {
-        if (key === 'site' && sale.status !== 'PAID') return;
-        const saleDate = new Date(sale.createdAt);
-        if (Number.isNaN(saleDate.getTime())) return;
-
-        const bucket = buckets.find((item) => saleDate >= item.start && saleDate < item.end);
-        if (bucket) bucket[key] += sale.amount;
-    });
-};
-
-const DashboardChart = () => {
-    const [period, setPeriod] = useState<ChartPeriod>('weekly');
-    const [view, setView] = useState<ChartView>('summary');
-    const { data, isLoading } = useQuery({
-        queryKey: ['dashboard', 'sales-chart', period, view],
-        queryFn: async () => {
-            const [siteSales, moyskladResult] = await Promise.all([fetchSiteSales(), fetchMoyskladSales(period, view)]);
-
-            return {
-                siteSales,
-                moyskladSales: moyskladResult.sales,
-                branchSales: moyskladResult.branches,
-                moyskladMessage: moyskladResult.message
-            };
-        }
-    });
-
-    const chartData = useMemo(() => {
-        const buckets = getPeriodBuckets(period);
-
-        addSalesToBuckets(buckets, data?.siteSales ?? [], 'site');
-        addSalesToBuckets(buckets, data?.moyskladSales ?? [], 'moysklad');
-
-        return buckets;
-    }, [data?.moyskladSales, data?.siteSales, period]);
-
-    const siteTotal = (data?.siteSales ?? [])
-        .filter((order) => order.status === 'PAID')
-        .reduce((total, order) => total + order.amount, 0);
-    const moyskladTotal = chartData.reduce((sum, item) => sum + item.moysklad, 0);
-    const branchData = (data?.branchSales ?? []).filter((item) => !isExcludedBranch(item.name)).slice(0, 12);
-    const maxValue = Math.max(
-        ...(view === 'branches'
-            ? branchData.map((item) => item.amount)
-            : chartData.flatMap((item) => [item.site, item.moysklad])),
-        1
-    );
-    const roundedMax = Math.ceil(maxValue / 1_000_000) * 1_000_000;
-
-    const commonAxisStyle = {
-        axisLine: {
-            lineStyle: {
-                color: '#4b5563'
-            }
-        },
-        axisTick: {
-            show: false
-        }
+const fetchSiteSales = async (signal: AbortSignal): Promise<SiteOrder[]> => {
+    const getPage = async (page: number) => {
+        const response = await api.get('/admin/orders', { params: { page, limit: 100 }, signal });
+        return response.data.data as { orders: SiteOrder[]; pagination?: { pages?: number } };
     };
+    const first = await getPage(1);
+    const orders = [...(first.orders ?? [])];
+    const pages = Number(first.pagination?.pages ?? 1);
+    for (let page = 2; Number.isFinite(pages) && page <= pages; page += 4) {
+        const batch = await Promise.all(
+            Array.from({ length: Math.min(4, pages - page + 1) }, (_, index) => getPage(page + index))
+        );
+        batch.forEach((data) => orders.push(...(data.orders ?? [])));
+    }
+    return orders;
+};
 
-    const branchOption = {
-        animation: true,
-        tooltip: {
-            trigger: 'axis',
-            valueFormatter: (value) => formatPrice(Number(value))
+const fetchMoyskladSales = async (period: SalesPeriod, signal: AbortSignal): Promise<MoyskladSales> => {
+    const response = await fetch(`/api/moysklad/sales?period=${period}`, { cache: 'no-store', signal });
+    const data = await response.json();
+    if (!response.ok || data.success === false) throw new Error(data.message || 'MoySklad savdosini yuklab bo‘lmadi');
+    return data;
+};
+
+const PeriodSelect = ({
+    value,
+    onChange,
+    onAllTime
+}: {
+    value: SalesPeriod | 'all';
+    onChange: (period: SalesPeriod) => void;
+    onAllTime?: () => void;
+}) => (
+    <div className='inline-flex flex-wrap gap-1 rounded-xl bg-[#f2e7d8] p-1 dark:bg-slate-900'>
+        {periods.map((period) => (
+            <button
+                key={period.value}
+                type='button'
+                aria-pressed={value === period.value}
+                onClick={() => onChange(period.value)}
+                className={`rounded-lg px-3 py-2 text-xs font-bold ${value === period.value ? 'bg-white text-[#ef7f1a] shadow-sm dark:bg-slate-800' : 'text-[#8b7e70]'}`}>
+                {period.label}
+            </button>
+        ))}
+        {onAllTime && (
+            <button
+                type='button'
+                aria-pressed={value === 'all'}
+                onClick={onAllTime}
+                className={`rounded-lg px-3 py-2 text-xs font-bold ${value === 'all' ? 'bg-white text-[#ef7f1a] shadow-sm dark:bg-slate-800' : 'text-[#8b7e70]'}`}>
+                Umumiy
+            </button>
+        )}
+    </div>
+);
+
+const SalesLine = ({ points, name, color }: { points: SalesPoint[]; name: string; color: string }) => {
+    const option: EChartsOption = {
+        tooltip: { trigger: 'axis', renderMode: 'richText', valueFormatter: (value) => formatPrice(Number(value)) },
+        grid: { left: 12, right: 18, top: 24, bottom: 12, containLabel: true },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: points.map((point) => point.label ?? point.createdAt),
+            axisLabel: { color: '#8b7e70' }
         },
-        legend: {
-            top: 0,
-            right: 8,
-            data: ['Filial savdosi']
+        yAxis: {
+            type: 'value',
+            axisLabel: { color: '#8b7e70', formatter: compactAmount },
+            splitLine: { lineStyle: { color: '#eadfce', type: 'dashed' } }
         },
-        grid: {
-            left: 190,
-            right: 32,
-            top: 52,
-            bottom: 44
-        },
+        series: [
+            {
+                name,
+                type: 'line',
+                data: points.map((point) => point.amount),
+                symbolSize: 7,
+                lineStyle: { color, width: 3 },
+                itemStyle: { color },
+                areaStyle: { color, opacity: 0.12 }
+            }
+        ]
+    };
+    return <ReactECharts option={option} notMerge style={{ height: 290, width: '100%' }} />;
+};
+
+const ChartError = ({ message, retry }: { message: string; retry: () => void }) => (
+    <div role='alert' className='my-6 rounded-xl bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950 dark:text-red-200'>
+        <p>{message}</p>
+        <button type='button' onClick={retry} className='mt-2 font-bold underline'>
+            Qayta urinish
+        </button>
+    </div>
+);
+const LoadingChart = () => (
+    <div role='status' className='grid h-72 place-items-center text-sm text-[#8b7e70]'>
+        Savdo yuklanmoqda…
+    </div>
+);
+
+const SiteSalesChart = () => {
+    const [period, setPeriod] = useState<SalesPeriod | 'all'>('weekly');
+    const query = useQuery({
+        queryKey: ['dashboard', 'site-sales'],
+        queryFn: ({ signal }) => fetchSiteSales(signal),
+        staleTime: 60_000
+    });
+    const points = useMemo(() => {
+        const sales = (query.data ?? []).filter(isOrderRevenueEligible).map((order) => ({
+            amount: Number(order.totalAmount),
+            createdAt: order.createdAt
+        }));
+        if (period === 'all') return getAllTimeSalesPoints(sales);
+        const buckets = getSalesBuckets(period);
+        sales.forEach((sale) => addSaleToBuckets(buckets, sale));
+        return toSalesPoints(buckets);
+    }, [period, query.data]);
+    const total = points.reduce((sum, point) => sum + point.amount, 0);
+    return (
+        <section className={cardClass} aria-label='Sayt savdosi'>
+            <div className='flex flex-wrap items-center justify-between gap-3'>
+                <h2 className='text-lg font-black text-[#2f2a25] dark:text-white'>Sayt savdosi</h2>
+                <PeriodSelect value={period} onChange={setPeriod} onAllTime={() => setPeriod('all')} />
+            </div>
+            <p className='mt-5 text-xs font-bold text-[#8b7e70]'>
+                {period === 'all' ? 'Barcha davr bo‘yicha jami · Oylar kesimida' : 'Tanlangan davr bo‘yicha jami'}
+            </p>
+            <p className='mt-1 text-2xl font-black text-[#4f73f6]'>
+                {query.isLoading ? 'Yuklanmoqda…' : query.isError ? '—' : formatPrice(total)}
+            </p>
+            {query.isError ? (
+                <ChartError message='Sayt savdosini yuklab bo‘lmadi.' retry={() => void query.refetch()} />
+            ) : query.isLoading ? (
+                <LoadingChart />
+            ) : (
+                <>
+                    <SalesLine points={points} name='Sayt savdosi' color='#4f73f6' />
+                    {total === 0 && <p className='text-sm text-[#8b7e70]'>Bu davrda sayt savdosi mavjud emas.</p>}
+                </>
+            )}
+        </section>
+    );
+};
+
+const MoyskladSalesChart = () => {
+    const [period, setPeriod] = useState<SalesPeriod>('weekly');
+    const [branchId, setBranchId] = useState('all');
+    const query = useQuery({
+        queryKey: ['dashboard', 'moysklad-sales', 'selected-branches', period],
+        queryFn: ({ signal }) => fetchMoyskladSales(period, signal),
+        staleTime: 60_000,
+        retry: false
+    });
+    const branches = query.data?.branches ?? [];
+    const selectedBranch = branches.find((branch) => branch.id === branchId);
+    const points = selectedBranch?.sales ?? query.data?.sales ?? [];
+    const total = points.reduce((sum, point) => sum + point.amount, 0);
+    const comparison: EChartsOption = {
+        tooltip: { trigger: 'axis', renderMode: 'richText', valueFormatter: (value) => formatPrice(Number(value)) },
+        grid: { left: 8, right: 28, top: 10, bottom: 20, containLabel: true },
         xAxis: {
             type: 'value',
-            axisLine: commonAxisStyle.axisLine,
-            axisTick: commonAxisStyle.axisTick,
-            axisLabel: {
-                color: '#4b5563',
-                formatter: (value: number) => `${Math.round(value / 1_000_000)}M`
-            },
-            splitLine: {
-                lineStyle: {
-                    color: '#d7dde6'
-                }
-            }
+            axisLabel: { color: '#8b7e70', formatter: compactAmount },
+            splitLine: { lineStyle: { color: '#eadfce', type: 'dashed' } }
         },
         yAxis: {
             type: 'category',
-            data: branchData.map((item) => item.name),
-            axisLine: {
-                show: false
-            },
-            axisTick: {
-                show: false
-            },
-            axisLabel: {
-                color: '#4b5563',
-                width: 170,
-                overflow: 'truncate'
-            }
+            inverse: true,
+            data: branches.map((branch) => branch.name),
+            axisLabel: { color: '#8b7e70', width: 135, overflow: 'truncate', interval: 0 }
         },
         series: [
             {
                 name: 'Filial savdosi',
                 type: 'bar',
-                data: branchData.map((item) => item.amount),
-                itemStyle: {
-                    color: '#4f73f6'
-                },
-                barMaxWidth: 24
+                barMaxWidth: 24,
+                data: branches.map((branch) => ({
+                    value: branch.amount,
+                    itemStyle: {
+                        color: branch.id === selectedBranch?.id ? '#ef7f1a' : '#43a27a',
+                        borderRadius: [0, 5, 5, 0]
+                    }
+                }))
             }
         ]
-    } as EChartsOption;
-
-    const summaryOption = {
-        animation: true,
-        tooltip: {
-            trigger: 'axis',
-            valueFormatter: (value) => formatPrice(Number(value))
-        },
-        legend: {
-            top: 0,
-            right: 8,
-            data: ['Sayt savdosi', 'MoySklad savdosi']
-        },
-        grid: {
-            left: 48,
-            right: 32,
-            top: 52,
-            bottom: 44
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: chartData.map((item) => item.label),
-            axisLine: commonAxisStyle.axisLine,
-            axisTick: commonAxisStyle.axisTick,
-            axisLabel: {
-                color: '#4b5563'
-            }
-        },
-        yAxis: {
-            type: 'value',
-            min: 0,
-            max: roundedMax,
-            axisLine: {
-                show: false
-            },
-            axisTick: {
-                show: false
-            },
-            axisLabel: {
-                color: '#4b5563',
-                formatter: (value: number) => `${Math.round(value / 1_000_000)}M`
-            },
-            splitLine: {
-                lineStyle: {
-                    color: '#d7dde6'
-                }
-            }
-        },
-        series: [
-            {
-                name: 'MoySklad savdosi',
-                type: 'line',
-                data: chartData.map((item) => item.moysklad),
-                symbol: 'circle',
-                symbolSize: 6,
-                lineStyle: {
-                    width: 2,
-                    color: '#b6e018'
-                },
-                itemStyle: {
-                    color: '#ffffff',
-                    borderColor: '#b6e018',
-                    borderWidth: 2
-                },
-                areaStyle: {
-                    color: 'rgba(182, 224, 24, 0.42)'
-                },
-                z: 1
-            },
-            {
-                name: 'Sayt savdosi',
-                type: 'line',
-                data: chartData.map((item) => item.site),
-                symbol: 'circle',
-                symbolSize: 6,
-                lineStyle: {
-                    width: 2,
-                    color: '#4f73f6'
-                },
-                itemStyle: {
-                    color: '#ffffff',
-                    borderColor: '#4f73f6',
-                    borderWidth: 2
-                },
-                areaStyle: {
-                    color: 'rgba(78, 111, 226, 0.68)'
-                },
-                z: 2
-            }
-        ]
-    } as EChartsOption;
-
-    const option = view === 'branches' ? branchOption : summaryOption;
-
+    };
     return (
-        <section className='mt-14 bg-admin-white p-4'>
-            <div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
-                <div>
-                    <h2 className='text-lg font-black text-[#2f2a25] dark:text-white'>Savdo tahlili</h2>
-                    {data?.moyskladMessage ? (
-                        <p className='text-xs font-bold text-red-500'>{data.moyskladMessage}</p>
-                    ) : null}
-                </div>
-                <div className='flex flex-wrap gap-2'>
-                    <div className='inline-flex rounded-xl bg-[#f2e7d8] p-1 dark:bg-slate-900'>
-                        {viewOptions.map((option) => (
-                            <button
-                                key={option.value}
-                                type='button'
-                                onClick={() => setView(option.value)}
-                                className={`rounded-lg px-3 py-2 text-xs font-black transition ${
-                                    view === option.value
-                                        ? 'bg-white text-[#ef7f1a] shadow-sm dark:bg-slate-800 dark:text-orange-300'
-                                        : 'text-[#8b7e70] hover:text-[#ef7f1a] dark:text-slate-400'
-                                }`}>
-                                {option.label}
-                            </button>
-                        ))}
-                    </div>
-                    <div className='inline-flex rounded-xl bg-[#f2e7d8] p-1 dark:bg-slate-900'>
-                        {periodOptions.map((option) => (
-                            <button
-                                key={option.value}
-                                type='button'
-                                onClick={() => setPeriod(option.value)}
-                                className={`rounded-lg px-3 py-2 text-xs font-black transition ${
-                                    period === option.value
-                                        ? 'bg-white text-[#ef7f1a] shadow-sm dark:bg-slate-800 dark:text-orange-300'
-                                        : 'text-[#8b7e70] hover:text-[#ef7f1a] dark:text-slate-400'
-                                }`}>
-                                {option.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+        <section className={cardClass} aria-label='MoySklad savdosi'>
+            <div className='flex flex-wrap items-center justify-between gap-3'>
+                <h2 className='text-lg font-black text-[#2f2a25] dark:text-white'>MoySklad savdosi</h2>
+                <PeriodSelect value={period} onChange={setPeriod} />
             </div>
-            <div className='mb-4 grid gap-3 sm:grid-cols-2'>
-                <div className='rounded-2xl bg-[#f2e7d8] p-4 dark:bg-slate-900'>
-                    <p className='text-xs font-black text-[#8b7e70] uppercase dark:text-slate-400'>Sayt jami</p>
-                    <p className='mt-1 text-xl font-black text-[#2f2a25] dark:text-white'>{formatPrice(siteTotal)}</p>
-                </div>
-                <div className='rounded-2xl bg-[#f2e7d8] p-4 dark:bg-slate-900'>
-                    <p className='text-xs font-black text-[#8b7e70] uppercase dark:text-slate-400'>MoySklad jami</p>
-                    <p className='mt-1 text-xl font-black text-[#2f2a25] dark:text-white'>
-                        {formatPrice(moyskladTotal)}
-                    </p>
-                </div>
-            </div>
-            <ReactECharts showLoading={isLoading} option={option} notMerge style={{ height: 300, width: '100%' }} />
+            <label className='mt-4 block text-xs font-bold text-[#8b7e70]'>
+                Filial
+                <select
+                    value={selectedBranch?.id ?? 'all'}
+                    onChange={(event) => setBranchId(event.target.value)}
+                    disabled={query.isLoading || query.isError}
+                    className='mt-1 block w-full rounded-xl border border-[#eadfce] bg-white p-3 text-sm text-[#2f2a25] dark:border-slate-800 dark:bg-slate-900 dark:text-white'>
+                    <option value='all'>Barcha filiallar</option>
+                    {branches.map((branch) => (
+                        <option key={branch.id} value={branch.id}>
+                            {branch.name}
+                        </option>
+                    ))}
+                </select>
+            </label>
+            <p className='mt-5 text-xs font-bold text-[#8b7e70]'>
+                {selectedBranch?.name ?? 'Barcha filiallar'} · Tanlangan davr bo‘yicha jami
+            </p>
+            <p className='mt-1 text-2xl font-black text-[#43a27a]'>
+                {query.isLoading ? 'Yuklanmoqda…' : query.isError ? '—' : formatPrice(total)}
+            </p>
+            {query.data?.message && !query.isError && (
+                <p role='status' className='mt-2 text-sm text-amber-700 dark:text-amber-300'>
+                    {query.data.message}
+                </p>
+            )}
+            {query.isError ? (
+                <ChartError message={query.error.message} retry={() => void query.refetch()} />
+            ) : query.isLoading ? (
+                <LoadingChart />
+            ) : (
+                <>
+                    <SalesLine points={points} name={selectedBranch?.name ?? 'MoySklad savdosi'} color='#43a27a' />
+                    {total === 0 && <p className='text-sm text-[#8b7e70]'>Bu davrda savdo mavjud emas.</p>}
+                    {branches.length > 0 && (
+                        <div className='mt-5 border-t border-[#eadfce] pt-5 dark:border-slate-800'>
+                            <h3 className='font-bold text-[#2f2a25] dark:text-white'>Filiallar bo‘yicha savdo</h3>
+                            <p className='mt-1 text-xs text-[#8b7e70]'>
+                                Filial grafigini ko‘rish uchun uning ustunini yoki nomini tanlang.
+                            </p>
+                            <div className='mt-3 max-h-96 overflow-y-auto'>
+                                <ReactECharts
+                                    option={comparison}
+                                    notMerge
+                                    style={{ height: Math.max(220, branches.length * 42 + 50), width: '100%' }}
+                                    onEvents={{
+                                        click: (event: { componentType?: string; dataIndex: number }) => {
+                                            if (event.componentType === 'series' && branches[event.dataIndex])
+                                                setBranchId(branches[event.dataIndex].id);
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className='mt-3 grid max-h-60 gap-2 overflow-y-auto sm:grid-cols-2'>
+                                {branches.map((branch) => (
+                                    <button
+                                        key={branch.id}
+                                        type='button'
+                                        aria-pressed={selectedBranch?.id === branch.id}
+                                        onClick={() => setBranchId(branch.id)}
+                                        className={`flex items-center justify-between gap-3 rounded-xl border p-3 text-left text-xs ${selectedBranch?.id === branch.id ? 'border-orange-400 bg-orange-50 dark:bg-orange-950' : 'border-[#eadfce] dark:border-slate-800'}`}>
+                                        <span className='min-w-0 font-bold break-words'>{branch.name}</span>
+                                        <span className='shrink-0'>{formatPrice(branch.amount)}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </>
+            )}
         </section>
     );
 };
 
-export default DashboardChart;
+export default function DashboardChart() {
+    return (
+        <div className='grid items-start gap-6 xl:grid-cols-2'>
+            <SiteSalesChart />
+            <MoyskladSalesChart />
+        </div>
+    );
+}

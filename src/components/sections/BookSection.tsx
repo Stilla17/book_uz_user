@@ -10,7 +10,7 @@ import type { BookSectionProps } from '@/types/section.types';
 import { BookCard } from '../cards/BookCard';
 import { BookCardSkeleton } from '../cards/BookCardSkeleton';
 import { motion } from 'framer-motion';
-import { Award, BookOpen, ChevronRight, Flame, Headphones, Sparkles, TrendingUp } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -29,7 +29,7 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
 
     const loading = !hasStaticBooks && isLoading;
     const displayBooks: Book[] = useMemo(
-        () => (hasStaticBooks ? books ?? [] : fetchedBooks),
+        () => (hasStaticBooks ? (books ?? []) : fetchedBooks),
         [books, fetchedBooks, hasStaticBooks]
     );
 
@@ -50,7 +50,8 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
 
                         <div className='min-w-0'>
                             <div className='flex flex-wrap items-center gap-2'>
-                                <h2 className={`text-xl font-semibold tracking-tight sm:text-2xl md:text-3xl ${config.color}`}>
+                                <h2
+                                    className={`text-xl font-semibold tracking-tight sm:text-2xl md:text-3xl ${config.color}`}>
                                     {title}
                                 </h2>
 

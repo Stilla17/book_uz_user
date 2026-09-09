@@ -2,20 +2,11 @@ import { OrderItem } from '@/types/orders';
 
 type RevenueOrderLike = {
     paymentStatus?: string;
-    paymentType?: string;
-    status?: string;
 };
 
-const cashRevenueStatuses = new Set(['CONFIRMED', 'PACKED', 'SHIPPED', 'DELIVERED']);
-
 export const isOrderRevenueEligible = (order: RevenueOrderLike) => {
-    const orderStatus = String(order.status || '').toUpperCase();
     const paymentStatus = String(order.paymentStatus || '').toUpperCase();
-    const paymentType = String(order.paymentType || '').toUpperCase();
-
-    if (orderStatus === 'CANCELLED') return false;
-
-    return paymentStatus === 'PAID' || (paymentType === 'CASH' && cashRevenueStatuses.has(orderStatus));
+    return paymentStatus === 'PAID';
 };
 
 export const getOrderItemProduct = (item: OrderItem) => {

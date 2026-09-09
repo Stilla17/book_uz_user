@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Input } from '@/components/ui/input';
+import { matchesTransliteratedSearch } from '@/utils/transliteration';
 
 import type { SearchableOption } from './SearchableSelect';
 import { Check, Search, X } from 'lucide-react';
@@ -31,7 +32,7 @@ const MultiSearchableSelect = ({
     const selectedOptions = value
         .map((selectedValue) => options.find((option) => option.value === selectedValue))
         .filter((option): option is SearchableOption => Boolean(option));
-    const filteredOptions = options.filter((option) => option.label.toLowerCase().includes(query.trim().toLowerCase()));
+    const filteredOptions = options.filter((option) => matchesTransliteratedSearch(option.label, query));
 
     const toggleOption = (optionValue: string) => {
         onChange(

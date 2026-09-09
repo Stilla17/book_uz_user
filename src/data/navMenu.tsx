@@ -188,11 +188,11 @@ export const menuItems = [
         href: '/admin/faq',
         icon: MessageCircleQuestionMark
     },
-    {
-        label: 'Partners',
-        href: '/admin/partners',
-        icon: Handshake
-    },
+    // {
+    //     label: 'Partners',
+    //     href: '/admin/partners',
+    //     icon: Handshake
+    // },
     {
         label: 'Buyurtmalar',
         href: '/admin/orders',

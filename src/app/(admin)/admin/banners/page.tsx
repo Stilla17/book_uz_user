@@ -82,9 +82,9 @@ const AdminBannerPage = () => {
                                                 className={`rounded-full px-3 py-1 text-xs font-black ${
                                                     banner.isActive
                                                         ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                                                        : 'bg-amber-50 text-amber-600 dark:bg-amber-500/10'
+                                                        : 'bg-amber-50 text-red-600 dark:bg-red-500/10'
                                                 }`}>
-                                                {banner.isActive ? 'Faol' : 'Qoralama'}
+                                                {banner.isActive ? 'Active' : 'Inactive'}
                                             </span>
                                         </div>
 

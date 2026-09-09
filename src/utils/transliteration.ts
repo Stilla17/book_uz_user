@@ -111,8 +111,10 @@ export const getTransliteratedSearchVariants = (value: string) => {
 };
 
 export const matchesTransliteratedSearch = (text: string, query: string) => {
-    const textVariants = getTransliteratedSearchVariants(text);
     const queryVariants = getTransliteratedSearchVariants(query);
+    if (queryVariants.length === 0) return true;
+
+    const textVariants = getTransliteratedSearchVariants(text);
 
     return textVariants.some((textVariant) =>
         queryVariants.some((queryVariant) => textVariant.includes(queryVariant))

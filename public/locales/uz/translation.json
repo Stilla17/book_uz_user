@@ -58,7 +58,8 @@
         "topSalesLabel": "Top 10",
         "topSalesLoadError": "Top sotuvlar yuklanmadi.",
         "topSalesEmpty": "Hali top sotuvlar sinxron qilinmagan.",
-        "basket": "Savat"
+        "basket": "Savat",
+        "mostViewed": "Eng ko'p ko'rilgan kitoblar"
     },
     "bookCard": {
         "alreadyInCart": "Bu kitob savatda bor",

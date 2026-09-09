@@ -1,24 +1,9 @@
 'use client';
 
+import { useDashboardStatsQuery } from '@/components/admin/hooks/queries/dashboard';
 import DashboardChart from '@/components/admin/sections/DashboardChart';
-import { api } from '@/components/admin/services/api';
-import { isOrderRevenueEligible } from '@/utils/order';
-import { useQuery } from '@tanstack/react-query';
 
 import { BookOpen, CircleDollarSign, PackageCheck, Users } from 'lucide-react';
-
-type AdminOrdersData = {
-    orders?: Array<{
-        totalAmount?: number;
-        paymentStatus?: string;
-        paymentType?: string;
-        status?: string;
-    }>;
-    pagination?: {
-        total?: number;
-        pages?: number;
-    };
-};
 
 const formatNumber = (value?: number) => Number(value ?? 0).toLocaleString('ru-RU');
 
@@ -32,87 +17,19 @@ const formatCompactAmount = (value?: number) => {
     return formatNumber(amount);
 };
 
-const getTotalFromPagination = (data: any, fallback = 0) =>
-    Number(data?.pagination?.total ?? data?.pagination?.totalItems ?? data?.total ?? fallback);
-
-const fetchBooksTotal = async () => {
-    const response = await api.get('/admin/products', {
-        params: { page: 1, limit: 1 }
-    });
-    const data = response.data.data;
-
-    return getTotalFromPagination(data, Array.isArray(data?.products) ? data.products.length : 0);
-};
-
-const fetchUsersTotal = async () => {
-    const response = await api.get('/admin/users', {
-        params: { page: 1, limit: 1 }
-    });
-    const data = response.data.data;
-
-    return Number(data?.totals?.all ?? data?.pagination?.total ?? 0);
-};
-
-const fetchOrdersDashboardStats = async () => {
-    const limit = 100;
-    const firstResponse = await api.get('/admin/orders', {
-        params: { page: 1, limit }
-    });
-    const firstData: AdminOrdersData = firstResponse.data.data;
-    const totalOrders = Number(firstData.pagination?.total ?? firstData.orders?.length ?? 0);
-    const totalPages = Number(firstData.pagination?.pages ?? 1);
-    const restResponses =
-        totalPages > 1
-            ? await Promise.all(
-                  Array.from({ length: totalPages - 1 }, (_, index) =>
-                      api.get('/admin/orders', {
-                          params: { page: index + 2, limit }
-                      })
-                  )
-              )
-            : [];
-    const allOrders = [
-        ...(firstData.orders ?? []),
-        ...restResponses.flatMap((response) => response.data.data?.orders ?? [])
-    ];
-    const revenue = allOrders.reduce((sum, order) => {
-        if (!isOrderRevenueEligible(order)) return sum;
-
-        return sum + Number(order.totalAmount || 0);
-    }, 0);
-
-    return {
-        totalOrders,
-        revenue
-    };
-};
-
-const fetchDashboardStats = async () => {
-    const [booksTotal, usersTotal, ordersStats] = await Promise.all([
-        fetchBooksTotal(),
-        fetchUsersTotal(),
-        fetchOrdersDashboardStats()
-    ]);
-
-    return {
-        booksTotal,
-        usersTotal,
-        ordersTotal: ordersStats.totalOrders,
-        revenue: ordersStats.revenue
-    };
-};
-
 export default function AdminPage() {
-    const { data, isLoading } = useQuery({
-        queryKey: ['admin', 'dashboard-stats'],
-        queryFn: fetchDashboardStats
-    });
+    const { data, isLoading } = useDashboardStatsQuery();
 
     const stats = [
         { label: 'Jami kitoblar', value: formatNumber(data?.booksTotal), icon: BookOpen, color: 'bg-[#ef7f1a]' },
         { label: 'Buyurtmalar', value: formatNumber(data?.ordersTotal), icon: PackageCheck, color: 'bg-[#7c6dc8]' },
         { label: 'Foydalanuvchilar', value: formatNumber(data?.usersTotal), icon: Users, color: 'bg-[#43a27a]' },
-        { label: 'Daromad', value: formatCompactAmount(data?.revenue), icon: CircleDollarSign, color: 'bg-[#285c7f]' }
+        {
+            label: "To'langan summa",
+            value: `${formatCompactAmount(data?.revenue)} so'm`,
+            icon: CircleDollarSign,
+            color: 'bg-[#285c7f]'
+        }
     ];
 
     return (

@@ -1,30 +1,31 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useDeleteBook } from '@/components/admin/hooks/bookHooks/useDeleteBook';
-import { useBookListQuery } from '@/components/admin/hooks/queries/book';
+import { useBookListQuery, useBookStatsQuery } from '@/components/admin/hooks/queries/book';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
+import { getBookStats, getStockFilterButtons } from '@/data/admin.data';
 import { StockFilter, getBookBarcodes, getStockStatus } from '@/helpers/admin/newBook';
-import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
+import { useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
-import { FETCH_PAGINATION_LIMIT } from '@/tools';
 import { getAuthor, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getBookImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { BookOpen, Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
+import { Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
 
 type SortKey = 'price' | 'title';
+const PAGE_SIZE = 50;
 
 const AdminBookPage = () => {
     const router = useRouter();
@@ -34,90 +35,44 @@ const AdminBookPage = () => {
     const [stockFilter, setStockFilter] = useState<StockFilter>('all');
     const { sortKey, sortOrder, handleSort: setAdminSort, SortIcon } = useAdminSort<SortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { data, isFetching, isLoading } = useBookListQuery(
+    const { data, isFetching, isLoading, isError, refetch } = useBookListQuery(
         page,
-        FETCH_PAGINATION_LIMIT,
+        PAGE_SIZE,
         debouncedSearch,
         sortKey === 'default' ? undefined : sortKey,
-        sortKey === 'default' ? undefined : sortOrder
+        sortKey === 'default' ? undefined : sortOrder,
+        stockFilter
     );
+
+    const {
+        data: bookStats,
+        isLoading: isStatsLoading,
+        isError: isStatsError,
+        refetch: refetchStats
+    } = useBookStatsQuery();
 
     const { mutate } = useDeleteBook();
 
     const books = data?.products ?? [];
 
-    const sortedBooks = useMemo(() => {
-        return sortAdminItems({
-            items: books,
-            sortKey,
-            sortOrder,
-            sortConfig: {
-                price: (book) => Number(book.price || 0),
-                title: (book) => getLocalizedText(book.title)
-            }
-        });
-    }, [books, sortKey, sortOrder]);
-
-    const filteredBooks = sortedBooks.filter((book) => {
-        const stock = Number(book.stock || 0);
-
-        if (stockFilter === 'out') return stock <= 0;
-        if (stockFilter === 'low') return stock > 0 && stock < 10;
-        if (stockFilter === 'available') return stock >= 10;
-
-        return true;
-    });
-    const pageSize = FETCH_PAGINATION_LIMIT;
-    const paginatedBooks = filteredBooks;
-    const displayPagination =
-        stockFilter === 'all'
-            ? (data?.pagination ?? {
-                  page,
-                  limit: pageSize,
-                  total: filteredBooks.length,
-                  pages: Math.max(1, Math.ceil(filteredBooks.length / pageSize))
-              })
-            : {
-                  page,
-                  limit: pageSize,
-                  total: filteredBooks.length,
-                  pages: Math.max(1, Math.ceil(filteredBooks.length / pageSize))
-              };
+    const stats = getBookStats(bookStats?.total ?? 0, bookStats?.active ?? 0);
+    const paginatedBooks = books;
+    const displayPagination = {
+        page: data?.pagination.page ?? page,
+        limit: PAGE_SIZE,
+        total: data?.pagination.total ?? 0,
+        pages: Math.max(1, data?.pagination.pages ?? 1)
+    };
 
     useEffect(() => {
         setPage(urlPage);
     }, [urlPage]);
 
-    const stockCounts = useMemo(
-        () =>
-            books.reduce(
-                (counts, book) => {
-                    const stock = Number(book.stock || 0);
-                    stock <= 0 ? (counts.out += 1) : stock < 10 ? (counts.low += 1) : (counts.available += 1);
-                    return counts;
-                },
-                {
-                    low: 0,
-                    available: 0,
-                    out: 0
-                }
-            ),
-        [books]
-    );
-    const stats = [
-        {
-            label: 'Jami kitoblar',
-            value: data?.pagination?.total ?? 0,
-            icon: BookOpen,
-            color: 'bg-[#ef7f1a]'
-        },
-        {
-            label: 'Active kitoblar',
-            value: data?.products?.filter((book) => book.isActive).length ?? 0,
-            icon: BookOpen,
-            color: 'bg-[#ef7f1a]'
-        }
-    ];
+    const stockFilterButtons = getStockFilterButtons({
+        low: bookStats?.low ?? 0,
+        available: bookStats?.available ?? 0,
+        out: bookStats?.out ?? 0
+    });
 
     const updatePage = (nextPage: number) => {
         updateUrlPage({
@@ -128,39 +83,6 @@ const AdminBookPage = () => {
             setPage
         });
     };
-
-    const stockFilterButtons: Array<{
-        value: StockFilter;
-        label: string;
-        count: number;
-        className: string;
-        activeClassName: string;
-    }> = [
-        {
-            value: 'low',
-            label: 'Kam',
-            count: stockCounts.low,
-            className:
-                'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300',
-            activeClassName: 'ring-2 ring-amber-400'
-        },
-        {
-            value: 'available',
-            label: 'Mavjud',
-            count: stockCounts.available,
-            className:
-                'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300',
-            activeClassName: 'ring-2 ring-emerald-400'
-        },
-        {
-            value: 'out',
-            label: 'Tugagan',
-            count: stockCounts.out,
-            className:
-                'border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300',
-            activeClassName: 'ring-2 ring-red-400'
-        }
-    ];
 
     const handleSort = (key: SortKey) => {
         setAdminSort(key);
@@ -182,7 +104,16 @@ const AdminBookPage = () => {
                 href='book'
             />
 
-            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
+            {isStatsError ? (
+                <div role='alert'>
+                    Statistikani yuklab bo‘lmadi.
+                    <Button variant='ghost' onClick={() => void refetchStats()}>
+                        Qayta urinish
+                    </Button>
+                </div>
+            ) : (
+                <StatsCardsAdmin stats={stats} isLoading={isStatsLoading} />
+            )}
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>
@@ -203,15 +134,16 @@ const AdminBookPage = () => {
                                     key={filter.value}
                                     type='button'
                                     variant='outline'
-                                    onClick={() =>
-                                        setStockFilter((current) => (current === filter.value ? 'all' : filter.value))
-                                    }
+                                    onClick={() => {
+                                        setStockFilter((current) => (current === filter.value ? 'all' : filter.value));
+                                        updatePage(1);
+                                    }}
                                     className={`h-10 rounded-2xl px-4 text-xs font-black ${filter.className} ${
                                         stockFilter === filter.value ? filter.activeClassName : ''
                                     }`}>
                                     {filter.label}
                                     <span className='ml-2 rounded-full bg-white/70 px-2 py-0.5 text-[11px] font-black dark:bg-slate-950/50'>
-                                        {filter.count}
+                                        {isStatsLoading ? '…' : isStatsError ? '—' : filter.count}
                                     </span>
                                 </Button>
                             ))}
@@ -219,11 +151,19 @@ const AdminBookPage = () => {
                     </div>
 
                     <div className='text-sm font-bold text-[#8b7e70] dark:text-slate-400'>
-                        {filteredBooks.length} ta natija ko'rsatildi
+                        {isFetching ? 'Yuklanmoqda…' : `${books.length} ta natija ko‘rsatildi`}
                     </div>
                 </div>
 
-                <div className='hidden overflow-x-auto lg:block'>
+                {isError && (
+                    <div role='alert' className='p-4'>
+                        Kitoblarni yuklab bo‘lmadi.
+                        <Button variant='ghost' onClick={() => void refetch()}>
+                            Qayta urinish
+                        </Button>
+                    </div>
+                )}
+                <div className='overflow-x-auto' aria-busy={isFetching}>
                     <table className='w-full min-w-245 text-left'>
                         <thead>
                             <tr className='border-b border-[#eadfce] text-xs font-black text-[#9d907e] uppercase dark:border-slate-800 dark:text-slate-500'>
@@ -253,6 +193,12 @@ const AdminBookPage = () => {
                         <tbody>
                             {isLoading ? (
                                 <BooksTableSkeleton />
+                            ) : !isError && paginatedBooks.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className='p-6 text-center'>
+                                        Kitob topilmadi.
+                                    </td>
+                                </tr>
                             ) : (
                                 paginatedBooks.map((book, index) => {
                                     const status = getStockStatus(book.stock);
@@ -268,6 +214,8 @@ const AdminBookPage = () => {
                                                         {imageUrl ? (
                                                             <img
                                                                 src={imageUrl}
+                                                                loading='lazy'
+                                                                decoding='async'
                                                                 alt={getLocalizedText(book.title)}
                                                                 className='h-full w-full object-cover'
                                                             />
@@ -277,7 +225,8 @@ const AdminBookPage = () => {
                                                     </div>
                                                     <div className='min-w-0'>
                                                         <p className='truncate font-black text-[#2f2a25] dark:text-white'>
-                                                            {index + 1}. {getLocalizedText(book.title)}
+                                                            {(displayPagination.page - 1) * PAGE_SIZE + index + 1}.{' '}
+                                                            {getLocalizedText(book.title)}
                                                         </p>
                                                         <p className='mt-1 truncate text-sm font-semibold text-[#9d907e] dark:text-slate-400'>
                                                             {getAuthor(book.authorName || book.author)}

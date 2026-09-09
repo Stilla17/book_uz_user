@@ -8,6 +8,7 @@ export type DiscountForm = {
     type: DiscountType;
     value: number;
     targetType: DiscountTargetType;
+    remainingDiscountPercentage?: number;
     products: string[];
     publishers: string[];
     minOrderAmount: number;
@@ -52,6 +53,11 @@ export const DiscountService = {
     getDiscounts: async () => {
         const response = await api.get('/admin/discounts');
         return normalizeDiscounts(response.data.data);
+    },
+
+    getDiscountById: async (id: string): Promise<Discount> => {
+        const response = await api.get(`/admin/discounts/${id}`);
+        return response.data.data;
     },
 
     createDiscount: async (data: DiscountForm) => {

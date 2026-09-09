@@ -60,7 +60,6 @@ const AdminNewBookPage = () => {
             format: 'paper',
             pages: 0,
             publishedYear: new Date().getFullYear(),
-            weight: '',
             price: 0,
             oldPrice: undefined,
             discount: undefined,
@@ -125,7 +124,7 @@ const AdminNewBookPage = () => {
                 'publishedYear',
                 bookData.year || bookData.publishedYear || bookData.details?.publishedYear || new Date().getFullYear()
             );
-            setValue('weight', bookData.weight || bookData.details?.weight || '');
+
             setValue('isActive', bookData.isActive ?? bookData.active ?? true);
             const bookTags = Array.isArray(bookData.tegs) ? bookData.tegs : bookData.tags;
             setValue('tags', Array.isArray(bookTags) ? bookTags.join(', ') : '');
@@ -271,7 +270,7 @@ const AdminNewBookPage = () => {
         }
 
         if (!normalizedSlug) {
-            toast.error("Slugni lotin harflari yoki raqamlar bilan kiriting");
+            toast.error('Slugni lotin harflari yoki raqamlar bilan kiriting');
             return;
         }
 
@@ -320,9 +319,7 @@ const AdminNewBookPage = () => {
             (category) => category._id === categoryValues[0] || category.slug === categoryValues[0]
         );
         const primarySubCategoryIds = getCategorySubCategories(primaryCategory).map(getSubCategoryValue);
-        const primarySubCategory = subCategoryValues.find((subCategory) =>
-            primarySubCategoryIds.includes(subCategory)
-        );
+        const primarySubCategory = subCategoryValues.find((subCategory) => primarySubCategoryIds.includes(subCategory));
         if (primarySubCategory) {
             formData.append('subCategoryId', primarySubCategory);
         }
@@ -340,8 +337,6 @@ const AdminNewBookPage = () => {
         appendNumber(formData, 'publishedYear', values.publishedYear);
         appendNumber(formData, 'year', values.publishedYear);
         appendNumber(formData, 'details[publishedYear]', values.publishedYear);
-        appendText(formData, 'weight', values.weight);
-        appendText(formData, 'details[weight]', values.weight);
         appendNumber(formData, 'price', values.price);
         appendNumber(formData, 'oldPrice', values.oldPrice);
         appendNumber(formData, 'discount', values.discount);
@@ -582,9 +577,6 @@ const AdminNewBookPage = () => {
                                     placeholder='2026'
                                     {...register('publishedYear', { valueAsNumber: true })}
                                 />
-                            </Field>
-                            <Field label="Og'irligi">
-                                <Input className={inputClass} placeholder='450 g' {...register('weight')} />
                             </Field>
 
                             <div className='rounded-2xl border border-[#eadfce] bg-white p-4 dark:border-slate-800 dark:bg-slate-900'>
