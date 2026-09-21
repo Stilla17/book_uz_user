@@ -2,12 +2,9 @@
 
 import { api } from '@/services/api';
 import type { AuthorResponse } from '@/types/author.types';
-import { fetchAllAndSortByCount } from '@/utils/paginated-collection';
 import { useQuery } from '@tanstack/react-query';
 
-const AUTHORS_FETCH_LIMIT = 100;
-
-const normalizeAuthorsResponse = (response: unknown, page: number): AuthorResponse => {
+const normalizeAuthorsResponse = (response: unknown, page: number, limit: number): AuthorResponse => {
     const source = response as { data?: { data?: unknown } | unknown };
     const data = (source?.data as { data?: unknown })?.data ?? source?.data ?? {};
     const payload = data as {
@@ -32,33 +29,24 @@ const normalizeAuthorsResponse = (response: unknown, page: number): AuthorRespon
         authors,
         pagination: {
             page: Number(pagination.page ?? pagination.currentPage ?? page),
-            limit: Number(pagination.limit ?? AUTHORS_FETCH_LIMIT),
+            limit: Number(pagination.limit ?? limit),
             total: Number(pagination.total ?? pagination.totalItems ?? authors.length),
             pages: Number(pagination.pages ?? pagination.totalPages ?? 1)
         }
     };
 };
 
-const getAuthorsPage = async (page: number, limit = AUTHORS_FETCH_LIMIT) => {
-    const response = await api.get('/authors', { params: { page, limit } });
-    return normalizeAuthorsResponse(response, page);
+const getAuthorsPage = async (page: number, limit: number, signal: AbortSignal) => {
+    const response = await api.get('/authors', { params: { page, limit, sort: 'books_count_desc' }, signal });
+    return normalizeAuthorsResponse(response, page, limit);
 };
 
-const getAllAuthors = () =>
-    fetchAllAndSortByCount({
-        fetchPage: getAuthorsPage,
-        getItems: (response) => response.authors,
-        getTotalPages: (response) => response.pagination.pages,
-        getCount: (author) => author.booksCount,
-        getName: (author) => author.name,
-        fetchLimit: AUTHORS_FETCH_LIMIT
-    });
-
-export const useAllAuthorsQuery = () =>
+export const useAuthorsQuery = (page: number, limit: number) =>
     useQuery({
-        queryKey: ['authors', 'books-count-desc'],
-        queryFn: getAllAuthors,
-        staleTime: 5 * 60 * 1000
+        queryKey: ['authors', 'list', 'books-count-desc', page, limit],
+        queryFn: ({ signal }) => getAuthorsPage(page, limit, signal),
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false
     });
 
 export const useTopAuthorsQuery = (limit: number) =>

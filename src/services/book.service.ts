@@ -184,5 +184,13 @@ export const bookService = {
             console.error("Eng ko'p ko'rilgan kitoblarni olishda xatolik:", error);
             return [];
         }
+    },
+
+    // EPUB faylni reader uchun yuklash
+    async getEbookFile(id: string): Promise<ArrayBuffer> {
+        const response = await api.get(`/products/${id}/ebook`, {
+            responseType: 'arraybuffer'
+        });
+        return response.data;
     }
 };

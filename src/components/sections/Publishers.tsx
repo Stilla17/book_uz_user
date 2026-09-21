@@ -3,7 +3,7 @@
 import Link from 'next/link';
 
 import PublisherCard from '@/components/cards/PublisherCard';
-import { useAllPublishersQuery } from '@/hooks/queries/usePublisherQueries';
+import { usePublishersQuery } from '@/hooks/queries/usePublisherQueries';
 
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
@@ -14,9 +14,9 @@ const PREVIEW_PUBLISHERS_LIMIT = 9;
 const Publishers = () => {
     const { t } = useTranslation();
 
-    const { data: allPublishers = [], isLoading } = useAllPublishersQuery();
-    const publishers = allPublishers.slice(0, PREVIEW_PUBLISHERS_LIMIT);
-    const totalPublishers = allPublishers.length;
+    const { data, isLoading } = usePublishersQuery(1, PREVIEW_PUBLISHERS_LIMIT);
+    const publishers = data?.publishers ?? [];
+    const totalPublishers = data?.pagination.total ?? 0;
 
     return (
         <section className='bg-background relative overflow-hidden py-16 dark:bg-slate-900'>

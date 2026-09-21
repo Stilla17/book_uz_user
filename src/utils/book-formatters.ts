@@ -234,6 +234,7 @@ export const mapProductToBook = (product: Product, type?: string): Book => {
         isHit: product.isTop,
         isNew: type === 'new',
         format: product.format,
+        hasEbook: product.hasEbook,
         soldQuantity: product.soldQuantity
     };
 };

@@ -221,7 +221,7 @@ type ResolvePaymentRedirectParams = {
     selectedPayment: string;
     orderId?: string;
     createClickPayment: (orderId: string) => Promise<unknown>;
-    createPaymePayment: (orderId: string) => Promise<unknown>;
+    getPaymeCheckoutUrl: (orderId: string) => string;
 };
 
 export const resolvePaymentRedirectUrl = async ({
@@ -229,7 +229,7 @@ export const resolvePaymentRedirectUrl = async ({
     selectedPayment,
     orderId,
     createClickPayment,
-    createPaymePayment
+    getPaymeCheckoutUrl
 }: ResolvePaymentRedirectParams) => {
     let paymentRedirectUrl = getPaymentRedirectUrl(response);
 
@@ -238,7 +238,7 @@ export const resolvePaymentRedirectUrl = async ({
     }
 
     if (!paymentRedirectUrl && selectedPayment === 'Payme' && orderId) {
-        paymentRedirectUrl = getPaymentRedirectUrl(await createPaymePayment(orderId));
+        paymentRedirectUrl = getPaymeCheckoutUrl(orderId);
     }
 
     return paymentRedirectUrl;

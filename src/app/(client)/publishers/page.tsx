@@ -5,8 +5,7 @@ import { useState } from 'react';
 import PublisherCard from '@/components/cards/PublisherCard';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import { Pagination } from '@/components/shared/Pagination';
-import { useAllPublishersQuery } from '@/hooks/queries/usePublisherQueries';
-import { paginateCollection } from '@/utils/paginated-collection';
+import { usePublishersQuery } from '@/hooks/queries/usePublisherQueries';
 
 import { motion } from 'framer-motion';
 import { Building2 } from 'lucide-react';
@@ -18,14 +17,12 @@ const PublishersPage = () => {
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
 
-    const { data: allPublishers = [], isLoading, isFetching } = useAllPublishersQuery();
+    const { data, isLoading, isFetching } = usePublishersQuery(page, PUBLISHERS_PER_PAGE);
 
-    const {
-        items: publishers,
-        total: totalPublishers,
-        totalPages,
-        currentPage
-    } = paginateCollection(allPublishers, page, PUBLISHERS_PER_PAGE);
+    const publishers = data?.publishers ?? [];
+    const totalPublishers = data?.pagination.total ?? 0;
+    const totalPages = Math.max(1, data?.pagination.pages ?? 1);
+    const currentPage = data?.pagination.page ?? page;
 
     const handlePageChange = (nextPage: number) => {
         setPage(nextPage);

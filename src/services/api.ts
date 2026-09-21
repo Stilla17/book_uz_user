@@ -238,9 +238,10 @@ export const UserService = {
         return response.data;
     },
 
-    createPaymePayment: async (orderId: string) => {
-        const response = await api.post('/payme/create-order', { orderId });
-        return response.data;
+    getPaymeCheckoutUrl: (orderId: string) => {
+        const apiBaseUrl = String(api.defaults.baseURL || '').replace(/\/+$/, '');
+
+        return `${apiBaseUrl}/payme/checkout/${encodeURIComponent(orderId)}`;
     },
 
     getDeliverySettings: async (): Promise<{ deliveryFee: number }> => {
@@ -407,6 +408,7 @@ type PublisherPaginationParams = {
     page?: number;
     limit?: number;
     search?: string;
+    sort?: string;
 };
 
 export type OtherPagination = {
@@ -449,8 +451,8 @@ const normalizePublishersResponse = (data: any, fallbackLimit: number): Publishe
 };
 
 export const ClientService = {
-    getPublishers: async (params?: PublisherPaginationParams): Promise<PublishersResponse> => {
-        const response = await api.get('/publishers', { params });
+    getPublishers: async (params?: PublisherPaginationParams, signal?: AbortSignal): Promise<PublishersResponse> => {
+        const response = await api.get('/publishers', { params, signal });
         return normalizePublishersResponse(response.data.data, params?.limit ?? 12);
     },
 

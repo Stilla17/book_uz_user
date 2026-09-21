@@ -31,6 +31,24 @@ export const BookService = {
         return response.data;
     },
 
+    uploadAdminEbook: async (id: string, file: File, replaceExisting = false) => {
+        const formData = new FormData();
+        // Some browsers report EPUB files as `application/epub`, while the API
+        // correctly expects the registered EPUB MIME type.
+        const normalizedFile = new File([file], file.name, {
+            type: 'application/epub+zip',
+            lastModified: file.lastModified
+        });
+        formData.append('ebook', normalizedFile);
+        const response = await api.request({
+            method: replaceExisting ? 'put' : 'post',
+            url: `/admin/products/${id}/ebook`,
+            data: formData,
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return response.data;
+    },
+
     deleteAdminBook: async (id: string) => {
         const response = await api.delete(`/admin/products/${id}`);
         return response.data;

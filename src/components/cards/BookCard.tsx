@@ -142,6 +142,14 @@ export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = 
                             <span className='text-xs font-semibold'>{t('bookCard.noImage')}</span>
                         </div>
                     )}
+                    {book.hasEbook && (
+                        <span
+                            title='Elektron kitob mavjud'
+                            aria-label='Elektron kitob mavjud'
+                            className='absolute top-2 right-2 z-10 grid size-9 place-items-center rounded-full bg-white text-[#ef7f1a] shadow-md'>
+                            <BookOpen size={18} />
+                        </span>
+                    )}
                     {priceInfo.discount ? (
                         <span className='absolute top-2 left-2 z-10 rounded-full bg-red-600 px-2.5 py-1 text-sm font-black text-white shadow-sm ring-1 ring-white/70'>
                             -{priceInfo.discount}%

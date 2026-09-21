@@ -15,7 +15,6 @@ import {
     getDeliveryType,
     getLocationName,
     getOrderId,
-    getPaymentRedirectUrl,
     isOnlinePayment,
     isValidUzPhone,
     resolvePaymentRedirectUrl,
@@ -246,13 +245,8 @@ const CheckoutPage = () => {
                     selectedPayment,
                     orderId,
                     createClickPayment: UserService.createClickPayment,
-                    createPaymePayment: UserService.createPaymePayment
+                    getPaymeCheckoutUrl: UserService.getPaymeCheckoutUrl
                 });
-
-                if (!paymentRedirectUrl && selectedPayment === 'Payme' && orderId) {
-                    const paymeResponse = await UserService.createPaymePayment(orderId);
-                    paymentRedirectUrl = getPaymentRedirectUrl(paymeResponse);
-                }
             }
 
             if (!isOnlineSelectedPayment) {

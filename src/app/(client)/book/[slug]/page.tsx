@@ -23,8 +23,9 @@ import { getBookImageUrl, getImageUrl } from '@/utils/image';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { motion } from 'framer-motion';
-import { Eye, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import { BookOpen, Eye, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
@@ -271,6 +272,15 @@ export default function BookDetailPage() {
                             alt={bookView.title}
                             className='h-full max-h-130 w-full object-contain'
                         />
+                        {book?.hasEbook && (
+                            <Link
+                                href={`/book/${book.slug || book._id}/reader`}
+                                title='Elektron kitobni o‘qish'
+                                aria-label='Elektron kitobni o‘qish'
+                                className='absolute top-4 right-4 grid size-10 place-items-center rounded-full bg-white text-[#ef7f1a] shadow-md sm:top-6 sm:right-6'>
+                                <BookOpen size={21} />
+                            </Link>
+                        )}
                         {priceInfo.discount ? (
                             <span className='absolute top-4 left-4 rounded-full bg-[#ef7f1a] px-3 py-1.5 text-sm font-black text-white shadow-sm ring-1 ring-white/70 sm:top-6 sm:left-6'>
                                 -{priceInfo.discount}%

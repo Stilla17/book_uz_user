@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -12,6 +12,7 @@ import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledS
 import MultiSearchableSelect from '@/components/admin/other/MultiSearchableSelect';
 import SearchableSelect, { type SearchableOption } from '@/components/admin/other/SearchableSelect';
 import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
+import { BookService } from '@/components/admin/services/book.service';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -28,11 +29,16 @@ import { filterService } from '@/services/filter.service';
 import { BookFormValues } from '@/types/book';
 import { getBookImageUrl } from '@/utils/image';
 import { slugifyBookSlug } from '@/utils/slug';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { BookOpen, FileText, ImagePlus, Loader, Sparkles, Upload, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+
+const EPUB_MIME_TYPES = new Set(['application/epub', 'application/epub+zip', 'application/octet-stream', '']);
+
+const isValidEpubFile = (file: File) =>
+    file.name.trim().toLowerCase().endsWith('.epub') && EPUB_MIME_TYPES.has(file.type.trim().toLowerCase());
 
 const AdminNewBookPage = () => {
     const { handleSubmit, register, setValue, getValues, watch, reset } = useForm<BookFormValues>({
@@ -68,15 +74,19 @@ const AdminNewBookPage = () => {
         }
     });
     const router = useRouter();
+    const queryClient = useQueryClient();
     const { imageFile, imagePreview, handleImageChange, setImagePreview, clearImagePreview } = useImagePreview();
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
 
-    const { mutate: createBook, isPending: isCreatePending } = useCreateBook();
-    const { mutate: updateBook, isPending: isUpdatePending } = useUpdateBook();
+    const { mutateAsync: createBook, isPending: isCreatePending } = useCreateBook();
+    const { mutateAsync: updateBook, isPending: isUpdatePending } = useUpdateBook();
     const { data: bookData, isLoading: isDetailLoading } = useBookDetailQuery(id);
+    const [ebookFile, setEbookFile] = useState<File | null>(null);
+    const [isUploadingEbook, setIsUploadingEbook] = useState(false);
     const isEdit = !!id;
-    const isPending = id ? isUpdatePending : isCreatePending;
+    const isPending = isCreatePending || isUpdatePending || isUploadingEbook;
+    const hasEbook = Boolean(bookData?.hasEbook || bookData?.ebook?.originalName);
 
     useEffect(() => {
         if (bookData) {
@@ -245,7 +255,7 @@ const AdminNewBookPage = () => {
 
     const isMongoId = (value: string | null) => Boolean(value && /^[0-9a-fA-F]{24}$/.test(value));
 
-    const onSubmit = (values: BookFormValues) => {
+    const onSubmit = async (values: BookFormValues) => {
         const normalizedSlug = slugifyBookSlug(values.slug || values.title.uz);
         const categoryValues = Array.from(
             new Set(values.category.map((category) => resolveOptionValue(category, categoryOptions)).filter(Boolean))
@@ -295,6 +305,16 @@ const AdminNewBookPage = () => {
 
         if (!Number.isFinite(values.price) || values.price <= 0) {
             toast.error("Asosiy narxni to'g'ri kiriting");
+            return;
+        }
+
+        if (ebookFile && !isValidEpubFile(ebookFile)) {
+            toast.error('Faqat EPUB fayl yuklash mumkin');
+            return;
+        }
+
+        if (ebookFile && ebookFile.size > 30 * 1024 * 1024) {
+            toast.error('EPUB hajmi 30 MB dan oshmasligi kerak');
             return;
         }
 
@@ -352,33 +372,66 @@ const AdminNewBookPage = () => {
                 return;
             }
 
-            updateBook(
-                { id: updateId, formData },
-                {
-                    onSuccess: (response: unknown) => {
-                        const updated = (response as { data?: { image?: string; images?: string[] } })?.data;
-                        const previewImage = getBookImageUrl(updated);
-                        if (previewImage) {
-                            setImagePreview(previewImage);
-                        }
-                        toast.success('Kitob muvaffaqiyatli yangilandi');
-                        router.push('/admin/book');
-                        router.refresh();
-                    },
-                    onError: (error) => toast.error(getErrorMessage(error, 'Kitobni yangilashda xatolik yuz berdi'))
+            try {
+                const response = await updateBook({ id: updateId, formData });
+                const previewImage = getBookImageUrl(response?.data);
+                if (previewImage) setImagePreview(previewImage);
+                if (ebookFile) {
+                    setIsUploadingEbook(true);
+                    try {
+                        await BookService.uploadAdminEbook(updateId, ebookFile, hasEbook);
+                        await queryClient.invalidateQueries({ queryKey: ['books'] });
+                        setEbookFile(null);
+                    } catch (error) {
+                        toast.error(
+                            getErrorMessage(error, 'Kitob yangilandi, lekin EPUB yuklanmadi. Qayta urinib ko‘ring.')
+                        );
+                        return;
+                    } finally {
+                        setIsUploadingEbook(false);
+                    }
                 }
-            );
+                toast.success('Kitob muvaffaqiyatli yangilandi');
+                router.push('/admin/book');
+                router.refresh();
+            } catch (error) {
+                toast.error(getErrorMessage(error, 'Kitobni yangilashda xatolik yuz berdi'));
+            }
         } else {
-            createBook(formData, {
-                onSuccess: () => {
-                    reset();
-                    clearImagePreview();
-                    toast.success("Kitob muvaffaqiyatli qo'shildi");
-                    router.push('/admin/book');
-                    router.refresh();
-                },
-                onError: (error) => toast.error(getErrorMessage(error, "Kitob qo'shishda xatolik yuz berdi"))
-            });
+            try {
+                const response = await createBook(formData);
+                const createdId = response?.data?._id;
+                if (ebookFile) {
+                    if (!createdId) {
+                        toast.error('Kitob yaratildi, lekin EPUB yuklash uchun ID qaytmadi');
+                        return;
+                    }
+                    setIsUploadingEbook(true);
+                    try {
+                        await BookService.uploadAdminEbook(createdId, ebookFile);
+                        await queryClient.invalidateQueries({ queryKey: ['books'] });
+                        setEbookFile(null);
+                    } catch (error) {
+                        router.replace(`/admin/book/new?id=${createdId}`);
+                        toast.error(
+                            getErrorMessage(
+                                error,
+                                'Kitob yaratildi, lekin EPUB yuklanmadi. Shu sahifada qayta urinib ko‘ring.'
+                            )
+                        );
+                        return;
+                    } finally {
+                        setIsUploadingEbook(false);
+                    }
+                }
+                reset();
+                clearImagePreview();
+                toast.success("Kitob muvaffaqiyatli qo'shildi");
+                router.push('/admin/book');
+                router.refresh();
+            } catch (error) {
+                toast.error(getErrorMessage(error, "Kitob qo'shishda xatolik yuz berdi"));
+            }
         }
     };
 
@@ -712,6 +765,50 @@ const AdminNewBookPage = () => {
                             accept='image/*'
                             onChange={handleImageChange}
                             className='mt-4 h-auto rounded-2xl border-[#eadfce] bg-white py-3 text-sm font-semibold dark:border-slate-800 dark:bg-slate-900'
+                        />
+                    </section>
+
+                    <section className='rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
+                        <SectionTitle icon={FileText} title='Elektron kitob' />
+                        {hasEbook && (
+                            <p className='mb-3 rounded-2xl border border-[#eadfce] bg-white p-4 text-sm font-semibold text-[#2f2a25] dark:border-slate-800 dark:bg-slate-900 dark:text-white'>
+                                EPUB qo'shilgan: {bookData?.ebook?.originalName || 'elektron kitob'}
+                            </p>
+                        )}
+                        <p className='mb-3 text-xs font-semibold text-[#8b7e70] dark:text-slate-400'>
+                            {hasEbook
+                                ? 'Yangi EPUB tanlasangiz, mavjud fayl almashtiriladi.'
+                                : 'EPUB faylni tanlang. Kitob saqlangandan keyin yuklanadi.'}{' '}
+                            Maksimal hajm: 30 MB.
+                        </p>
+                        <Input
+                            type='file'
+                            accept='.epub,application/epub,application/epub+zip'
+                            disabled={isPending}
+                            onChange={(event) => {
+                                const file = event.target.files?.[0] ?? null;
+
+                                if (!file) {
+                                    setEbookFile(null);
+                                    return;
+                                }
+
+                                if (!isValidEpubFile(file)) {
+                                    toast.error('Faqat EPUB fayl yuklash mumkin');
+                                    event.target.value = '';
+                                    setEbookFile(null);
+                                    return;
+                                }
+
+                                if (file.size > 30 * 1024 * 1024) {
+                                    toast.error('EPUB hajmi 30 MB dan oshmasligi kerak');
+                                    event.target.value = '';
+                                    setEbookFile(null);
+                                    return;
+                                }
+
+                                setEbookFile(file);
+                            }}
                         />
                     </section>
                 </aside>

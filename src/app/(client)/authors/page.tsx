@@ -6,10 +6,9 @@ import Link from 'next/link';
 
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import { Pagination } from '@/components/shared/Pagination';
-import { useAllAuthorsQuery } from '@/hooks/queries/useAuthorQueries';
+import { useAuthorsQuery } from '@/hooks/queries/useAuthorQueries';
 import type { AuthorItems } from '@/types/author.types';
 import { getImageUrl } from '@/utils/image';
-import { paginateCollection } from '@/utils/paginated-collection';
 
 import { motion } from 'framer-motion';
 import { BookOpen, ChevronRight } from 'lucide-react';
@@ -22,18 +21,12 @@ const AuthorsPage = () => {
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
 
-    const {
-        data: allAuthors = [],
-        isLoading,
-        isFetching
-    } = useAllAuthorsQuery();
+    const { data, isLoading, isFetching } = useAuthorsQuery(page, AUTHORS_PER_PAGE);
 
-    const {
-        items: authors,
-        total: totalAuthors,
-        totalPages,
-        currentPage
-    } = paginateCollection(allAuthors, page, AUTHORS_PER_PAGE);
+    const authors = data?.authors ?? [];
+    const totalAuthors = data?.pagination.total ?? 0;
+    const totalPages = Math.max(1, data?.pagination.pages ?? 1);
+    const currentPage = data?.pagination.page ?? page;
 
     const handlePageChange = (nextPage: number) => {
         setPage(nextPage);

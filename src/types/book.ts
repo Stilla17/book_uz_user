@@ -40,6 +40,8 @@ export interface Book {
     isActive?: boolean;
     active?: boolean;
     format?: 'ebook' | 'audio' | 'paper';
+    hasEbook?: boolean;
+    ebook?: { originalName?: string; format?: string; size?: number; access?: string; price?: number };
     isWishlisted?: boolean;
     category?: Array<{ _id?: string; name?: string; title?: { uz?: string; ru?: string; en?: string } }>;
     categories?: Array<string | { _id?: string; name?: string; title?: LocalizedText }>;

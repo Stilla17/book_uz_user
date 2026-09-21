@@ -1,34 +1,15 @@
 'use client';
 
 import { ClientService } from '@/services/api';
-import { fetchAllAndSortByCount } from '@/utils/paginated-collection';
 import { queryOptions, useQuery } from '@tanstack/react-query';
-
-const PUBLISHERS_FETCH_LIMIT = 100;
-
-const getAllPublishers = () =>
-    fetchAllAndSortByCount({
-        fetchPage: (page, limit) => ClientService.getPublishers({ page, limit }),
-        getItems: (response) => response.publishers,
-        getTotalPages: (response) => response.pagination.pages,
-        getCount: (publisher) => publisher.booksCount,
-        getName: (publisher) => publisher.name,
-        fetchLimit: PUBLISHERS_FETCH_LIMIT
-    });
-
-export const useAllPublishersQuery = () =>
-    useQuery({
-        queryKey: ['publishers', 'books-count-desc'],
-        queryFn: getAllPublishers,
-        staleTime: 5 * 60 * 1000
-    });
 
 export const usePublishersQuery = (page: number, limit: number) =>
     useQuery({
-        queryKey: ['publishers', page, limit],
-        queryFn: () => ClientService.getPublishers({ page, limit }),
+        queryKey: ['publishers', 'list', 'books-count-desc', page, limit],
+        queryFn: ({ signal }) => ClientService.getPublishers({ page, limit, sort: 'books_count_desc' }, signal),
         staleTime: 10 * 60 * 1000,
-        gcTime: 30 * 60 * 1000
+        gcTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false
     });
 
 export const usePublishersCountQuery = () =>
