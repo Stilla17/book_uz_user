@@ -1,9 +1,24 @@
 ﻿import { CreateCommentPayload, OrderPayload, Product, PublisherItems } from '@/types';
 
-import axios, { create } from 'axios';
+import { create } from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const AUTH_SESSION_KEY = 'bookuz:auth-session';
+const ACCESS_TOKEN_KEY = 'bookuz:access-token';
+
+const readStoredAccessToken = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(ACCESS_TOKEN_KEY) ?? null;
+};
+
+const writeStoredAccessToken = (token: string | null) => {
+    if (typeof window === 'undefined') return;
+    if (token) {
+        localStorage.setItem(ACCESS_TOKEN_KEY, token);
+        return;
+    }
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+};
 
 export const hasAuthSession = () => typeof window !== 'undefined' && localStorage.getItem(AUTH_SESSION_KEY) === 'true';
 
@@ -18,7 +33,11 @@ export const api = create({
     withCredentials: true
 });
 
-// Access tokenni saqlash uchun o'zgaruvchi
+const refreshApi = create({
+    baseURL: API_BASE_URL,
+    withCredentials: true
+});
+
 let accessToken: string | null = null;
 
 const getAccessTokenFromResponse = (response: any): string | null =>
@@ -28,26 +47,26 @@ const getAccessTokenFromResponse = (response: any): string | null =>
     response?.data?.token ??
     null;
 
-// Access tokenni o'rnatish funksiyasi
 export const setAccessToken = (token: string | null) => {
     accessToken = token;
+    writeStoredAccessToken(token);
 };
 
-// Access tokenni olish funksiyasi
-export const getAccessToken = () => accessToken;
+export const getAccessToken = () => accessToken ?? readStoredAccessToken();
 
-// Request interceptor
 api.interceptors.request.use(
     (config) => {
-        // Agar accessToken mavjud bo'lsa, header ga qo'shish
-        if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
+        const token = getAccessToken();
+
+        if (token) {
+            config.headers = config.headers ?? {};
+            config.headers.Authorization = `Bearer ${token}`;
         }
-        // console.log(`рџ“¤ API Request: ${config.method?.toUpperCase()} ${config.url}`);
+
         return config;
     },
     (error) => {
-        console.error('вќЊ Request Error:', error);
+        console.error('Request Error:', error);
         throw error;
     }
 );
@@ -66,13 +85,11 @@ const processQueue = (error: any, token: string | null = null) => {
     failedQueue = [];
 };
 
-// Response interceptor - 401 xatoliklarini handle qilish
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
-        // MUHIM: Agar xato /auth/refresh so'rovidan kelsa, interceptor hech narsa qilmasligi kerak
         if (originalRequest.url?.includes('/auth/refresh')) {
             throw error;
         }
@@ -83,9 +100,10 @@ api.interceptors.response.use(
                     failedQueue.push({ resolve, reject });
                 });
 
-                // Yangi accessToken bilan so'rovni qayta jo'natish
-                if (accessToken) {
-                    originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+                const refreshedToken = getAccessToken();
+                if (refreshedToken) {
+                    originalRequest.headers = originalRequest.headers ?? {};
+                    originalRequest.headers.Authorization = `Bearer ${refreshedToken}`;
                 }
 
                 return api(originalRequest);
@@ -95,43 +113,32 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                console.log('рџ”„ Token yangilanmoqda...');
+                const refreshResponse = await refreshApi.post('/auth/refresh');
 
-                // Refresh token so'rovi (cookie avtomatik yuboriladi)
-                const refreshResponse = await axios.post(
-                    `${api.defaults.baseURL}/auth/refresh`,
-                    {},
-                    { withCredentials: true }
-                );
-
-                // Yangi accessToken ni saqlash
                 const refreshedAccessToken = getAccessTokenFromResponse(refreshResponse);
                 if (!refreshedAccessToken) {
                     throw new Error('Refresh javobida access token topilmadi');
                 }
 
-                if (refreshedAccessToken) {
-                    accessToken = refreshedAccessToken;
-                    console.log('вњ… Yangi accessToken olindi');
-                }
-
+                setAccessToken(refreshedAccessToken);
                 isRefreshing = false;
-                processQueue(null, accessToken);
+                processQueue(null, refreshedAccessToken);
 
-                // Asl so'rovni yangi token bilan qayta jo'natish
                 originalRequest.headers = originalRequest.headers ?? {};
-                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+                originalRequest.headers.Authorization = `Bearer ${refreshedAccessToken}`;
                 return api(originalRequest);
             } catch (refreshError: any) {
-                console.error('вќЊ Refresh failed:', refreshError.response?.status || refreshError.message);
+                console.error('Refresh failed:', refreshError.response?.status || refreshError.message);
 
                 isRefreshing = false;
                 processQueue(refreshError, null);
-                accessToken = null;
+                setAccessToken(null);
+                setAuthSession(false);
 
                 throw refreshError;
             }
         }
+
         throw error;
     }
 );
@@ -143,12 +150,7 @@ export const AuthServiceAPI = {
         setAuthSession(true);
         return response.data;
     },
-    sendPhoneOtp: async (data: {
-        phone: string;
-        mode?: 'login' | 'register';
-        name?: string;
-        birthDate?: string;
-    }) => {
+    sendPhoneOtp: async (data: { phone: string; mode?: 'login' | 'register'; name?: string; birthDate?: string }) => {
         const response = await api.post('/auth/phone/send-otp', data);
         return response.data;
     },
@@ -485,4 +487,3 @@ export const ClientService = {
         };
     }
 };
-

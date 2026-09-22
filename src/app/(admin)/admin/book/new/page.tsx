@@ -70,7 +70,8 @@ const AdminNewBookPage = () => {
             oldPrice: undefined,
             discount: undefined,
             dimensions: '',
-            isActive: true
+            isActive: true,
+            moyskladExternalCode: ''
         }
     });
     const router = useRouter();
@@ -84,8 +85,9 @@ const AdminNewBookPage = () => {
     const { data: bookData, isLoading: isDetailLoading } = useBookDetailQuery(id);
     const [ebookFile, setEbookFile] = useState<File | null>(null);
     const [isUploadingEbook, setIsUploadingEbook] = useState(false);
+    const [isDeletingEbook, setIsDeletingEbook] = useState(false);
     const isEdit = !!id;
-    const isPending = isCreatePending || isUpdatePending || isUploadingEbook;
+    const isPending = isCreatePending || isUpdatePending || isUploadingEbook || isDeletingEbook;
     const hasEbook = Boolean(bookData?.hasEbook || bookData?.ebook?.originalName);
 
     useEffect(() => {
@@ -101,6 +103,7 @@ const AdminNewBookPage = () => {
             setValue('description.ru', typeof bookData.description === 'object' ? bookData.description?.ru || '' : '');
             setValue('description.en', typeof bookData.description === 'object' ? bookData.description?.en || '' : '');
             setValue('isbn', getBookBarcode(bookData));
+            setValue('moyskladExternalCode', bookData.moyskladExternalCode || '');
             setValue('slug', bookData.slug || '');
             setValue('price', bookData.price || 0);
             setValue('oldPrice', bookData.oldPrice);
@@ -253,6 +256,26 @@ const AdminNewBookPage = () => {
         return message || fallback;
     };
 
+    const handleDeleteEbook = async () => {
+        if (!id) return;
+
+        const bookId = bookData?._id || id;
+        if (!bookId || !window.confirm("Ushbu EPUB faylni o'chirmoqchimisiz?")) return;
+
+        setIsDeletingEbook(true);
+
+        try {
+            await BookService.deleteAdminEbook(bookId);
+            await queryClient.invalidateQueries({ queryKey: ['books'] });
+            await queryClient.invalidateQueries({ queryKey: ['admin-book', id] });
+            toast.success("EPUB fayl o'chirildi");
+        } catch (error) {
+            toast.error(getErrorMessage(error, "EPUB faylni o'chirishda xatolik yuz berdi"));
+        } finally {
+            setIsDeletingEbook(false);
+        }
+    };
+
     const isMongoId = (value: string | null) => Boolean(value && /^[0-9a-fA-F]{24}$/.test(value));
 
     const onSubmit = async (values: BookFormValues) => {
@@ -329,6 +352,7 @@ const AdminNewBookPage = () => {
         appendText(formData, 'description[en]', values.description.en);
         appendText(formData, 'barcode', values.isbn);
         appendText(formData, 'isbn', values.isbn);
+        formData.append('moyskladExternalCode', values.moyskladExternalCode.trim());
         appendText(formData, 'details[isbn]', values.isbn);
         formData.append('slug', normalizedSlug);
         tags.forEach((tag) => formData.append('tegs', tag));
@@ -491,6 +515,21 @@ const AdminNewBookPage = () => {
                             <Field label='ISBN / Barcode'>
                                 <Input className={inputClass} placeholder='978...' {...register('isbn')} />
                             </Field>
+                            <Field label='Moysklad code'>
+                                <Input
+                                    className={inputClass}
+                                    placeholder='moysklad external code'
+                                    {...register('moyskladExternalCode')}
+                                />
+                            </Field>
+                            <Field label='Teglar'>
+                                <Input
+                                    type='text'
+                                    className={inputClass}
+                                    placeholder='tarixiy roman, psixologiya, biznes'
+                                    {...register('tags')}
+                                />
+                            </Field>
                         </div>
 
                         <div className='mt-4 grid gap-4 md:grid-cols-3'>
@@ -540,14 +579,6 @@ const AdminNewBookPage = () => {
                                                 shouldDirty: true
                                             })
                                     })}
-                                />
-                            </Field>
-                            <Field label='Teglar'>
-                                <Input
-                                    type='text'
-                                    className={inputClass}
-                                    placeholder='tarixiy roman, psixologiya, biznes'
-                                    {...register('tags')}
                                 />
                             </Field>
                         </div>
@@ -771,9 +802,18 @@ const AdminNewBookPage = () => {
                     <section className='rounded-[24px] bg-[#fffaf2] p-5 shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                         <SectionTitle icon={FileText} title='Elektron kitob' />
                         {hasEbook && (
-                            <p className='mb-3 rounded-2xl border border-[#eadfce] bg-white p-4 text-sm font-semibold text-[#2f2a25] dark:border-slate-800 dark:bg-slate-900 dark:text-white'>
-                                EPUB qo'shilgan: {bookData?.ebook?.originalName || 'elektron kitob'}
-                            </p>
+                            <div className='mb-3 space-y-3 rounded-2xl border border-[#eadfce] bg-white p-4 dark:border-slate-800 dark:bg-slate-900'>
+                                <p className='text-sm font-semibold text-[#2f2a25] dark:text-white'>
+                                    EPUB qo'shilgan: {bookData?.ebook?.originalName || 'elektron kitob'}
+                                </p>
+                                <button
+                                    type='button'
+                                    onClick={() => void handleDeleteEbook()}
+                                    disabled={isDeletingEbook || isPending}
+                                    className='inline-flex items-center justify-center rounded-xl bg-red-500 px-3 py-2 text-sm font-black text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60'>
+                                    {isDeletingEbook ? "O'chirilmoqda..." : "EPUBni o'chirish"}
+                                </button>
+                            </div>
                         )}
                         <p className='mb-3 text-xs font-semibold text-[#8b7e70] dark:text-slate-400'>
                             {hasEbook

@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useBookDetailQuery } from '@/hooks/queries/useBookQueries';
 import { bookService } from '@/services/book.service';
 
+import { isAxiosError } from 'axios';
 import type { Contents, Book as EpubBook, Location, Rendition } from 'epubjs';
 import { BookOpen, ChevronLeft, ChevronRight, Maximize, Minus, Plus, X } from 'lucide-react';
 
@@ -26,6 +27,31 @@ const DEFAULT_FONT_SIZE = 100;
 
 const PROGRESS_STORAGE_PREFIX = 'ebook-progress:';
 
+/**
+ * epubjs 0.3.x adds a legacy `unload` listener asynchronously when its manager
+ * is attached. React cleanup below already destroys the rendition and the book.
+ */
+function suppressNextLegacyUnloadListener(): () => void {
+    const originalAddEventListener = window.addEventListener;
+    let restored = false;
+
+    const restore = () => {
+        if (restored) return;
+        restored = true;
+        window.addEventListener = originalAddEventListener;
+    };
+
+    window.addEventListener = ((...args: Parameters<typeof window.addEventListener>) => {
+        if (args[0] === 'unload') {
+            restore();
+            return;
+        }
+        return originalAddEventListener.apply(window, args);
+    }) as typeof window.addEventListener;
+
+    return restore;
+}
+
 function readSavedCfi(bookId: string): string | null {
     try {
         return localStorage.getItem(`${PROGRESS_STORAGE_PREFIX}${bookId}`);
@@ -39,6 +65,14 @@ function writeSavedCfi(bookId: string, cfi: string) {
         localStorage.setItem(`${PROGRESS_STORAGE_PREFIX}${bookId}`, cfi);
     } catch {
         // localStorage mavjud bo'lmasa yoki to'lgan bo'lsa, o'qishga xalaqit bermaymiz.
+    }
+}
+
+function removeSavedCfi(bookId: string) {
+    try {
+        localStorage.removeItem(`${PROGRESS_STORAGE_PREFIX}${bookId}`);
+    } catch {
+        // localStorage mavjud bo'lmasa reader birinchi sahifadan ochilaveradi.
     }
 }
 
@@ -76,8 +110,8 @@ export default function EbookReaderPage() {
         }
     }, []);
 
-    // Shrift o‘lchamini o‘zgartirish: joriy o‘qish o‘rnini saqlab qolib,
-    // matnni qayta oqizadi va sahifalar sonini (locations) qayta hisoblaydi.
+    // Shrift o‘lchamini o‘zgartirishda joriy o‘qish o‘rnini saqlab qolamiz.
+    // CFI locations matnga bog‘liq, shuning uchun uni qayta generatsiya qilish shart emas.
     const applyFontSize = useCallback(async (size: number) => {
         const rendition = renditionRef.current;
         const epubBook = epubBookRef.current;
@@ -89,14 +123,11 @@ export default function EbookReaderPage() {
         try {
             rendition.themes.fontSize(`${size}%`);
 
-            // Shrift o‘zgarganda matn qayta joylanadi, shuning uchun joriy
-            // o‘rinni tiklab, sahifa sanog‘ini qayta generatsiya qilamiz.
+            // Shrift o‘zgarganda matn qayta joylanadi, so‘ng joriy o‘rinni tiklaymiz.
             if (currentCfi) {
                 await rendition.display(currentCfi);
             }
 
-            // epubBook.locations.clear?.();
-            await epubBook.locations.generate(1024);
             await rendition.reportLocation();
         } catch {
             // Shrift o‘lchamini qo‘llashda xatolik bo‘lsa, o‘qishni buzmaymiz.
@@ -136,6 +167,7 @@ export default function EbookReaderPage() {
                 if (cancelled) return;
 
                 const epubBook = ePub(epubData);
+                const restoreLegacyUnloadListener = suppressNextLegacyUnloadListener();
                 const rendition = epubBook.renderTo(frame!, {
                     width: '100%',
                     height: '100%',
@@ -238,16 +270,73 @@ export default function EbookReaderPage() {
 
                 // Avval o'qilgan bo'lsa, saqlangan pozitsiyadan davom ettiramiz.
                 const savedCfi = readSavedCfi(book!._id);
-                await rendition.display(savedCfi ?? undefined);
-                setLoading(false);
+                let initialCfi: string | undefined;
 
-                await epubBook.locations.generate(1024);
-                if (!cancelled) await rendition.reportLocation();
-            } catch {
-                if (!cancelled) {
-                    setError('Elektron kitobni yuklab bo‘lmadi. EPUB fayl buzilgan bo‘lishi mumkin.');
-                    setLoading(false);
+                if (savedCfi) {
+                    await epubBook.ready;
+
+                    try {
+                        initialCfi = epubBook.spine.get(savedCfi) ? savedCfi : undefined;
+                    } catch {
+                        initialCfi = undefined;
+                    }
+
+                    if (!initialCfi) removeSavedCfi(book!._id);
                 }
+
+                try {
+                    try {
+                        await rendition.display(initialCfi);
+                    } catch (displayError) {
+                        if (!initialCfi) throw displayError;
+
+                        // EPUB almashtirilgan bo'lsa, eski CFI yangi spine ichida topilmaydi.
+                        // Eskirgan progressni olib tashlab, kitob boshidan ochamiz.
+                        removeSavedCfi(book!._id);
+                        await rendition.display();
+                    }
+                } finally {
+                    restoreLegacyUnloadListener();
+                }
+                if (!cancelled) setLoading(false);
+
+                // Locations progress uchun yordamchi indeks, kitobni ko'rsatish uchun shart emas.
+                // Ayrim eski EPUB fayllardagi noto'g'ri XHTML butun readerni yopib qo'ymasligi kerak.
+                try {
+                    await epubBook.locations.generate(1024);
+                    if (!cancelled) await rendition.reportLocation();
+                } catch (locationError) {
+                    console.warn("EPUB progress indeksini yaratib bo'lmadi:", locationError);
+                }
+            } catch (readerError) {
+                console.error('EPUB reader xatosi:', readerError);
+                if (cancelled) return;
+                if (isAxiosError(readerError)) {
+                    const status = readerError.response?.status;
+                    const serverMessage = readerError.response?.data?.message;
+                    if (status === 401) {
+                        const readerUrl = `/book/${slug}/reader`;
+
+                        router.replace(`/auth/login?redirect=${encodeURIComponent(readerUrl)}`);
+                        return;
+                    }
+                    if (status === 403) {
+                        setError(serverMessage || "Bu elektron kitobni o'qish uchun avval sotib olishingiz kerak.");
+                        setLoading(false);
+                        return;
+                    }
+                    if (status === 404) {
+                        setError('Bu kitobning EPUB fayli mavjud emas.');
+                        setLoading(false);
+                        return;
+                    }
+                }
+                setError(
+                    readerError instanceof Error
+                        ? `Elektron kitobni ochib bo‘lmadi: ${readerError.message}`
+                        : 'Elektron kitobni ochib bo‘lmadi.'
+                );
+                setLoading(false);
             }
         }
 

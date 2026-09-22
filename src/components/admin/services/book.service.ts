@@ -49,6 +49,11 @@ export const BookService = {
         return response.data;
     },
 
+    deleteAdminEbook: async (id: string) => {
+        const response = await api.delete(`/admin/products/${id}/ebook`);
+        return response.data;
+    },
+
     deleteAdminBook: async (id: string) => {
         const response = await api.delete(`/admin/products/${id}`);
         return response.data;

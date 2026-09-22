@@ -31,6 +31,7 @@ export interface Book {
     images?: ImageValue;
     image?: ImageValue;
     barcode?: string | number;
+    moyskladExternalCode?: string;
     discount?: number;
     isDiscount?: boolean;
     isTop?: boolean;
@@ -169,8 +170,8 @@ export type BookFormValues = {
     image?: FileList;
     isActive: boolean;
     tags: string;
+    moyskladExternalCode: string;
 };
-
 
 export type BookStats = {
     total: number;
@@ -179,4 +180,20 @@ export type BookStats = {
     low: number;
     available: number;
     out: number;
+};
+
+export type EbookAccess = {
+    hasAccess: boolean;
+    ebookPrice?: number;
+};
+
+export type EbookPurchaseResult = {
+    hasAccess?: boolean;
+    orderId?: string;
+    amount?: number;
+    paymentStatus?: string;
+    payment?: {
+        type?: string;
+        redirectUrl?: string;
+    };
 };

@@ -1,0 +1,17 @@
+2026-09-21 10:00:33.296: [INFO] CurrentProfilePath: C:\Users\user\Desktop\book uz Project\Book_uz\frontend\.codex-tmp\edge-reader-2\Default
+2026-09-21 10:00:33.296: [INFO] Profiles total count: 1
+2026-09-21 10:00:33.296: [INFO] Profile: name=Профиль 1 path=C:\Users\user\Desktop\book uz Project\Book_uz\frontend\.codex-tmp\edge-reader-2\Default lastActive=2026-09-21T10:00:33.278Z
+2026-09-21 10:00:33.296: [INFO] LastUsedProfileDir: C:\Users\user\Desktop\book uz Project\Book_uz\frontend\.codex-tmp\edge-reader-2\Default
+2026-09-21 10:00:33.296: [INFO] MostRecentlyActiveProfile: name=Профиль 1 path=C:\Users\user\Desktop\book uz Project\Book_uz\frontend\.codex-tmp\edge-reader-2\Default lastActive=2026-09-21T10:00:33.278Z
+2026-09-21 10:00:33.296: [INFO] OnDoneLoading sync enabled: 0
+2026-09-21 10:00:33.296: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-09-21 10:00:33.296: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-09-21 10:00:33.296: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-09-21 10:00:33.340: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-09-21 10:00:33.442: [INFO] VisibilityChanged: 0
+2026-09-21 10:00:33.464: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-09-21 10:00:33.466: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-09-21 10:00:33.468: [INFO] Primary account changed.
+2026-09-21 10:00:33.468: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-09-21 10:00:33.474: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-09-21 10:00:39.203: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1

@@ -31,6 +31,7 @@ const getApiOrigin = () => {
 };
 
 const apiOrigin = getApiOrigin();
+const isAnalyticsEnabled = process.env.NODE_ENV === 'production';
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://book.uz'),
@@ -154,8 +155,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                                 <CustomThemeProvider>
                                     <AuthProvider>
                                         <Toaster position='top-center' />
-                                        <Script id='yandex-metrika' strategy='afterInteractive'>
-                                            {`
+                                        {isAnalyticsEnabled ? (
+                                            <>
+                                                <Script id='yandex-metrika' strategy='afterInteractive'>
+                                                    {`
                                                 (function (m, e, t, r, i, k, a) {
                                                     m[i] = m[i] || function () {
                                                         (m[i].a = m[i].a || []).push(arguments);
@@ -178,18 +181,18 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                                                     accurateTrackBounce: true
                                                 });
                                             `}
-                                        </Script>
-                                        <noscript>
-                                            <div>
-                                                <img
-                                                    src='https://mc.yandex.ru/watch/89693632'
-                                                    style={{ position: 'absolute', left: '-9999px' }}
-                                                    alt=''
-                                                />
-                                            </div>
-                                        </noscript>
-                                        <Script id='facebook-pixel' strategy='afterInteractive'>
-                                            {`
+                                                </Script>
+                                                <noscript>
+                                                    <div>
+                                                        <img
+                                                            src='https://mc.yandex.ru/watch/89693632'
+                                                            style={{ position: 'absolute', left: '-9999px' }}
+                                                            alt=''
+                                                        />
+                                                    </div>
+                                                </noscript>
+                                                <Script id='facebook-pixel' strategy='afterInteractive'>
+                                                    {`
                                                 !(function (f, b, e, v, n, t, s) {
                                                     if (f.fbq) return;
                                                     n = f.fbq = function () {
@@ -209,16 +212,18 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                                                 fbq("init", "345384311180158");
                                                 fbq("track", "PageView");
                                             `}
-                                        </Script>
-                                        <noscript>
-                                            <img
-                                                height='1'
-                                                width='1'
-                                                style={{ display: 'none' }}
-                                                src='https://www.facebook.com/tr?id=345384311180158&ev=PageView&noscript=1'
-                                                alt=''
-                                            />
-                                        </noscript>
+                                                </Script>
+                                                <noscript>
+                                                    <img
+                                                        height='1'
+                                                        width='1'
+                                                        style={{ display: 'none' }}
+                                                        src='https://www.facebook.com/tr?id=345384311180158&ev=PageView&noscript=1'
+                                                        alt=''
+                                                    />
+                                                </noscript>
+                                            </>
+                                        ) : null}
                                         {children}
                                     </AuthProvider>
                                 </CustomThemeProvider>

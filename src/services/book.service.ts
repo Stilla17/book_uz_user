@@ -1,5 +1,6 @@
 // services/book.service.ts
 import { Book, Product } from '@/types';
+import { EbookAccess, EbookPurchaseResult } from '@/types/book';
 
 import { api } from './api';
 
@@ -184,6 +185,18 @@ export const bookService = {
             console.error("Eng ko'p ko'rilgan kitoblarni olishda xatolik:", error);
             return [];
         }
+    },
+
+    // User ning ebookga ruxsatini tekshirish
+    async getEbookAccess(id: string): Promise<EbookAccess> {
+        const response = await api.get(`/products/${id}/ebook/access`);
+        return response.data.data;
+    },
+
+    // Ebook uchun to'lov yaratish
+    async purchaseEbook(id: string, paymentType: 'CLICK' | 'PAYME'): Promise<EbookPurchaseResult> {
+        const response = await api.post(`/products/${id}/ebook/purchase`, { paymentType });
+        return response.data.data;
     },
 
     // EPUB faylni reader uchun yuklash

@@ -5,13 +5,14 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
+import { BookService } from '@/components/admin/services/book.service';
 import { Button } from '@/components/ui/button';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getBookImageUrl } from '@/utils/image';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ArrowLeft, BookOpen, Edit3, ImageIcon, PackageCheck, Store, Trash2 } from 'lucide-react';
 
@@ -29,11 +30,20 @@ const InfoItem = ({ label, value }: { label: string; value?: string | number | n
 const AdminBookDetailPage = () => {
     const params = useParams();
     const slug = params?.slug as string;
+    const queryClient = useQueryClient();
 
     const { data: book, isLoading } = useQuery<DetailBook | null>({
         queryKey: ['admin-book', slug],
         queryFn: () => bookService.getBookById(slug) as Promise<DetailBook | null>,
         enabled: Boolean(slug)
+    });
+
+    const { mutate: deleteEbook, isPending: isDeletingEbook } = useMutation({
+        mutationFn: (id: string) => BookService.deleteAdminEbook(id),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: ['admin-book', slug] });
+            void queryClient.invalidateQueries({ queryKey: ['books'] });
+        }
     });
 
     const bookView = useMemo(
@@ -96,7 +106,19 @@ const AdminBookDetailPage = () => {
                     </p>
                 </div>
 
-                <div className='flex gap-2'>
+                <div className='flex flex-wrap gap-2'>
+                    {book.hasEbook ? (
+                        <Button
+                            type='button'
+                            variant='outline'
+                            asChild
+                            className='h-11 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
+                            <Link href={`/book/${book.slug || book._id}/reader`} target='_blank' rel='noreferrer'>
+                                <BookOpen size={15} />
+                                EPUB ochish
+                            </Link>
+                        </Button>
+                    ) : null}
                     <Button
                         variant='outline'
                         className='h-11 rounded-2xl border-[#eadfce] bg-white font-black dark:border-slate-800 dark:bg-slate-900'>
@@ -104,9 +126,20 @@ const AdminBookDetailPage = () => {
                             <Edit3 size={12} />
                         </Link>
                     </Button>
-                    <Button className='h-11 rounded-2xl bg-red-500 px-4 font-black text-white hover:bg-red-600'>
-                        <Trash2 size={17} />
-                    </Button>
+                    {book.hasEbook ? (
+                        <Button
+                            type='button'
+                            onClick={() => {
+                                if (window.confirm('Ushbu EPUB faylni haqiqatan ham o\'chirmoqchimisiz?')) {
+                                    deleteEbook(book._id);
+                                }
+                            }}
+                            disabled={isDeletingEbook}
+                            className='h-11 rounded-2xl bg-red-500 px-4 font-black text-white hover:bg-red-600'>
+                            <Trash2 size={17} />
+                            {isDeletingEbook ? 'O\'chirilmoqda...' : 'EPUBni o\'chirish'}
+                        </Button>
+                    ) : null}
                 </div>
             </section>
 

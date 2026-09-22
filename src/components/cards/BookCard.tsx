@@ -46,9 +46,13 @@ export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = 
     const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
 
-        if (isBookInCart || addCartMutation.isPending) {
-            if (isBookInCart && freeDeliveryEligible) markFreeDeliveryBook(book._id);
-            toast(t('bookCard.alreadyInCart'));
+        if (isBookInCart) {
+            if (freeDeliveryEligible) markFreeDeliveryBook(book._id);
+            router.push('/cart');
+            return;
+        }
+
+        if (addCartMutation.isPending) {
             return;
         }
 
@@ -225,7 +229,7 @@ export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = 
 
                         <button
                             type='button'
-                            aria-label={t('bookCard.addToCart')}
+                            aria-label={isBookInCart ? 'Savatga o\'tish' : t('bookCard.addToCart')}
                             className='flex items-center gap-1 rounded-full bg-[#ef7f1a] p-2.5 text-white shadow-[0_10px_22px_-10px_rgba(239,127,26,0.9)] hover:bg-[#df7012] hover:shadow-lg'
                             disabled={Boolean(!book?.stock || book.stock <= 0 || addCartMutation.isPending)}
                             onClick={handleAddToCart}>

@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useParams } from 'next/navigation';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 
 import { BookStructuredData } from '@/components/seo/StructuredData';
 import BreadCrumb from '@/components/shared/BreadCrumb';
@@ -15,6 +16,7 @@ import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { useBookStats } from '@/hooks/bookHooks/useBookStats';
 import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
 import { useBookDetailQuery } from '@/hooks/queries/useBookQueries';
+import { useAuth } from '@/hooks/useAuth';
 import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getBookPriceInfo, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
@@ -22,10 +24,11 @@ import { formatPrice } from '@/utils/currency';
 import { getBookImageUrl, getImageUrl } from '@/utils/image';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { AxiosError } from 'axios';
 import { motion } from 'framer-motion';
 import { BookOpen, Eye, Heart, Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import Link from 'next/link';
 
 type DetailBook = Book & {
     category?: Parameters<typeof getCategoryLabel>[0];
@@ -40,7 +43,12 @@ export default function BookDetailPage() {
     const params = useParams();
     const slug = params?.slug as string;
     const queryClient = useQueryClient();
+    const router = useRouter();
     const [selectedQuantity, setSelectedQuantity] = useState(1);
+    const { isAuthenticated, isLoading: authLoading } = useAuth();
+    const [ebookAccess, setEbookAccess] = useState(false);
+    const [ebookAccessLoading, setEbookAccessLoading] = useState(false);
+    const [ebookPurchaseLoading, setEbookPurchaseLoading] = useState<'CLICK' | 'PAYME' | null>(null);
 
     const { data: book, isLoading: bookLoading } = useBookDetailQuery<DetailBook>(slug);
 
@@ -82,6 +90,8 @@ export default function BookDetailPage() {
     const isBookAvailable = availableStock > 0;
     const displayedQuantity = cartQuantity > 0 ? cartQuantity : selectedQuantity;
     const priceInfo = getBookPriceInfo(book);
+    const ebookPrice =
+        Number(book?.ebook?.price) > 0 ? Number(book?.ebook?.price) : Math.round(Number(priceInfo.price || 0) * 0.5);
 
     const bookView = useMemo(
         () => ({
@@ -156,13 +166,54 @@ export default function BookDetailPage() {
     };
 
     const addBookToCart = async () => {
-        if (!isBookAvailable || cartQuantity > 0) return;
+        if (!isBookAvailable) return;
+
+        if (cartQuantity > 0) {
+            router.push('/cart');
+            return;
+        }
 
         const cartBook = getCartBook();
         if (!cartBook) return;
 
         await addItem(cartBook, selectedQuantity);
     };
+
+    useEffect(() => {
+        if (authLoading || !book?._id || !book.hasEbook) return;
+
+        if (!isAuthenticated) {
+            setEbookAccess(false);
+            return;
+        }
+
+        let cancelled = false;
+
+        const checkEbookAccess = async () => {
+            try {
+                setEbookAccessLoading(true);
+                const result = await bookService.getEbookAccess(book._id);
+
+                if (!cancelled) {
+                    setEbookAccess(result.hasAccess);
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    setEbookAccess(false);
+                }
+                console.error('Ebook ruxsatini tekshirishda xatolik:', error);
+            } finally {
+                if (!cancelled) {
+                    setEbookAccessLoading(false);
+                }
+            }
+        };
+        void checkEbookAccess();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [authLoading, book?._id, book?.hasEbook, isAuthenticated]);
 
     useEffect(() => {
         if (!book?._id || viewedBookRef.current === book._id) return;
@@ -240,6 +291,63 @@ export default function BookDetailPage() {
 
     const countStockBranchMoysklad = visibleBranchNameMoysklad.reduce((total, item) => total + item.available, 0);
 
+    const openEbookReader = () => {
+        if (!book) return;
+
+        const readerUrl = `/book/${book.slug || book._id}/reader`;
+
+        if (!isAuthenticated) {
+            router.push(`/auth/login?redirect=${encodeURIComponent(readerUrl)}`);
+            return;
+        }
+
+        if (!ebookAccess) {
+            toast.error("Elektron kitobni o'qish uchun avval sotib oling");
+            return;
+        }
+
+        router.push(readerUrl);
+    };
+
+    const purchaseEbook = async (paymentType: 'CLICK' | 'PAYME') => {
+        if (!book) return;
+
+        if (!isAuthenticated) {
+            const currentUrl = `/book/${book.slug || book._id}`;
+
+            router.push(`/auth/login?redirect=${encodeURIComponent(currentUrl)}`);
+            return;
+        }
+
+        try {
+            setEbookPurchaseLoading(paymentType);
+
+            const result = await bookService.purchaseEbook(book._id, paymentType);
+
+            if (result.hasAccess) {
+                setEbookAccess(true);
+                toast.success('Siz bu elektron kitobni avval sotib olgansiz');
+                return;
+            }
+
+            const redirectUrl = result.payment?.redirectUrl;
+
+            if (!redirectUrl) {
+                throw new Error("To'lov manzili server javobida topilmadi");
+            }
+
+            window.location.assign(redirectUrl);
+        } catch (error) {
+            const axiosError = error as AxiosError<{
+                message?: string;
+            }>;
+
+            toast.error(axiosError.response?.data?.message || 'Elektron kitob xaridini boshlashda xatolik yuz berdi');
+        } finally {
+            setEbookPurchaseLoading(null);
+        }
+    };
+
     if (!book) {
         return (
             <div className='min-h-screen py-16 dark:bg-slate-900'>
@@ -273,13 +381,9 @@ export default function BookDetailPage() {
                             className='h-full max-h-130 w-full object-contain'
                         />
                         {book?.hasEbook && (
-                            <Link
-                                href={`/book/${book.slug || book._id}/reader`}
-                                title='Elektron kitobni o‘qish'
-                                aria-label='Elektron kitobni o‘qish'
-                                className='absolute top-4 right-4 grid size-10 place-items-center rounded-full bg-white text-[#ef7f1a] shadow-md sm:top-6 sm:right-6'>
-                                <BookOpen size={21} />
-                            </Link>
+                            <div className='absolute top-4 right-4 flex items-center gap-2 rounded-full border-2 border-[#ef7f1a] bg-white/95 px-3 py-2 text-xs font-black text-[#ef7f1a] shadow-md backdrop-blur sm:top-6 sm:right-6'>
+                                <BookOpen size={16} color='#ef7f1a' />
+                            </div>
                         )}
                         {priceInfo.discount ? (
                             <span className='absolute top-4 left-4 rounded-full bg-[#ef7f1a] px-3 py-1.5 text-sm font-black text-white shadow-sm ring-1 ring-white/70 sm:top-6 sm:left-6'>
@@ -403,75 +507,129 @@ export default function BookDetailPage() {
                             />
                         </div>
 
-                        <div className='mt-8 rounded-3xl'>
-                            <div className='flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-center'>
-                                <div className='mt-2 min-w-0'>
-                                    {priceInfo.hasDiscount ? (
-                                        <div className='mb-2 flex flex-wrap items-center gap-2'>
-                                            <span className='text-base font-bold text-slate-400 line-through dark:text-slate-500'>
-                                                {formatPrice(priceInfo.oldPrice)}
-                                            </span>
-                                            {priceInfo.discount ? (
-                                                <span className='rounded-full bg-orange-50 px-2.5 py-1 text-xs font-black text-[#ef7f1a] dark:bg-orange-500/10 dark:text-orange-300'>
-                                                    -{priceInfo.discount}%
+                        <div className={`mt-8 grid gap-3 ${book.hasEbook ? 'xl:grid-cols-2' : ''}`}>
+                            <section className='flex flex-col rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-4 shadow-sm sm:p-5 dark:border-orange-400/20 dark:from-orange-500/10 dark:to-slate-900/20'>
+                                <div className='flex items-start justify-between gap-3'>
+                                    <span className='grid size-10 shrink-0 place-items-center rounded-xl bg-orange-100 text-[#ef7f1a] dark:bg-orange-500/15 dark:text-orange-300'>
+                                        <ShoppingCart size={20} />
+                                    </span>
+                                </div>
+
+                                <div className='mt-5 flex flex-wrap items-end justify-between gap-4'>
+                                    <div className='min-w-0'>
+                                        {priceInfo.hasDiscount ? (
+                                            <div className='mb-1.5 flex flex-wrap items-center gap-2'>
+                                                <span className='text-sm font-bold text-slate-400 line-through dark:text-slate-500'>
+                                                    {formatPrice(priceInfo.oldPrice)}
                                                 </span>
-                                            ) : null}
-                                        </div>
-                                    ) : null}
-                                    <div className='flex min-w-0 items-end gap-3'>
-                                        <span className='text-3xl font-black tracking-tight break-words text-[#ef7f1a] sm:text-4xl'>
+                                                {priceInfo.discount ? (
+                                                    <span className='rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-black text-[#ef7f1a] dark:bg-orange-500/15 dark:text-orange-300'>
+                                                        -{priceInfo.discount}%
+                                                    </span>
+                                                ) : null}
+                                            </div>
+                                        ) : null}
+                                        <p className='text-2xl font-black tracking-tight text-[#ef7f1a] sm:text-3xl'>
                                             {formatPrice(priceInfo.price)}
-                                        </span>
+                                        </p>
+                                    </div>
+
+                                    <div className='flex items-center gap-1.5'>
+                                        <button
+                                            type='button'
+                                            onClick={decrementCartQuantity}
+                                            aria-label={t('bookDetail.decreaseQuantity')}
+                                            disabled={!isBookAvailable || (cartQuantity === 0 && selectedQuantity <= 1)}
+                                            className='grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-orange-300 hover:text-[#ef7f1a] disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'>
+                                            <Minus size={17} />
+                                        </button>
+                                        <div className='grid h-10 min-w-12 place-items-center rounded-xl bg-slate-900 px-3 text-base font-black text-white dark:bg-white dark:text-slate-900'>
+                                            {displayedQuantity}
+                                        </div>
+                                        <button
+                                            type='button'
+                                            aria-label={t('bookDetail.increaseQuantity')}
+                                            disabled={
+                                                !isBookAvailable || !stockLimit || displayedQuantity >= stockLimit
+                                            }
+                                            onClick={isBookAvailable ? incrementCartQuantity : undefined}
+                                            className='grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-900 transition hover:border-orange-300 hover:text-[#ef7f1a] disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-white'>
+                                            <Plus size={17} />
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div className='flex items-center gap-1.5'>
-                                    <button
-                                        type='button'
-                                        onClick={decrementCartQuantity}
-                                        aria-label={t('bookDetail.decreaseQuantity')}
-                                        disabled={!isBookAvailable || (cartQuantity === 0 && selectedQuantity <= 1)}
-                                        className='flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-[#ef7f1a] disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800'>
-                                        <Minus size={18} />
-                                    </button>
-
-                                    <div className='flex h-11 min-w-16 items-center justify-center rounded-xl bg-gradient-to-b from-slate-50 to-white px-4 text-center text-lg font-black text-slate-900 ring-1 ring-slate-200 dark:from-slate-900 dark:to-slate-950 dark:text-white dark:ring-slate-700'>
-                                        {displayedQuantity}
-                                    </div>
-
-                                    <button
-                                        type='button'
-                                        aria-label={t('bookDetail.increaseQuantity')}
-                                        disabled={!isBookAvailable || !stockLimit || displayedQuantity >= stockLimit}
-                                        onClick={isBookAvailable ? incrementCartQuantity : undefined}
-                                        className='flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-[#ef7f1a] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900 dark:hover:bg-orange-100'>
-                                        <Plus size={18} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className='mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]'>
                                 <Button
                                     onClick={addBookToCart}
-                                    disabled={!isBookAvailable || cartQuantity > 0}
-                                    className='h-12 rounded-2xl bg-[#ef7f1a] text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] sm:h-14 sm:text-base dark:shadow-none'>
-                                    <ShoppingCart size={20} />
+                                    disabled={!isBookAvailable}
+                                    className='mt-5 h-12 w-full rounded-xl bg-[#ef7f1a] text-sm font-black text-white shadow-md shadow-orange-200/70 transition hover:bg-[#d96f12] dark:shadow-none'>
+                                    <ShoppingCart size={19} />
                                     {!isBookAvailable
                                         ? t('bookDetail.outOfStock')
                                         : cartQuantity > 0
-                                          ? t('bookDetail.inCart')
+                                          ? "Savatga o'tish"
                                           : t('bookDetail.addToCart')}
                                 </Button>
-                                <Button
-                                    variant='outline'
-                                    disabled={favoriteLoading}
-                                    onClick={toggleFavorite}
-                                    className={`h-12 rounded-2xl border-slate-200 bg-white/80 px-4 text-sm font-bold backdrop-blur hover:border-[#ef7f1a] hover:text-[#ef7f1a] sm:h-14 sm:px-5 sm:text-base dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-slate-500 dark:hover:text-white`}>
-                                    <Heart className={isBookmarked ? 'fill-red-500 text-red-500' : ''} size={20} />
-                                    {t('bookDetail.favorites')}
-                                </Button>
-                            </div>
+                            </section>
+
+                            {book.hasEbook && (
+                                <section className='flex flex-col rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-4 shadow-sm sm:p-5 dark:border-violet-400/20 dark:from-violet-500/10 dark:to-slate-900/20'>
+                                    <div className='flex items-start justify-between gap-3'>
+                                        <span className='grid size-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300'>
+                                            <BookOpen size={20} />
+                                        </span>
+                                    </div>
+
+                                    <div className='mt-5'>
+                                        <p className='mt-1 text-2xl font-black tracking-tight text-violet-700 sm:text-3xl dark:text-violet-300'>
+                                            {ebookPrice > 0 ? formatPrice(ebookPrice) : 'Narx aniqlanmoqda'}
+                                        </p>
+                                    </div>
+
+                                    <div className='mt-auto pt-5'>
+                                        {authLoading || ebookAccessLoading ? (
+                                            <div className='grid h-12 place-items-center rounded-xl border border-violet-200 bg-white/70 text-sm font-bold text-violet-700 dark:border-violet-400/20 dark:bg-slate-900/40 dark:text-violet-300'>
+                                                Ruxsat tekshirilmoqda...
+                                            </div>
+                                        ) : ebookAccess ? (
+                                            <Button
+                                                type='button'
+                                                onClick={openEbookReader}
+                                                className='h-12 w-full rounded-xl bg-violet-700 text-sm font-black text-white shadow-md shadow-violet-200/70 hover:bg-violet-800 dark:shadow-none'>
+                                                <BookOpen size={19} />
+                                                Mutolaa qilish
+                                            </Button>
+                                        ) : (
+                                            <div className='grid grid-cols-2 gap-2'>
+                                                <button
+                                                    type='button'
+                                                    disabled={ebookPurchaseLoading !== null}
+                                                    onClick={() => void purchaseEbook('CLICK')}
+                                                    className='h-12 rounded-xl bg-[#1f62f2] px-4 text-sm font-black text-white shadow-sm transition hover:bg-[#1853d4] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50'>
+                                                    {ebookPurchaseLoading === 'CLICK' ? 'Kutilmoqda...' : 'Click'}
+                                                </button>
+                                                <button
+                                                    type='button'
+                                                    disabled={ebookPurchaseLoading !== null}
+                                                    onClick={() => void purchaseEbook('PAYME')}
+                                                    className='h-12 rounded-xl bg-[#08b8d4] px-4 text-sm font-black text-white shadow-sm transition hover:bg-[#069eb8] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50'>
+                                                    {ebookPurchaseLoading === 'PAYME' ? 'Kutilmoqda...' : 'Payme'}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+                            )}
                         </div>
+
+                        <Button
+                            variant='outline'
+                            disabled={favoriteLoading}
+                            onClick={toggleFavorite}
+                            className='mt-3 h-12 w-full rounded-2xl border-slate-200 bg-white/80 px-4 text-sm font-bold backdrop-blur hover:border-[#ef7f1a] hover:text-[#ef7f1a] sm:text-base dark:border-slate-700 dark:bg-slate-950/40 dark:hover:border-slate-500 dark:hover:text-white'>
+                            <Heart className={isBookmarked ? 'fill-red-500 text-red-500' : ''} size={20} />
+                            {t('bookDetail.favorites')}
+                        </Button>
                     </div>
                 </motion.section>
 
