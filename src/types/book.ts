@@ -155,7 +155,7 @@ export type BookFormValues = {
     category: string[];
     subCategoryIds: string[];
     author: string[];
-    publisher: string;
+    publisher: string[];
     language: string;
     contentLanguage: 'latin' | 'cyrillic';
     cover: 'hardcover' | 'softcover';

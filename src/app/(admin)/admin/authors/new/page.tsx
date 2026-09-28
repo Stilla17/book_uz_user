@@ -1,6 +1,6 @@
 'use client';
 
-import { type ChangeEvent, type ElementType, type ReactNode, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -56,11 +56,7 @@ const AdminNewAuthorPage = () => {
 
     const { mutate: createAuthor, isPending: isCreatePanding } = useCreateAuthor();
     const { mutate: updateAuthor, isPending: isUpdatePending } = useUpdateAuthor();
-    const {
-        data: authorData,
-        isLoading: isDetailLoading,
-        isError: isDetailError
-    } = useAuthorDetailQuery(id);
+    const { data: authorData, isLoading: isDetailLoading, isError: isDetailError } = useAuthorDetailQuery(id);
     const { imageFile, imagePreview, setImagePreview, handleImageChange, clearImagePreview } = useImagePreview();
 
     const isPending = id ? isUpdatePending : isCreatePanding;
@@ -154,7 +150,7 @@ const AdminNewAuthorPage = () => {
                         router.refresh();
                     },
                     onError: (error: unknown) => {
-                        toast.error(getErrorMessage(error, "Muallifni yangilashda xatolik yuz berdi"));
+                        toast.error(getErrorMessage(error, 'Muallifni yangilashda xatolik yuz berdi'));
                     }
                 }
             );

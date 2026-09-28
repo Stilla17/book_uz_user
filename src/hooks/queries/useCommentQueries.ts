@@ -1,6 +1,6 @@
 'use client';
 
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import { useQuery } from '@tanstack/react-query';
 
 export const useBookCommentsQuery = (bookId: string | undefined, enabled = true) =>

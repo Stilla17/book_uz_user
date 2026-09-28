@@ -3,14 +3,16 @@
 import Link from 'next/link';
 
 import { mainNav } from '@/data/navMenu';
+import { useAppSelector } from '@/store/hooks';
 
 import { motion } from 'framer-motion';
-import { ArrowUp, Facebook, Instagram, Mail, Phone, Send, Youtube } from 'lucide-react';
+import { ArrowUp, Facebook, Instagram, Mail, Phone, Send, ShoppingCart, Youtube } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export const Footer = () => {
     const { t } = useTranslation();
     const currentYear = new Date().getFullYear();
+    const cartCount = useAppSelector((state) => state.cart.items.length);
 
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -171,6 +173,18 @@ export const Footer = () => {
                         aria-label={t('footer.scrollTop')}>
                         <ArrowUp size={14} />
                     </button>
+
+                    <Link
+                        href='/cart'
+                        aria-label={t('cart')}
+                        className='fixed bottom-5 left-5 z-50 grid h-12 w-12 place-items-center rounded-full bg-[#ef7f1a] text-white shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-1 hover:shadow-lg md:hidden'>
+                        <ShoppingCart size={21} />
+                        {cartCount > 0 && (
+                            <span className='absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#005CB9] px-1 text-[10px] font-bold text-white'>
+                                {cartCount}
+                            </span>
+                        )}
+                    </Link>
                 </div>
             </div>
         </footer>

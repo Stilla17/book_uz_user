@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
 
-import { ImageIcon, Settings2, Upload, X } from 'lucide-react';
+import { ImageIcon, Upload, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { AuthServiceAPI } from '@/services/api';
+import { AuthServiceAPI } from '@/services/auth.service';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle, Eye, EyeOff, Key, Loader2, Lock, Mail, Send, X } from 'lucide-react';

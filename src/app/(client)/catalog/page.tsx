@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { BookCard } from '@/components/cards/BookCard';
 import { BookCardSkeleton } from '@/components/cards/BookCardSkeleton';
@@ -38,19 +38,26 @@ export default function CatalogPage() {
     const { t } = useTranslation();
     const router = useRouter();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
     const queryClient = useQueryClient();
-    const searchParamsKey = searchParams.toString();
 
-    const [filters, setFilters] = useState<CatalogFilters>(() => parseFilters(searchParams));
-    const [page, setPage] = useState(() => parsePage(searchParams.get('page')));
+    const [filters, setFilters] = useState<CatalogFilters>(DEFAULT_FILTERS);
+    const [page, setPage] = useState(1);
+    const [searchParamsKey, setSearchParamsKey] = useState('');
     const [viewMode, setViewMode] = useState<CatalogViewMode>('grid');
 
     useEffect(() => {
-        const nextFilters = parseFilters(searchParams);
-        setFilters(nextFilters);
-        setPage(parsePage(searchParams.get('page')));
-    }, [searchParams, searchParamsKey]);
+        const syncStateFromUrl = () => {
+            const params = new URLSearchParams(window.location.search);
+            setFilters(parseFilters(params));
+            setPage(parsePage(params.get('page')));
+            setSearchParamsKey(params.toString());
+        };
+
+        syncStateFromUrl();
+        window.addEventListener('popstate', syncStateFromUrl);
+
+        return () => window.removeEventListener('popstate', syncStateFromUrl);
+    }, []);
 
     const requestParams = useMemo(
         () => ({
@@ -103,6 +110,7 @@ export default function CatalogPage() {
     function syncUrl(nextFilters: CatalogFilters, nextPage: number) {
         const queryString = buildQueryString(nextFilters, nextPage);
         if (queryString === searchParamsKey) return;
+        setSearchParamsKey(queryString);
         router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
     }
 
@@ -125,6 +133,7 @@ export default function CatalogPage() {
     return (
         <div className='min-h-screen'>
             <div className='mx-auto max-w-7xl px-3 py-5 sm:px-6 sm:py-8 lg:px-8'>
+                <h1 className='text-3xl font-black text-slate-950 dark:text-white'>Kitoblar katalogi</h1>
                 <div className='mt-3 grid gap-4 sm:mt-6 lg:grid-cols-[290px_minmax(0,1fr)] lg:gap-6'>
                     <AsideFilter filters={filters} onChange={applyFilters} onClear={clearFilters} />
 

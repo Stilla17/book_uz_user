@@ -274,6 +274,7 @@
         "birthDate": "Tug‘ilgan kun",
         "phone": "Telefon raqami",
         "sendCode": "Kod yuborish",
+        "sendTelegram": "Telegram orqali kirish",
         "otpLabel": "Tasdiqlash kodi",
         "otpDigitLabel": "Tasdiqlash kodining {{number}}-raqami",
         "signIn": "Kirish",

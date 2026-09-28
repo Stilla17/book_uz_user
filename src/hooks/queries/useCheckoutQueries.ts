@@ -1,6 +1,6 @@
 'use client';
 
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import { PromoServiceUser } from '@/services/promo.service';
 import type { Coupon } from '@/types';
 import type { DistrictItem, RegionItem } from '@/helpers/checkout';

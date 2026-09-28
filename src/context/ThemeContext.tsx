@@ -72,10 +72,6 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         brandOrange: isDark ? '#ffb14d' : '#FF8A00'
     };
 
-    if (!mounted) {
-        return null;
-    }
-
     return <ThemeContext.Provider value={{ theme, setTheme, colors, isDark }}>{children}</ThemeContext.Provider>;
 };
 

@@ -10,7 +10,7 @@ import { useBookDetailQuery } from '@/components/admin/hooks/queries/book';
 import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
 import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
 import MultiSearchableSelect from '@/components/admin/other/MultiSearchableSelect';
-import SearchableSelect, { type SearchableOption } from '@/components/admin/other/SearchableSelect';
+import type { SearchableOption } from '@/components/admin/other/SearchableSelect';
 import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { BookService } from '@/components/admin/services/book.service';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,7 @@ import {
     getBookBarcode,
     getBookCategoryIds,
     getBookContentLanguage,
+    getBookPublisherIds,
     getBookSubCategoryIds,
     getCategorySubCategories,
     getRelationId,
@@ -59,7 +60,7 @@ const AdminNewBookPage = () => {
             category: [],
             subCategoryIds: [],
             author: [],
-            publisher: '',
+            publisher: [],
             language: 'uz',
             contentLanguage: 'latin',
             cover: 'hardcover',
@@ -120,7 +121,7 @@ const AdminNewBookPage = () => {
                 'author',
                 bookAuthors.map((author) => (typeof author === 'string' ? author : author?._id || '')).filter(Boolean)
             );
-            setValue('publisher', getRelationId(bookData.publisher));
+            setValue('publisher', getBookPublisherIds(bookData));
 
             setValue('language', bookData.language || 'uz');
             setValue('contentLanguage', getBookContentLanguage(bookData));
@@ -185,7 +186,7 @@ const AdminNewBookPage = () => {
     const categoryIds = watch('category');
     const subCategoryIds = watch('subCategoryIds');
     const authorIds = watch('author');
-    const publisherId = watch('publisher');
+    const publisherIds = watch('publisher');
     const language = watch('language');
     const contentLanguage = watch('contentLanguage');
     const cover = watch('cover');
@@ -293,7 +294,9 @@ const AdminNewBookPage = () => {
         const authorValues = Array.from(
             new Set(values.author.map((author) => resolveOptionValue(author, authorOptions)).filter(Boolean))
         );
-        const publisherValue = resolveOptionValue(values.publisher, publisherOptions);
+        const publisherValues = Array.from(
+            new Set(values.publisher.map((publisher) => resolveOptionValue(publisher, publisherOptions)).filter(Boolean))
+        );
         const coverValue = values.cover;
         const tags = getNormalizedTags(values.tags);
 
@@ -307,7 +310,7 @@ const AdminNewBookPage = () => {
             return;
         }
 
-        if (!categoryValues.length || !authorValues.length || !publisherValue) {
+        if (!categoryValues.length || !authorValues.length || !publisherValues.length) {
             toast.error('Kategoriya, muallif va nashriyotni tanlang');
             return;
         }
@@ -368,7 +371,8 @@ const AdminNewBookPage = () => {
             formData.append('subCategoryId', primarySubCategory);
         }
         authorValues.forEach((author) => formData.append('author', author));
-        formData.append('publisher', publisherValue);
+        formData.append('publisher', publisherValues[0]);
+        publisherValues.forEach((publisher) => formData.append('publishers', publisher));
         formData.append('language', values.language);
         formData.append('contentLanguage', values.contentLanguage);
         formData.append('cover', coverValue);
@@ -749,11 +753,13 @@ const AdminNewBookPage = () => {
                             </Field>
 
                             <Field label='Nashriyot'>
-                                <SearchableSelect
-                                    value={publisherId}
+                                <MultiSearchableSelect
+                                    value={publisherIds}
                                     name='publisher'
                                     options={publisherOptions}
                                     placeholder={isLoading ? 'Yuklanmoqda...' : 'Tanlang'}
+                                    selectedLabel='nashriyot'
+                                    itemLabel='nashriyot'
                                     disabled={isLoading}
                                     onChange={(value) => setValue('publisher', value)}
                                 />

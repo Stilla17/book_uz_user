@@ -8,9 +8,7 @@ import { useRouter } from 'next/navigation';
 import MobileAction from '@/components/shared/MobileAction';
 import NavbarControls from '@/components/shared/NavbarControls';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { bottomNav, serviceMenuItems } from '@/data/navMenu';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 
 import { BookOpen, Grid3x3, Menu, Phone, Search, ShoppingCart, User, UserCircle, X } from 'lucide-react';
@@ -24,21 +22,10 @@ type NavbarMobileProps = {
 
 const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobileProps) => {
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const router = useRouter();
     const { getBgColor, getTextColor, getBorderColor } = useThemeStyles();
     const { t } = useTranslation();
     const myBooksHref = '/my-books';
 
-    const submitSearch = (event?: FormEvent<HTMLFormElement>) => {
-        event?.preventDefault();
-
-        const query = searchQuery.trim();
-        if (!query) return;
-
-        setMobileOpen(false);
-        router.push(`/catalog?search=${encodeURIComponent(query)}`);
-    };
     return (
         <div>
             {/* Mobile burger */}
@@ -87,21 +74,6 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
 
                         <div className='max-h-[calc(100dvh-92px)] space-y-4 overflow-y-auto p-4 sm:space-y-5 sm:p-5'>
                             <NavbarControls variant='mobile' onLanguageSelect={() => setMobileOpen(false)} />
-
-                            <form className='relative' onSubmit={submitSearch}>
-                                <Input
-                                    placeholder={t('searchPlaceholder')}
-                                    value={searchQuery}
-                                    onChange={(event) => setSearchQuery(event.target.value)}
-                                    className={`h-12 rounded-2xl pr-12 ${getBgColor('muted')} border-2 ${getBorderColor()}`}
-                                />
-                                <button
-                                    type='submit'
-                                    className='absolute top-1/2 right-3 -translate-y-1/2 text-slate-500 dark:text-slate-400'
-                                    aria-label={t('search')}>
-                                    <Search size={18} />
-                                </button>
-                            </form>
 
                             <div className='grid grid-cols-2 gap-2.5 sm:gap-3'>
                                 <MobileAction

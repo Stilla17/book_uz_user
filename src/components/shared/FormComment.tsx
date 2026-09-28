@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { useAuth } from '@/hooks/useAuth';
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { MessageSquareText, Send } from 'lucide-react';

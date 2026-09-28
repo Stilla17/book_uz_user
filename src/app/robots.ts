@@ -15,6 +15,8 @@ export default function robots(): MetadataRoute.Robots {
                     '/admin/auth',
                     '/admin/auth/',
                     '/admin/auth/*',
+                    '/api/',
+                    '/api/*',
                     '/auth',
                     '/auth/',
                     '/auth/*',
@@ -26,6 +28,7 @@ export default function robots(): MetadataRoute.Robots {
                     '/profile/',
                     '/my-books',
                     '/my-books/',
+                    '/book/*/reader',
                     '/payment',
                     '/payment/',
                     '/payment/*'

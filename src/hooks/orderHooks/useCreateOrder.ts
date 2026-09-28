@@ -1,4 +1,4 @@
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import { useMutation } from '@tanstack/react-query';
 
 export const useCreateOrder = () => {

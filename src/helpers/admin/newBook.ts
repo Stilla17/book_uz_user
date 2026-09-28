@@ -34,6 +34,20 @@ export const getRelationId = (value: unknown) => {
     return '';
 };
 
+export const getBookPublisherIds = (book: Book) => {
+    const maybeBook = book as Book & {
+        publisher?: unknown;
+        publishers?: unknown;
+    };
+    const publisherValues =
+        Array.isArray(maybeBook.publishers) && maybeBook.publishers.length
+            ? maybeBook.publishers
+            : maybeBook.publisher;
+    const values = Array.isArray(publisherValues) ? publisherValues : publisherValues ? [publisherValues] : [];
+
+    return Array.from(new Set(values.map(getRelationId).filter(Boolean)));
+};
+
 export const getBookSubCategoryIds = (book: Book) => {
     const maybeBook = book as Book & {
         subCategoryIds?: Array<string | { _id?: string }>;

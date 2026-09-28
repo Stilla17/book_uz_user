@@ -9,6 +9,7 @@ import { ThemeProvider as NextThemeProvider } from 'next-themes';
 import '@/app/globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider as CustomThemeProvider } from '@/context/ThemeContext';
+import { defaultDescription, defaultOgImage, defaultTitle, siteUrl } from '@/lib/seo';
 import I18nProvider from '@/providers/I18nProvider';
 import ProviderRedux from '@/providers/ProviderRedux';
 import QueryProvider from '@/providers/QueryProvider';
@@ -34,9 +35,9 @@ const apiOrigin = getApiOrigin();
 const isAnalyticsEnabled = process.env.NODE_ENV === 'production';
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://book.uz'),
-    title: "Book.uz - O'zbekistondagi eng katta onlayn kitob do'koni",
-    description: "O'zbekistondagi eng katta onlayn kitob do'koni. Keng tanlov, arzon narxlar, tez yetkazib berish.",
+    metadataBase: new URL(siteUrl),
+    title: defaultTitle,
+    description: defaultDescription,
     keywords: [
         'kitoblar',
         "o'zbekiston",
@@ -60,39 +61,30 @@ export const metadata: Metadata = {
         }
     },
     alternates: {
-        canonical: '/',
-        languages: {
-            uz: '/',
-            'uz-UZ': '/',
-            ru: '/ru',
-            'ru-UZ': '/ru',
-            en: '/en',
-            'en-US': '/en',
-            'x-default': '/'
-        }
+        canonical: '/'
     },
     openGraph: {
-        title: "Book.uz - O'zbekistondagi eng katta onlayn kitob do'koni",
-        description: "O'zbekistondagi eng katta onlayn kitob do'koni. Keng tanlov, arzon narxlar, tez yetkazib berish.",
-        url: 'https://book.uz',
+        title: defaultTitle,
+        description: defaultDescription,
+        url: siteUrl,
         siteName: 'Book.uz',
         type: 'website',
         locale: 'uz_UZ',
         alternateLocale: ['ru_UZ', 'en_US'],
         images: [
             {
-                url: '/images/Logo.png',
+                url: defaultOgImage,
                 width: 1200,
                 height: 630,
-                alt: "Book.uz - O'zbekistondagi eng katta onlayn kitob do'koni"
+                alt: defaultTitle
             }
         ]
     },
     twitter: {
         card: 'summary_large_image',
-        title: "Book.uz - O'zbekistondagi eng katta onlayn kitob do'koni",
-        description: "O'zbekistondagi eng katta onlayn kitob do'koni. Keng tanlov, arzon narxlar, tez yetkazib berish.",
-        images: ['/images/Logo.png']
+        title: defaultTitle,
+        description: defaultDescription,
+        images: [defaultOgImage]
     },
     icons: {
         icon: [

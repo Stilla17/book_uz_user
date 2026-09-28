@@ -3,15 +3,19 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import Link from 'next/link';
+import Script from 'next/script';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useTelegramAuth } from '@/hooks/useTelegramAuth';
+import type { TelegramAuthPayload } from '@/types/auth.types';
 
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Loader2, Phone, ShieldCheck } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { FaTelegramPlane } from 'react-icons/fa';
 import { IMaskInput } from 'react-imask';
 
 const OTP_LENGTH = 4;
@@ -32,11 +36,30 @@ type LoginType = {
     phone: string;
 };
 
+type TelegramLoginOptions = {
+    bot_id: number;
+    request_access?: boolean;
+};
+
+declare global {
+    interface Window {
+        Telegram?: {
+            Login?: {
+                auth: (
+                    options: TelegramLoginOptions,
+                    callback: (payload: TelegramAuthPayload | false) => void
+                ) => void;
+            };
+        };
+    }
+}
+
 export default function LoginPage() {
     const { t } = useTranslation();
-    const { sendPhoneOtp, verifyPhoneOtp, isLoading } = useAuth();
+    const { sendPhoneOtp, verifyPhoneOtp, refreshUser, isLoading } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const telegramAuth = useTelegramAuth();
 
     const {
         control,
@@ -96,6 +119,38 @@ export default function LoginPage() {
 
     const handleSendOtp = handleSubmit(requestOtp);
 
+    const handleTelegramLogin = () => {
+        const botId = Number(process.env.NEXT_PUBLIC_TELEGRAM_BOT_ID);
+        const telegramLogin = window.Telegram?.Login?.auth;
+
+        if (!Number.isInteger(botId) || botId <= 0) {
+            toast.error('NEXT_PUBLIC_TELEGRAM_BOT_ID sozlanmagan');
+            return;
+        }
+
+        if (!telegramLogin) {
+            toast.error('Telegram login yuklanmadi. Qayta urinib ko‘ring.');
+            return;
+        }
+
+        telegramLogin({ bot_id: botId, request_access: true }, (payload) => {
+            if (!payload) return;
+
+            telegramAuth.mutate(payload, {
+                onSuccess: async () => {
+                    await refreshUser();
+                    toast.success(t('loginPage.welcome'));
+                    const redirect = new URLSearchParams(window.location.search).get('redirect');
+                    router.push(redirect || '/');
+                    router.refresh();
+                },
+                onError: (error) => {
+                    toast.error(getErrorMessage(error, 'Telegram orqali kirishda xatolik yuz berdi'));
+                }
+            });
+        });
+    };
+
     const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -153,6 +208,7 @@ export default function LoginPage() {
 
     return (
         <div className='flex min-h-screen items-center justify-center px-4 py-12 dark:bg-slate-900'>
+            <Script src='https://telegram.org/js/telegram-widget.js?22' strategy='afterInteractive' />
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -217,6 +273,21 @@ export default function LoginPage() {
                             ) : (
                                 <>
                                     {t('loginPage.sendCode')} <ArrowRight size={20} />
+                                </>
+                            )}
+                        </button>
+
+                        {/* Telegram Button */}
+                        <button
+                            type='button'
+                            onClick={handleTelegramLogin}
+                            disabled={isLoading || telegramAuth.isPending}
+                            className='mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0097E3] py-4 font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:bg-[#0097E3] disabled:cursor-not-allowed disabled:opacity-70 dark:shadow-[#0097E3]/30'>
+                            {telegramAuth.isPending ? (
+                                <Loader2 className='animate-spin' size={22} />
+                            ) : (
+                                <>
+                                    <FaTelegramPlane size={22} /> {t('loginPage.sendTelegram')}
                                 </>
                             )}
                         </button>

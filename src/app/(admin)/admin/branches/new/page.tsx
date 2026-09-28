@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -12,7 +12,7 @@ import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { Input } from '@/components/ui/input';
 import { BranchFormData } from '@/types';
 
-import L from 'leaflet';
+import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet';
 import { Building2, Map, MapPin } from 'lucide-react';
 import { useForm, useWatch } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -41,36 +41,55 @@ const BranchCoordinatePreview = ({
     name?: string;
 }) => {
     const mapContainerRef = useRef<HTMLDivElement | null>(null);
-    const mapRef = useRef<L.Map | null>(null);
-    const markerRef = useRef<L.Marker | null>(null);
+    const mapRef = useRef<LeafletMap | null>(null);
+    const markerRef = useRef<LeafletMarker | null>(null);
+    const leafletRef = useRef<typeof import('leaflet') | null>(null);
+    const [mapReady, setMapReady] = useState(false);
     const isValid = hasValidCoordinate(latitude, longitude);
 
     useEffect(() => {
-        if (!mapContainerRef.current || mapRef.current) return;
+        let cancelled = false;
+        let activeMap: LeafletMap | null = null;
 
-        const map = L.map(mapContainerRef.current, {
-            zoomControl: true,
-            scrollWheelZoom: false
-        }).setView([41.3775, 64.5853], 6);
+        const initializeMap = async () => {
+            const container = mapContainerRef.current;
+            if (!container || mapRef.current) return;
 
-        map.attributionControl.setPrefix(false);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+            const L = await import('leaflet');
+            if (cancelled || !mapContainerRef.current) return;
 
-        mapRef.current = map;
+            const map = L.map(container, {
+                zoomControl: true,
+                scrollWheelZoom: false
+            }).setView([41.3775, 64.5853], 6);
+
+            map.attributionControl.setPrefix(false);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            activeMap = map;
+            leafletRef.current = L;
+            mapRef.current = map;
+            setMapReady(true);
+        };
+
+        void initializeMap();
 
         return () => {
-            map.stop();
+            cancelled = true;
+            activeMap?.stop();
             markerRef.current = null;
+            leafletRef.current = null;
             mapRef.current = null;
-            map.remove();
+            activeMap?.remove();
         };
     }, []);
 
     useEffect(() => {
         const map = mapRef.current;
-        if (!map || !isValid) return;
+        const L = leafletRef.current;
+        if (!map || !L || !isValid) return;
 
         const position: [number, number] = [Number(latitude), Number(longitude)];
         const branchPinIcon = L.divIcon({
@@ -81,18 +100,16 @@ const BranchCoordinatePreview = ({
             popupAnchor: [0, -28]
         });
 
-        if (!markerRef.current) {
-            markerRef.current = L.marker(position, { icon: branchPinIcon }).addTo(map);
-        } else {
-            markerRef.current.setLatLng(position);
-        }
+        const marker = markerRef.current || L.marker(position, { icon: branchPinIcon }).addTo(map);
+        markerRef.current = marker;
+        marker.setLatLng(position);
 
-        markerRef.current
+        marker
             .bindPopup(`<strong>${name?.trim() || 'Yangi filial'}</strong><br/>${position[0]}, ${position[1]}`)
             .openPopup();
         map.stop();
         map.flyTo(position, 13, { duration: 0.5 });
-    }, [isValid, latitude, longitude, name]);
+    }, [isValid, latitude, longitude, mapReady, name]);
 
     return (
         <div className='relative mt-4 min-h-72 overflow-hidden rounded-[22px] border border-[#d8c7b2] bg-[#f2e7d8] dark:border-slate-700 dark:bg-slate-900'>

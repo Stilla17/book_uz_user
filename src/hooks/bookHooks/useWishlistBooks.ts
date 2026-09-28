@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { type Book } from '@/components/cards/BookCard';
 import { type LocalizedText } from '@/types/book';
 import { useAuth } from '@/hooks/useAuth';
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import { setWishlist, type WishlistBook } from '@/store/features/wishlistSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getWishlistFromLocalStorage } from '@/utils/wishlistStorage';

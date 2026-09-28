@@ -23,7 +23,7 @@ const AdminFaqPage = () => {
     const searchParams = useSearchParams();
     const urlPage = getPageFromUrl(searchParams.get('page'));
     const [page, setPage] = useState(urlPage);
-    const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
+    const { debouncedSearch } = useUrlSearch();
     const { data: faqItems, isFetching, isLoading } = useFaqListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
     const { mutate } = useDeleteFaq();
     const faqData = faqItems?.faqs ?? [];

@@ -4,11 +4,9 @@ import React, { useEffect } from 'react';
 
 import Link from 'next/link';
 
-import { BookCard } from '@/components/cards/BookCard';
 import AsideCart from '@/components/shared/AsideCart';
 import QuantityControl from '@/components/shared/QuantityControl';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
-import { useRandomBooksQuery } from '@/hooks/queries/useBookQueries';
 import { setLoading } from '@/store/features/globalSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { getText } from '@/utils/book-formatters';
@@ -26,11 +24,6 @@ export default function CartPage() {
     const { cartItems, loadingCart, authLoading, totalPrice, totalQuantity, updateQuantity, removeItem, clearItems } =
         useBookCart();
     // Yangi asr Nashryoti boyicha bosin
-
-    const { data: randomBooks = [], isLoading: booksLoading } = useRandomBooksQuery({
-        limit: 5,
-        minPrice: 20_000
-    });
 
     useEffect(() => {
         dispatch(setLoading(authLoading || loadingCart));

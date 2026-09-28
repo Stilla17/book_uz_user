@@ -2,11 +2,13 @@ import type { Metadata } from 'next';
 
 import type { Book } from '@/types/book';
 import type { NewsItems } from '@/types/news';
-import { getBookImageUrl, getImageUrl, type ImageValue } from '@/utils/image';
+import { type ImageValue, getBookImageUrl, getImageUrl } from '@/utils/image';
 
-export const siteUrl = 'https://book.uz';
+const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://book.uz';
+
+export const siteUrl = configuredSiteUrl.replace(/\/$/, '');
 export const siteName = 'Book.uz';
-export const defaultOgImage = '/images/Logo.png';
+export const defaultOgImage = '/opengraph-image';
 export const defaultTitle = "Book.uz - O'zbekistondagi eng katta onlayn kitob do'koni";
 export const defaultDescription =
     "O'zbekistondagi eng katta onlayn kitob do'koni. Keng tanlov, arzon narxlar, tez yetkazib berish.";
@@ -38,6 +40,24 @@ export const absoluteUrl = (path = '/') => {
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
 
     return `${siteUrl}${path.startsWith('/') ? path : `/${path}`}`;
+};
+
+export const cleanSeoText = (value: string, maxLength = 160) => {
+    const text = value
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/&amp;/gi, '&')
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;/gi, "'")
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    if (text.length <= maxLength) return text;
+
+    const shortened = text.slice(0, maxLength - 1);
+    const lastSpace = shortened.lastIndexOf(' ');
+
+    return `${lastSpace > 80 ? shortened.slice(0, lastSpace) : shortened}…`;
 };
 
 export const absoluteImageUrl = (image?: ImageValue) => {
@@ -72,22 +92,15 @@ export const createPageMetadata = ({
 }): Metadata => {
     const url = absoluteUrl(path);
     const imageUrl = absoluteImageUrl(image);
+    const safeTitle = cleanSeoText(title, 65);
+    const safeDescription = cleanSeoText(description);
 
     return {
-        title,
-        description,
+        title: safeTitle,
+        description: safeDescription,
         keywords,
         alternates: {
-            canonical: url,
-            languages: {
-                uz: url,
-                'uz-UZ': url,
-                ru: absoluteUrl(`/ru${path === '/' ? '' : path}`),
-                'ru-UZ': absoluteUrl(`/ru${path === '/' ? '' : path}`),
-                en: absoluteUrl(`/en${path === '/' ? '' : path}`),
-                'en-US': absoluteUrl(`/en${path === '/' ? '' : path}`),
-                'x-default': url
-            }
+            canonical: url
         },
         robots: noIndex
             ? {
@@ -106,8 +119,8 @@ export const createPageMetadata = ({
                   }
               },
         openGraph: {
-            title,
-            description,
+            title: safeTitle,
+            description: safeDescription,
             url,
             siteName,
             type: type === 'article' ? 'article' : 'website',
@@ -118,14 +131,14 @@ export const createPageMetadata = ({
                     url: imageUrl,
                     width: 1200,
                     height: 630,
-                    alt: title
+                    alt: safeTitle
                 }
             ]
         },
         twitter: {
             card: 'summary_large_image',
-            title,
-            description,
+            title: safeTitle,
+            description: safeDescription,
             images: [imageUrl]
         }
     };
@@ -161,7 +174,7 @@ export const createBookMetadata = (book: Book | null, slug: string): Metadata =>
 
     const title = getLocalizedText(book.title, 'Kitob');
     const description =
-        getLocalizedText(book.description) ||
+        cleanSeoText(getLocalizedText(book.description)) ||
         `${title} kitobini Book.uz onlayn kitob do'konida xarid qiling. Tez yetkazib berish va qulay narxlar.`;
 
     return createPageMetadata({
@@ -170,7 +183,7 @@ export const createBookMetadata = (book: Book | null, slug: string): Metadata =>
         path: `/book/${book.slug || slug}`,
         image: getBookImageUrl(book),
         type: 'book',
-        keywords: [...defaultKeywords, title]
+        keywords: [...defaultKeywords, title, ...(book.tags || book.tegs || [])]
     });
 };
 
@@ -185,7 +198,8 @@ export const createNewsMetadata = (news: NewsItems | null, slug: string): Metada
     }
 
     const title = getLocalizedText(news.title, 'Yangilik');
-    const description = getLocalizedText(news.excerpt) || getLocalizedText(news.description) || defaultDescription;
+    const description =
+        cleanSeoText(getLocalizedText(news.excerpt) || getLocalizedText(news.description)) || defaultDescription;
 
     return createPageMetadata({
         title: `${title} | Book.uz`,

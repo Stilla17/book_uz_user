@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useAuth } from '@/hooks/useAuth';
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import { type CartBook, type CartItem, addCart, clearCart, removeCart, setCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getBookPriceInfo } from '@/utils/book-formatters';

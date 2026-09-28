@@ -1,5 +1,5 @@
 import type { Book } from '@/components/cards/BookCard';
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import { type WishlistBook } from '@/store/features/wishlistSlice';
 
 import { toggleGuestWishlist } from './wishlistStorage';

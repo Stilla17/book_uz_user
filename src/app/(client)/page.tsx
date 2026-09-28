@@ -6,8 +6,6 @@ import { BookSection } from '@/components/sections/BookSection';
 import { Hero } from '@/components/sections/Hero';
 import { NewsSection } from '@/components/sections/NewsSection';
 import Publishers from '@/components/sections/Publishers';
-import { ServicesSection } from '@/components/sections/ServicesSection';
-import { SupportSection } from '@/components/sections/SupportSection';
 import { TopSalesSection } from '@/components/sections/TopSalesSection';
 import HomepageStructuredData from '@/components/seo/HomepageStructuredData';
 
@@ -19,6 +17,7 @@ const Page = () => {
     return (
         <div className='bg-background flex flex-col dark:bg-slate-900'>
             <HomepageStructuredData />
+            <h1 className='sr-only'>Book.uz — O‘zbekistondagi onlayn kitob do‘koni</h1>
 
             {/* Hero Section */}
             <Hero />
@@ -45,12 +44,6 @@ const Page = () => {
 
             {/* About Section */}
             <AboutSection />
-
-            {/* Services Section */}
-            {/* <ServicesSection /> */}
-
-            {/* Support Section */}
-            {/* <SupportSection /> */}
         </div>
     );
 };

@@ -2,7 +2,9 @@
 
 import React, { type ReactNode, createContext, useEffect, useReducer } from 'react';
 
-import { AuthServiceAPI, UserService, hasAuthSession, setAuthSession } from '@/services/api';
+import { hasAuthSession, setAuthSession } from '@/services/api';
+import { AuthServiceAPI } from '@/services/auth.service';
+import { UserService } from '@/services/user.service';
 import { type CartItem, setCart } from '@/store/features/cartSlice';
 import { type WishlistBook, setWishlist } from '@/store/features/wishlistSlice';
 import { useAppDispatch } from '@/store/hooks';

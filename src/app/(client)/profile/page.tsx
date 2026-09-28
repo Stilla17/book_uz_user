@@ -11,7 +11,7 @@ import { orderStatusConfig, profileTabs } from '@/data';
 import { useWishlistBooks } from '@/hooks/bookHooks/useWishlistBooks';
 import { useGetOrder } from '@/hooks/orderHooks/useGetOrder';
 import { useAuth } from '@/hooks/useAuth';
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import type { Book } from '@/types/book';
 import { getText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';

@@ -9,8 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { deliveryOptions, paymentOptions } from '@/data';
 import {
     DELIVERY_COST,
-    type DistrictItem,
-    type RegionItem,
     buildOrderPayload,
     getDeliveryType,
     getLocationName,
@@ -24,7 +22,7 @@ import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { useCreateOrder } from '@/hooks/orderHooks/useCreateOrder';
 import { useDeliverySettingsQuery, useDistrictsQuery, useRegionsQuery } from '@/hooks/queries/useCheckoutQueries';
 import { useAuth } from '@/hooks/useAuth';
-import { UserService } from '@/services/api';
+import { UserService } from '@/services/user.service';
 import { resetCheckout, updateField } from '@/store/features/checkoutSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getFreeDeliveryBookIds } from '@/utils/cartStorage';

@@ -65,3 +65,31 @@ export interface LoginResponse {
     token?: string;
     user: User | null;
 }
+
+// 1. Telegram Widget'dan keladigan xom ma'lumotlar
+export interface TelegramAuthPayload {
+    id: number;
+    first_name: string;
+    last_name?: string;
+    username?: string;
+    photo_url?: string;
+    auth_date: number;
+    hash: string;
+}
+
+// 2. Foydalanuvchi ma'lumotlari tipi
+export interface TelegramUser {
+    telegramId: string;
+    firstName: string;
+    lastName?: string;
+    username?: string;
+    photoUrl?: string;
+}
+
+// 3. Backenddan qaytadigan javob (LoginWithTelegramResponse)
+export interface LoginWithTelegramResponse {
+    success: boolean;
+    message?: string;
+    user: TelegramUser;
+    token?: string; // JWT token
+}
