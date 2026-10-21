@@ -2,10 +2,10 @@
 
 import { type MouseEvent } from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { BookCover } from '@/components/shared/BookCover';
 import { useAddCartMutation } from '@/hooks/bookCardHooks/useCardQuery';
 import { useBookStats } from '@/hooks/bookHooks/useBookStats';
 import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
@@ -42,6 +42,8 @@ export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = 
     const { isBookmarked, favoriteLoading, toggleFavorite, user } = useBookWishlist(book, { onWishlistChange });
     const priceInfo = getBookPriceInfo(book);
     const bookImageUrl = getBookImageUrl(book);
+    const moyskladCode = book.moyskladExternalCode?.trim();
+    const hasMoyskladCode = Boolean(moyskladCode && moyskladCode !== '-');
 
     const handleAddToCart = (event: MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
@@ -132,20 +134,15 @@ export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = 
                     onFocus={prefetchBook}
                     aria-label={t('bookCard.detailsLabel', { title: getBookTitle(book) })}
                     className='relative flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] dark:border-slate-700 dark:bg-slate-900'>
-                    {bookImageUrl ? (
-                        <Image
-                            src={bookImageUrl}
-                            alt={getBookTitle(book)}
-                            fill
-                            sizes='(max-width: 470px) 70vw, (max-width: 768px) 42vw, (max-width: 1024px) 30vw, 220px'
-                            className='object-contain'
-                        />
-                    ) : (
-                        <div className='flex size-full flex-col items-center justify-center gap-3 bg-slate-50 text-slate-400 dark:bg-slate-900 dark:text-slate-500'>
-                            <BookOpen size={48} strokeWidth={1.5} />
-                            <span className='text-xs font-semibold'>{t('bookCard.noImage')}</span>
-                        </div>
-                    )}
+                    <BookCover
+                        src={bookImageUrl}
+                        alt={getBookTitle(book)}
+                        fill
+                        sizes='(max-width: 470px) 70vw, (max-width: 768px) 42vw, (max-width: 1024px) 30vw, 220px'
+                        className='object-contain'
+                        fallbackClassName='rounded-[12px]'
+                        iconSize={48}
+                    />
                     {book.hasEbook && (
                         <span
                             title='Elektron kitob mavjud'
@@ -231,7 +228,9 @@ export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = 
                             type='button'
                             aria-label={isBookInCart ? 'Savatga o\'tish' : t('bookCard.addToCart')}
                             className='flex items-center gap-1 rounded-full bg-[#ef7f1a] p-2.5 text-white shadow-[0_10px_22px_-10px_rgba(239,127,26,0.9)] hover:bg-[#df7012] hover:shadow-lg'
-                            disabled={Boolean(!book?.stock || book.stock <= 0 || addCartMutation.isPending)}
+                            disabled={Boolean(
+                                (hasMoyskladCode && (!book.stock || book.stock <= 0)) || addCartMutation.isPending
+                            )}
                             onClick={handleAddToCart}>
                             <ShoppingCart size={18} />
                         </button>

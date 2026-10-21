@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { BookStructuredData } from '@/components/seo/StructuredData';
+import { BookCover } from '@/components/shared/BookCover';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import DottedLine from '@/components/shared/DottedLine';
 import { Loading } from '@/components/shared/Loading';
@@ -20,7 +21,7 @@ import { bookService } from '@/services/book.service';
 import { Book } from '@/types/book';
 import { getAuthor, getBookPriceInfo, getCategoryLabel, getLocalizedText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
-import { getBookImageUrl, getImageUrl } from '@/utils/image';
+import { getBookImageUrl } from '@/utils/image';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { AxiosError } from 'axios';
@@ -45,6 +46,7 @@ export default function BookDetailPage() {
     const router = useRouter();
     const [selectedQuantity, setSelectedQuantity] = useState(1);
     const { isAuthenticated, isLoading: authLoading } = useAuth();
+    // tolov ebook ochirish
     const [ebookAccess, setEbookAccess] = useState(false);
     const [ebookAccessLoading, setEbookAccessLoading] = useState(false);
     const [ebookPurchaseLoading, setEbookPurchaseLoading] = useState<'CLICK' | 'PAYME' | null>(null);
@@ -85,8 +87,10 @@ export default function BookDetailPage() {
 
         return Math.max(book.stock ?? 0, 0);
     }, [book]);
+    const moyskladCode = book?.moyskladExternalCode?.trim();
+    const hasMoyskladCode = Boolean(moyskladCode && moyskladCode !== '-');
     const stockLimit = availableStock > 0 ? availableStock : undefined;
-    const isBookAvailable = availableStock > 0;
+    const isBookAvailable = !hasMoyskladCode || availableStock > 0;
     const displayedQuantity = cartQuantity > 0 ? cartQuantity : selectedQuantity;
     const priceInfo = getBookPriceInfo(book);
     const ebookPrice =
@@ -281,7 +285,6 @@ export default function BookDetailPage() {
     ];
 
     const normalizedHiddenLocationsMoysklad = hiddenLocationsMoysklad.map(normalizeStoreName);
-    const isMoyskladSynced = Boolean(book?.branchStocks?.length);
     const visibleBranchNameMoysklad = branchStocks.filter(
         (item) =>
             !normalizedHiddenLocationsMoysklad.includes(normalizeStoreName(item.storeName)) &&
@@ -373,23 +376,27 @@ export default function BookDetailPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className='grid gap-4 rounded-2xl border border-[#f7e3cf] bg-[#fff9f3] p-1.5 shadow-lg shadow-orange-100/70 backdrop-blur sm:gap-8 lg:grid-cols-[minmax(0,460px)_1fr] dark:border-slate-700 dark:bg-slate-800 dark:shadow-none'>
-                    <div className='relative min-h-80 overflow-hidden p-4 sm:min-h-105 sm:p-6'>
-                        <img
-                            src={getImageUrl(bookView.image)}
-                            alt={bookView.title}
-                            className='h-full max-h-130 w-full object-contain'
-                        />
-                        {book?.hasEbook && (
-                            <div className='absolute top-4 right-4 flex items-center gap-2 rounded-full border-2 border-[#ef7f1a] bg-white/95 px-3 py-2 text-xs font-black text-[#ef7f1a] shadow-md backdrop-blur sm:top-6 sm:right-6'>
-                                <BookOpen size={16} color='#ef7f1a' />
-                            </div>
-                        )}
-                        {priceInfo.discount ? (
-                            <span className='absolute top-4 left-4 rounded-full bg-[#ef7f1a] px-3 py-1.5 text-sm font-black text-white shadow-sm ring-1 ring-white/70 sm:top-6 sm:left-6'>
-                                -{priceInfo.discount}%
-                            </span>
-                        ) : null}
-                        {!isMoyskladSynced ? null : visibleBranchNameMoysklad.length ? (
+                    <div className='mx-auto w-full max-w-[380px] self-start'>
+                        <div className='relative aspect-[2/3] overflow-hidden p-4 sm:p-6'>
+                            <BookCover
+                                src={bookView.image}
+                                alt={bookView.title}
+                                className='size-full object-contain'
+                                fallbackClassName='rounded-xl'
+                                iconSize={72}
+                            />
+                            {book?.hasEbook && (
+                                <div className='absolute top-4 right-4 flex items-center gap-2 rounded-full border-2 border-[#ef7f1a] bg-white/95 px-3 py-2 text-xs font-black text-[#ef7f1a] shadow-md backdrop-blur sm:top-6 sm:right-6'>
+                                    <BookOpen size={16} color='#ef7f1a' />
+                                </div>
+                            )}
+                            {priceInfo.discount ? (
+                                <span className='absolute top-4 left-4 rounded-full bg-[#ef7f1a] px-3 py-1.5 text-sm font-black text-white shadow-sm ring-1 ring-white/70 sm:top-6 sm:left-6'>
+                                    -{priceInfo.discount}%
+                                </span>
+                            ) : null}
+                        </div>
+                        {!hasMoyskladCode ? null : visibleBranchNameMoysklad.length ? (
                             <div className='mt-5 space-y-3 border-t border-orange-100 pt-4 dark:border-slate-700'>
                                 <div className='rounded-lg border border-green-100 bg-green-50/70 p-3 text-sm font-semibold text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400'>
                                     {t('bookDetail.stockAvailable', { count: countStockBranchMoysklad })}

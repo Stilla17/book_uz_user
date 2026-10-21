@@ -2,10 +2,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { BookCover } from '@/components/shared/BookCover';
 import { useSearchSuggestionsQuery } from '@/hooks/queries/useSearchSuggestionsQuery';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getCatalogCategoryHref } from '@/lib/catalog-links';
@@ -16,8 +16,6 @@ import { getBookImageUrl } from '@/utils/image';
 
 import { BookOpen, ChevronRight, Grid3x3, Loader2, Search, User, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1887';
 
 export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchDropdownProps) => {
     const { t } = useTranslation();
@@ -97,11 +95,13 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                         onClick={handleItemClick}
                                         className='group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50'>
                                         <div className='relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-lg'>
-                                            <Image
-                                                src={getBookImageUrl(product) || FALLBACK_IMAGE}
+                                            <BookCover
+                                                src={getBookImageUrl(product)}
                                                 alt={getProductTitle(product)}
                                                 fill
+                                                sizes='40px'
                                                 className='object-cover'
+                                                iconSize={22}
                                             />
                                         </div>
                                         <div className='min-w-0 flex-1'>

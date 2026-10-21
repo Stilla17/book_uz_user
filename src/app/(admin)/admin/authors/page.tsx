@@ -5,22 +5,23 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { getAuthorStats } from '@/components/admin/data/admin-data';
 import { useDeleteAuthor } from '@/components/admin/hooks/authorsHooks/useDeleteAuthor';
 import { useAuthorListQuery } from '@/components/admin/hooks/queries/author';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
+import EntityImage from '@/components/shared/EntityImage';
 import { Button } from '@/components/ui/button';
 import { PublishersSkeleton } from '@/components/ui/skeleton';
 import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
-import { FETCH_PAGINATION_LIMIT } from '@/tools';
-import { getImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { BookOpen, Edit3, Search, Trash2, User, Users } from 'lucide-react';
+import { Edit3, Search, Trash2 } from 'lucide-react';
 
 type AuthorSortKey = 'title' | 'bookCount';
+const AUTHOR_PAGE_SIZE = 20;
 
 const AdminAuthorsPage = () => {
     const router = useRouter();
@@ -29,7 +30,7 @@ const AdminAuthorsPage = () => {
     const [page, setPage] = useState(urlPage);
     const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<AuthorSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { data, isFetching, isLoading } = useAuthorListQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
+    const { data, isFetching, isLoading } = useAuthorListQuery(page, AUTHOR_PAGE_SIZE, debouncedSearch);
     const { mutate } = useDeleteAuthor();
 
     useEffect(() => {
@@ -56,11 +57,6 @@ const AdminAuthorsPage = () => {
         return sum + getAuthorBookCount(auth);
     }, 0);
 
-    const stats = [
-        { label: 'Jami mualliflar', value: pagination?.total, icon: Users, color: 'bg-[#ef7f1a]' },
-        { label: 'Kitoblar', value: totalAuthorBooks, icon: BookOpen, color: 'bg-[#285c7f]' }
-    ];
-
     const updatePage = (nextPage: number) => {
         updateUrlPage({
             nextPage,
@@ -79,7 +75,7 @@ const AdminAuthorsPage = () => {
                 href='authors'
             />
 
-            <StatsCardsAdmin stats={stats} isLoading={isLoading} />
+            <StatsCardsAdmin stats={getAuthorStats(pagination?.total, totalAuthorBooks)} isLoading={isLoading} />
 
             <section className='rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>
@@ -125,17 +121,14 @@ const AdminAuthorsPage = () => {
                                 key={author._id}
                                 className='grid gap-4 rounded-4xl bg-white p-4 ring-1 ring-[#eadfce] md:grid-cols-[minmax(0,1fr)_120px_110px] md:items-center dark:bg-slate-900 dark:ring-slate-800'>
                                 <div className='flex min-w-0 items-center gap-3'>
-                                    {author.image === '' ? (
-                                        <span className='grid size-13 shrink-0 place-items-center rounded-2xl bg-[#f2e7d8] text-[#ef7f1a] dark:bg-slate-950'>
-                                            <User size={22} />
-                                        </span>
-                                    ) : (
-                                        <img
-                                            src={getImageUrl(author.image)}
-                                            alt={author.name}
-                                            className='size-13 rounded-full object-cover'
-                                        />
-                                    )}
+                                    <EntityImage
+                                        src={author.image}
+                                        alt={author.name}
+                                        type='author'
+                                        className='size-13 shrink-0 rounded-2xl bg-[#f2e7d8] dark:bg-slate-950'
+                                        imageClassName='size-full rounded-full object-cover'
+                                        iconClassName='size-6 text-[#ef7f1a]'
+                                    />
 
                                     <div className='min-w-0'>
                                         <h3 className='truncate font-black text-[#2f2a25] dark:text-white'>
@@ -154,16 +147,29 @@ const AdminAuthorsPage = () => {
                                 </div>
 
                                 <div className='flex items-center justify-end gap-2'>
-                                    <button className='grid size-9 place-items-center rounded-xl text-[#817466] transition hover:bg-[#f2e7d8] hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-950'>
-                                        <Link href={`/admin/authors/new?id=${author._id}`}>
+                                    <Button
+                                        asChild
+                                        variant='ghost'
+                                        size='icon'
+                                        className='size-9 rounded-xl text-[#817466] hover:bg-[#f2e7d8] hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-950'>
+                                        <Link
+                                            href={`/admin/authors/new?id=${author._id}`}
+                                            aria-label='Muallifni tahrirlash'
+                                            title='Tahrirlash'>
                                             <Edit3 size={17} />
                                         </Link>
-                                    </button>
-                                    <button
+                                    </Button>
+
+                                    <Button
+                                        type='button'
+                                        variant='ghost'
+                                        size='icon'
                                         onClick={() => mutate(author._id)}
-                                        className='grid size-9 place-items-center rounded-xl text-red-500 transition hover:bg-red-50 dark:hover:bg-red-500/10'>
+                                        aria-label='Muallifni o‘chirish'
+                                        title='O‘chirish'
+                                        className='size-9 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10'>
                                         <Trash2 size={17} />
-                                    </button>
+                                    </Button>
                                 </div>
                             </article>
                         ))

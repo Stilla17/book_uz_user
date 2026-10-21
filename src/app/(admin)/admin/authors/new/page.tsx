@@ -11,99 +11,71 @@ import { useImagePreview } from '@/components/admin/hooks/useImagePreview';
 import { Field, SectionTitle, inputClass } from '@/components/admin/other/FiledSettingsAdmin';
 import HeadSectionEdit from '@/components/admin/sections/HeadSectionEdit';
 import { Input } from '@/components/ui/input';
+import { AUTHOR_DEFAULT_VALUES, buildAuthorFormData, validateAuthorDates } from '@/helpers/authorForm';
+import type { AuthorFormValues } from '@/types/author.types';
+import { formatDateInputValue, slugify } from '@/utils/formHelpers';
 import { getImageUrl } from '@/utils/image';
 
 import { ImagePlus, Loader, ScrollText, Upload, UserRound, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
-type AuthorFormValues = {
-    name: string;
-    slug: string;
-    bio: {
-        uz: string;
-        ru: string;
-        en: string;
-    };
-    birthDate: string;
-    deathDate: string;
-};
-
-const slugify = (value: string) =>
-    value
-        .toLowerCase()
-        .trim()
-        .replace(/['"`]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-
-const formatDateInputValue = (value?: string) => (value ? value.slice(0, 10) : '');
-
-const isValidDateInput = (value: string) => {
-    if (!value) return true;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-
-    const date = new Date(`${value}T00:00:00Z`);
-
-    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
-};
-
 const AdminNewAuthorPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
+
     const id = searchParams.get('id');
     const isEdit = !!id;
 
-    const { mutate: createAuthor, isPending: isCreatePanding } = useCreateAuthor();
-    const { mutate: updateAuthor, isPending: isUpdatePending } = useUpdateAuthor();
+    const createMutation = useCreateAuthor();
+    const updateMutation = useUpdateAuthor();
     const { data: authorData, isLoading: isDetailLoading, isError: isDetailError } = useAuthorDetailQuery(id);
     const { imageFile, imagePreview, setImagePreview, handleImageChange, clearImagePreview } = useImagePreview();
-
-    const isPending = id ? isUpdatePending : isCreatePanding;
-
-    const { getValues, handleSubmit, register, setValue, reset } = useForm<AuthorFormValues>({
-        defaultValues: {
-            name: '',
-            slug: '',
-            bio: {
-                uz: '',
-                ru: '',
-                en: ''
-            },
-            birthDate: '',
-            deathDate: ''
-        }
+    const {
+        handleSubmit,
+        register,
+        setValue,
+        reset,
+        formState: { dirtyFields }
+    } = useForm<AuthorFormValues>({
+        defaultValues: AUTHOR_DEFAULT_VALUES
     });
 
-    useEffect(() => {
-        if (authorData) {
-            reset({
-                name: authorData.name || '',
-                slug: authorData.slug || '',
-                bio: authorData.bio || {
-                    uz: '',
-                    ru: '',
-                    en: ''
-                },
-                birthDate: formatDateInputValue(authorData.birthDate),
-                deathDate: formatDateInputValue(authorData.deathDate)
-            });
-
-            if (authorData.image) {
-                setImagePreview(getImageUrl(authorData.image) || '');
-            }
-        }
-    }, [authorData, reset]);
+    const isPending = isEdit ? updateMutation.isPending : createMutation.isPending;
 
     useEffect(() => {
-        return () => {
-            if (imagePreview && imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
-        };
-    }, [imagePreview]);
+        if (!authorData) return;
+
+        reset({
+            name: authorData.name ?? '',
+            slug: authorData.slug ?? '',
+            bio: {
+                ...AUTHOR_DEFAULT_VALUES.bio,
+                ...authorData.bio
+            },
+            birthDate: formatDateInputValue(authorData.birthDate),
+            deathDate: formatDateInputValue(authorData.deathDate)
+        });
+
+        setImagePreview(getImageUrl(authorData.image) ?? '');
+    }, [authorData, reset, setImagePreview]);
 
     const handleNameChange = (value: string) => {
-        setValue('name', value);
-        if (!getValues('slug')) setValue('slug', slugify(value));
+        setValue('name', value, {
+            shouldDirty: true
+        });
+
+        if (!dirtyFields.slug) {
+            setValue('slug', slugify(value), {
+                shouldDirty: false
+            });
+        }
+    };
+
+    const finishSubmission = (message: string) => {
+        toast.success(message);
+        router.push('/admin/authors');
+        router.refresh();
     };
 
     const getErrorMessage = (error: unknown, fallback: string) => {
@@ -114,57 +86,51 @@ const AdminNewAuthorPage = () => {
     };
 
     const onSubmit = (values: AuthorFormValues) => {
-        if (!isValidDateInput(values.birthDate) || !isValidDateInput(values.deathDate)) {
-            toast.error("Sanani YYYY-MM-DD formatida to'g'ri kiriting");
+        const dateError = validateAuthorDates(values);
+
+        if (dateError) {
+            toast.error(dateError);
             return;
         }
 
-        if (values.birthDate && values.deathDate && values.deathDate < values.birthDate) {
-            toast.error("Vafot etgan sana tug'ilgan sanadan oldin bo'lishi mumkin emas");
-            return;
-        }
+        const formData = buildAuthorFormData(values, imageFile);
 
-        const formData = new FormData();
-
-        formData.append('name', values.name);
-        formData.append('slug', values.slug);
-        formData.append('bio', JSON.stringify(values.bio));
-        if (values.birthDate) formData.append('birthDate', values.birthDate);
-        if (values.deathDate) formData.append('deathDate', values.deathDate);
-        if (imageFile) formData.append('image', imageFile);
-
-        if (id) {
-            const updateId = authorData?._id;
+        if (isEdit) {
+            const updateId = authorData?._id ?? id;
 
             if (!updateId || !/^[0-9a-fA-F]{24}$/.test(updateId)) {
-                toast.error("Muallif topilmadi. Ro'yxatga qaytib, qaytadan tahrirlashni oching.");
+                toast.error('Muallif topilmadi. Ro‘yxatga qaytib, qaytadan tahrirlashni oching.');
                 return;
             }
 
-            updateAuthor(
-                { id: updateId, formData },
+            updateMutation.mutate(
+                {
+                    id: updateId,
+                    formData
+                },
                 {
                     onSuccess: () => {
-                        toast.success('Muallif muvaffaqiyatli yangilandi');
-                        router.push('/admin/authors');
-                        router.refresh();
+                        finishSubmission('Muallif muvaffaqiyatli yangilandi');
                     },
-                    onError: (error: unknown) => {
+                    onError: (error) => {
                         toast.error(getErrorMessage(error, 'Muallifni yangilashda xatolik yuz berdi'));
                     }
                 }
             );
-        } else {
-            createAuthor(formData, {
-                onSuccess: () => {
-                    reset();
-                    clearImagePreview();
-                    toast.success("Muallif muvaffaqiyatli qo'shildi");
-                    router.push('/admin/authors');
-                    router.refresh();
-                }
-            });
+
+            return;
         }
+
+        createMutation.mutate(formData, {
+            onSuccess: () => {
+                reset(AUTHOR_DEFAULT_VALUES);
+                clearImagePreview();
+                finishSubmission('Muallif muvaffaqiyatli qo‘shildi');
+            },
+            onError: (error) => {
+                toast.error(getErrorMessage(error, 'Muallifni yaratishda xatolik yuz berdi'));
+            }
+        });
     };
 
     return (
@@ -217,7 +183,10 @@ const AdminNewAuthorPage = () => {
                                 placeholder='abdulla-qodiriy'
                                 {...register('slug', {
                                     required: true,
-                                    onChange: (event) => setValue('slug', slugify(event.target.value))
+                                    onChange: (event) =>
+                                        setValue('slug', slugify(event.target.value), {
+                                            shouldDirty: true
+                                        })
                                 })}
                             />
                         </Field>

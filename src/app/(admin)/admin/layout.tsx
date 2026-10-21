@@ -19,8 +19,8 @@ const AdminLayoutContent = ({ children }: AdminLayoutProps) => {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const { mutate: logout, isPending: isLoggingOut } = useLogout();
     const { adminTheme } = useAdminTheme();
-    const { theme } = useTheme();
-    const resolvedAdminTheme = adminTheme === 'valentine' ? 'valentine' : theme === 'dark' ? 'dark' : 'bookuzadmin';
+    const { isDark } = useTheme();
+    const resolvedAdminTheme = adminTheme === 'valentine' ? 'valentine' : isDark ? 'dark' : 'bookuzadmin';
 
     const handleLogout = () => {
         logout(undefined, {

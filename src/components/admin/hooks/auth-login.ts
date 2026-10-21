@@ -1,5 +1,7 @@
 import { useRouter } from 'next/navigation';
 
+import { setAccessToken, setAuthSession } from '@/services/api';
+
 import { useMutation } from '@tanstack/react-query';
 
 import { login, logout } from '../services/auth.service';
@@ -14,12 +16,16 @@ export const useLogin = () => {
         onSuccess: (data) => {
             if (!data.user) {
                 Cookies.remove('token');
+                setAccessToken(null);
+                setAuthSession(false);
                 toast.error(data.message || 'Bunday foydalanuvchi topilmadi');
                 return;
             }
 
             if (data.user.role !== 'ADMIN') {
                 Cookies.remove('token');
+                setAccessToken(null);
+                setAuthSession(false);
                 toast.error('Bu panelga faqat admin kira oladi');
                 return;
             }
@@ -32,6 +38,8 @@ export const useLogin = () => {
             }
 
             Cookies.set('token', data.token);
+            setAccessToken(data.token);
+            setAuthSession(true);
             toast.success('Admin panelga xush kelibsiz');
             router.push('/admin');
             router.refresh();
@@ -48,12 +56,16 @@ export const useLogout = () => {
         mutationFn: logout,
         onSuccess: () => {
             Cookies.remove('token');
+            setAccessToken(null);
+            setAuthSession(false);
             toast.success('Tizimdan chiqdingiz');
             router.push('/admin/auth/login');
             router.refresh();
         },
         onError: () => {
             Cookies.remove('token');
+            setAccessToken(null);
+            setAuthSession(false);
             router.push('/admin/auth/login');
             router.refresh();
         }

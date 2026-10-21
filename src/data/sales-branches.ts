@@ -4,7 +4,7 @@ export const SALES_BRANCHES = [
     { id: '257a3813-2da2-11f1-0a80-074c0007a4cf', name: 'Toshkent - Qoramish', aliases: ['Toshkent - Qoraqamish'] },
     { id: '10b98052-ba4e-11ec-0a80-050e0009d3d8', name: "Farg'ona filial" },
     { id: '0664e7c5-f232-11ec-0a80-09850011c255', name: 'Navoiy filial' },
-    { id: 'a0541343-5dbc-11f1-0a80-19be00363869', name: 'Qarshi 2-filial' },
+    { id: 'a0541343-5dbc-11f1-0a80-19be00363869', name: 'Qarshi' },
     { id: '3bd5dee6-7f27-11ef-0a80-05c000498859', name: 'Namangan filial' },
     { id: '1a95712f-5b2a-11f1-0a80-159600044b37', name: 'Buxoro filial' }
 ];

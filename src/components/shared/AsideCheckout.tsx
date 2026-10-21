@@ -1,5 +1,6 @@
 ﻿import React from 'react';
 
+import { BookCover } from '@/components/shared/BookCover';
 import { getDeliveryCost } from '@/helpers/checkout';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
 import { getText } from '@/utils/book-formatters';
@@ -58,10 +59,11 @@ const AsideCheckout = ({
                                 key={item.book._id}
                                 className='flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-950'>
                                 <div className='flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-2 shadow-sm dark:bg-slate-900'>
-                                    <img
+                                    <BookCover
                                         src={getImageUrl(item.book.images)}
                                         alt={getText(item.book.title, t('checkoutPage.unknownBook'))}
                                         className='h-full w-full object-contain'
+                                        iconSize={28}
                                     />
                                 </div>
                                 <div className='min-w-0 flex-1'>

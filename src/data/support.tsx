@@ -1,4 +1,4 @@
-import { Award, Clock, MessageCircle, Users } from "lucide-react";
+import { Award, Clock, MessageCircle, Users } from 'lucide-react';
 
 export const supportStats = [
     {

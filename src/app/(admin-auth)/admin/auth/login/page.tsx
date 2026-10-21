@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { useLogin } from '@/components/admin/hooks/auth-login';
+import { Button } from '@/components/ui/button';
 
 import logo from '../../../../../../public/images/Logo.svg';
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, UserRound } from 'lucide-react';
@@ -87,15 +88,14 @@ export default function AdminLoginPage() {
                                 </button>
                             </div>
                         </div>
-
-                        <button
+                        <Button
                             type='submit'
                             disabled={isPending}
                             className='flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#ef7f1a] text-sm font-black text-white shadow-[0_16px_34px_rgba(239,127,26,0.28)] transition hover:bg-[#df7014] disabled:cursor-not-allowed disabled:opacity-70'>
                             <UserRound size={18} />
                             {isPending ? 'Loading...' : 'Kirish'}
                             <ArrowRight size={18} />
-                        </button>
+                        </Button>
                     </form>
                 </div>
             </section>

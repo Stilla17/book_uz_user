@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 
 import Link from 'next/link';
 
+import { BookCover } from '@/components/shared/BookCover';
 import AsideCart from '@/components/shared/AsideCart';
 import QuantityControl from '@/components/shared/QuantityControl';
 import { useBookCart } from '@/hooks/bookHooks/useBookCart';
@@ -96,10 +97,11 @@ export default function CartPage() {
                                     className='rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4 dark:border-slate-800 dark:bg-slate-900'>
                                     <div className='flex flex-col gap-5 md:flex-row md:items-center'>
                                         <div className='mx-auto flex h-40 w-full max-w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 p-3 sm:h-44 sm:max-w-36 sm:p-4 md:mx-0 dark:bg-slate-950'>
-                                            <img
+                                            <BookCover
                                                 src={getImageUrl(item.book.images)}
                                                 alt={getText(item.book.title, t('cartPage.unknownBook'))}
                                                 className='h-full w-full object-contain'
+                                                iconSize={36}
                                             />
                                         </div>
 

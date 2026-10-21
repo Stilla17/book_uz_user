@@ -1,0 +1,12 @@
+PLAN
+
+1. admin panelda catalog qoshish bolsin✅
+2. catalogda narx moysklad bn sinxronizatsiya bolsin. +12% nds narx qoyilsin optoviklarga✅
+3. Katalog sahifasi qoshilsin. ✅
+4. adminda 20 tadan chiqsin malumotlar ✅
+5. catalogga active inactive qilish qoshish ✅
+
+Optimizatsiya bosqichi
+1. (admin-auth) admin\auth\login\page.tsx ui togirlandi✅
+2. (admin)\authors ichidagi fayllar ui optimizatsiyalashtrsh✅
+3. (admin)\banners ichidagi fayllar ui optimizatsiyalashtrsh✅

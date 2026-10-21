@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 
+import EntityImage from '@/components/shared/EntityImage';
 import { useTopAuthorsQuery } from '@/hooks/queries/useAuthorQueries';
-import { getImageUrl } from '@/utils/image';
 
 import { BookOpenText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,6 @@ type AuthorItem = {
 };
 
 const TOP_AUTHORS_LIMIT = 20;
-const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
 
 const getAuthorBooksCount = (author: AuthorItem) => author.booksCount ?? author.bookCount ?? 0;
 
@@ -76,13 +75,14 @@ const Authors = () => {
                                 <Link
                                     href={`/catalog?author=${encodeURIComponent(authorItem._id)}`}
                                     className='flex h-26.5 items-center overflow-hidden rounded-xl bg-white transition hover:-translate-y-1 hover:shadow-sm dark:bg-slate-900'>
-                                    <div className='h-26.6 w-25 flex-none overflow-hidden rounded-xl'>
-                                        <img
-                                            src={getImageUrl(authorItem.image) || AUTHOR_FALLBACK_IMAGE}
-                                            alt={authorItem.name}
-                                            className='h-full w-full rounded-full object-contain transition duration-500'
-                                        />
-                                    </div>
+                                    <EntityImage
+                                        src={authorItem.image}
+                                        alt={authorItem.name}
+                                        type='author'
+                                        className='h-26.5 w-25 flex-none rounded-xl'
+                                        imageClassName='size-full rounded-full object-contain transition duration-500'
+                                        iconClassName='size-11 text-[#ef7f1a]'
+                                    />
 
                                     <div className='min-w-0 px-4'>
                                         <h3 className='truncate text-base font-black text-slate-950 transition group-hover:text-[#ef7f1a] dark:text-white'>

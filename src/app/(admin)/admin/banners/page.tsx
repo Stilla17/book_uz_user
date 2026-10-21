@@ -6,6 +6,7 @@ import { useDeleteBanner } from '@/components/admin/hooks/bannerHooks/useDeleteB
 import { useBannerQuery } from '@/components/admin/hooks/queries/banner';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
+import { Button } from '@/components/ui/button';
 import { getLocalizedText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
 
@@ -100,12 +101,17 @@ const AdminBannerPage = () => {
                                             className='grid size-9 place-items-center rounded-xl text-[#817466] transition hover:bg-[#f2e7d8] hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-950'>
                                             <Edit3 size={17} />
                                         </Link>
-                                        <button
+                                        <Button
+                                            type='button'
+                                            variant='ghost'
+                                            size='icon'
                                             disabled={isDeletePending}
                                             onClick={() => handleDelete(banner._id)}
-                                            className='grid size-9 place-items-center rounded-xl text-red-500 transition hover:bg-red-50 disabled:opacity-50 dark:hover:bg-red-500/10'>
+                                            aria-label='Bannerni o‘chirish'
+                                            title='O‘chirish'
+                                            className='size-9 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-500/10'>
                                             <Trash2 size={17} />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </article>

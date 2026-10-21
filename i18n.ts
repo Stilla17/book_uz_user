@@ -9,20 +9,6 @@ import { transliterateUzbekResource } from './src/utils/uzbek-cyrillic';
 
 export const LANGUAGE_STORAGE_KEY = 'bookuz-language';
 
-const getInitialLanguage = () => {
-    if (typeof window === 'undefined') {
-        return 'uz';
-    }
-
-    const savedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-
-    if (savedLanguage === 'uz' || savedLanguage === 'uz-Cyrl' || savedLanguage === 'ru' || savedLanguage === 'en') {
-        return savedLanguage;
-    }
-
-    return 'uz';
-};
-
 if (!i18n.isInitialized) {
     i18n.use(initReactI18next).init({
         resources: {
@@ -32,7 +18,9 @@ if (!i18n.isInitialized) {
             'uz-Cyrl': { translation: transliterateUzbekResource(uz) },
         },
         supportedLngs: ['uz', 'uz-Cyrl', 'ru', 'en'],
-        lng: getInitialLanguage(),
+        // The server cannot read localStorage. Keep the first server and client
+        // render identical, then restore the saved language after hydration.
+        lng: 'uz',
         fallbackLng: 'uz',
         interpolation: {
             escapeValue: false,

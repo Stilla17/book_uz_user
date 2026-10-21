@@ -4,18 +4,17 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
+import EntityImage from '@/components/shared/EntityImage';
 import BreadCrumb from '@/components/shared/BreadCrumb';
 import { Pagination } from '@/components/shared/Pagination';
 import { useAuthorsQuery } from '@/hooks/queries/useAuthorQueries';
 import type { AuthorItems } from '@/types/author.types';
-import { getImageUrl } from '@/utils/image';
 
 import { motion } from 'framer-motion';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const AUTHORS_PER_PAGE = 12;
-const AUTHOR_FALLBACK_IMAGE = '/images/unUser.png';
 
 const AuthorsPage = () => {
     const { t } = useTranslation();
@@ -92,10 +91,13 @@ const AuthorCard = ({ author }: { author: AuthorItems }) => {
             viewport={{ once: true, amount: 0.2 }}
             className='group overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-[0_18px_50px_-26px_rgba(15,23,42,0.45)] transition-all hover:-translate-y-1 hover:border-[#ef7f1a]/40 dark:border-slate-700 dark:bg-slate-900'>
             <div className='flex h-48 items-center justify-center bg-slate-50 p-5 dark:bg-slate-800'>
-                <img
-                    src={getImageUrl(author.image) || AUTHOR_FALLBACK_IMAGE}
+                <EntityImage
+                    src={author.image}
                     alt={author.name}
-                    className='size-36 rounded-full object-cover shadow-sm transition-transform duration-300 group-hover:scale-105'
+                    type='author'
+                    className='size-36 rounded-full shadow-sm'
+                    imageClassName='size-full object-cover transition-transform duration-300 group-hover:scale-105'
+                    iconClassName='size-16 text-[#ef7f1a]'
                 />
             </div>
 

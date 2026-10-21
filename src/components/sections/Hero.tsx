@@ -68,7 +68,7 @@ export const Hero = () => {
                             <div className='relative h-full w-full'>
                                 {/* Background Image */}
                                 <div
-                                    className='swiper-slide-active:scale-105 absolute inset-0 scale-100 bg-contain bg-center bg-no-repeat transition-transform duration-10000 sm:scale-105'
+                                    className='absolute inset-0 bg-contain bg-center bg-no-repeat'
                                     style={{
                                         backgroundImage: `url(${getImageUrl(banner.imageUrl) || banner.imageUrl})`
                                     }}

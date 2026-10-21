@@ -20,3 +20,15 @@ export interface AuthorItems {
 }
 
 // -------------------------create Author for Admin----------------------------------
+
+export type AuthorFormValues = {
+    name: string;
+    slug: string;
+    bio: {
+        uz: string;
+        ru: string;
+        en: string;
+    };
+    birthDate: string;
+    deathDate: string;
+};

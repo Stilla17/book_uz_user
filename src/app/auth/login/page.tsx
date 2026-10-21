@@ -8,7 +8,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useTelegramAuth } from '@/hooks/useTelegramAuth';
-import type { TelegramAuthPayload } from '@/types/auth.types';
 
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Loader2, Phone, ShieldCheck } from 'lucide-react';
@@ -35,24 +34,6 @@ const isValidUzPhone = (value: string) => /^\+998\d{9}$/.test(value);
 type LoginType = {
     phone: string;
 };
-
-type TelegramLoginOptions = {
-    bot_id: number;
-    request_access?: boolean;
-};
-
-declare global {
-    interface Window {
-        Telegram?: {
-            Login?: {
-                auth: (
-                    options: TelegramLoginOptions,
-                    callback: (payload: TelegramAuthPayload | false) => void
-                ) => void;
-            };
-        };
-    }
-}
 
 export default function LoginPage() {
     const { t } = useTranslation();

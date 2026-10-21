@@ -9,12 +9,12 @@ import {
     CreditCard,
     FileText,
     Gift,
-    Handshake,
     Headphones,
     HelpCircle,
     ImageIcon,
     Info,
     LayoutDashboard,
+    LibraryBig,
     Mail,
     MapPinned,
     MessageCircleQuestionMark,
@@ -22,6 +22,7 @@ import {
     Newspaper,
     PenLine,
     Percent,
+    QrCode,
     Settings,
     Shield,
     ShoppingCart,
@@ -139,6 +140,11 @@ export const menuItems = [
         icon: BookOpen
     },
     {
+        label: 'Katalog',
+        href: '/admin/catalog',
+        icon: LibraryBig
+    },
+    {
         label: 'Janrlar',
         href: '/admin/genre',
         icon: Tags
@@ -188,11 +194,6 @@ export const menuItems = [
         href: '/admin/faq',
         icon: MessageCircleQuestionMark
     },
-    // {
-    //     label: 'Partners',
-    //     href: '/admin/partners',
-    //     icon: Handshake
-    // },
     {
         label: 'Buyurtmalar',
         href: '/admin/orders',

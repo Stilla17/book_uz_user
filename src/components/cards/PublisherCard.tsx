@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
+import EntityImage from '@/components/shared/EntityImage';
 import type { PublisherItems } from '@/types';
-import { getImageUrl } from '@/utils/image';
 
 import { BookOpen, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -19,17 +19,14 @@ const PublisherCard = ({ publisher, className = '' }: PublisherCardProps) => {
             <Link
                 href={`/publishers/${publisher.slug ?? publisher._id}`}
                 className='group flex min-h-24 items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 hover:border-[#ef7f1a]/40 dark:border-slate-700 dark:bg-slate-900'>
-                <div className='flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 text-xl font-bold text-[#ef7f1a] dark:bg-slate-800'>
-                    {publisher.image ? (
-                        <img
-                            src={getImageUrl(publisher.image)}
-                            alt={publisher.name}
-                            className='size-full object-contain p-2'
-                        />
-                    ) : (
-                        <span>{publisher.name?.charAt(0)?.toUpperCase()}</span>
-                    )}
-                </div>
+                <EntityImage
+                    src={publisher.image}
+                    alt={publisher.name}
+                    type='publisher'
+                    className='size-16 shrink-0 rounded-xl'
+                    imageClassName='size-full object-contain p-2'
+                    iconClassName='size-8 text-[#ef7f1a]'
+                />
 
                 <div className='min-w-0 flex-1'>
                     <h3 className='truncate text-lg font-semibold text-slate-900 dark:text-white'>{publisher.name}</h3>

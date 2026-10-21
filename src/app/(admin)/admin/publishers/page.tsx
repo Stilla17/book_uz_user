@@ -9,17 +9,17 @@ import { useDeletePublisher } from '@/components/admin/hooks/publisherHooks/useD
 import { usePublisherQuery } from '@/components/admin/hooks/queries/publishers';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
+import EntityImage from '@/components/shared/EntityImage';
 import { Button } from '@/components/ui/button';
 import { PublishersSkeleton } from '@/components/ui/skeleton';
 import { sortAdminItems, useAdminSort } from '@/hooks/useAdminSort';
 import { useUrlSearch } from '@/hooks/useUrlSearch';
-import { FETCH_PAGINATION_LIMIT } from '@/tools';
-import { getImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import { ArrowLeft, ArrowRight, BookOpen, Building2, Edit3, Search, Trash2 } from 'lucide-react';
 
 type PublisherSortKey = 'title' | 'bookCount';
+const PUBLISHERS_PAGE_SIZE = 20;
 
 const AdminPublishersPage = () => {
     const router = useRouter();
@@ -28,7 +28,7 @@ const AdminPublishersPage = () => {
     const [page, setPage] = useState(urlPage);
     const { sortKey, sortOrder, handleSort, SortIcon } = useAdminSort<PublisherSortKey>();
     const { searchInput, setSearchInput, debouncedSearch } = useUrlSearch();
-    const { data, isFetching, isLoading } = usePublisherQuery(page, FETCH_PAGINATION_LIMIT, debouncedSearch);
+    const { data, isFetching, isLoading } = usePublisherQuery(page, PUBLISHERS_PAGE_SIZE, debouncedSearch);
     const { mutate } = useDeletePublisher();
 
     useEffect(() => {
@@ -131,17 +131,14 @@ const AdminPublishersPage = () => {
                                     key={publisher._id}
                                     className='grid gap-4 rounded-4xl bg-white p-4 ring-1 ring-[#eadfce] md:grid-cols-[minmax(0,1fr)_130px_120px_auto] md:items-center dark:bg-slate-900 dark:ring-slate-800'>
                                     <div className='flex min-w-0 items-center gap-3'>
-                                        {publisher.image === '' ? (
-                                            <span className='grid size-13 shrink-0 place-items-center rounded-2xl bg-[#f2e7d8] text-[#ef7f1a] dark:bg-slate-950'>
-                                                <Building2 size={22} />
-                                            </span>
-                                        ) : (
-                                            <img
-                                                src={getImageUrl(publisher.image)}
-                                                alt={publisher.name}
-                                                className='size-13'
-                                            />
-                                        )}
+                                        <EntityImage
+                                            src={publisher.image}
+                                            alt={publisher.name}
+                                            type='publisher'
+                                            className='size-13 shrink-0 rounded-2xl bg-[#f2e7d8] dark:bg-slate-950'
+                                            imageClassName='size-full object-contain p-1'
+                                            iconClassName='size-6 text-[#ef7f1a]'
+                                        />
                                         <div className='min-w-0'>
                                             <h3 className='truncate font-black text-[#2f2a25] dark:text-white'>
                                                 {index + 1}. {publisher.name}

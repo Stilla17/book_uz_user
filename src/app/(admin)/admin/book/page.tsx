@@ -13,6 +13,7 @@ import HeadSection from '@/components/admin/sections/HeadSection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BooksTableSkeleton } from '@/components/ui/skeleton';
+import EntityImage from '@/components/shared/EntityImage';
 import { getBookStats, getStockFilterButtons } from '@/data/admin.data';
 import { StockFilter, getBookBarcodes, getStockStatus } from '@/helpers/admin/newBook';
 import { useAdminSort } from '@/hooks/useAdminSort';
@@ -22,10 +23,10 @@ import { formatPrice } from '@/utils/currency';
 import { getBookImageUrl } from '@/utils/image';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
-import { Eye, ImageIcon, Pencil, Search, Star, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Search, Star, Trash2 } from 'lucide-react';
 
 type SortKey = 'price' | 'title';
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 20;
 
 const AdminBookPage = () => {
     const router = useRouter();
@@ -201,7 +202,8 @@ const AdminBookPage = () => {
                                 </tr>
                             ) : (
                                 paginatedBooks.map((book, index) => {
-                                    const status = getStockStatus(book.stock);
+                                    const stock = Number(book.stock ?? 0);
+                                    const status = getStockStatus(stock);
                                     const imageUrl = getBookImageUrl(book);
                                     const barcode = getBookBarcodes(book);
                                     return (
@@ -210,19 +212,14 @@ const AdminBookPage = () => {
                                             className='border-b border-[#f0e4d3] last:border-0 dark:border-slate-900'>
                                             <td className='px-4 py-4'>
                                                 <div className='flex min-w-0 items-center gap-3'>
-                                                    <div className='grid size-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[#f2e7d8] dark:bg-slate-900'>
-                                                        {imageUrl ? (
-                                                            <img
-                                                                src={imageUrl}
-                                                                loading='lazy'
-                                                                decoding='async'
-                                                                alt={getLocalizedText(book.title)}
-                                                                className='h-full w-full object-cover'
-                                                            />
-                                                        ) : (
-                                                            <ImageIcon size={20} className='text-[#9d907e]' />
-                                                        )}
-                                                    </div>
+                                                    <EntityImage
+                                                        src={imageUrl}
+                                                        alt={getLocalizedText(book.title)}
+                                                        type='book'
+                                                        className='size-14 shrink-0 rounded-2xl bg-[#f2e7d8] dark:bg-slate-900'
+                                                        imageClassName='size-full object-cover'
+                                                        iconClassName='size-6 text-[#9d907e]'
+                                                    />
                                                     <div className='min-w-0'>
                                                         <p className='truncate font-black text-[#2f2a25] dark:text-white'>
                                                             {(displayPagination.page - 1) * PAGE_SIZE + index + 1}.{' '}
@@ -253,7 +250,7 @@ const AdminBookPage = () => {
                                             <td className='px-4 py-4'>
                                                 <span
                                                     className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-black text-nowrap ring-1 ${status.className}`}>
-                                                    {status.label} {book.stock} dona
+                                                    {status.label} {stock} dona
                                                 </span>
                                             </td>
                                             <td className='px-4 py-4'>

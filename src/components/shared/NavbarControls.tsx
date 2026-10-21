@@ -34,7 +34,7 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
     const { getTextColor, getBgColor, getBorderColor } = useThemeStyles();
     const { theme, setTheme } = useTheme();
     const { i18n, t } = useTranslation();
-    const [lang, setLang] = useState<Lang>(() => normalizeLanguage(i18n.resolvedLanguage || i18n.language));
+    const [lang, setLang] = useState<Lang>('uz');
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -50,30 +50,22 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
 
     const currentLang = languages.find((item) => item.key === lang) || languages[0];
 
-    useEffect(() => setMounted(true), []);
-
     useEffect(() => {
-        if (typeof window === 'undefined') return;
-
         const savedLanguage = normalizeLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY) || undefined);
 
-        if (savedLanguage !== lang) {
-            setLang(savedLanguage);
-            return;
-        }
-
-        if (normalizeLanguage(i18n.resolvedLanguage || i18n.language) !== savedLanguage) {
-            i18n.changeLanguage(savedLanguage);
-        }
+        setLang(savedLanguage);
+        setMounted(true);
     }, [i18n]);
 
     useEffect(() => {
-        i18n.changeLanguage(lang);
+        if (!mounted) return;
 
-        if (typeof window !== 'undefined') {
-            window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+        if (normalizeLanguage(i18n.resolvedLanguage || i18n.language) !== lang) {
+            void i18n.changeLanguage(lang);
         }
-    }, [lang, i18n]);
+
+        window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    }, [lang, i18n, mounted]);
 
     const isMobile = variant === 'mobile';
 
