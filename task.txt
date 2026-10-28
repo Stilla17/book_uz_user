@@ -10,3 +10,6 @@ Optimizatsiya bosqichi
 1. (admin-auth) admin\auth\login\page.tsx ui togirlandi✅
 2. (admin)\authors ichidagi fayllar ui optimizatsiyalashtrsh✅
 3. (admin)\banners ichidagi fayllar ui optimizatsiyalashtrsh✅
+
+Admin
+1. kitoblarni tillarini qoshish Nemischa Turkcha

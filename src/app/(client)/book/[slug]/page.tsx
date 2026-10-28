@@ -500,7 +500,16 @@ export default function BookDetailPage() {
                                 value={book?.year ? String(book.year) : undefined}
                             />
                             <DottedLine label={t('bookDetail.publisher')} value={book?.publisherName} />
-                            <DottedLine label={t('bookDetail.language')} value={book?.language?.toUpperCase()} />
+                            <DottedLine
+                                label={t('bookDetail.language')}
+                                value={
+                                    book?.language
+                                        ? t(`bookDetail.languageNames.${book.language.toLowerCase()}`, {
+                                              defaultValue: book.language.toUpperCase()
+                                          })
+                                        : undefined
+                                }
+                            />
                             <DottedLine
                                 label={t('bookDetail.cover')}
                                 value={

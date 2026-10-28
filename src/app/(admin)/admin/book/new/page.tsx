@@ -295,7 +295,9 @@ const AdminNewBookPage = () => {
             new Set(values.author.map((author) => resolveOptionValue(author, authorOptions)).filter(Boolean))
         );
         const publisherValues = Array.from(
-            new Set(values.publisher.map((publisher) => resolveOptionValue(publisher, publisherOptions)).filter(Boolean))
+            new Set(
+                values.publisher.map((publisher) => resolveOptionValue(publisher, publisherOptions)).filter(Boolean)
+            )
         );
         const coverValue = values.cover;
         const tags = getNormalizedTags(values.tags);
@@ -593,7 +595,9 @@ const AdminNewBookPage = () => {
 
                         <div className='grid gap-4 md:grid-cols-4'>
                             <Field label='Til'>
-                                <Select value={language} onValueChange={(value) => setValue('language', value)}>
+                                <Select
+                                    value={language}
+                                    onValueChange={(value) => setValue('language', value)}>
                                     <SelectTrigger className='border-[#eadfce] bg-white font-semibold dark:border-slate-800 dark:bg-slate-900'>
                                         <SelectValue />
                                     </SelectTrigger>
@@ -601,6 +605,8 @@ const AdminNewBookPage = () => {
                                         <SelectItem value='uz'>O'zbekcha</SelectItem>
                                         <SelectItem value='ru'>Ruscha</SelectItem>
                                         <SelectItem value='en'>Inglizcha</SelectItem>
+                                        <SelectItem value='de'>Nemischa</SelectItem>
+                                        <SelectItem value='tr'>Turkcha</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </Field>

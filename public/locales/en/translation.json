@@ -59,7 +59,7 @@
         "topSalesLoadError": "Top sales could not be loaded.",
         "topSalesEmpty": "Top sales have not been synchronized yet.",
         "basket": "Basket",
-        "mostViewed": "Eng ko'p ko'rilgan kitoblar"
+        "mostViewed": "Most Viewed Books"
     },
     "bookCard": {
         "alreadyInCart": "This book is already in your cart",
@@ -353,6 +353,13 @@
         "year": "Year",
         "publisher": "Publisher",
         "language": "Language",
+        "languageNames": {
+            "uz": "Uzbek",
+            "ru": "Russian",
+            "en": "English",
+            "de": "German",
+            "tr": "Turkish"
+        },
         "cover": "Cover",
         "paperback": "Paperback",
         "hardcover": "Hardcover",

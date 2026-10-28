@@ -359,6 +359,13 @@
         "year": "Yili",
         "publisher": "Nashriyot",
         "language": "Til",
+        "languageNames": {
+            "uz": "O'zbekcha",
+            "ru": "Ruscha",
+            "en": "Inglizcha",
+            "de": "Nemischa",
+            "tr": "Turkcha"
+        },
         "cover": "Muqova",
         "paperback": "Yumshoq",
         "hardcover": "Qattiq",

@@ -59,7 +59,7 @@
         "topSalesLoadError": "Не удалось загрузить топ продаж.",
         "topSalesEmpty": "Топ продаж пока не синхронизирован.",
         "basket": "Корзина",
-        "mostViewed": "Eng ko'p ko'rilgan kitoblar"
+        "mostViewed": "Самые просматриваемые книги"
     },
     "servicesSection": {
         "title": "Услуги",
@@ -344,6 +344,13 @@
         "year": "Год",
         "publisher": "Издательство",
         "language": "Язык",
+        "languageNames": {
+            "uz": "Узбекский",
+            "ru": "Русский",
+            "en": "Английский",
+            "de": "Немецкий",
+            "tr": "Турецкий"
+        },
         "cover": "Обложка",
         "paperback": "Мягкая",
         "hardcover": "Твёрдая",
