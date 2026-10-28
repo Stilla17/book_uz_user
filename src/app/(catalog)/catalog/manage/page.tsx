@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import Image from 'next/image';
 
+import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import { useCatalogManageQuery } from '@/hooks/queries/useCatalogManageQuery';
 import type { CatalogCategoryFilter, CatalogItem } from '@/types/catalog';
 
@@ -26,6 +27,8 @@ const categories: Array<{ value: CatalogCategoryFilter; label: string }> = [
     { value: 'trend', label: 'Trend' },
     { value: 'bolalar-adabiyoti', label: 'Bolalar adabiyotlari' }
 ];
+
+const PAGE_SIZE = 20;
 
 const getPdfImageData = async (url: string) => {
     try {
@@ -60,12 +63,61 @@ const getPdfImageData = async (url: string) => {
     }
 };
 
+const getPdfTextImageData = (text: string) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 840;
+    canvas.height = 260;
+
+    const context = canvas.getContext('2d');
+    if (!context) return null;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = '#1e293b';
+    context.font = '600 34px Arial, sans-serif';
+    context.textBaseline = 'top';
+
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    const lines: string[] = [];
+    const maxWidth = canvas.width - 32;
+    const maxLines = 4;
+    let currentLine = '';
+
+    for (const word of words) {
+        const candidate = currentLine ? `${currentLine} ${word}` : word;
+
+        if (context.measureText(candidate).width <= maxWidth || !currentLine) {
+            currentLine = candidate;
+            continue;
+        }
+
+        lines.push(currentLine);
+        currentLine = word;
+
+        if (lines.length === maxLines - 1) break;
+    }
+
+    if (currentLine && lines.length < maxLines) lines.push(currentLine);
+
+    if (lines.length === maxLines && words.join(' ') !== lines.join(' ')) {
+        let lastLine = `${lines[maxLines - 1]}...`;
+        while (context.measureText(lastLine).width > maxWidth && lastLine.length > 3) {
+            lastLine = `${lastLine.slice(0, -4).trimEnd()}...`;
+        }
+        lines[maxLines - 1] = lastLine;
+    }
+
+    lines.forEach((line, index) => context.fillText(line, 16, 14 + index * 54));
+
+    return canvas.toDataURL('image/png');
+};
+
 export default function CatalogManagePage() {
+    const [page, setPage] = useState(1);
     const [activeCategory, setActiveCategory] = useState<CatalogCategoryFilter>('hammasi');
     const [selections, setSelections] = useState<Record<string, CatalogSelection>>({});
     const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
     const [isPdfDownloading, setIsPdfDownloading] = useState(false);
-    const { data, isLoading, isFetching, isError, refetch } = useCatalogManageQuery(activeCategory);
+    const { data, isLoading, isFetching, isError, refetch } = useCatalogManageQuery(activeCategory, page, PAGE_SIZE);
     const catalogItems = data?.catalogs ?? [];
     const selectedItems = Object.values(selections);
 
@@ -97,9 +149,10 @@ export default function CatalogManagePage() {
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
             const tableWidth = pageWidth - margin * 2;
-            const imageColumnWidth = tableWidth * 0.55;
-            const unitColumnWidth = tableWidth * 0.27;
-            const quantityColumnWidth = tableWidth - imageColumnWidth - unitColumnWidth;
+            const imageColumnWidth = 36;
+            const nameColumnWidth = 84;
+            const unitColumnWidth = 40;
+            const quantityColumnWidth = tableWidth - imageColumnWidth - nameColumnWidth - unitColumnWidth;
             const headerHeight = 10;
             const rowHeight = 34;
 
@@ -115,8 +168,9 @@ export default function CatalogManagePage() {
                 pdf.rect(margin, headerY, tableWidth, headerHeight, 'FD');
                 pdf.setFontSize(10);
                 pdf.text('Rasm', margin + 3, headerY + 6.5);
-                pdf.text('Birlik', margin + imageColumnWidth + 3, headerY + 6.5);
-                pdf.text('Soni', margin + imageColumnWidth + unitColumnWidth + 3, headerY + 6.5);
+                pdf.text('Kitob nomi', margin + imageColumnWidth + 3, headerY + 6.5);
+                pdf.text('Birlik', margin + imageColumnWidth + nameColumnWidth + 3, headerY + 6.5);
+                pdf.text('Soni', margin + imageColumnWidth + nameColumnWidth + unitColumnWidth + 3, headerY + 6.5);
 
                 return headerY + headerHeight;
             };
@@ -132,10 +186,18 @@ export default function CatalogManagePage() {
                 pdf.setDrawColor(226, 232, 240);
                 pdf.rect(margin, rowY, tableWidth, rowHeight);
                 pdf.line(margin + imageColumnWidth, rowY, margin + imageColumnWidth, rowY + rowHeight);
+
                 pdf.line(
-                    margin + imageColumnWidth + unitColumnWidth,
+                    margin + imageColumnWidth + nameColumnWidth,
                     rowY,
-                    margin + imageColumnWidth + unitColumnWidth,
+                    margin + imageColumnWidth + nameColumnWidth,
+                    rowY + rowHeight
+                );
+
+                pdf.line(
+                    margin + imageColumnWidth + nameColumnWidth + unitColumnWidth,
+                    rowY,
+                    margin + imageColumnWidth + nameColumnWidth + unitColumnWidth,
                     rowY + rowHeight
                 );
 
@@ -145,13 +207,30 @@ export default function CatalogManagePage() {
                     pdf.addImage(imageData, 'JPEG', margin + 3, rowY + 3, 18, 28);
                 }
 
+                const nameImageData = getPdfTextImageData(item.moyskladName || 'Nomi topilmadi');
+
+                if (nameImageData) {
+                    pdf.addImage(
+                        nameImageData,
+                        'PNG',
+                        margin + imageColumnWidth + 3,
+                        rowY + 5,
+                        nameColumnWidth - 6,
+                        24
+                    );
+                }
+
                 pdf.setFont('helvetica', 'normal');
                 pdf.setFontSize(11);
                 pdf.setTextColor(30, 41, 59);
-                pdf.text(unit === 'pochka' ? 'Pochka' : 'Dona', margin + imageColumnWidth + 3, rowY + 18);
+                pdf.text(
+                    unit === 'pochka' ? 'Pochka' : 'Dona',
+                    margin + imageColumnWidth + nameColumnWidth + 3,
+                    rowY + 18
+                );
                 pdf.text(
                     String(quantity),
-                    margin + imageColumnWidth + unitColumnWidth + quantityColumnWidth / 2,
+                    margin + imageColumnWidth + nameColumnWidth + unitColumnWidth + quantityColumnWidth / 2,
                     rowY + 18,
                     { align: 'center' }
                 );
@@ -219,7 +298,10 @@ export default function CatalogManagePage() {
                                 <button
                                     key={category.value}
                                     type='button'
-                                    onClick={() => setActiveCategory(category.value)}
+                                    onClick={() => {
+                                        setActiveCategory(category.value);
+                                        setPage(1);
+                                    }}
                                     className={`shrink-0 rounded-full border px-5 py-2.5 text-sm font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00a0e3] ${
                                         isActive
                                             ? 'border-[#00a0e3] bg-[#00a0e3] text-white shadow-[0_7px_20px_rgba(0,160,227,0.2)]'
@@ -264,7 +346,7 @@ export default function CatalogManagePage() {
                                     return (
                                         <article
                                             key={item._id}
-                                            className={`min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 transition dark:bg-slate-900 ${
+                                            className={`h-fit min-w-0 self-start overflow-hidden rounded-2xl bg-white shadow-sm ring-1 transition dark:bg-slate-900 ${
                                                 isSelected
                                                     ? 'ring-2 ring-[#00a0e3] dark:ring-[#00a0e3]'
                                                     : 'ring-slate-200 dark:ring-slate-700'
@@ -375,6 +457,14 @@ export default function CatalogManagePage() {
                                 })}
                             </div>
                         )}
+                        {!isLoading && !isError && (
+                            <PaginationFooter
+                                pagination={data?.pagination}
+                                page={page}
+                                updatePage={setPage}
+                                isFetching={isFetching}
+                            />
+                        )}
                     </section>
                 </div>
             </div>
@@ -389,9 +479,6 @@ export default function CatalogManagePage() {
                         <div className='mb-6 flex items-center justify-between gap-4 print:hidden'>
                             <div>
                                 <p className='text-xs font-semibold tracking-wider text-[#00a0e3] uppercase'>Katalog</p>
-                                <h2 id='catalog-pdf-title' className='mt-1 text-xl font-bold text-slate-900'>
-                                    Tanlangan kitoblar
-                                </h2>
                             </div>
                             <div className='flex gap-2'>
                                 <button
@@ -423,6 +510,7 @@ export default function CatalogManagePage() {
                                     <thead>
                                         <tr className='border-y-2 border-slate-300 text-xs font-bold text-slate-600 uppercase'>
                                             <th className='px-3 py-3'>Rasm</th>
+                                            <th className='px-3 py-3'>Kitob nomi</th>
                                             <th className='px-3 py-3'>Birlik</th>
                                             <th className='px-3 py-3 text-center'>Soni</th>
                                         </tr>
@@ -439,6 +527,9 @@ export default function CatalogManagePage() {
                                                         unoptimized
                                                         className='h-18 w-14 object-contain'
                                                     />
+                                                </td>
+                                                <td className='max-w-72 px-3 py-3 text-sm font-semibold text-slate-800'>
+                                                    {item.moyskladName || 'Nomi topilmadi'}
                                                 </td>
                                                 <td className='px-3 py-3 text-sm font-semibold text-slate-800'>
                                                     {unit === 'pochka' ? 'Pochka' : 'Dona'}

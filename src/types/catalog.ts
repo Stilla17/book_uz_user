@@ -8,6 +8,7 @@ export type CatalogItem = {
     _id: string;
     price: number;
     wholesalePrice?: number;
+    moyskladName?: string;
     image: string;
     imageKey?: string;
     category: CatalogCategory;

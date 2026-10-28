@@ -1,10 +1,10 @@
+import { CatalogService } from '@/services/catalog.service';
 import type { CatalogCategoryFilter, CatalogListResponse } from '@/types/catalog';
 import { useQuery } from '@tanstack/react-query';
 
-import { CatalogService } from '@/services/catalog.service';
-
-export const useCatalogManageQuery = (category: CatalogCategoryFilter) =>
+export const useCatalogManageQuery = (category: CatalogCategoryFilter, page: number, limit: number) =>
     useQuery<CatalogListResponse>({
-        queryKey: ['catalog-manage', category],
-        queryFn: ({ signal }) => CatalogService.getCatalogs(category, signal)
+        queryKey: ['catalog-manage', category, page, limit],
+        queryFn: ({ signal }) => CatalogService.getCatalogs(category, page, limit, signal),
+        placeholderData: (previousData) => previousData
     });
