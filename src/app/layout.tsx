@@ -7,6 +7,7 @@ import Script from 'next/script';
 import { ThemeProvider as NextThemeProvider } from 'next-themes';
 
 import '@/app/globals.css';
+import ReferralTracker from '@/components/shared/ReferralTracker';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider as CustomThemeProvider } from '@/context/ThemeContext';
 import { defaultDescription, defaultOgImage, defaultTitle, siteUrl } from '@/lib/seo';
@@ -146,6 +147,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                             <I18nProvider>
                                 <CustomThemeProvider>
                                     <AuthProvider>
+                                        <ReferralTracker />
                                         <Toaster position='top-center' />
                                         {isAnalyticsEnabled ? (
                                             <>

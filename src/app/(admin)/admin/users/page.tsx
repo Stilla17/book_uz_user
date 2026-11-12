@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useBranchQuery } from '@/components/admin/hooks/queries/branch';
-import { useAdminUsersQuery } from '@/components/admin/hooks/queries/users';
+import { useAdminUsersQuery, useMoyskladDailyStatsQuery } from '@/components/admin/hooks/queries/users';
+import { MoyskladDailyStats } from '@/components/admin/users/MoyskladDailyStats';
 import PaginationFooter from '@/components/admin/other/PaginationFooter';
 import StatsCardsAdmin from '@/components/admin/other/StatsCardsAdmin';
 import HeadSection from '@/components/admin/sections/HeadSection';
@@ -20,7 +21,7 @@ import type { AdminUserListItem } from '@/types/admin-users';
 import { getPageFromUrl, updateUrlPage } from '@/utils/pagination';
 
 import dayjs from 'dayjs';
-import { Building2, ContactRound, Edit3, Mail, Search, Table2, UserCheck, Users } from 'lucide-react';
+import { Building2, ContactRound, Edit3, Mail, RefreshCw, Search, Table2, UserCheck, Users } from 'lucide-react';
 
 type UserSortKey = 'name' | 'phone' | 'source' | 'orders' | 'registeredAt' | 'birthDate';
 
@@ -64,14 +65,21 @@ const UserRow = ({ user, index }: { user: AdminUserListItem; index: number }) =>
             )}
         </td>
         <td className='px-4 py-4'>
-            <span
-                className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${
-                    user.source === 'AMO_CRM'
-                        ? 'bg-blue-50 text-[#285c7f] ring-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:ring-blue-500/20'
-                        : 'bg-orange-50 text-[#d7690d] ring-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:ring-orange-500/20'
-                }`}>
-                {user.source === 'AMO_CRM' ? 'amoCRM' : 'Book.uz'}
-            </span>
+            <div className='flex flex-wrap gap-1.5'>
+                {(user.sources?.length ? user.sources : [user.source]).map((source) => (
+                    <span
+                        key={source}
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${
+                            source === 'AMO_CRM'
+                                ? 'bg-blue-50 text-[#285c7f] ring-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:ring-blue-500/20'
+                                : source === 'MOYSKLAD'
+                                  ? 'bg-violet-50 text-violet-700 ring-violet-200 dark:bg-violet-500/10 dark:text-violet-300 dark:ring-violet-500/20'
+                                  : 'bg-orange-50 text-[#d7690d] ring-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:ring-orange-500/20'
+                        }`}>
+                        {source === 'AMO_CRM' ? 'amoCRM' : source === 'MOYSKLAD' ? 'MoySklad' : 'Book.uz'}
+                    </span>
+                ))}
+            </div>
         </td>
         <td className='px-4 py-4 font-black text-[#2f2a25] dark:text-white'>{user.salesCount}</td>
         <td className='px-4 py-4 text-sm font-bold whitespace-nowrap text-[#8b7e70] dark:text-slate-400'>
@@ -83,7 +91,7 @@ const UserRow = ({ user, index }: { user: AdminUserListItem; index: number }) =>
         <td>
             <button className='grid size-9 place-items-center rounded-xl text-[#817466] transition hover:bg-[#f2e7d8] hover:text-[#ef7f1a] dark:text-slate-300 dark:hover:bg-slate-950'>
                 <Link href={`/admin/users/new?id=${user.id}`}>
-                    {user.source !== 'AMO_CRM' ? <Edit3 size={17} /> : ''}
+                    {user.source === 'BOOK_UZ' ? <Edit3 size={17} /> : ''}
                 </Link>
             </button>
         </td>
@@ -110,6 +118,7 @@ const AdminUsersPage = () => {
         selectedBranchId === 'all' ? '' : selectedBranchId,
         selectedBranchName
     );
+    const { data: moyskladDailyStats, isLoading: isMoyskladStatsLoading } = useMoyskladDailyStatsQuery(14);
 
     useEffect(() => {
         setPage(urlPage);
@@ -117,6 +126,7 @@ const AdminUsersPage = () => {
 
     const users = data?.users ?? [];
     const amoContacts = data?.amoContacts ?? [];
+    const moyskladContacts = data?.moyskladContacts ?? [];
     const items = data?.items ?? [];
     const pagination = data?.pagination;
     const totals = data?.totals;
@@ -141,9 +151,15 @@ const AdminUsersPage = () => {
         { label: 'Book.uz userlar', value: totals?.users ?? users.length, icon: UserCheck, color: 'bg-emerald-600' },
         {
             label: 'amoCRM kontaktlar',
-            value: totals?.amoContacts ?? amoContacts.length,
+            value: totals?.amoCrmContacts ?? amoContacts.length,
             icon: ContactRound,
             color: 'bg-[#285c7f]'
+        },
+        {
+            label: 'MoySklad mijozlar',
+            value: totals?.moyskladContacts ?? moyskladContacts.length,
+            icon: RefreshCw,
+            color: 'bg-violet-600'
         }
     ];
 
@@ -199,11 +215,13 @@ const AdminUsersPage = () => {
         <div className='space-y-5'>
             <HeadSection
                 title='Foydalanuvchilar'
-                text="Book.uz foydalanuvchilari va amoCRM kontaktlarini bitta joyda ko'rish."
+                text="Book.uz, amoCRM va MoySklad mijozlarini bitta joyda ko'rish."
                 href='users'
             />
 
             <StatsCardsAdmin stats={stats} isLoading={isLoading} />
+
+            <MoyskladDailyStats data={moyskladDailyStats} isLoading={isMoyskladStatsLoading} />
 
             <section className='overflow-hidden rounded-[24px] bg-[#fffaf2] shadow-sm ring-1 ring-[#eadfce] dark:bg-slate-950 dark:ring-slate-800'>
                 <div className='flex flex-col gap-3 border-b border-[#eadfce] p-4 lg:flex-row lg:items-center lg:justify-between dark:border-slate-800'>

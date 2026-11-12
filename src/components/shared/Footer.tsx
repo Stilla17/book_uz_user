@@ -169,7 +169,7 @@ export const Footer = () => {
                     {/* Scroll top */}
                     <button
                         onClick={scrollToTop}
-                        className='fixed right-5 bottom-5 z-50 grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-1 hover:shadow-lg'
+                        className='fixed right-5 bottom-24 z-50 grid h-10 w-10 place-items-center rounded-full bg-white text-black shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-1 hover:shadow-lg sm:right-6 sm:bottom-28'
                         aria-label={t('footer.scrollTop')}>
                         <ArrowUp size={14} />
                     </button>

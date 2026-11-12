@@ -55,7 +55,7 @@ const fetchSiteSales = async (signal: AbortSignal): Promise<SiteOrder[]> => {
 };
 
 const fetchMoyskladSales = async (period: SalesPeriod, signal: AbortSignal): Promise<MoyskladSales> => {
-    const response = await fetch(`/api/moysklad/sales?period=${period}`, { cache: 'no-store', signal });
+    const response = await fetch(`/api/moysklad/sales?period=${period}`, { signal });
     const data = await response.json();
     if (!response.ok || data.success === false) throw new Error(data.message || 'MoySklad savdosini yuklab bo‘lmadi');
     return data;
@@ -187,7 +187,10 @@ const MoyskladSalesChart = () => {
     const query = useQuery({
         queryKey: ['dashboard', 'moysklad-sales', 'selected-branches', period],
         queryFn: ({ signal }) => fetchMoyskladSales(period, signal),
-        staleTime: 60_000,
+        staleTime: 15 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
         retry: false
     });
     const branches = query.data?.branches ?? [];

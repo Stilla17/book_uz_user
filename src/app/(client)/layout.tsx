@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { Footer } from '@/components/shared/Footer';
+import LazyChatWidget from '@/components/shared/LazyChatWidget';
 import { Navbar } from '@/components/shared/Navbar';
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
@@ -9,7 +10,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             <Navbar />
 
             <main className='min-w-0 flex-1'>{children}</main>
-
+            <LazyChatWidget />
             <Footer />
         </div>
     );

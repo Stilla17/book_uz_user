@@ -148,6 +148,30 @@
             }
         }
     },
+    "chatWidget": {
+        "ariaLabel": "Yordam chat oynasi",
+        "operatorTitle": "Book.uz operatori",
+        "responseTime": "Odatda bir necha daqiqada javob beramiz",
+        "greeting": "Assalomu alaykum! 👋",
+        "helpQuestion": "Sizga qanday yordam bera olamiz?",
+        "today": "Bugun",
+        "introTitle": "Tanishib olamizmi?",
+        "introDescription": "Operatorimiz sizga murojaat qilishi uchun ism va telefon raqamingizni kiriting.",
+        "name": "Ismingiz",
+        "phone": "Telefon raqamingiz",
+        "phonePlaceholder": "+998 __ ___ __ __",
+        "start": "Chatni boshlash",
+        "messagePlaceholder": "Xabaringizni yozing...",
+        "service": "Book.uz qo‘llab-quvvatlash xizmati",
+        "open": "Chatni ochish",
+        "close": "Chatni yopish",
+        "send": "Xabar yuborish",
+        "nameRequired": "Ismingizni kiriting.",
+        "nameInvalid": "Iltimos, ismingizni to‘g‘ri kiriting.",
+        "phoneRequired": "Telefon raqamingizni kiriting.",
+        "phoneInvalid": "Telefon raqamini +998 90 123 45 67 formatida kiriting.",
+        "sendError": "Xabarni yuborib bo‘lmadi. Qayta urinib ko‘ring."
+    },
     "authorsPage": {
         "totalAuthors": "{{count}} ta muallif",
         "pageCount": "{{current}} / {{total}} sahifa",

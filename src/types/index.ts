@@ -163,6 +163,7 @@ export interface OrderPayload {
     guestName?: string;
     description?: string;
     couponCode?: string;
+    referralCode?: string;
     totalAmount: number;
     deliveryFee: number;
     freeDelivery?: boolean;

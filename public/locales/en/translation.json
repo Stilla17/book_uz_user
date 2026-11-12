@@ -142,6 +142,30 @@
             }
         }
     },
+    "chatWidget": {
+        "ariaLabel": "Support chat window",
+        "operatorTitle": "Book.uz operator",
+        "responseTime": "We usually reply within a few minutes",
+        "greeting": "Hello! 👋",
+        "helpQuestion": "How can we help you?",
+        "today": "Today",
+        "introTitle": "Let's get acquainted",
+        "introDescription": "Enter your name and phone number so our operator can address you.",
+        "name": "Your name",
+        "phone": "Phone number",
+        "phonePlaceholder": "+998 __ ___ __ __",
+        "start": "Start chat",
+        "messagePlaceholder": "Type your message...",
+        "service": "Book.uz support service",
+        "open": "Open chat",
+        "close": "Close chat",
+        "send": "Send message",
+        "nameRequired": "Enter your name.",
+        "nameInvalid": "Please enter a valid name.",
+        "phoneRequired": "Enter your phone number.",
+        "phoneInvalid": "Enter the number in +998 90 123 45 67 format.",
+        "sendError": "Could not send the message. Please try again."
+    },
     "authorsPage": {
         "totalAuthors": "{{count}} authors",
         "pageCount": "Page {{current}} of {{total}}",

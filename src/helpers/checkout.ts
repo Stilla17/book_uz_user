@@ -159,6 +159,7 @@ type BuildOrderPayloadParams = {
     selectedPayment: string;
     deliveryFee?: number;
     freeDelivery?: boolean;
+    referralCode?: string;
 };
 
 export const getDeliveryCost = (
@@ -189,7 +190,8 @@ export const buildOrderPayload = ({
     selectedDelivery,
     selectedPayment,
     deliveryFee: configuredDeliveryFee,
-    freeDelivery = false
+    freeDelivery = false,
+    referralCode
 }: BuildOrderPayloadParams): OrderPayload => {
     const deliveryFee = getDeliveryCost(selectedDelivery, configuredDeliveryFee, totalPrice, freeDelivery);
     const postDeliveryType = getPostDeliveryType(selectedDelivery);
@@ -203,6 +205,7 @@ export const buildOrderPayload = ({
         guestName: checkout.clientName.trim(),
         description: checkout.description.trim(),
         couponCode: checkout.promoCode || undefined,
+        referralCode,
         shippingAddress: {
             city: getLocationName(selectedRegionItem),
             region: getLocationName(selectedDistrictItem),

@@ -61,7 +61,7 @@ const AdminNewBookPage = () => {
             subCategoryIds: [],
             author: [],
             publisher: [],
-            language: 'uz',
+            language: '',
             contentLanguage: 'latin',
             cover: 'hardcover',
             format: 'paper',
@@ -331,6 +331,11 @@ const AdminNewBookPage = () => {
             return;
         }
 
+        if (!values.language) {
+            toast.error('Kitob tilini tanlang');
+            return;
+        }
+
         if (!Number.isFinite(values.price) || values.price <= 0) {
             toast.error("Asosiy narxni to'g'ri kiriting");
             return;
@@ -595,11 +600,9 @@ const AdminNewBookPage = () => {
 
                         <div className='grid gap-4 md:grid-cols-4'>
                             <Field label='Til'>
-                                <Select
-                                    value={language}
-                                    onValueChange={(value) => setValue('language', value)}>
+                                <Select value={language} onValueChange={(value) => setValue('language', value)}>
                                     <SelectTrigger className='border-[#eadfce] bg-white font-semibold dark:border-slate-800 dark:bg-slate-900'>
-                                        <SelectValue />
+                                        <SelectValue placeholder='Tilni tanlang' />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value='uz'>O'zbekcha</SelectItem>

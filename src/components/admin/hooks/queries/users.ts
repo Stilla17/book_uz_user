@@ -37,6 +37,13 @@ export const useAdminUsersQuery = (
     });
 };
 
+export const useMoyskladDailyStatsQuery = (days = 14) =>
+    useQuery({
+        queryKey: [...usersKeys.all, 'moysklad-daily-stats', days],
+        queryFn: () => UsersService.getMoyskladDailyStats(days),
+        staleTime: 5 * 60 * 1000
+    });
+
 export const useCreateAdminUsersQuery = () => {
     const queryClient = useQueryClient();
 

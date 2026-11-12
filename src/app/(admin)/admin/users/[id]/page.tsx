@@ -196,14 +196,19 @@ const AdminUserDetailPage = () => {
                     </Link>
                     <div className='mt-3 flex flex-wrap items-center gap-3'>
                         <h2 className='truncate text-2xl font-black text-[#2f2a25] dark:text-white'>{user.name}</h2>
-                        <span
-                            className={`rounded-full px-3 py-1 text-xs font-black ring-1 ${
-                                user.source === 'AMO_CRM'
-                                    ? 'bg-blue-50 text-[#285c7f] ring-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:ring-blue-500/20'
-                                    : 'bg-orange-50 text-[#d7690d] ring-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:ring-orange-500/20'
-                            }`}>
-                            {user.source === 'AMO_CRM' ? 'amoCRM' : 'Book.uz'}
-                        </span>
+                        {(user.sources?.length ? user.sources : [user.source]).map((source) => (
+                            <span
+                                key={source}
+                                className={`rounded-full px-3 py-1 text-xs font-black ring-1 ${
+                                    source === 'AMO_CRM'
+                                        ? 'bg-blue-50 text-[#285c7f] ring-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:ring-blue-500/20'
+                                        : source === 'MOYSKLAD'
+                                          ? 'bg-violet-50 text-violet-700 ring-violet-200 dark:bg-violet-500/10 dark:text-violet-300 dark:ring-violet-500/20'
+                                          : 'bg-orange-50 text-[#d7690d] ring-orange-200 dark:bg-orange-500/10 dark:text-orange-300 dark:ring-orange-500/20'
+                                }`}>
+                                {source === 'AMO_CRM' ? 'amoCRM' : source === 'MOYSKLAD' ? 'MoySklad' : 'Book.uz'}
+                            </span>
+                        ))}
                     </div>
                     <p className='mt-2 text-sm font-semibold text-[#8b7e70] dark:text-slate-400'>
                         Ro'yxatdan o'tgan sana: {formatDate(user.createdAt)}

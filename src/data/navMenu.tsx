@@ -11,10 +11,12 @@ import {
     Gift,
     Headphones,
     HelpCircle,
+    IdCard,
     ImageIcon,
     Info,
     LayoutDashboard,
     LibraryBig,
+    Link2,
     Mail,
     MapPinned,
     MessageCircleQuestionMark,
@@ -180,6 +182,11 @@ export const menuItems = [
         icon: TicketPercent
     },
     {
+        label: 'Bloger havolalari',
+        href: '/admin/referrals',
+        icon: Link2
+    },
+    {
         label: 'Chegirmalar',
         href: '/admin/discount',
         icon: Percent
@@ -203,6 +210,11 @@ export const menuItems = [
         label: 'Mijozlar',
         href: '/admin/users',
         icon: Users
+    },
+    {
+        label: 'HR',
+        href: '/admin/hr',
+        icon: IdCard
     },
     {
         label: 'Sozlamalar',

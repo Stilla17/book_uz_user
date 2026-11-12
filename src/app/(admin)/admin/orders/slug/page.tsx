@@ -276,6 +276,7 @@ const AdminOrderDetailPage = () => {
                                 />
                                 <InfoRow label='Yetkazish narxi' value={formatPrice(orderData?.deliveryFee ?? 0)} />
                                 <InfoRow label="To'lov turi" value={orderData?.paymentType || ''} />
+                                <InfoRow label='Bloger kodi' value={orderData?.referralCode || '—'} />
                                 <InfoRow label="To'lov holati" value={paymentStatusLabel} />
                             </div>
                         </article>

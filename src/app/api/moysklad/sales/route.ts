@@ -41,6 +41,33 @@ type MoyskladNamedEntity = {
 const MOYSKLAD_API_URL = 'https://api.moysklad.ru/api/remap/1.2';
 const MOYSKLAD_REQUEST_TIMEOUT = 25_000;
 const MOYSKLAD_PAGE_TIMEOUT = 8_000;
+const SALES_CACHE_TTL = 15 * 60 * 1000;
+const SALES_STALE_TTL = 24 * 60 * 60 * 1000;
+const CIRCUIT_BREAKER_TTL = 5 * 60 * 1000;
+const STORE_NAMES_CACHE_TTL = 6 * 60 * 60 * 1000;
+
+type MoyskladSalesPayload = {
+    success: true;
+    sales: ReturnType<typeof toSalesPoints>;
+    branches: BranchSales[];
+    partial: boolean;
+    totalAmount: number;
+    message?: string;
+};
+
+type SalesCacheEntry = {
+    data: MoyskladSalesPayload;
+    cachedAt: number;
+    expiresAt: number;
+};
+
+const salesCache = new Map<ChartPeriod, SalesCacheEntry>();
+const inFlightRequests = new Map<ChartPeriod, Promise<MoyskladSalesPayload>>();
+let circuitOpenUntil = 0;
+let storeNamesCache:
+    | { storeNames: Map<string, string>; retailStoreNames: Map<string, string>; expiresAt: number }
+    | undefined;
+let storeNamesRequest: Promise<{ storeNames: Map<string, string>; retailStoreNames: Map<string, string> }> | undefined;
 
 const isChartPeriod = (value: string | null): value is ChartPeriod =>
     value === 'weekly' || value === 'current-month' || value === 'monthly';
@@ -90,7 +117,7 @@ const fetchMoyskladRows = async (
         });
         let response: Response | null = null;
 
-        for (let attempt = 0; attempt < 4; attempt += 1) {
+        for (let attempt = 0; attempt < 2; attempt += 1) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), MOYSKLAD_PAGE_TIMEOUT);
 
@@ -179,6 +206,24 @@ const fetchMoyskladNameMap = async (entity: 'store' | 'retailstore', token: stri
     return map;
 };
 
+const getCachedStoreNames = async (token: string) => {
+    if (storeNamesCache && storeNamesCache.expiresAt > Date.now()) return storeNamesCache;
+    if (!storeNamesRequest) {
+        storeNamesRequest = Promise.all([
+            fetchMoyskladNameMap('store', token),
+            fetchMoyskladNameMap('retailstore', token)
+        ]).then(([storeNames, retailStoreNames]) => ({ storeNames, retailStoreNames }));
+    }
+
+    try {
+        const names = await storeNamesRequest;
+        storeNamesCache = { ...names, expiresAt: Date.now() + STORE_NAMES_CACHE_TTL };
+        return storeNamesCache;
+    } finally {
+        storeNamesRequest = undefined;
+    }
+};
+
 const getBranchSales = (
     rows: MoyskladRow[],
     storeNames: Map<string, string>,
@@ -211,6 +256,45 @@ const getBranchSales = (
     }));
 };
 
+const loadMoyskladSales = async (period: ChartPeriod, token: string): Promise<MoyskladSalesPayload> => {
+    const buckets = getSalesBuckets(period);
+    const start = buckets[0].start;
+    const end = buckets[buckets.length - 1].end;
+    const allowPartial = period !== 'weekly';
+    const demandResult = await fetchMoyskladRows('demand', token, start, end, { allowPartial });
+    await wait(500);
+    const retailDemandResult = await fetchMoyskladRows('retaildemand', token, start, end, { allowPartial });
+    const { storeNames, retailStoreNames } = await getCachedStoreNames(token);
+    const isPartial = demandResult.partial || retailDemandResult.partial;
+    const branches = getBranchSales(
+        [...demandResult.rows, ...retailDemandResult.rows],
+        storeNames,
+        retailStoreNames,
+        buckets
+    );
+    const sales = toSalesPoints(buckets).map((sale, index) => ({
+        ...sale,
+        amount: branches.reduce((sum, branch) => sum + branch.sales[index].amount, 0)
+    }));
+
+    return {
+        success: true,
+        sales,
+        branches,
+        partial: isPartial,
+        totalAmount: sales.reduce((sum, item) => sum + item.amount, 0),
+        message: isPartial ? "MoySklad ma'lumotlari ko'p bo'lgani uchun qisman yuklandi" : undefined
+    };
+};
+
+const jsonResponse = (data: MoyskladSalesPayload, cacheStatus: 'HIT' | 'MISS' | 'STALE') =>
+    NextResponse.json(data, {
+        headers: {
+            'Cache-Control': 'public, max-age=300, s-maxage=900, stale-while-revalidate=86400',
+            'X-Moysklad-Cache': cacheStatus
+        }
+    });
+
 export async function GET(request: NextRequest) {
     const periodParam = request.nextUrl.searchParams.get('period');
     const period: ChartPeriod = isChartPeriod(periodParam) ? periodParam : 'monthly';
@@ -227,40 +311,41 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    try {
-        const buckets = getSalesBuckets(period);
-        const start = buckets[0].start;
-        const end = buckets[buckets.length - 1].end;
-        const allowPartial = period !== 'weekly';
-        const demandResult = await fetchMoyskladRows('demand', token, start, end, { allowPartial });
-        await wait(500);
-        const retailDemandResult = await fetchMoyskladRows('retaildemand', token, start, end, { allowPartial });
-        const [storeNames, retailStoreNames] = await Promise.all([
-            fetchMoyskladNameMap('store', token),
-            fetchMoyskladNameMap('retailstore', token)
-        ]);
-        const demands = demandResult.rows;
-        const retailDemands = retailDemandResult.rows;
-        const isPartial = demandResult.partial || retailDemandResult.partial;
+    const now = Date.now();
+    const cached = salesCache.get(period);
+    if (cached && cached.expiresAt > now) return jsonResponse(cached.data, 'HIT');
 
-        const branches = getBranchSales([...demands, ...retailDemands], storeNames, retailStoreNames, buckets);
-        const sales = toSalesPoints(buckets).map((sale, index) => ({
-            ...sale,
-            amount: branches.reduce((sum, branch) => sum + branch.sales[index].amount, 0)
-        }));
-
+    if (circuitOpenUntil > now) {
+        if (cached && now - cached.cachedAt < SALES_STALE_TTL) {
+            return jsonResponse(
+                { ...cached.data, message: 'MoySklad vaqtincha cheklangan. Oxirgi saqlangan ma’lumot ko‘rsatildi.' },
+                'STALE'
+            );
+        }
         return NextResponse.json(
-            {
-                success: true,
-                sales,
-                branches,
-                partial: isPartial,
-                totalAmount: sales.reduce((sum, item) => sum + item.amount, 0),
-                message: isPartial ? "MoySklad ma'lumotlari ko'p bo'lgani uchun qisman yuklandi" : undefined
-            },
-            { headers: { 'Cache-Control': 'no-store' } }
+            { success: false, message: 'MoySklad vaqtincha cheklangan. Keyinroq qayta urinib ko‘ring.', sales: [] },
+            { status: 503, headers: { 'Retry-After': String(Math.ceil((circuitOpenUntil - now) / 1000)) } }
         );
+    }
+
+    try {
+        let requestPromise = inFlightRequests.get(period);
+        if (!requestPromise) {
+            requestPromise = loadMoyskladSales(period, token);
+            inFlightRequests.set(period, requestPromise);
+        }
+        const data = await requestPromise;
+        salesCache.set(period, { data, cachedAt: now, expiresAt: now + SALES_CACHE_TTL });
+        circuitOpenUntil = 0;
+        return jsonResponse(data, 'MISS');
     } catch (error) {
+        circuitOpenUntil = Date.now() + CIRCUIT_BREAKER_TTL;
+        if (cached && Date.now() - cached.cachedAt < SALES_STALE_TTL) {
+            return jsonResponse(
+                { ...cached.data, message: 'MoySklad javob bermadi. Oxirgi saqlangan ma’lumot ko‘rsatildi.' },
+                'STALE'
+            );
+        }
         return NextResponse.json(
             {
                 success: false,
@@ -269,5 +354,7 @@ export async function GET(request: NextRequest) {
             },
             { status: 502 }
         );
+    } finally {
+        inFlightRequests.delete(period);
     }
 }

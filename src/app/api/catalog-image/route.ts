@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const ALLOWED_IMAGE_HOSTS = new Set(['res.cloudinary.com', 'backend.book.uz', 'images.unsplash.com']);
 
-const isAllowedImageHost = (hostname: string) =>
-    ALLOWED_IMAGE_HOSTS.has(hostname) || hostname.endsWith('.r2.dev');
+const isAllowedImageHost = (hostname: string) => ALLOWED_IMAGE_HOSTS.has(hostname) || hostname.endsWith('.r2.dev');
 
 export const GET = async (request: NextRequest) => {
     const source = request.nextUrl.searchParams.get('url');

@@ -1,6 +1,7 @@
 import type {
     AdminUserListItem,
     AdminUserPurchasedBook,
+    MoyskladDailyStatsResponse,
     AdminUsersPagination,
     AdminUsersResponse,
     AdminUsersTotals
@@ -51,6 +52,8 @@ type ApiAmoContact = {
     ordersCount?: number;
     orderCount?: number;
     createdAt?: string;
+    moyskladIntegratedAt?: string;
+    sources?: { amocrm?: boolean; moysklad?: boolean };
     branch?: ApiBranchValue;
     branchId?: string;
     branchName?: string;
@@ -264,10 +267,13 @@ const mapAmoContact = (contact: ApiAmoContact): AdminUserListItem => ({
     telegramUsername: contact.telegramUsername,
     role: contact.role,
     salesCount: getExternalSalesCount(contact),
-    createdAt: contact.createdAt,
+    createdAt: contact.moyskladIntegratedAt || contact.createdAt,
     birthDate: contact.birthDate,
     ...getBranchInfo(contact),
-    source: 'AMO_CRM',
+    source: contact.sources?.moysklad && !contact.sources?.amocrm ? 'MOYSKLAD' : 'AMO_CRM',
+    sources: [contact.sources?.amocrm ? 'AMO_CRM' : null, contact.sources?.moysklad ? 'MOYSKLAD' : null].filter(
+        (source): source is 'AMO_CRM' | 'MOYSKLAD' => Boolean(source)
+    ),
     purchasedBooks: getPurchasedBooks(contact)
 });
 
@@ -350,6 +356,7 @@ const normalizeUsersResponse = (data: AdminUsersApiData): AdminUsersResponse => 
     return {
         users,
         amoContacts,
+        moyskladContacts: amoContacts.filter((contact) => contact.sources?.includes('MOYSKLAD')),
         items: [...users, ...amoContacts],
         pagination: data.pagination,
         totals: data.totals
@@ -471,7 +478,8 @@ const createUsersResponse = (
     totals: AdminUsersTotals
 ): AdminUsersResponse => ({
     users: items.filter((item) => item.source === 'BOOK_UZ'),
-    amoContacts: items.filter((item) => item.source === 'AMO_CRM'),
+    amoContacts: items.filter((item) => item.sources?.includes('AMO_CRM') || item.source === 'AMO_CRM'),
+    moyskladContacts: items.filter((item) => item.sources?.includes('MOYSKLAD') || item.source === 'MOYSKLAD'),
     items,
     pagination,
     totals
@@ -629,6 +637,10 @@ const normalizeUserDetailResponse = (response: AdminUserApiResponse, fallbackId:
 };
 
 export const UsersService = {
+    getMoyskladDailyStats: async (days = 14): Promise<MoyskladDailyStatsResponse> => {
+        const response = await api.get('/admin/users/moysklad-daily-stats', { params: { days } });
+        return response.data.data;
+    },
     getAdminUsers: async (params: GetAdminUsersParams): Promise<AdminUsersResponse> => {
         const search = params.search?.trim();
         const hasBranchFilter = Boolean(params.branchId || params.branchName);

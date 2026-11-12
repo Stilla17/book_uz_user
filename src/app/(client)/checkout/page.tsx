@@ -26,6 +26,7 @@ import { UserService } from '@/services/user.service';
 import { resetCheckout, updateField } from '@/store/features/checkoutSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { getFreeDeliveryBookIds } from '@/utils/cartStorage';
+import { getStoredReferralCode } from '@/utils/referral';
 import { matchesTransliteratedSearch } from '@/utils/transliteration';
 
 import axios from 'axios';
@@ -230,7 +231,8 @@ const CheckoutPage = () => {
                 selectedDelivery,
                 selectedPayment,
                 deliveryFee,
-                freeDelivery: isFreeDelivery
+                freeDelivery: isFreeDelivery,
+                referralCode: getStoredReferralCode()
             });
             const response = await createOrder.mutateAsync(payload);
             const orderId = getOrderId(response);
