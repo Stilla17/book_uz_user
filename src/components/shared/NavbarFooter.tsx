@@ -3,11 +3,13 @@ import React from 'react';
 import Link from 'next/link';
 
 import { bottomNav, mainNav } from '@/data/navMenu';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 
 import { useTranslation } from 'react-i18next';
 
 const NavbarFooter: React.FC = () => {
+    const localePath = useLocalePath();
     const { getBgColor, getBorderColor } = useThemeStyles();
     const { t } = useTranslation();
 
@@ -17,7 +19,7 @@ const NavbarFooter: React.FC = () => {
                 {mainNav.map((item) => (
                     <Link
                         key={item.label}
-                        href={item.href}
+                        href={localePath(item.href)}
                         className='text-sm font-semibold whitespace-nowrap text-[#475266] transition-colors hover:text-[#e67600] dark:text-white dark:hover:text-[#e67600]'>
                         {t(item.label)}
                     </Link>

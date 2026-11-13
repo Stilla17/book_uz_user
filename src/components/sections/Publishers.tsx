@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import PublisherCard from '@/components/cards/PublisherCard';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { usePublishersQuery } from '@/hooks/queries/usePublisherQueries';
 
 import { motion } from 'framer-motion';
@@ -12,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 const PREVIEW_PUBLISHERS_LIMIT = 9;
 
 const Publishers = () => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
 
     const { data, isLoading } = usePublishersQuery(1, PREVIEW_PUBLISHERS_LIMIT);
@@ -36,7 +38,7 @@ const Publishers = () => {
                     {totalPublishers > PREVIEW_PUBLISHERS_LIMIT ? (
                         <div className='flex justify-center'>
                             <Link
-                                href='/publishers'
+                                href={localePath('/publishers')}
                                 className='group flex items-center rounded-full bg-[#ef7f1a]/10 px-5 py-2.5 text-sm font-bold text-[#ef7f1a] transition-all hover:shadow-md md:text-base dark:bg-orange-500/20 dark:text-orange-400'>
                                 {t('publish.viewAll')}
                                 <ChevronRight size={18} />

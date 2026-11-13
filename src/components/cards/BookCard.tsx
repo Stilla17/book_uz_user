@@ -9,6 +9,7 @@ import { BookCover } from '@/components/shared/BookCover';
 import { useAddCartMutation } from '@/hooks/bookCardHooks/useCardQuery';
 import { useBookStats } from '@/hooks/bookHooks/useBookStats';
 import { useBookWishlist } from '@/hooks/bookHooks/useBookWishlist';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { bookService } from '@/services/book.service';
 import { addCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -17,6 +18,7 @@ import { getBookAuthorName, getBookPriceInfo, getBookTitle } from '@/utils/book-
 import { addGuestCart, markFreeDeliveryBook, saveCartPriceOverride } from '@/utils/cartStorage';
 import { formatPriceNumber } from '@/utils/currency';
 import { getBookImageUrl } from '@/utils/image';
+import { getPublicBookSlug } from '@/utils/slug';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { BookOpen, Eye, Heart, ShoppingCart, Star } from 'lucide-react';
@@ -26,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 export type { Book } from '@/types/book';
 
 export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = false }: BookCardProps) => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const router = useRouter();
@@ -50,7 +53,7 @@ export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = 
 
         if (isBookInCart) {
             if (freeDeliveryEligible) markFreeDeliveryBook(book._id);
-            router.push('/cart');
+            router.push(localePath('/cart'));
             return;
         }
 
@@ -103,9 +106,10 @@ export const BookCard = ({ book, onWishlistChange, slug, freeDeliveryEligible = 
         toggleFavorite();
     };
 
-    const bookHref = `/book/${slug || book.slug || book._id}`;
+    const publicSlug = getPublicBookSlug(slug || book.slug) || book._id;
+    const bookHref = localePath(`/book/${publicSlug}`);
     const prefetchBook = () => {
-        const bookSlug = slug || book.slug || book._id;
+        const bookSlug = publicSlug;
 
         queryClient.prefetchQuery({
             queryKey: ['book', bookSlug],

@@ -1,20 +1,25 @@
-import { absoluteImageUrl, getLocalizedText, siteUrl } from '@/lib/seo';
+import { getLocalizedPath } from '@/lib/i18n-routing';
+import { absoluteImageUrl, absoluteUrl, getLocalizedText, siteUrl } from '@/lib/seo';
 import type { Book } from '@/types/book';
 import type { NewsItems } from '@/types/news';
 import { getBookAuthorName } from '@/utils/book-formatters';
 import { getBookImageUrl } from '@/utils/image';
+import { getPublicBookSlug } from '@/utils/slug';
 
 type NewsWithContent = NewsItems & {
     content?: NewsItems['description'];
     updatedAt?: string;
 };
 
-export function BookStructuredData({ book }: { book: Book }) {
+export function BookStructuredData({ book, locale = 'uz' }: { book: Book; locale?: string }) {
     const title = getLocalizedText(book.title, 'Kitob');
     const description = getLocalizedText(book.description);
     const author = getBookAuthorName(book) || 'Book.uz';
 
-    const bookUrl = `${siteUrl}/book/${encodeURIComponent(book.slug || book._id)}`;
+    const publicSlug = getPublicBookSlug(book.slug) || book._id;
+    const bookUrl = absoluteUrl(getLocalizedPath(locale, `/book/${encodeURIComponent(publicSlug)}`));
+    const homeUrl = absoluteUrl(getLocalizedPath(locale, '/'));
+    const catalogUrl = absoluteUrl(getLocalizedPath(locale, '/catalog'));
     const ratingValue = Number(book.ratingAvg || book.rating);
     const ratingCount = Number(book.ratingCount || book.reviewsCount);
     const price = Number(book.discountPrice || book.price);
@@ -79,8 +84,8 @@ export function BookStructuredData({ book }: { book: Book }) {
             {
                 '@type': 'BreadcrumbList',
                 itemListElement: [
-                    { '@type': 'ListItem', position: 1, name: 'Bosh sahifa', item: siteUrl },
-                    { '@type': 'ListItem', position: 2, name: 'Kitoblar', item: `${siteUrl}/catalog` },
+                    { '@type': 'ListItem', position: 1, name: 'Bosh sahifa', item: homeUrl },
+                    { '@type': 'ListItem', position: 2, name: 'Kitoblar', item: catalogUrl },
                     { '@type': 'ListItem', position: 3, name: title, item: bookUrl }
                 ]
             }
@@ -97,11 +102,13 @@ export function BookStructuredData({ book }: { book: Book }) {
     );
 }
 
-export function NewsStructuredData({ news }: { news: NewsWithContent }) {
+export function NewsStructuredData({ news, locale = 'uz' }: { news: NewsWithContent; locale?: string }) {
     const title = getLocalizedText(news.title, 'Yangilik');
     const description = getLocalizedText(news.excerpt) || getLocalizedText(news.description);
 
-    const newsUrl = `${siteUrl}/news/${encodeURIComponent(news.slug)}`;
+    const newsUrl = absoluteUrl(getLocalizedPath(locale, `/news/${encodeURIComponent(news.slug)}`));
+    const homeUrl = absoluteUrl(getLocalizedPath(locale, '/'));
+    const newsListUrl = absoluteUrl(getLocalizedPath(locale, '/news'));
     const structuredData = {
         '@context': 'https://schema.org',
         '@graph': [
@@ -132,8 +139,8 @@ export function NewsStructuredData({ news }: { news: NewsWithContent }) {
             {
                 '@type': 'BreadcrumbList',
                 itemListElement: [
-                    { '@type': 'ListItem', position: 1, name: 'Bosh sahifa', item: siteUrl },
-                    { '@type': 'ListItem', position: 2, name: 'Yangiliklar', item: `${siteUrl}/news` },
+                    { '@type': 'ListItem', position: 1, name: 'Bosh sahifa', item: homeUrl },
+                    { '@type': 'ListItem', position: 2, name: 'Yangiliklar', item: newsListUrl },
                     { '@type': 'ListItem', position: 3, name: title, item: newsUrl }
                 ]
             }

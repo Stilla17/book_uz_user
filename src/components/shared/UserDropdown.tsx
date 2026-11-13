@@ -11,6 +11,7 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import type { User as UserType } from '@/types';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { getImageUrl } from '@/utils/image';
 
 import { Library, LogOut, Settings, ShoppingCart, UserCircle } from 'lucide-react';
@@ -25,6 +26,7 @@ type UserDropdownProps = {
 };
 
 const UserDropdown = ({ user, onLogout, initials, firstName, isDark }: UserDropdownProps) => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
     const avatarUrl = getImageUrl(user.avatar);
 
@@ -67,7 +69,7 @@ const UserDropdown = ({ user, onLogout, initials, firstName, isDark }: UserDropd
                 <DropdownMenuItem
                     asChild
                     className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                    <Link href='/profile?tab=settings' className='flex items-center gap-2 py-2'>
+                    <Link href={localePath('/profile?tab=settings')} className='flex items-center gap-2 py-2'>
                         <UserCircle size={18} className='text-[#005CB9] dark:text-blue-400' />
                         <span>{t('userMenu.profile')}</span>
                     </Link>
@@ -76,7 +78,7 @@ const UserDropdown = ({ user, onLogout, initials, firstName, isDark }: UserDropd
                 <DropdownMenuItem
                     asChild
                     className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                    <Link href='/profile?tab=wishlist' className='flex items-center gap-2 py-2'>
+                    <Link href={localePath('/profile?tab=wishlist')} className='flex items-center gap-2 py-2'>
                         <Library size={18} className='text-[#005CB9] dark:text-blue-400' />
                         <span>{t('userMenu.myBooks')}</span>
                     </Link>
@@ -85,7 +87,7 @@ const UserDropdown = ({ user, onLogout, initials, firstName, isDark }: UserDropd
                 <DropdownMenuItem
                     asChild
                     className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                    <Link href='/profile?tab=orders' className='flex items-center gap-2 py-2'>
+                    <Link href={localePath('/profile?tab=orders')} className='flex items-center gap-2 py-2'>
                         <ShoppingCart size={18} className='text-[#005CB9] dark:text-blue-400' />
                         <span>{t('userMenu.orders')}</span>
                     </Link>
@@ -94,7 +96,7 @@ const UserDropdown = ({ user, onLogout, initials, firstName, isDark }: UserDropd
                 <DropdownMenuItem
                     asChild
                     className={`cursor-pointer rounded-xl ${isDark ? 'text-white hover:bg-slate-700' : 'text-gray-900 hover:bg-gray-50'}`}>
-                    <Link href='/profile?tab=settings' className='flex items-center gap-2 py-2'>
+                    <Link href={localePath('/profile?tab=settings')} className='flex items-center gap-2 py-2'>
                         <Settings size={18} className={isDark ? 'text-slate-400' : 'text-slate-500'} />
                         <span>{t('userMenu.settings')}</span>
                     </Link>

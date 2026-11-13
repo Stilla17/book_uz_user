@@ -2,6 +2,8 @@ import React from 'react';
 
 import Link from 'next/link';
 
+import { useLocalePath } from '@/hooks/useLocalePath';
+
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +18,7 @@ interface BreadcrumbProps {
 }
 
 const BreadCrumb = ({ items }: BreadcrumbProps) => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
 
     return (
@@ -23,7 +26,7 @@ const BreadCrumb = ({ items }: BreadcrumbProps) => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className='mb-6 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400'>
-            <Link href='/' className='hover:text-blue-600 dark:hover:text-blue-400'>
+            <Link href={localePath('/')} className='hover:text-blue-600 dark:hover:text-blue-400'>
                 {t('breadcrumb.home')}
             </Link>
 
@@ -37,7 +40,7 @@ const BreadCrumb = ({ items }: BreadcrumbProps) => {
                             <span className='truncate font-medium text-gray-900 dark:text-white'>{item.label}</span>
                         ) : (
                             <Link
-                                href={item.path}
+                                href={localePath(item.path)}
                                 className='whitespace-nowrap hover:text-blue-600 dark:hover:text-blue-400'>
                                 {item.label}
                             </Link>

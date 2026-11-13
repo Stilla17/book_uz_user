@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { getCatalogCategoryHref } from '@/lib/catalog-links';
 import { cn } from '@/lib/utils';
 import type { Category } from '@/types/category.types';
@@ -18,6 +19,7 @@ export const CategorySection = ({
     limit = 8,
     showAllLink = true
 }: CategorySectionProps) => {
+    const localePath = useLocalePath();
     const reduceMotion = useReducedMotion();
     const { data: categoriesData = [], isLoading: loading } = usePublicCategoriesQuery();
 
@@ -103,7 +105,7 @@ export const CategorySection = ({
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5 }}>
                             <Link
-                                href='/catalog'
+                                href={localePath('/catalog')}
                                 className='group hidden cursor-pointer items-center gap-2 text-sm font-semibold text-[#00a0e3] transition-colors hover:text-[#ef7f1a] md:flex dark:text-blue-300 dark:hover:text-orange-400'>
                                 {allText}{' '}
                                 <ChevronRight size={18} className='transition-transform group-hover:translate-x-1' />
@@ -256,7 +258,7 @@ export const CategorySection = ({
                         transition={{ duration: 0.5, delay: 0.6 }}
                         className='mt-8 flex justify-center md:hidden'>
                         <Link
-                            href='/catalog'
+                            href={localePath('/catalog')}
                             className='inline-flex transform items-center gap-2 rounded-full bg-gradient-to-r from-[#00a0e3] to-[#ef7f1a] px-6 py-3 font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl dark:from-[#00a0e3] dark:to-[#ef7f1a]'>
                             {viewAllText}
                             <ChevronRight size={18} />

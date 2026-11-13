@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import EntityImage from '@/components/shared/EntityImage';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { useTopAuthorsQuery } from '@/hooks/queries/useAuthorQueries';
 
 import { BookOpenText } from 'lucide-react';
@@ -26,6 +27,7 @@ const TOP_AUTHORS_LIMIT = 20;
 const getAuthorBooksCount = (author: AuthorItem) => author.booksCount ?? author.bookCount ?? 0;
 
 const Authors = () => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
     const { data, isLoading } = useTopAuthorsQuery(TOP_AUTHORS_LIMIT);
 
@@ -73,7 +75,7 @@ const Authors = () => {
                         return (
                             <SwiperSlide key={authorItem._id}>
                                 <Link
-                                    href={`/catalog?author=${encodeURIComponent(authorItem._id)}`}
+                                    href={localePath(`/catalog?author=${encodeURIComponent(authorItem._id)}`)}
                                     className='flex h-26.5 items-center overflow-hidden rounded-xl bg-white transition hover:-translate-y-1 hover:shadow-sm dark:bg-slate-900'>
                                     <EntityImage
                                         src={authorItem.image}

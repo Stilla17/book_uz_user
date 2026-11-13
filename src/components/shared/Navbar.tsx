@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/compon
 import { Input } from '@/components/ui/input';
 import { usePublicCategoriesQuery } from '@/hooks/queries/usePublicCategoriesQuery';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { getCatalogCategoryHref, getCatalogSubgenreHref } from '@/lib/catalog-links';
 import { getLocalizedCategoryName, getLocalizedTitle, getUserFirstName, getUserInitials } from '@/lib/navbar-utils';
@@ -33,6 +34,7 @@ import { useTranslation } from 'react-i18next';
 
 // Kategoriya interfeysi
 export const Navbar = () => {
+    const localePath = useLocalePath();
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
     const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
     const [cartCount, setCartCount] = useState(0);
@@ -47,7 +49,7 @@ export const Navbar = () => {
 
     const { t, i18n } = useTranslation();
     const { data: categories = [] } = usePublicCategoriesQuery();
-    const myBooksHref = '/my-books';
+    const myBooksHref = localePath('/my-books');
     const activeCategory = categories.find((category) => category._id === activeCategoryId) ?? categories[0];
     const activeSubgenres = activeCategory?.subgenres?.length
         ? activeCategory.subgenres
@@ -116,7 +118,7 @@ export const Navbar = () => {
         setWishlistCount(0);
         dispatch(setCart([]));
         dispatch(setWishlist([]));
-        router.push('/');
+        router.push(localePath('/'));
     };
 
     const submitSearch = (event?: FormEvent<HTMLFormElement>) => {
@@ -126,7 +128,7 @@ export const Navbar = () => {
         if (!query) return;
 
         setShowSearchDropdown(false);
-        router.push(`/catalog?search=${encodeURIComponent(query)}`);
+        router.push(localePath(`/catalog?search=${encodeURIComponent(query)}`));
     };
 
     return (
@@ -175,11 +177,11 @@ export const Navbar = () => {
                     </form>
 
                     {/* LOGO */}
-                    <Link href='/' className='group hidden items-center gap-2 sm:flex'>
+                    <Link href={localePath('/')} className='group hidden items-center gap-2 sm:flex'>
                         <Image src='/images/Logo.png' alt='Logo' width={80} height={80} />
                     </Link>
 
-                    <Link href='/' className='group flex items-center gap-2 sm:hidden'>
+                    <Link href={localePath('/')} className='group flex items-center gap-2 sm:hidden'>
                         <Image src='/images/Logo.png' alt='Logo' width={58} height={58} />
                     </Link>
                 </div>
@@ -215,7 +217,7 @@ export const Navbar = () => {
                                             {t('catalog')}
                                         </h3>
                                         <Link
-                                            href='/catalog'
+                                            href={localePath('/catalog')}
                                             onClick={() => setIsCatalogOpen(false)}
                                             className='flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-[#00a0e3] transition-colors hover:bg-[#00a0e3]/10 hover:text-[#FF8A00] dark:text-blue-400 dark:hover:bg-blue-400/10 dark:hover:text-orange-400'>
                                             {t('allView')}
@@ -234,7 +236,7 @@ export const Navbar = () => {
                                                 return (
                                                     <Link
                                                         key={category._id}
-                                                        href={getCatalogCategoryHref(category)}
+                                                        href={localePath(getCatalogCategoryHref(category))}
                                                         onMouseEnter={() => setActiveCategoryId(category._id)}
                                                         onFocus={() => setActiveCategoryId(category._id)}
                                                         onClick={() => setIsCatalogOpen(false)}
@@ -261,7 +263,9 @@ export const Navbar = () => {
                                                     <div className='mb-4 flex items-start justify-between gap-4'>
                                                         <div className='min-w-0'>
                                                             <Link
-                                                                href={getCatalogCategoryHref(activeCategory)}
+                                                                href={localePath(
+                                                                    getCatalogCategoryHref(activeCategory)
+                                                                )}
                                                                 onClick={() => setIsCatalogOpen(false)}
                                                                 className={`block text-xl leading-tight font-black ${getTextColor()} transition-colors hover:text-[#f07e1a] dark:hover:text-orange-400`}>
                                                                 {getLocalizedCategoryName(
@@ -282,7 +286,9 @@ export const Navbar = () => {
                                                             {activeSubgenres.map((sub, index) => (
                                                                 <Link
                                                                     key={sub._id ?? sub.slug ?? index}
-                                                                    href={getCatalogSubgenreHref(activeCategory, sub)}
+                                                                    href={localePath(
+                                                                        getCatalogSubgenreHref(activeCategory, sub)
+                                                                    )}
                                                                     onClick={() => setIsCatalogOpen(false)}
                                                                     className='group rounded-xl border border-slate-200 bg-white p-3 transition-all hover:-translate-y-0.5 hover:border-[#00a0e3]/30 hover:bg-[#00a0e3]/5 hover:shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:hover:border-blue-400/30 dark:hover:bg-blue-400/10'>
                                                                     <span className='block text-sm leading-snug font-black text-slate-800 group-hover:text-[#f07e1a] dark:text-slate-100 dark:group-hover:text-orange-400'>
@@ -341,7 +347,7 @@ export const Navbar = () => {
                                 {cartDisplayCount}
                             </span>
                         )}
-                        <NavIcon icon={<ShoppingCart size={22} />} label={t('cart')} href='/cart' />
+                        <NavIcon icon={<ShoppingCart size={22} />} label={t('cart')} href={localePath('/cart')} />
                     </div>
 
                     <div className='relative'>

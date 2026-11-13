@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 
+import { getLocalizedPath, isSupportedLocale, SUPPORTED_LOCALES } from '@/lib/i18n-routing';
 import type { Book } from '@/types/book';
 import type { NewsItems } from '@/types/news';
 import { type ImageValue, getBookImageUrl, getImageUrl } from '@/utils/image';
+import { getBookSlugSearchKeywords, getPublicBookSlug } from '@/utils/slug';
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://book.uz';
 
@@ -80,7 +82,8 @@ export const createPageMetadata = ({
     image = defaultOgImage,
     type = 'website',
     keywords = defaultKeywords,
-    noIndex = false
+    noIndex = false,
+    locale = 'uz'
 }: {
     title: string;
     description?: string;
@@ -89,8 +92,11 @@ export const createPageMetadata = ({
     type?: 'website' | 'article' | 'book';
     keywords?: string[];
     noIndex?: boolean;
+    locale?: string;
 }): Metadata => {
-    const url = absoluteUrl(path);
+    const currentLocale = isSupportedLocale(locale) ? locale : 'uz';
+    const localizedPath = getLocalizedPath(currentLocale, path);
+    const url = absoluteUrl(localizedPath);
     const imageUrl = absoluteImageUrl(image);
     const safeTitle = cleanSeoText(title, 65);
     const safeDescription = cleanSeoText(description);
@@ -100,7 +106,13 @@ export const createPageMetadata = ({
         description: safeDescription,
         keywords,
         alternates: {
-            canonical: url
+            canonical: url,
+            languages: Object.fromEntries(
+                SUPPORTED_LOCALES.map((supportedLocale) => [
+                    supportedLocale,
+                    absoluteUrl(getLocalizedPath(supportedLocale, path))
+                ])
+            )
         },
         robots: noIndex
             ? {
@@ -124,7 +136,7 @@ export const createPageMetadata = ({
             url,
             siteName,
             type: type === 'article' ? 'article' : 'website',
-            locale: 'uz_UZ',
+            locale: currentLocale === 'ru' ? 'ru_UZ' : currentLocale === 'en' ? 'en_US' : 'uz_UZ',
             alternateLocale: ['ru_UZ', 'en_US'],
             images: [
                 {
@@ -162,12 +174,47 @@ export const fetchSeoData = async <T>(path: string) => {
     }
 };
 
-export const createBookMetadata = (book: Book | null, slug: string): Metadata => {
+export const fetchBookSeoData = async (slug: string) => {
+    const exactBook = await fetchSeoData<Book>(`/products/${encodeURIComponent(slug)}`);
+    if (exactBook || /^[0-9a-f]{24}$/i.test(slug)) return exactBook;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) return null;
+
+    try {
+        for (const keyword of getBookSlugSearchKeywords(slug)) {
+            const searchParams = new URLSearchParams({ keyword, page: '1', limit: '100' });
+            const response = await fetch(`${apiUrl}/products?${searchParams.toString()}`, {
+                next: { revalidate: 60 * 30 }
+            });
+
+            if (!response.ok) continue;
+
+            const payload = (await response.json()) as ApiResponse<{
+                products?: Book[];
+                items?: Book[];
+                docs?: Book[];
+            }>;
+            const data = payload.data;
+            const products = data?.products || data?.items || data?.docs || [];
+            const legacyBook = products.find((product) => getPublicBookSlug(product.slug) === slug);
+
+            if (legacyBook) return legacyBook;
+        }
+
+        return null;
+    } catch {
+        return null;
+    }
+};
+
+export const createBookMetadata = (book: Book | null, slug: string, locale = 'uz'): Metadata => {
     if (!book) {
         return createPageMetadata({
             title: 'Kitob topilmadi | Book.uz',
             description: 'Book.uz katalogida bu kitob topilmadi.',
             path: `/book/${slug}`,
+            locale,
             noIndex: true
         });
     }
@@ -180,19 +227,21 @@ export const createBookMetadata = (book: Book | null, slug: string): Metadata =>
     return createPageMetadata({
         title: `${title} | Book.uz`,
         description,
-        path: `/book/${book.slug || slug}`,
+        path: `/book/${getPublicBookSlug(book.slug) || slug}`,
+        locale,
         image: getBookImageUrl(book),
         type: 'book',
         keywords: [...defaultKeywords, title, ...(book.tags || book.tegs || [])]
     });
 };
 
-export const createNewsMetadata = (news: NewsItems | null, slug: string): Metadata => {
+export const createNewsMetadata = (news: NewsItems | null, slug: string, locale = 'uz'): Metadata => {
     if (!news) {
         return createPageMetadata({
             title: 'Yangilik topilmadi | Book.uz',
             description: 'Book.uz yangiliklari orasida bu maqola topilmadi.',
             path: `/news/${slug}`,
+            locale,
             noIndex: true
         });
     }
@@ -205,6 +254,7 @@ export const createNewsMetadata = (news: NewsItems | null, slug: string): Metada
         title: `${title} | Book.uz`,
         description,
         path: `/news/${news.slug || slug}`,
+        locale,
         image: absoluteImageUrl(news.image),
         type: 'article',
         keywords: [...defaultKeywords, title, 'yangiliklar']

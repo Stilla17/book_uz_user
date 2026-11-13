@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FREE_DELIVERY_MIN_TOTAL } from '@/helpers/checkout';
 import { calculatePromoDiscount } from '@/helpers/promoDiscount';
 import { useDeliverySettingsQuery, usePromosQuery } from '@/hooks/queries/useCheckoutQueries';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import type { CartItem } from '@/store/features/cartSlice';
 import { clearPromo, setPromo } from '@/store/features/checkoutSlice';
 import { useAppDispatch } from '@/store/hooks';
@@ -28,6 +29,7 @@ interface PromoForm {
 }
 
 const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
     const formatCartPrice = (value?: number) => formatPrice(value, t('bookCard.currency'));
     const { register, handleSubmit } = useForm<PromoForm>();
@@ -130,7 +132,7 @@ const AsideCart = ({ cartItems, totalPrice, totalQuantity }: AsideCartProps) => 
                 </div>
 
                 <Button className='mt-6 h-14 w-full rounded-xl bg-[#ef7f1a] text-base font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-[#d96f12] dark:shadow-none'>
-                    <Link href='/checkout' className='flex items-center justify-center gap-2'>
+                    <Link href={localePath('/checkout')} className='flex items-center justify-center gap-2'>
                         <CreditCard size={18} />
                         {t('cartPage.checkout')}
                     </Link>

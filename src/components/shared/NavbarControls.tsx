@@ -2,8 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { usePathname, useRouter } from 'next/navigation';
+
 import { useTheme } from '@/context/ThemeContext';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
+import { SUPPORTED_LOCALES } from '@/lib/i18n-routing';
 
 import { LANGUAGE_STORAGE_KEY } from '../../../i18n';
 import { Button } from '../ui/button';
@@ -37,6 +40,8 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
     const [lang, setLang] = useState<Lang>('uz');
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const router = useRouter();
+    const pathname = usePathname();
 
     const languages = useMemo(
         () => [
@@ -51,11 +56,14 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
     const currentLang = languages.find((item) => item.key === lang) || languages[0];
 
     useEffect(() => {
-        const savedLanguage = normalizeLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY) || undefined);
+        const localeFromPath = pathname.split('/').filter(Boolean)[0];
+        const urlLanguage = SUPPORTED_LOCALES.includes(localeFromPath as Lang)
+            ? (localeFromPath as Lang)
+            : normalizeLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY) || undefined);
 
-        setLang(savedLanguage);
+        setLang(urlLanguage);
         setMounted(true);
-    }, [i18n]);
+    }, [pathname]);
 
     useEffect(() => {
         if (!mounted) return;
@@ -68,6 +76,21 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
     }, [lang, i18n, mounted]);
 
     const isMobile = variant === 'mobile';
+
+    const changeLanguage = (newLang: Lang) => {
+        const segments = pathname.split('/').filter(Boolean);
+
+        if (SUPPORTED_LOCALES.includes(segments[0] as Lang)) {
+            segments[0] = newLang;
+        } else {
+            segments.unshift(newLang);
+        }
+
+        const nextPath = `/${segments.join('/')}${window.location.search}`;
+
+        setLang(newLang);
+        router.replace(nextPath);
+    };
 
     return (
         <div className={isMobile ? 'grid grid-cols-2 gap-3' : 'flex items-center gap-3 md:gap-5'}>
@@ -108,8 +131,8 @@ const NavbarControls = ({ variant = 'header', onLanguageSelect }: NavbarControls
                         <button
                             key={langOption.key}
                             onClick={() => {
-                                setLang(langOption.key);
                                 setIsLanguageMenuOpen(false);
+                                changeLanguage(langOption.key);
                                 onLanguageSelect?.();
                             }}
                             className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${

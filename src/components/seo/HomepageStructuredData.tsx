@@ -1,6 +1,7 @@
-import { siteUrl } from '@/lib/seo';
+import { getLocalizedPath } from '@/lib/i18n-routing';
+import { absoluteUrl, siteUrl } from '@/lib/seo';
 
-const structuredData = {
+const createStructuredData = (locale: string) => ({
     '@context': 'https://schema.org',
     '@graph': [
         {
@@ -20,7 +21,7 @@ const structuredData = {
             email: 'support@book.uz',
             potentialAction: {
                 '@type': 'SearchAction',
-                target: `${siteUrl}/catalog?keyword={search_term_string}`,
+                target: `${absoluteUrl(getLocalizedPath(locale, '/catalog'))}?keyword={search_term_string}`,
                 'query-input': 'required name=search_term_string'
             },
             sameAs: [
@@ -61,17 +62,17 @@ const structuredData = {
             inLanguage: 'uz',
             potentialAction: {
                 '@type': 'SearchAction',
-                target: `${siteUrl}/catalog?keyword={search_term_string}`,
+                target: `${absoluteUrl(getLocalizedPath(locale, '/catalog'))}?keyword={search_term_string}`,
                 'query-input': 'required name=search_term_string'
             },
             publisher: { '@id': `${siteUrl}/#organization` }
         }
     ]
-};
+});
 
-const serializedStructuredData = JSON.stringify(structuredData).replace(/</g, '\\u003c');
+export default function HomepageStructuredData({ locale = 'uz' }: { locale?: string }) {
+    const serializedStructuredData = JSON.stringify(createStructuredData(locale)).replace(/</g, '\\u003c');
 
-export default function HomepageStructuredData() {
     return (
         <script
             type='application/ld+json'

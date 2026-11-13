@@ -8,16 +8,19 @@ import { useRouter } from 'next/navigation';
 import { BookCover } from '@/components/shared/BookCover';
 import { useSearchSuggestionsQuery } from '@/hooks/queries/useSearchSuggestionsQuery';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { getCatalogCategoryHref } from '@/lib/catalog-links';
 import type { SearchDropdownProps, SearchProduct } from '@/types/search.types';
 import { getText } from '@/utils/book-formatters';
 import { formatPrice } from '@/utils/currency';
 import { getBookImageUrl } from '@/utils/image';
+import { getPublicBookSlug } from '@/utils/slug';
 
 import { BookOpen, ChevronRight, Grid3x3, Loader2, Search, User, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchDropdownProps) => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
     const router = useRouter();
     const [showResults, setShowResults] = useState(false);
@@ -46,7 +49,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
 
     const handleSearch = () => {
         if (searchQuery.trim()) {
-            router.push(`/catalog?search=${encodeURIComponent(searchQuery.trim())}`);
+            router.push(localePath(`/catalog?search=${encodeURIComponent(searchQuery.trim())}`));
             setShowResults(false);
             if (onClose) onClose();
         }
@@ -91,7 +94,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                 {results!.products.map((product) => (
                                     <Link
                                         key={product._id}
-                                        href={`/book/${product.slug || product._id}`}
+                                        href={localePath(`/book/${getPublicBookSlug(product.slug) || product._id}`)}
                                         onClick={handleItemClick}
                                         className='group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50'>
                                         <div className='relative h-14 w-10 flex-shrink-0 overflow-hidden rounded-lg'>
@@ -128,7 +131,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                 {results!.categories.map((category) => (
                                     <Link
                                         key={category._id}
-                                        href={getCatalogCategoryHref(category)}
+                                        href={localePath(getCatalogCategoryHref(category))}
                                         onClick={handleItemClick}
                                         className='group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50'>
                                         <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#005CB9]/10 to-[#FF8A00]/10'>
@@ -155,7 +158,7 @@ export const SearchDropdown = ({ searchQuery, setSearchQuery, onClose }: SearchD
                                 {results!.authors.map((author) => (
                                     <Link
                                         key={author._id}
-                                        href={`/catalog?author=${encodeURIComponent(author._id)}`}
+                                        href={localePath(`/catalog?author=${encodeURIComponent(author._id)}`)}
                                         onClick={handleItemClick}
                                         className='group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50'>
                                         <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#005CB9]/10 to-[#FF8A00]/10'>

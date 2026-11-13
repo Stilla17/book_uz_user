@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { mainNav } from '@/data/navMenu';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { useAppSelector } from '@/store/hooks';
 
 import { motion } from 'framer-motion';
@@ -10,6 +11,7 @@ import { ArrowUp, Facebook, Instagram, Mail, Phone, Send, ShoppingCart, Youtube 
 import { useTranslation } from 'react-i18next';
 
 export const Footer = () => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
     const currentYear = new Date().getFullYear();
     const cartCount = useAppSelector((state) => state.cart.items.length);
@@ -64,7 +66,7 @@ export const Footer = () => {
                 <div className='mb-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-12'>
                     {/* Brand - colSpan 4 */}
                     <div className='space-y-4 lg:col-span-4'>
-                        <Link href='/' className='group inline-flex items-center gap-2'>
+                        <Link href={localePath('/')} className='group inline-flex items-center gap-2'>
                             <div className='grid h-15 w-15 place-items-center rounded-xl bg-gradient-to-r text-lg font-black text-white'>
                                 <img src='/images/Logo.svg' alt='' />
                             </div>
@@ -102,7 +104,7 @@ export const Footer = () => {
                             {mainNav.map((link) => (
                                 <li key={link.href}>
                                     <Link
-                                        href={link.href}
+                                        href={localePath(link.href)}
                                         className='text-xs text-slate-400 transition-colors hover:text-[#005CB9]'>
                                         {t(link.label)}
                                     </Link>
@@ -120,7 +122,7 @@ export const Footer = () => {
                             {footerLinks.support.map((link) => (
                                 <li key={link.name}>
                                     <Link
-                                        href={link.href}
+                                        href={localePath(link.href)}
                                         className='text-xs text-slate-400 transition-colors hover:text-[#FF8A00]'>
                                         {t(link.name)}
                                     </Link>
@@ -175,7 +177,7 @@ export const Footer = () => {
                     </button>
 
                     <Link
-                        href='/cart'
+                        href={localePath('/cart')}
                         aria-label={t('cart')}
                         className='fixed bottom-5 left-5 z-50 grid h-12 w-12 place-items-center rounded-full bg-[#ef7f1a] text-white shadow-[0_12px_30px_-12px_rgba(0,0,0,0.55)] transition-all hover:-translate-y-1 hover:shadow-lg md:hidden'>
                         <ShoppingCart size={21} />

@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 
+import { getLocalizedPath, SUPPORTED_LOCALES } from '@/lib/i18n-routing';
 import { siteUrl } from '@/lib/seo';
+import { getPublicBookSlug } from '@/utils/slug';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -25,48 +27,43 @@ type SlugItem = {
     createdAt?: string;
 };
 
-const staticRoutes: SitemapItem[] = [
+const staticRoutes: SitemapItem[] = SUPPORTED_LOCALES.flatMap((locale) => [
     {
-        url: siteUrl,
+        url: `${siteUrl}${getLocalizedPath(locale, '/')}`,
         changeFrequency: 'daily',
         priority: 1
     },
     {
-        url: `${siteUrl}/catalog`,
+        url: `${siteUrl}${getLocalizedPath(locale, '/catalog')}`,
         changeFrequency: 'daily',
         priority: 0.9
     },
     {
-        url: `${siteUrl}/news`,
+        url: `${siteUrl}${getLocalizedPath(locale, '/news')}`,
         changeFrequency: 'weekly',
         priority: 0.7
     },
     {
-        url: `${siteUrl}/authors`,
+        url: `${siteUrl}${getLocalizedPath(locale, '/authors')}`,
         changeFrequency: 'weekly',
         priority: 0.7
     },
     {
-        url: `${siteUrl}/publishers`,
+        url: `${siteUrl}${getLocalizedPath(locale, '/publishers')}`,
         changeFrequency: 'weekly',
         priority: 0.7
     },
     {
-        url: `${siteUrl}/about`,
+        url: `${siteUrl}${getLocalizedPath(locale, '/about')}`,
         changeFrequency: 'monthly',
         priority: 0.6
     },
     {
-        url: `${siteUrl}/service`,
+        url: `${siteUrl}${getLocalizedPath(locale, '/service')}`,
         changeFrequency: 'monthly',
         priority: 0.5
-    },
-    {
-        url: `${siteUrl}/promo`,
-        changeFrequency: 'weekly',
-        priority: 0.6
     }
-];
+]);
 
 const getItems = <T>(data: ApiListResponse<T>, key: 'products' | 'news' | 'publishers') => {
     if (Array.isArray(data?.data)) return data.data;
@@ -113,30 +110,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const bookRoutes: SitemapItem[] = books
         .filter((book) => Boolean(book.slug))
-        .map((book) => ({
-            url: `${siteUrl}/book/${encodeSlug(book.slug!)}`,
-            lastModified: getLastModified(book),
-            changeFrequency: 'weekly',
-            priority: 0.8
-        }));
+        .flatMap((book) =>
+            SUPPORTED_LOCALES.map((locale) => ({
+                url: `${siteUrl}${getLocalizedPath(locale, `/book/${encodeSlug(getPublicBookSlug(book.slug!))}`)}`,
+                lastModified: getLastModified(book),
+                changeFrequency: 'weekly' as const,
+                priority: 0.8
+            }))
+        );
 
     const newsRoutes: SitemapItem[] = news
         .filter((item) => Boolean(item.slug))
-        .map((item) => ({
-            url: `${siteUrl}/news/${encodeSlug(item.slug!)}`,
-            lastModified: getLastModified(item),
-            changeFrequency: 'monthly',
-            priority: 0.6
-        }));
+        .flatMap((item) =>
+            SUPPORTED_LOCALES.map((locale) => ({
+                url: `${siteUrl}${getLocalizedPath(locale, `/news/${encodeSlug(item.slug!)}`)}`,
+                lastModified: getLastModified(item),
+                changeFrequency: 'monthly' as const,
+                priority: 0.6
+            }))
+        );
 
     const publisherRoutes: SitemapItem[] = publishers
         .filter((publisher) => Boolean(publisher.slug))
-        .map((publisher) => ({
-            url: `${siteUrl}/publishers/${encodeSlug(publisher.slug!)}`,
-            lastModified: getLastModified(publisher),
-            changeFrequency: 'weekly',
-            priority: 0.7
-        }));
+        .flatMap((publisher) =>
+            SUPPORTED_LOCALES.map((locale) => ({
+                url: `${siteUrl}${getLocalizedPath(locale, `/publishers/${encodeSlug(publisher.slug!)}`)}`,
+                lastModified: getLastModified(publisher),
+                changeFrequency: 'weekly' as const,
+                priority: 0.7
+            }))
+        );
 
     return [...staticRoutes, ...bookRoutes, ...newsRoutes, ...publisherRoutes];
 }

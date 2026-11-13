@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { NewsItem, formatDate } from '@/helpers/newsSection';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { useNewsPreviewQuery } from '@/hooks/queries/useNewsQueries';
 import { getText } from '@/utils/book-formatters';
 import { getImageUrl } from '@/utils/image';
@@ -23,6 +24,7 @@ const NEWS_VIEWS_EVENT = 'news-views-change';
 const NEWS_PREVIEW_LIMIT = 8;
 
 export const NewsSection = () => {
+    const localePath = useLocalePath();
     const { t, i18n } = useTranslation();
     const [savedViews, setSavedViews] = useState<Record<string, number>>({});
     const { data: news = [], isLoading: loading } = useNewsPreviewQuery(NEWS_PREVIEW_LIMIT);
@@ -87,7 +89,7 @@ export const NewsSection = () => {
                     </div>
 
                     <Link
-                        href='/news'
+                        href={localePath('/news')}
                         className='group inline-flex items-center gap-2 rounded-full bg-[#ef7f1a]/15 px-6 py-3 text-sm font-bold text-[#ef7f1a] transition-all duration-300 dark:bg-[#5b3a2b] dark:text-[#ef7f1a]'>
                         {t('newsSection.viewAll')}
                         <ChevronRight
@@ -122,7 +124,7 @@ export const NewsSection = () => {
                         const title = getText(item.title, item.titleRu || item.titleEn || t('newsSection.fallbackTitle'));
                         const description = getText(item.excerpt, getText(item.description, ''));
                         const imageUrl = getImageUrl(item.image || item.imageUrl);
-                        const href = item.slug ? `/news/${item.slug}` : '/news';
+                        const href = localePath(item.slug ? `/news/${item.slug}` : '/news');
                         const date = formatDate(item.publishedAt || item.createdAt, language);
 
                         return (

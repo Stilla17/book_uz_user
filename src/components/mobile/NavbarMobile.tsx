@@ -9,6 +9,7 @@ import MobileAction from '@/components/shared/MobileAction';
 import NavbarControls from '@/components/shared/NavbarControls';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 
 import { BookOpen, Grid3x3, Menu, Phone, Search, ShoppingCart, User, UserCircle, X } from 'lucide-react';
@@ -21,10 +22,11 @@ type NavbarMobileProps = {
 };
 
 const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobileProps) => {
+    const localePath = useLocalePath();
     const [mobileOpen, setMobileOpen] = useState(false);
     const { getBgColor, getTextColor, getBorderColor } = useThemeStyles();
     const { t } = useTranslation();
-    const myBooksHref = '/my-books';
+    const myBooksHref = localePath('/my-books');
 
     return (
         <div>
@@ -50,7 +52,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                         <div
                             className={`flex min-h-16 items-center justify-between border-b px-4 py-3 sm:px-5 ${getBorderColor()}`}>
                             <Link
-                                href='/'
+                                href={localePath('/')}
                                 aria-label={t('mobileNav.home')}
                                 onClick={() => setMobileOpen(false)}
                                 className='inline-flex items-center'>
@@ -77,7 +79,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
 
                             <div className='grid grid-cols-2 gap-2.5 sm:gap-3'>
                                 <MobileAction
-                                    href='/cart'
+                                    href={localePath('/cart')}
                                     icon={<ShoppingCart size={18} />}
                                     label={t('cart')}
                                     badge={cartCount > 0 ? cartCount.toString() : undefined}
@@ -90,14 +92,14 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                     onClick={() => setMobileOpen(false)}
                                 />
                                 <MobileAction
-                                    href='/catalog'
+                                    href={localePath('/catalog')}
                                     icon={<Grid3x3 size={18} />}
                                     label={t('catalog')}
                                     onClick={() => setMobileOpen(false)}
                                 />
                                 {isAuthenticated ? (
                                     <MobileAction
-                                        href='/profile'
+                                        href={localePath('/profile')}
                                         icon={<UserCircle size={18} />}
                                         label={userFirstName}
                                         primary
@@ -119,7 +121,7 @@ const NavbarMobile = ({ cartCount, isAuthenticated, userFirstName }: NavbarMobil
                                 <div className='flex items-center justify-between'>
                                     <div className={`text-sm font-extrabold ${getTextColor()}`}>{t('catalog')}</div>
                                     <Link
-                                        href='/catalog'
+                                        href={localePath('/catalog')}
                                         onClick={() => setMobileOpen(false)}
                                         className={`text-xs font-bold text-[#005CB9] hover:underline dark:text-blue-400`}>
                                         {t('mobileNav.all')}

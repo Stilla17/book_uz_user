@@ -3,6 +3,7 @@
 import React, { useMemo, useRef } from 'react';
 
 import { getSectionConfig } from '@/helpers/bookSection';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { useBookSectionQuery } from '@/hooks/queries/useBookQueries';
 import type { Book } from '@/types/book';
 import type { BookSectionProps } from '@/types/section.types';
@@ -19,6 +20,7 @@ import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 export const BookSection = ({ title, books, type = 'default', viewAllLink = '/catalog' }: BookSectionProps) => {
+    const localePath = useLocalePath();
     const prevRef = useRef<HTMLButtonElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
 
@@ -65,7 +67,7 @@ export const BookSection = ({ title, books, type = 'default', viewAllLink = '/ca
                     </div>
 
                     <motion.a
-                        href={viewAllLink}
+                        href={localePath(viewAllLink)}
                         className={`group flex items-center rounded-full px-4 py-2 text-sm font-bold transition-all sm:px-5 sm:py-2.5 md:text-base ${config.bgColor} ${config.color} hover:shadow-md`}
                         whileHover={{ x: 5 }}
                         whileTap={{ scale: 0.95 }}>

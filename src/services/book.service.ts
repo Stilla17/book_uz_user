@@ -1,6 +1,7 @@
 // services/book.service.ts
 import { Book, Product } from '@/types';
 import { EbookAccess, EbookPurchaseResult } from '@/types/book';
+import { getBookSlugSearchKeywords, getPublicBookSlug } from '@/utils/slug';
 
 import { api } from './api';
 
@@ -118,12 +119,38 @@ export const bookService = {
 
     // Bitta kitobni olish
     async getBookById(id: string): Promise<Book | null> {
+        const fetchBook = async (identifier: string) => {
+            const response = await api.get(`/products/${encodeURIComponent(identifier)}`);
+            return (response.data.data || null) as Book | null;
+        };
+
         try {
-            const response = await api.get(`/products/${encodeURIComponent(id)}`);
-            return response.data.data || null;
-        } catch (error) {
-            console.error('Error fetching book:', error);
-            return null;
+            return await fetchBook(id);
+        } catch (initialError) {
+            if (/^[0-9a-f]{24}$/i.test(id)) {
+                console.error('Error fetching book:', initialError);
+                return null;
+            }
+
+            try {
+                let legacyBook: Product | undefined;
+
+                for (const keyword of getBookSlugSearchKeywords(id)) {
+                    const response = await api.get('/products', {
+                        params: { keyword, page: 1, limit: 100 }
+                    });
+                    const candidates = normalizeProductList(response.data?.data, 100).products;
+                    legacyBook = candidates.find((product) => getPublicBookSlug(product.slug) === id);
+                    if (legacyBook) break;
+                }
+
+                if (!legacyBook?.slug) return null;
+
+                return await fetchBook(legacyBook.slug);
+            } catch (fallbackError) {
+                console.error('Error fetching book:', fallbackError);
+                return null;
+            }
         }
     },
 

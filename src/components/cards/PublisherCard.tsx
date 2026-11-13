@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import EntityImage from '@/components/shared/EntityImage';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import type { PublisherItems } from '@/types';
 
 import { BookOpen, ChevronRight } from 'lucide-react';
@@ -12,12 +13,13 @@ type PublisherCardProps = {
 };
 
 const PublisherCard = ({ publisher, className = '' }: PublisherCardProps) => {
+    const localePath = useLocalePath();
     const { t } = useTranslation();
 
     return (
         <article className={className}>
             <Link
-                href={`/publishers/${publisher.slug ?? publisher._id}`}
+                href={localePath(`/publishers/${publisher.slug ?? publisher._id}`)}
                 className='group flex min-h-24 items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 hover:border-[#ef7f1a]/40 dark:border-slate-700 dark:bg-slate-900'>
                 <EntityImage
                     src={publisher.image}

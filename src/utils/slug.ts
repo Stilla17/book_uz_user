@@ -50,3 +50,17 @@ export const slugifyBookSlug = (value: string) =>
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/-{2,}/g, '-')
         .replace(/^-+|-+$/g, '');
+
+const LEGACY_BOOK_ID_SUFFIX = /-[0-9a-f]{24}$/i;
+
+export const getPublicBookSlug = (value?: string | null) =>
+    String(value || '')
+        .trim()
+        .replace(LEGACY_BOOK_ID_SUFFIX, '');
+
+export const getBookSlugSearchKeywords = (slug: string) => {
+    const tokens = slug.split('-').filter(Boolean);
+    const variants = [tokens.join(' '), tokens.slice(0, 3).join(' '), tokens.slice(0, 2).join(' '), tokens[0]];
+
+    return [...new Set(variants.filter(Boolean))];
+};

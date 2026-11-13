@@ -7,12 +7,14 @@ import Link from 'next/link';
 import { useBranchUserQuery } from '@/components/admin/hooks/queries/branch';
 import { BranchMap } from '@/components/map/Map';
 import { useBookCount } from '@/hooks/bookHooks/useBookCount';
+import { useLocalePath } from '@/hooks/useLocalePath';
 import { usePublishersCountQuery } from '@/hooks/queries/usePublisherQueries';
 
 import { Book, BookOpen, Building2, MapPin, Truck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export const AboutSection = () => {
+    const localePath = useLocalePath();
     const { t, i18n } = useTranslation();
     const [focusRequest, setFocusRequest] = useState<{ name: string; id: number } | null>(null);
     const { data: apiBranches } = useBranchUserQuery();
@@ -88,7 +90,7 @@ export const AboutSection = () => {
                         </div>
 
                         <button className='group relative mt-4 transform overflow-hidden rounded-full bg-[#ef7f1a] px-8 py-4 font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl'>
-                            <Link href={'/about'} className='relative z-10 flex items-center gap-2'>
+                            <Link href={localePath('/about')} className='relative z-10 flex items-center gap-2'>
                                 <BookOpen size={18} />
                                 {t('aboutSection.moreDetails')}
                             </Link>
